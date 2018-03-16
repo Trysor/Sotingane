@@ -2,7 +2,7 @@
 @import '_theme_vars';
 
 .search {
-	margin-top: 10px;
+	margin: 10px 0;
 }
 
 a.active {
@@ -24,9 +24,9 @@ h2.mat-subheader {
 
 .mat-subheader {
 	/*background: $headerBG;
-    /*border: $border;
-    border-style: solid none;*/
+	border: $border;
+	border-style: solid none;
+	box-shadow: $boxShadow, $boxShadow inset;*/
 	font-weight: bold;
 	margin: 0.8em 0;
-	/*box-shadow: $boxShadow, $boxShadow inset;*/
 }

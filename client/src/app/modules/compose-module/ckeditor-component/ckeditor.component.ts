@@ -6,7 +6,12 @@ import { CmsContent } from '@app/models';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic/build/ckeditor';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+//import Alignment from '@ckeditor/ckeditor5-alignment/src/alignment';
+//import Code from '@ckeditor/ckeditor5-basic-styles/src/code';
+
+//ClassicEditor.build.plugins.push(Alignment);
+//ClassicEditor.build.plugins.push(Code);
 
 @Component({
 	selector: 'ck-editor',
@@ -29,13 +34,20 @@ export class CKEditorComponent implements OnInit, OnDestroy {
 	}
 
 	private readonly _settings = {
+		removePlugins: ['CKFinderUploadAdapter', 'ImageUpload'],
+		toolbar: ['heading', 'bold', 'italic', 'link', 'bulletedList', // 'alignmentDropdown', 'code',
+			'numberedList', 'blockQuote', 'undo', 'redo'],
 		image: {
-			toolbar: ['imageTextAlternative', '|', 'imageStyleAlignLeft', 'imageStyleFull', 'imageStyleAlignRight'],
-			styles: ['imageStyleAlignLeft', 'imageStyleFull', 'imageStyleAlignRight']
+			toolbar: ['imageTextAlternative', '|', 'imageStyle:alignLeft', 'imageStyle:full', 'imageStyle:alignRight'],
+			styles: [
+				{ name: 'alignLeft', icon: 'left' },
+				{ name: 'full', icon: 'full' },
+				{ name: 'alignRight', icon: 'right' },
+			]
 		}
 	};
 
-	constructor(@Inject(DOCUMENT) private document: Document) { }
+	constructor( @Inject(DOCUMENT) private document: Document) { }
 
 
 	ngOnInit() {
@@ -63,7 +75,7 @@ export class CKEditorComponent implements OnInit, OnDestroy {
 			});
 
 			// Create editor event listener
-			this._editor.listenTo(this._editor.document, 'changesDone', (a, b) => {
+			this._editor.listenTo(this._editor.model.document, 'change', () => {
 				if (this._updateFromForm) { return; }
 
 				// Set control value
@@ -75,7 +87,7 @@ export class CKEditorComponent implements OnInit, OnDestroy {
 				if (!this._control.dirty) { this._control.markAsDirty(); }
 			});
 		}).catch(err => {
-
+			console.error(err);
 		});
 	}
 

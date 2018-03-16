@@ -4,16 +4,23 @@
 .searchBox {
 	width: 350px;
 	transition: width ease-in-out 0.5s;
+	background: $sideBG;
+	box-shadow: $boxShadow inset;
+	height: calc(#{$headerHeight} - 12px);
+	max-height: calc(#{$headerHeight} - 12px);
+	box-sizing: border-box;
 
-	&:not(.mobile) {
-		&.wide {
-			width: 550px;
-		}
+	&.altCol {
+		background: $background; // darken($sideBG, 99%)
+	}
+
+	&:not(.mobile).wide {
+		width: 550px;
 	}
 
 	&.mobile {
-		width: 80%;
-		max-width: 80%;
+		width: 90%;
+		max-width: 90%;
 		margin: 0 auto;
 	}
 
@@ -26,9 +33,8 @@
 			border-top: none;
 		}
 	}
-}
 
-
-.searchBox ::ng-deep .mat-input-underline {
-	display: none;
+	::ng-deep .mat-input-underline {
+		display: none;
+	}
 }

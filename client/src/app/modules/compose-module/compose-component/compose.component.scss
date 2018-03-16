@@ -26,6 +26,10 @@
 			}
 		}
 	}
+
+	::ng-deep .mat-tab-body {
+		min-height: 320px;
+	}
 }
 
 

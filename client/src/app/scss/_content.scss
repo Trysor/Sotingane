@@ -1,8 +1,7 @@
 @import '_theme_vars';
 
-
-.ck-editor__editable,
-.content {
+.wrapper .ck-content,
+.wrapper .content {
 	a, p {
 		word-wrap: break-word; // legacy name of overflow-wrap
 		overflow-wrap: break-word;

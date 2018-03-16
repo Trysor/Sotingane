@@ -18,7 +18,8 @@ $disabled: #686868;
 $contentBG: #232323;
 $materialBG: #303030;
 
-$border: 1px solid #000;
+$borderColor: #000;
+$border: 1px solid $borderColor;
 
 
 $activeRouteBackground: rgba($primary, 0.3); // rgba(255,255,255,0.10);

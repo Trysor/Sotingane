@@ -1,7 +1,7 @@
-<div class="search">
-	<search-component *ngIf="mobileService.isMobile() | async"></search-component>
+<div class="search" *ngIf="mobileService.isMobile() | async">
+	<search-component alternativeColor="true"></search-component>
 </div>
-<mat-nav-list dense>
+<mat-nav-list dense [style.touch-action]="'pan-y'">
 	<ng-container *ngIf="contentSubject | async as nav">
 		<a mat-list-item *ngFor="let navEntry of nav.rootContent; trackBy: trackBy"
 		   routerLink="/{{navEntry.route}}"

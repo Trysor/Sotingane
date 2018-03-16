@@ -5,64 +5,95 @@
 	box-sizing: border-box;
 	margin: 0;
 	overflow: hidden;
-
-	::ng-deep .ck-dropdown__panel,
-	::ng-deep .ck-editor__top .ck-toolbar {
-		background: $headerBG;
-		border: $border;
-	}
-
-	::ng-deep .ck-dropdown__panel .ck-list__item {
-		background: $headerBG;
-	}
+	display: block;
 
 	::ng-deep .ck-editor .ck-sticky-panel .ck-sticky-panel__content_sticky {
 		top: $headerHeight !important;
 	}
 
-	::ng-deep .ck-editor-toolbar {
-		.ck-button,
-		.ck-button.ck-disabled {
-			background: $materialBG !important;
-			color: $textColor !important;
-			border: none;
-
-			&:active,
-			&:hover {
-				background: $materialBG !important;
-				box-shadow: none !important;
-			}
-
-			&.ck-on {
-				background: $activeRouteBackground !important;
-			}
-		}
-
-		.ck-button.ck-disabled {
-			background: $background !important;
-		}
-	}
-	// entire box
-	::ng-deep .ck-editor {
-		background: $background;
-		box-shadow: $boxShadow;
-	}
-
 	::ng-deep .ck-editor__editable {
-		border: $border;
-		min-height: 200px;
-		padding-top: 0.8em;
-	}
-
-	::ng-deep .ck-list__item_active {
-		background-color: $activeRouteBackground;
-		/*color: #000;*/
+		min-height: 245px;
+		background: none;
+		border-color: $borderColor;
 	}
 }
 
-// Popup (outside of the .editor div)
-::ng-deep .ck-balloon-panel {
-	background: $contentBG;
-	color: $textColor;
-	border: $border;
+::ng-deep :root {
+	--ck-color-base-foreground: $headerBG;
+	--ck-color-base-background: $headerBG;
+	--ck-color-base-border: $borderColor;
+	--ck-color-base-action: $activeRouteBackground;
+	--ck-color-base-focus: $activeRouteBackground;
+	--ck-color-base-text: $textColor;
+	--ck-color-base-active: $activeRouteBackground;
+	--ck-color-base-active-focus: $activeRouteBackground;
+	--ck-color-focus-border: $borderColor;
+	--ck-color-focus-shadow: $background;
+	--ck-color-button-default-focus-background: $materialBG;
+	--ck-color-button-default-active-background: $materialBG;
+	--ck-color-button-default-active-shadow: $background;
+	--ck-color-button-default-disabled-background: transparent;
+	--ck-color-button-on-background: $background;
+	--ck-color-button-on-focus-background: $activeRouteBackground;
+	--ck-color-button-on-active-background: $activeRouteBackground;
+	--ck-color-button-on-active-shadow: $background;
+	--ck-color-button-on-disabled-background: $disabled;
+	--ck-color-button-action-focus-background: $materialBG;
+	--ck-color-button-action-active-background: $activeRouteBackground;
+	--ck-color-button-action-active-shadow: $background;
+	--ck-color-button-action-disabled-background: $disabled;
+	// block a
+	--ck-color-list-item-text-active: $textColor;
+	// block b
+	--ck-color-link-default: $primary;
+	--ck-color-link-selected-background: $activeRouteBackground;
+	// block c
+	--ck-color-widget-border-blurred: $borderColor;
+	--ck-color-focus-border: $primary;
+	--ck-color-widget-border-hover: $primary;
 }
+
+
+/*
+	block a
+
+	--ck-color-dropdown-panel-background: var(--ck-color-base-background);
+	--ck-color-dropdown-panel-border: var(--ck-color-base-border);
+	--ck-color-input-background: var(--ck-color-base-background);
+	--ck-color-input-border: #c7c7c7;
+	--ck-color-input-text: var(--ck-color-base-text);
+	--ck-color-input-disabled-background: #f2f2f2;
+	--ck-color-input-disabled-border: #c7c7c7;
+	--ck-color-input-disabled-text: #5c5c5c;
+	--ck-color-list-background: var(--ck-color-base-background);
+	--ck-color-list-item-background-hover: var(--ck-color-base-foreground);
+	--ck-color-list-item-background-active: var(--ck-color-base-active);
+	--ck-color-list-item-background-active-focus: var(--ck-color-base-active-focus);
+
+	block b
+
+	--ck-color-panel-background: var(--ck-color-base-background);
+	--ck-color-panel-border: var(--ck-color-base-border);
+	--ck-color-toolbar-background: var(--ck-color-base-foreground);
+	--ck-color-toolbar-border: var(--ck-color-base-border);
+	--ck-color-tooltip-background: var(--ck-color-base-text);
+	--ck-color-tooltip-text: var(--ck-color-base-background);
+	--ck-color-engine-placeholder-text: #c2c2c2;
+	--ck-color-upload-bar-background: #6cb5f9;
+	--ck-color-upload-infinite-background: rgba(0,0,0,.1);
+
+	block c
+
+	--ck-disabled-opacity: .5;
+	--ck-focus-outer-shadow: 0 0 3px var(--ck-color-focus-shadow);
+	--ck-focus-ring: 1px solid var(--ck-color-focus-border);
+	--ck-font-size-base: 13px;
+	--ck-line-height-base: 1.84615;
+	--ck-font-face: Helvetica, Arial, Tahoma, Verdana, Sans-Serif;
+	--ck-font-size-tiny: 0.7em;
+	--ck-font-size-small: 0.75em;
+	--ck-font-size-normal: 1em;
+	--ck-font-size-big: 1.4em;
+	--ck-font-size-large: 1.8em;
+	--ck-ui-component-min-height: 2.3em;
+*/

@@ -39,12 +39,4 @@
 			}
 		}
 	}
-
-	.search {
-		height: calc(#{$headerHeight} - 12px);
-		max-height: calc(#{$headerHeight} - 12px);
-		box-sizing: border-box;
-		background: $sideBG;
-		box-shadow: $boxShadow inset;
-	}
 }

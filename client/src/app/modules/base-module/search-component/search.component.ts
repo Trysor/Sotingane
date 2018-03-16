@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
 
 import { Router } from '@angular/router';
 import { FormGroup, FormBuilder } from '@angular/forms';
@@ -12,6 +12,7 @@ import { CMSService, MobileService } from '@app/services';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchComponent implements OnInit {
+	@Input() alternativeColor: boolean;
 	public form: FormGroup;
 
 	constructor(
