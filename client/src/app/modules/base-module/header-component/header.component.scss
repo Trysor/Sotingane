@@ -4,29 +4,34 @@
 
 // HEADER
 .topHeader {
-	background: $contentBG;
-	border-bottom: $border;
-	height: $headerHeight;
-	max-height: $headerHeight;
+	padding: 0 8px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 	box-sizing: border-box;
 	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100vw;
 	z-index: 1000;
+	height: $headerHeight;
+	max-height: $headerHeight;
+	background: $contentBG;
+	border-bottom: $border;
 	box-shadow: $boxShadow;
 
-	.wrapper {
-		height: $headerHeight;
-		max-height: $headerHeight;
-		padding: 0 8px;
+	.flex {
+		flex: 1 1 33%;
 		display: flex;
-		justify-content: space-between;
-		align-items: center;
+		&.center {
+			justify-content: center;
+		}
+		&.right {
+			justify-content: flex-end;
+		}
 	}
 
 	a.title {
-		text-align: center;
 		font-size: 1.5em;
 
 		.logo {

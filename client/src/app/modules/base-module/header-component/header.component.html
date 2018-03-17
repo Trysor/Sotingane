@@ -1,53 +1,58 @@
 <header class="topHeader" [ngClass]="{ 'fixed': (mobileService.isMobile() | async) }">
-	<div class="wrapper" [ngClass]="{ 'mobile': (mobileService.isMobile() | async) }">
 
-		<!-- Mobile navigation toggler -->
-		<button mat-icon-button *ngIf="mobileService.isMobile() | async" (click)="toggleLeft()"
+	<!-- Mobile navigation toggler -->
+	<div class="flex" mat-icon-button *ngIf="mobileService.isMobile() | async">
+		<button (click)="toggleLeft()"
 				class="navToggle" aria-label="Toggle navigation">
 			<mat-icon>menu</mat-icon>
 		</button>
-
-		<!-- header -->
-		<a routerLink="/" class="title"><mat-icon svgIcon="logo" ngClass="logo"></mat-icon>otingane</a>
-
-		<!-- Search box -->
-		<search-component *ngIf="!(mobileService.isMobile() | async)" class="search"></search-component>
-
-		<!-- Right side logic -->
-		<!-- IF you are logged in -->
-		<ng-container *ngIf="authService.getUser() | async as user; else headerlogin">
-			<ng-container [ngSwitch]="(mobileService.isMobile() | async)">
-				<!-- For MOBILE -->
-				<button mat-icon-button *ngSwitchCase="true" (click)="toggleRight()"
-						class="userToggle mobile" aria-label="Toggle user panel">
-					<mat-icon [color]="(authService.getUser() | async) ? 'primary' : ''">person</mat-icon>
-				</button>
-				<!-- For DESKTOP -->
-				<button mat-button *ngSwitchCase="false" [matMenuTriggerFor]="userPanel"
-						class="userToggle" aria-label="Show user menu">
-					<mat-icon color="primary">person</mat-icon> {{ user.username }}
-				</button>
-			</ng-container>
-		</ng-container>
-
-		<!-- If you are NOT logged in -->
-		<ng-template #headerlogin>
-			<ng-container [ngSwitch]="(mobileService.isMobile() | async)">
-				<!-- For MOBILE -->
-				<button mat-icon-button *ngSwitchCase="true" routerLink="/login" routerLinkActive="active" class="userToggle mobile">
-					<mat-icon>person</mat-icon>
-				</button>
-				<!-- For DESKTOP -->
-				<button mat-button *ngSwitchCase="false" routerLink="/login" routerLinkActive="active" class="userToggle">
-					<mat-icon>person</mat-icon> <ng-container *ngIf="!(mobileService.isMobile() | async)">Login</ng-container>
-				</button>
-			</ng-container>
-		</ng-template>
 	</div>
-	<!-- Menu for DESKTOP -->
-	<mat-menu #userPanel="matMenu" xPosition="before" yPosition="below" [overlapTrigger]="false">
-		<div class="user menu" *ngIf="!(mobileService.isMobile() | async)">
-			<control-panel-component style="menu"></control-panel-component>
+
+	<!-- Title -->
+	<div class="flex" [ngClass]="{ 'center': (mobileService.isMobile() | async) }">
+		<a routerLink="/" class="title"><mat-icon svgIcon="logo" ngClass="logo"></mat-icon>otingane</a>
+	</div>
+
+	<!-- Search box -->
+	<div class="flex center" *ngIf="!(mobileService.isMobile() | async)">
+		<search-component class="search"></search-component>
+	</div>
+
+	<!-- Right side logic -->
+	<!-- IF you are logged in -->
+	<ng-container *ngIf="authService.getUser() | async as user; else headerlogin">
+		<div class="flex right" [ngSwitch]="(mobileService.isMobile() | async)">
+			<!-- For MOBILE -->
+			<button mat-icon-button *ngSwitchCase="true" (click)="toggleRight()"
+					class="userToggle mobile" aria-label="Toggle user panel">
+				<mat-icon [color]="(authService.getUser() | async) ? 'primary' : ''">person</mat-icon>
+			</button>
+			<!-- For DESKTOP -->
+			<button mat-button *ngSwitchCase="false" [matMenuTriggerFor]="userPanel"
+					class="userToggle" aria-label="Show user menu">
+				<mat-icon color="primary">person</mat-icon> {{ user.username }}
+			</button>
 		</div>
-	</mat-menu>
+	</ng-container>
+
+	<!-- If you are NOT logged in -->
+	<ng-template #headerlogin>
+		<div class="flex right" [ngSwitch]="(mobileService.isMobile() | async)">
+			<!-- For MOBILE -->
+			<button mat-icon-button *ngSwitchCase="true" routerLink="/login" routerLinkActive="active" class="userToggle mobile">
+				<mat-icon>person</mat-icon>
+			</button>
+			<!-- For DESKTOP -->
+			<button mat-button *ngSwitchCase="false" routerLink="/login" routerLinkActive="active" class="userToggle">
+				<mat-icon>person</mat-icon> <ng-container *ngIf="!(mobileService.isMobile() | async)">Login</ng-container>
+			</button>
+		</div>
+	</ng-template>
 </header>
+
+<!-- Menu for DESKTOP -->
+<mat-menu #userPanel="matMenu" xPosition="before" yPosition="below" [overlapTrigger]="false">
+	<div class="user menu" *ngIf="!(mobileService.isMobile() | async)">
+		<control-panel-component style="menu"></control-panel-component>
+	</div>
+</mat-menu>
