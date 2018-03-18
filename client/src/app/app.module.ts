@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserModule } from '@angular/platform-browser';
 import { environment } from '@env';
 
 // Service Worker
@@ -24,7 +24,7 @@ import { BaseRoutingModule } from '@app/modules/base-module/base.routing-module'
 		AppComponent
 	],
 	imports: [
-		BrowserAnimationsModule,
+		BrowserModule.withServerTransition({ appId: 'soting' }),
 		BaseModule,
 		BaseRoutingModule,
 		// RouterModule.forRoot(appRoutes),
