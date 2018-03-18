@@ -40,18 +40,25 @@
 
 	<!-- The content is unavailable or doesn't exist -->
 	<ng-template #unavailable>
-		<h1>Page at /{{ (route.url | async).join('/') }}</h1>
-		<h2>Page not available</h2>
-		<div>
-			<div class="content">
-				<p>
-					This page seems to be unavailable at the moment. Maybe you're not authorized, or maybe the network is flaky.
-					It could even be that the page you attempted to access does not actually exist.
-				</p>
-				<p>
-					Either way; it wasn't meant to be, right now.
-				</p>
+		<ng-container *ngIf="!isPlatformServer; else server">
+			<h1>Page at /{{ (route.url | async).join('/') }}</h1>
+			<h2>Page not available</h2>
+			<div>
+				<div class="content">
+					<p>
+						This page seems to be unavailable at the moment. Maybe you're not authorized, or maybe the network is flaky.
+						It could even be that the page you attempted to access does not actually exist.
+					</p>
+					<p>
+						Either way; it wasn't meant to be, right now.
+					</p>
+				</div>
 			</div>
-		</div>
+		</ng-container>
+
+		<ng-template #server>
+			<h1>Loading</h1>
+			<p>The content is being loaded</p>
+		</ng-template>
 	</ng-template>
 </div>

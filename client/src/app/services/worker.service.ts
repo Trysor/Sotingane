@@ -1,6 +1,6 @@
-import { Injectable, NgZone, PLATFORM_ID, Inject } from '@angular/core';
+import { Injectable, NgZone, PLATFORM_ID, Inject, Optional } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformServer } from '@angular/common';
 
 import { environment } from '@env';
 
@@ -13,12 +13,12 @@ export class WorkerService {
 
 	constructor(
 		@Inject(PLATFORM_ID) private platformId: Object,
+		@Optional() private ngZone: NgZone,
 		private updates: SwUpdate,
-		private ngZone: NgZone,
 		private snackBar: MatSnackBar) {
 
 		if (!environment.production) { return; }
-		if (!isPlatformBrowser(platformId)) { return; }
+		if (isPlatformServer(platformId)) { return; }
 
 
 		// TODO: revert this back when it has been fixed

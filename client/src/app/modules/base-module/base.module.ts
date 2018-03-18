@@ -17,7 +17,6 @@ import { NavComponent } from './nav-component/nav.component';
 import { SearchComponent } from './search-component/search.component';
 import { SearchResultsComponent } from './search-results-component/search.results.component';
 
-
 // Resolvers
 import { CmsResolver, SearchResolver } from '@app/guards';
 

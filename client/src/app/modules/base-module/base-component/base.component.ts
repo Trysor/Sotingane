@@ -1,7 +1,8 @@
-import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Optional, Inject, PLATFORM_ID, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconRegistry, MatDrawer } from '@angular/material';
 import { Router, ActivationStart, ActivationEnd } from '@angular/router';
+import { isPlatformBrowser } from '@angular/common';
 
 import { MobileService, AuthService, WorkerService } from '@app/services';
 // import { RoutingAnim } from '@app/animations';
@@ -25,14 +26,17 @@ export class BaseComponent implements OnInit, OnDestroy {
 
 
 	constructor(
+		@Inject(PLATFORM_ID) private platformId: Object,
+		@Optional() private workerService: WorkerService,
 		public mobileService: MobileService,
 		public authService: AuthService,
 		public router: Router,
-		private workerService: WorkerService,
 		private iconRegistry: MatIconRegistry,
 		private san: DomSanitizer) {
 		// Register logo
-		iconRegistry.addSvgIcon('logo', san.bypassSecurityTrustResourceUrl('assets/logo192themed.svg'));
+		if (isPlatformBrowser(platformId)) {
+			iconRegistry.addSvgIcon('logo', san.bypassSecurityTrustResourceUrl('/assets/logo192themed.svg'));
+		}
 	}
 
 	ngOnInit() {

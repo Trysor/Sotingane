@@ -10,7 +10,6 @@ import { ContentComponent } from '@app/modules/content-module/content-component/
 // Guards
 import { CmsResolver, SearchResolver, AuthGuard, AdminGuard, LoginGuard } from '@app/guards';
 
-
 const routes: Routes = [
 	{
 		path: '', component: BaseComponent,

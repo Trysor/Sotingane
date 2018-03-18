@@ -1,11 +1,5 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { environment } from '@env';
-
-// Service Worker
-import { WorkerService } from '@app/services';
-import { ServiceWorkerModule } from '@angular/service-worker';
-
 
 import { AppComponent } from './app.component';
 
@@ -28,10 +22,6 @@ import { BaseRoutingModule } from '@app/modules/base-module/base.routing-module'
 		BaseModule,
 		BaseRoutingModule,
 		// RouterModule.forRoot(appRoutes),
-		ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })
-	],
-	providers: [
-		WorkerService,
 	],
 	bootstrap: [AppComponent]
 })

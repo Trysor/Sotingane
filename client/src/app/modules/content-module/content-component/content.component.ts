@@ -1,9 +1,10 @@
 import {
-	Component, Input, OnInit, AfterViewInit, OnDestroy, DoCheck, ChangeDetectionStrategy, ChangeDetectorRef,
-	ComponentFactoryResolver, InjectionToken, Injector, ComponentFactory, ViewChild, ElementRef, ComponentRef
+	Component, Input, OnInit, AfterViewInit, OnDestroy, DoCheck, Inject, PLATFORM_ID, ChangeDetectionStrategy,
+	ComponentFactoryResolver, Injector, ComponentFactory, ViewChild, ElementRef, ComponentRef
 } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
-import { MatDialog, MatDialogConfig } from '@angular/material';
+
+import { isPlatformServer } from '@angular/common';
 
 import { CMSService, AuthService, ModalService } from '@app/services';
 import { CmsContent, AccessRoles, DynamicComponent } from '@app/models';
@@ -32,6 +33,7 @@ export class ContentComponent implements OnInit, AfterViewInit, OnDestroy, DoChe
 
 	public readonly AccessRoles = AccessRoles;
 	public readonly contentSubject = new BehaviorSubject<CmsContent>(null);
+	public isPlatformServer = false;
 
 	private readonly _ngUnsub = new Subject();
 	@ViewChild('contentHost') private _contentHost: ElementRef;
@@ -40,14 +42,17 @@ export class ContentComponent implements OnInit, AfterViewInit, OnDestroy, DoChe
 
 
 	constructor(
+		@Inject(PLATFORM_ID) private platformId: Object,
 		private modalService: ModalService,
 		private resolver: ComponentFactoryResolver,
 		private injector: Injector,
-		private dialog: MatDialog,
 		private router: Router,
 		private route: ActivatedRoute,
 		public authService: AuthService,
 		public cmsService: CMSService) {
+
+
+		this.isPlatformServer = isPlatformServer(platformId);
 
 		// Map the tag to replace with the corresponding factory
 		this._dynamicContent.set('a', resolver.resolveComponentFactory(DynamicLinkComponent));

@@ -4,62 +4,63 @@
 		"name": "sotingane"
 	},
 	"apps": [
-		{
-			"root": "src",
-			"outDir": "dist/browser",
-			"assets": [
-				"assets",
-				"favicon.ico",
-				"manifest.json"
-			],
-			"index": "index.html",
-			"main": "main.ts",
-			"polyfills": "polyfills.ts",
-			"prefix": "",
-			"test": "test.ts",
-			"tsconfig": "tsconfig.app.json",
-			"testTsconfig": "tsconfig.spec.json",
-			"styles": [
-				"app/app.scss"
-			],
-			"stylePreprocessorOptions": {
-				"includePaths": [ "app/scss" ]
+			{
+				"assets": [
+					"assets",
+					"favicon.ico",
+					"manifest.json"
+				],
+				"environments": {
+					"dev": "environments/environment.ts",
+					"prod": "environments/environment.prod.ts"
+				},
+				"environmentSource": "environments/environment.ts",
+				"index": "index.html",
+				"main": "main.ts",
+				"outDir": "dist/browser",
+				"polyfills": "polyfills.ts",
+				"prefix": "",
+				"root": "src",
+				"scripts": [],
+				"serviceWorker": true,
+				"stylePreprocessorOptions": {
+					"includePaths": [ "app/scss" ]
+				},
+				"styles": [
+					"app/app.scss"
+				],
+				"test": "test.ts",
+				"testTsconfig": "tsconfig.spec.json",
+				"tsconfig": "tsconfig.app.json"
 			},
-			"scripts": [],
-			"environmentSource": "environments/environment.ts",
-			"environments": {
-				"dev": "environments/environment.ts",
-				"prod": "environments/environment.prod.ts"
-			},
-			"serviceWorker": true
-		},
-		{
-			"root": "src",
-			"outDir": "dist/server",
-			"assets": [
-				"assets",
-				"favicon.ico",
-				"manifest.json"
-			],
-			"index": "index.html",
-			"main": "main.server.ts",
-			"prefix": "",
-			"test": "test.ts",
-			"tsconfig": "tsconfig.server.json",
-			"testTsconfig": "tsconfig.spec.json",
-			"styles": [
-				"app/app.scss"
-			],
-			"stylePreprocessorOptions": {
-				"includePaths": [ "app/scss" ]
-			},
-			"scripts": [],
-			"environmentSource": "environments/environment.ts",
-			"environments": {
-				"dev": "environments/environment.ts",
-				"prod": "environments/environment.prod.ts"
+			{
+				"assets": [
+					"assets",
+					"favicon.ico",
+					"manifest.json"
+				],
+				"environments": {
+					"dev": "environments/environment.ts",
+					"prod": "environments/environment.prod.ts"
+				},
+				"environmentSource": "environments/environment.ts",
+				"index": "index.html",
+				"main": "main.server.ts",
+				"outDir": "dist/server",
+				"platform": "server",
+				"prefix": "",
+				"root": "src",
+				"scripts": [],
+				"stylePreprocessorOptions": {
+					"includePaths": [ "app/scss" ]
+				},
+				"styles": [
+					"app/app.scss"
+				],
+				"test": "test.ts",
+				"testTsconfig": "tsconfig.spec.json",
+				"tsconfig": "tsconfig.server.json"
 			}
-		}
 	],
 	"e2e": {
 		"protractor": {
