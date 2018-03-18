@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 // Modules
 import { SharedModule } from '@app/modules/shared-module/shared.module';
-import { CommonModule } from '@app/modules';
+import { CommonModule } from '@app/modules/common.module';
 
 // Guard
 import { AuthGuard } from '@app/guards';

@@ -18,7 +18,7 @@
 			</div>
 			<div>
 				<!-- The actual content will be injected here -->
-				<div #contentHost class="content"></div>
+				<div #contentHost id="content"></div>
 				<!-- End of content -->
 
 				<span class="info" *ngIf="contentObject.access !== AccessRoles.everyone">Access group: {{contentObject.access}}</span>

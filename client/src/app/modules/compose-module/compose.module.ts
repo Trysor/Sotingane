@@ -5,7 +5,9 @@ import { NgModule } from '@angular/core';
 import { ComposeRoutingModule } from './compose.routing-module';
 
 // Modules
-import { SharedModule, CommonModule, ContentModule } from '@app/modules';
+import { ContentModule } from '@app/modules/content-module/content.module';
+import { SharedModule } from '@app/modules/shared-module/shared.module';
+import { CommonModule } from '@app/modules/common.module';
 
 // Components
 import { ComposeComponent } from './compose-component/compose.component';

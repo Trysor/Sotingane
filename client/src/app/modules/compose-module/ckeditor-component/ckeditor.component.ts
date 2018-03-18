@@ -1,17 +1,14 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Input, Inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Input, Renderer2, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { DOCUMENT } from '@angular/platform-browser';
-
-import { CmsContent } from '@app/models';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-//import Alignment from '@ckeditor/ckeditor5-alignment/src/alignment';
-//import Code from '@ckeditor/ckeditor5-basic-styles/src/code';
+// import Alignment from '@ckeditor/ckeditor5-alignment/src/alignment';
+// import Code from '@ckeditor/ckeditor5-basic-styles/src/code';
 
-//ClassicEditor.build.plugins.push(Alignment);
-//ClassicEditor.build.plugins.push(Code);
+// ClassicEditor.build.plugins.push(Alignment);
+// ClassicEditor.build.plugins.push(Code);
 
 @Component({
 	selector: 'ck-editor',
@@ -21,7 +18,7 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 })
 export class CKEditorComponent implements OnInit, OnDestroy {
 	// editor
-	@ViewChild('content') editorBox: ElementRef;
+	@ViewChild('content') editorBox: ElementRef<HTMLDivElement>;
 	private _editor: CKEditor;
 	private _control: FormControl;
 
@@ -47,7 +44,7 @@ export class CKEditorComponent implements OnInit, OnDestroy {
 		}
 	};
 
-	constructor( @Inject(DOCUMENT) private document: Document) { }
+	constructor(private renderer: Renderer2) { }
 
 
 	ngOnInit() {
@@ -55,9 +52,12 @@ export class CKEditorComponent implements OnInit, OnDestroy {
 		if (this._editor) { return; } // if editor ALREADY exist.
 		if (!this._control) { return; } // if control DOESNT exist.
 
+		const el = this.editorBox.nativeElement;
+
 		// Load CKEditor
-		ClassicEditor.create(this.editorBox.nativeElement, this._settings).then(editor => {
+		ClassicEditor.create(el, this._settings).then(editor => {
 			this._editor = editor;
+			this.renderer.setAttribute(el.parentElement.querySelector('.ck-content'), 'id', 'content');
 
 			// Disabled / ReadOnly flags
 			this._editor.isReadOnly = this._control.disabled;

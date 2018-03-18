@@ -22,7 +22,6 @@ export class NavComponent {
 	public get contentSubject() { return this._contentSubject; }
 	public get steamServersSubject() { return this._steamServersSubject; }
 
-
 	/**
 	 * Sort arrangement function for CmsContent, CmsFolders and SteamServer, based on either's title.
 	 * @param  {CmsContent | CmsFolder | SteamServer}   a object to be sorted

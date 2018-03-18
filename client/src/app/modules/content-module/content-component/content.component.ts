@@ -6,14 +6,14 @@ import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 
 import { CMSService, AuthService, ModalService } from '@app/services';
-import { CmsContent, AccessRoles } from '@app/models';
+import { CmsContent, AccessRoles, DynamicComponent } from '@app/models';
 
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { takeUntil } from 'rxjs/operators';
 
 import { DynamicLinkComponent } from '../content-controllers/dynamic.link.component';
-
+import { DynamicImageComponent } from '../content-controllers/dynamic.image.component';
 
 @Component({
 	selector: 'content-component',
@@ -22,16 +22,21 @@ import { DynamicLinkComponent } from '../content-controllers/dynamic.link.compon
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContentComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
-	@Input() public set contentInput(value: CmsContent) { this.contentSubject.next(value); }
-	@Input() public previewMode = false;
+	private _inputSet = false;
+	@Input() public set contentInput(value: CmsContent) {
+		if (this._inputSet) { return; }
+		this.contentSubject.next(value);
+		this._inputSet = true;
+	}
+	@Input() public previewMode = false; // used in the template
 
-	public AccessRoles = AccessRoles;
-	public contentSubject = new BehaviorSubject<CmsContent>(null);
+	public readonly AccessRoles = AccessRoles;
+	public readonly contentSubject = new BehaviorSubject<CmsContent>(null);
 
-	private _ngUnsub = new Subject();
+	private readonly _ngUnsub = new Subject();
 	@ViewChild('contentHost') private _contentHost: ElementRef;
-	private _ngLinkFactory: ComponentFactory<DynamicLinkComponent>;
-	private _embeddedComponents: ComponentRef<DynamicLinkComponent>[] = [];
+	private readonly _dynamicContent = new Map<string, ComponentFactory<DynamicComponent>>();
+	private readonly _embeddedComponents: ComponentRef<DynamicComponent>[] = [];
 
 
 	constructor(
@@ -44,8 +49,9 @@ export class ContentComponent implements OnInit, AfterViewInit, OnDestroy, DoChe
 		public authService: AuthService,
 		public cmsService: CMSService) {
 
-		this._ngLinkFactory = resolver.resolveComponentFactory(DynamicLinkComponent);
-
+		// Map the tag to replace with the corresponding factory
+		this._dynamicContent.set('a', resolver.resolveComponentFactory(DynamicLinkComponent));
+		this._dynamicContent.set('figure', resolver.resolveComponentFactory(DynamicImageComponent));
 	}
 
 	ngOnInit() {
@@ -63,7 +69,7 @@ export class ContentComponent implements OnInit, AfterViewInit, OnDestroy, DoChe
 
 	ngAfterViewInit() {
 		this.contentSubject.pipe(takeUntil(this._ngUnsub)).subscribe(content => {
-			this.build(content);
+			this.build(content); // also cleans
 			// Detect changes manually for each component.
 			this._embeddedComponents.forEach(comp => comp.changeDetectorRef.detectChanges());
 		});
@@ -91,28 +97,41 @@ export class ContentComponent implements OnInit, AfterViewInit, OnDestroy, DoChe
 		}
 		// Clean components before rebuilding.
 		this.cleanEmbeddedComponents();
+
 		// Prepare content for injection
 		const e = (<HTMLElement>this._contentHost.nativeElement);
-		const nglinksel = this._ngLinkFactory.selector;
-		e.innerHTML = cmsContent.content.replace(/<a /g, `<${nglinksel} `).replace(/<\/a>/g, `</${nglinksel}>`);
+		let newContent = cmsContent.content;
 
-		// query for elements we need to adjust
-		const ngLinks = e.querySelectorAll(this._ngLinkFactory.selector);
-		for (let i = 0; i < ngLinks.length; i++) {
-			const link = ngLinks.item(i);
-			const savedTextContent = link.textContent; // save text content before we modify the element
-			// convert NodeList into an array, since Angular dosen't like having a NodeList passed for projectableNodes
-			const comp = this._ngLinkFactory.create(this.injector, [Array.prototype.slice.call(link.childNodes)], link);
-			// apply inputs into the dynamic component
-			// only static ones work here since this is the only time they're set
-			for (const attr of (link as any).attributes) {
-				comp.instance[attr.nodeName] = attr.nodeValue;
+		// First loop; alter everything first, then inject afterwards.
+		this._dynamicContent.forEach((fac, tag) => {
+			const selector = fac.selector;
+			const open = new RegExp(`<${tag} `, 'g');
+			const close = new RegExp(`</${tag}>`, 'g');
+			newContent = newContent.replace(open, `<${selector} `).replace(close, `</${selector}>`);
+		});
+		e.innerHTML = newContent;
+
+
+		// Second loop; Injection time
+		this._dynamicContent.forEach((fac) => {
+			// query for elements we need to adjust
+			const elems = e.querySelectorAll(fac.selector);
+
+			for (let i = 0; i < elems.length; i++) {
+				const el = elems.item(i);
+				const savedTextContent = el.textContent; // save text content before we modify the element
+				// convert NodeList into an array, since Angular dosen't like having a NodeList passed for projectableNodes
+				const comp = fac.create(this.injector, [Array.prototype.slice.call(el.childNodes)], el);
+				// only static ones work here since this is the only time they're set
+				for (const attr of (el as any).attributes) {
+					comp.instance[attr.nodeName] = attr.nodeValue;
+				}
+				// do buildJob
+				comp.instance.buildJob(el, savedTextContent);
+
+				this._embeddedComponents.push(comp);
 			}
-			comp.instance.link = link.getAttribute('href');
-			comp.instance.text = savedTextContent;
-
-			this._embeddedComponents.push(comp);
-		}
+		});
 	}
 
 	private cleanEmbeddedComponents() {

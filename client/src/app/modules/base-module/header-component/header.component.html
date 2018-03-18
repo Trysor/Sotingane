@@ -1,8 +1,8 @@
 <header class="topHeader" [ngClass]="{ 'fixed': (mobileService.isMobile() | async) }">
 
 	<!-- Mobile navigation toggler -->
-	<div class="flex" mat-icon-button *ngIf="mobileService.isMobile() | async">
-		<button (click)="toggleLeft()"
+	<div class="flex" *ngIf="mobileService.isMobile() | async">
+		<button mat-icon-button (click)="toggleLeft()"
 				class="navToggle" aria-label="Toggle navigation">
 			<mat-icon>menu</mat-icon>
 		</button>
@@ -39,11 +39,11 @@
 	<ng-template #headerlogin>
 		<div class="flex right" [ngSwitch]="(mobileService.isMobile() | async)">
 			<!-- For MOBILE -->
-			<button mat-icon-button *ngSwitchCase="true" routerLink="/login" routerLinkActive="active" class="userToggle mobile">
+			<button mat-icon-button *ngSwitchCase="true" routerLink="/login" routerLinkActive="active" class="userToggle mobile" aria-label="Go to login">
 				<mat-icon>person</mat-icon>
 			</button>
 			<!-- For DESKTOP -->
-			<button mat-button *ngSwitchCase="false" routerLink="/login" routerLinkActive="active" class="userToggle">
+			<button mat-button *ngSwitchCase="false" routerLink="/login" routerLinkActive="active" class="userToggle" aria-label="Go to login">
 				<mat-icon>person</mat-icon> <ng-container *ngIf="!(mobileService.isMobile() | async)">Login</ng-container>
 			</button>
 		</div>

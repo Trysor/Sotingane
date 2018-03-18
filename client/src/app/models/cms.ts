@@ -30,3 +30,8 @@ export interface CmsFolder {
 	title: string;
 	content: CmsContent[];
 }
+
+
+export interface DynamicComponent {
+	buildJob(el: Element, textContent?: string): void;
+}

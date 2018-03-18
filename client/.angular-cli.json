@@ -4,35 +4,35 @@
 		"name": "sotingane"
 	},
 	"apps": [
-			{
-				"root": "src",
-				"outDir": "dist",
-				"assets": [
-					"assets",
-					"favicon.ico",
-					"manifest.json"
-				],
-				"index": "index.html",
-				"main": "main.ts",
-				"polyfills": "polyfills.ts",
-				"prefix": "",
-				"test": "test.ts",
-				"tsconfig": "tsconfig.app.json",
-				"testTsconfig": "tsconfig.spec.json",
-				"styles": [
-					"app/app.scss"
-				],
-				"stylePreprocessorOptions": {
-					"includePaths": [ "app/scss" ]
-				},
-				"scripts": [],
-				"environmentSource": "environments/environment.ts",
-				"environments": {
-					"dev": "environments/environment.ts",
-					"prod": "environments/environment.prod.ts"
-				},
-				"serviceWorker": true
-			}
+		{
+			"root": "src",
+			"outDir": "dist",
+			"assets": [
+				"assets",
+				"favicon.ico",
+				"manifest.json"
+			],
+			"index": "index.html",
+			"main": "main.ts",
+			"polyfills": "polyfills.ts",
+			"prefix": "",
+			"test": "test.ts",
+			"tsconfig": "tsconfig.app.json",
+			"testTsconfig": "tsconfig.spec.json",
+			"styles": [
+				"app/app.scss"
+			],
+			"stylePreprocessorOptions": {
+				"includePaths": [ "app/scss" ]
+			},
+			"scripts": [],
+			"environmentSource": "environments/environment.ts",
+			"environments": {
+				"dev": "environments/environment.ts",
+				"prod": "environments/environment.prod.ts"
+			},
+			"serviceWorker": true
+		}
 	],
 	"e2e": {
 		"protractor": {

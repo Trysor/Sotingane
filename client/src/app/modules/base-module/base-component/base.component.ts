@@ -32,7 +32,7 @@ export class BaseComponent implements OnInit, OnDestroy {
 		private iconRegistry: MatIconRegistry,
 		private san: DomSanitizer) {
 		// Register logo
-		iconRegistry.addSvgIcon('logo', san.bypassSecurityTrustResourceUrl('assets/logo256.svg'));
+		iconRegistry.addSvgIcon('logo', san.bypassSecurityTrustResourceUrl('assets/logo192themed.svg'));
 	}
 
 	ngOnInit() {

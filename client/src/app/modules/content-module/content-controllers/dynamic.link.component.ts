@@ -1,5 +1,10 @@
-﻿import { Component, OnInit, AfterViewInit, Input, Inject, Renderer2, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+﻿import { Component, OnInit, Input, Inject, Renderer2, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { DOCUMENT, DomSanitizer, SafeUrl } from '@angular/platform-browser';
+
+import { DynamicComponent } from '@app/models';
+
+import { IntersectionService } from '@app/services';
+import { DynamicLazyLoader } from './dynamic.lazy.loader';
 
 enum TwitchType {
 	Channel = 'channel',
@@ -8,7 +13,7 @@ enum TwitchType {
 }
 
 @Component({
-	selector: 'dynamic-link',
+	selector: 'router-link',
 	template: `
 		<ng-container *ngIf="!isVideo; else video;" [ngSwitch]="isRemoteUrl">
 			<a *ngSwitchCase="true" [href]="safeLink" [ngStyle]="style">{{text}}</a>
@@ -16,11 +21,10 @@ enum TwitchType {
 		</ng-container>
 		<ng-template #video>
 			<div #videoHost></div>
-		</ng-template>
-	`,
+		</ng-template>`,
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DynamicLinkComponent implements OnInit, AfterViewInit {
+export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicComponent, OnInit {
 	@Input() link: string;
 	@Input() text: string;
 
@@ -40,10 +44,12 @@ export class DynamicLinkComponent implements OnInit, AfterViewInit {
 
 	constructor(
 		@Inject(DOCUMENT) private document: Document,
-		private el: ElementRef,
+		private el: ElementRef<HTMLElement>,
+		private inters: IntersectionService,
 		private renderer: Renderer2,
 		private san: DomSanitizer) {
 
+		super(inters);
 	}
 
 	ngOnInit() {
@@ -54,9 +60,6 @@ export class DynamicLinkComponent implements OnInit, AfterViewInit {
 			this._isRemoteUrl = false;
 		}
 
-	}
-
-	ngAfterViewInit() {
 		if (!this.isVideo) { return; }
 		// Protect against template issues
 		if (!this.el.nativeElement.parentNode) { return; }
@@ -84,6 +87,28 @@ export class DynamicLinkComponent implements OnInit, AfterViewInit {
 		this.renderer.insertBefore(this.el.nativeElement.parentElement, wrapper, this.el.nativeElement);
 		this.renderer.removeChild(this.renderer.parentNode(this.el.nativeElement), this.el.nativeElement);
 		this.renderer.destroy();
+
+		// Init with the lazy-loader
+		super.init(wrapper);
+	}
+
+	/**
+	 * DynamicComponent interface method. Triggered as the component is injected
+	 * @param el
+	 * @param textContent
+	 */
+	public buildJob(el: Element, textContent: string): void {
+		this.link = el.getAttribute('href');
+		this.text = textContent;
+	}
+
+
+	/**
+	 * DynamicLazyLoader abstract method override. Triggered when the lazyloader loads.
+	 */
+	load() {
+		this.renderer.setAttribute(this._iframe, 'src', this._iframe.getAttribute('data-src'));
+		this.renderer.removeAttribute(this._iframe, 'data-src');
 	}
 
 	/**
@@ -98,7 +123,7 @@ export class DynamicLinkComponent implements OnInit, AfterViewInit {
 
 		// Create iframe
 		this._iframe = this.renderer.createElement('iframe');
-		this.renderer.setAttribute(this._iframe, 'src', 'https://www.youtube.com/embed/' + videoId);
+		this.renderer.setAttribute(this._iframe, 'data-src', 'https://www.youtube.com/embed/' + videoId);
 
 		// Create Thumbnail image (also required for aspect ratio)
 		this._img = this.renderer.createElement('img');
@@ -123,7 +148,7 @@ export class DynamicLinkComponent implements OnInit, AfterViewInit {
 
 		// Create iframe
 		this._iframe = this.renderer.createElement('iframe');
-		this.renderer.setAttribute(this._iframe, 'src', 'https://player.twitch.tv/?' + type + '=' + prefix + source);
+		this.renderer.setAttribute(this._iframe, 'data-src', 'https://player.twitch.tv/?' + type + '=' + prefix + source);
 
 		// Create Thumbnail image (also required for aspect ratio)
 		this._img = this.renderer.createElement('img');  // Creating a black 16 by 9 base64 image

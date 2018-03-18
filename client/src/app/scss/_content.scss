@@ -1,7 +1,6 @@
 @import '_theme_vars';
 
-.wrapper .ck-content,
-.wrapper .content {
+#content {
 	a, p {
 		word-wrap: break-word; // legacy name of overflow-wrap
 		overflow-wrap: break-word;
@@ -56,6 +55,7 @@
 		}
 	}
 
+	image-container.image,
 	figure.image {
 		text-align: center;
 		margin: 0 0 1em 0; // 1em margin bottom
@@ -116,6 +116,11 @@
 			clear: right;
 		}
 	}
+
+	// Lazy-load pre-sizing to fill space.
+	image-container.image.lazy {
+		height: calc(#{$wrapperWidth} / 2 * 9 / 16);
+	}
 }
 
 .video {
@@ -146,8 +151,8 @@
 
 // Mobile styling
 .site.mobile {
-	.ck-editor__editable,
-	.content {
+	#content {
+		image-container.image,
 		figure.image {
 			&.image-style-align-right,
 			&.image-style-align-left {

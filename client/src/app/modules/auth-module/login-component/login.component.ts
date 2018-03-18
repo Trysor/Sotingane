@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -24,7 +24,7 @@ enum STATES {
 	styleUrls: ['./login.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LoginComponent {
+export class LoginComponent implements OnDestroy {
 	private _ngUnsub = new Subject();
 
 	public loginForm: FormGroup;
@@ -52,6 +52,11 @@ export class LoginComponent {
 				this.loginForm.get('password').enable();
 			}
 		});
+	}
+
+	ngOnDestroy() {
+		this._ngUnsub.next();
+		this._ngUnsub.complete();
 	}
 
 
