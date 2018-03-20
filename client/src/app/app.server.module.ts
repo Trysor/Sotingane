@@ -6,6 +6,8 @@ import { ModuleMapLoaderModule } from '@nguniversal/module-map-ngfactory-loader'
 import { AppModule } from './app.module';
 import { AppComponent } from './app.component';
 
+import { ServerService } from '@app/services';
+
 @NgModule({
 	imports: [
 		NoopAnimationsModule,
@@ -15,6 +17,9 @@ import { AppComponent } from './app.component';
 		ServerModule,
 		ModuleMapLoaderModule,
 		ServerTransferStateModule,
+	],
+	providers: [
+		ServerService
 	],
 	// Since the bootstrapped component is not inherited from your
 	// imported AppModule, it needs to be repeated here.

@@ -15,15 +15,4 @@
 			   ngClass="subItem">{{ navEntry.title }}</a>
 		</ng-container>
 	</ng-container>
-
-	<ng-container *ngIf="steamServersSubject | async as steamServers">
-		<ng-container *ngIf="steamServers && steamServers.length > 0">
-			<h2 mat-subheader>Steam Servers</h2>
-
-			<a mat-list-item *ngFor="let server of steamServers; trackBy: trackBy"
-			   routerLink="/steam/{{server.route}}"
-			   routerLinkActive="active"
-			   ngClass="subItem">{{ server.title }}</a>
-		</ng-container>
-	</ng-container>
 </mat-nav-list>

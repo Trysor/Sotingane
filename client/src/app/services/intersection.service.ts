@@ -29,10 +29,19 @@ export class IntersectionService {
 		);
 	}
 
+
+	/**
+	 * Observe the on-screen visiblity of a given element
+	 * @param el
+	 */
 	public observe(el: Element) {
 		this._obs.observe(el);
 	}
 
+	/**
+	 * Unobserves an element
+	 * @param el
+	 */
 	public unobserve(el: Element) {
 		this._obs.unobserve(el);
 	}

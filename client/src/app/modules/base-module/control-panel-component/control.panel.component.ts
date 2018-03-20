@@ -9,6 +9,6 @@ import { AuthService } from '@app/services';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ControlPanelComponent {
-	@Input() style: 'menu';
+	@Input() layout: 'menu';
 	constructor(public authService: AuthService) { }
 }

@@ -24,7 +24,6 @@ export class BaseComponent implements OnInit, OnDestroy {
 
 	public routerSub = new Subject<string>();
 
-
 	constructor(
 		@Inject(PLATFORM_ID) private platformId: Object,
 		@Optional() private workerService: WorkerService,
@@ -33,8 +32,9 @@ export class BaseComponent implements OnInit, OnDestroy {
 		public router: Router,
 		private iconRegistry: MatIconRegistry,
 		private san: DomSanitizer) {
-		// Register logo
+
 		if (isPlatformBrowser(platformId)) {
+			// Register logo
 			iconRegistry.addSvgIcon('logo', san.bypassSecurityTrustResourceUrl('/assets/logo192themed.svg'));
 		}
 	}

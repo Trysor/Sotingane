@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { environment } from '@env';
 import { CmsContent } from '@app/models';
 
+import { AuthService } from '@app/services/auth.service';
+
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { timeout } from 'rxjs/operators';
@@ -15,8 +17,12 @@ export class CMSService {
 	private _listSubject: BehaviorSubject<CmsContent[]> = new BehaviorSubject(null);
 
 	constructor(
+		private authService: AuthService,
 		private http: HttpClient,
 		private router: Router) {
+
+		// Whenever a user logs in or out, update
+		authService.getUser().subscribe(user => this.getContentList(true));
 	}
 
 	/**
@@ -25,14 +31,12 @@ export class CMSService {
 	 * @return {BehaviorSubject<CmsContent[]>}    the BehaviorSubject
 	 */
 	public getContentList(forceUpdate = false): BehaviorSubject<CmsContent[]> {
-		if (forceUpdate) {
-			const sub = this.requestContentList().subscribe(
-				contentList => {
-					sub.unsubscribe();
-					this._listSubject.next(contentList);
-				}
-			);
-		}
+		if (!forceUpdate) { return this._listSubject; }
+
+		const sub = this.requestContentList().subscribe(contentList => {
+			sub.unsubscribe();
+			this._listSubject.next(contentList);
+		});
 		return this._listSubject;
 	}
 

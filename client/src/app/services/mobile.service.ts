@@ -1,11 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Optional } from '@angular/core';
+
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+
+import { ServerService } from '@app/services/server.service';
 
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
+
 @Injectable()
 export class MobileService {
+	// Private fields
 	private _isMobileSubject = new BehaviorSubject<boolean>(false);
 
 	private readonly _mobileDevices = [
@@ -14,8 +19,15 @@ export class MobileService {
 		Breakpoints.TabletPortrait
 	];
 
+	public isMobile(): BehaviorSubject<boolean> { return this._isMobileSubject; }
+
 	constructor(
+		@Optional() private server: ServerService, // This service only exists in SSR
 		private breakpointObserver: BreakpointObserver) {
+
+		// Alternative method to get mobile, for server.
+		if (!!server) { this._isMobileSubject.next(server.isMobile()); return; }
+
 		// Handle Mobile devices
 		if (breakpointObserver.isMatched(this._mobileDevices)) { this._isMobileSubject.next(true); }
 
@@ -24,9 +36,4 @@ export class MobileService {
 			this._isMobileSubject.next(result.matches);
 		});
 	}
-
-	isMobile(): BehaviorSubject<boolean> {
-		return this._isMobileSubject;
-	}
-
 }

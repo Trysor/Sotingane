@@ -1,4 +1,6 @@
-import { Component, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Output, EventEmitter, Inject, PLATFORM_ID, ChangeDetectionStrategy } from '@angular/core';
+
+import { isPlatformBrowser } from '@angular/common';
 
 import { AuthService, MobileService } from '@app/services';
 
@@ -12,7 +14,15 @@ export class HeaderComponent {
 	@Output() leftNav: EventEmitter<void> = new EventEmitter();
 	@Output() rightNav: EventEmitter<void> = new EventEmitter();
 
-	constructor(public authService: AuthService, public mobileService: MobileService) { }
+	public isPlatformBrowser = false;
+
+	constructor(
+		@Inject(PLATFORM_ID) private platformId: Object,
+		public authService: AuthService,
+		public mobileService: MobileService) {
+
+		this.isPlatformBrowser = isPlatformBrowser(platformId);
+	}
 
 
 	/**

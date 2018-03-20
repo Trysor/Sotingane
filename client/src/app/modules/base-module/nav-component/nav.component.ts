@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 import { CmsContent, CmsFolder, SteamServer } from '@app/models';
-import { AuthService, CMSService, SteamService, MobileService } from '@app/services';
+import { CMSService, SteamService, MobileService } from '@app/services';
 
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -17,44 +17,26 @@ export class NavComponent {
 	private _ngUnsub = new Subject();
 
 	private _contentSubject = new BehaviorSubject(null);
-	private _steamServersSubject = new BehaviorSubject<SteamServer[]>(null);
 
 	public get contentSubject() { return this._contentSubject; }
-	public get steamServersSubject() { return this._steamServersSubject; }
 
 	/**
 	 * Sort arrangement function for CmsContent, CmsFolders and SteamServer, based on either's title.
-	 * @param  {CmsContent | CmsFolder | SteamServer}   a object to be sorted
-	 * @param  {CmsContent | CmsFolder | SteamServer}   b object to be sorted
+	 * @param  {CmsContent | CmsFolder}   a object to be sorted
+	 * @param  {CmsContent | CmsFolder}   b object to be sorted
 	 * @return {number}                                 a's relative position to b.
 	 */
-	private static sortMethod(a: CmsContent | CmsFolder | SteamServer, b: CmsContent | CmsFolder | SteamServer): number {
+	private static sortMethod(a: CmsContent | CmsFolder, b: CmsContent | CmsFolder): number {
 		return a.title.localeCompare(b.title);
 	}
 
 	constructor(
 		public mobileService: MobileService,
-		private authService: AuthService,
-		private cmsService: CMSService,
-		private steamService: SteamService) {
+		private cmsService: CMSService) {
 
-		// Whenever a user logs in or out, do update
-		authService.getUser().pipe(takeUntil(this._ngUnsub)).subscribe(user => {
-			cmsService.getContentList(true); // force update
-			steamService.requestSteamServers();
-		});
+		// Subscribe to content updates
+		cmsService.getContentList().subscribe(contentList => this.updateContentList(contentList));
 
-		// Subscribe to content updates, and keep the subscription until we get a new userSubject.next
-		cmsService.getContentList().pipe(takeUntil(this._ngUnsub)).subscribe(
-			contentList => this.updateContentList(contentList)
-		);
-
-		// Subscribe to steam server updates
-		steamService.requestSteamServers().pipe(takeUntil(this._ngUnsub)).subscribe(serverList => {
-			if (!serverList) { return; }
-			serverList.sort(NavComponent.sortMethod);
-			this._steamServersSubject.next(serverList);
-		});
 	}
 
 	/**

@@ -1,12 +1,12 @@
 import {
 	Component, Input, OnInit, AfterViewInit, OnDestroy, DoCheck, Inject, PLATFORM_ID, ChangeDetectionStrategy,
-	ComponentFactoryResolver, Injector, ComponentFactory, ViewChild, ElementRef, ComponentRef
+	ComponentFactoryResolver, Injector, ComponentFactory, ViewChild, ElementRef, ComponentRef, Optional
 } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 
 import { isPlatformServer } from '@angular/common';
 
-import { CMSService, AuthService, ModalService } from '@app/services';
+import { CMSService, AuthService, ModalService, ServerService } from '@app/services';
 import { CmsContent, AccessRoles, DynamicComponent } from '@app/models';
 
 import { Subject } from 'rxjs/Subject';
@@ -42,6 +42,7 @@ export class ContentComponent implements OnInit, AfterViewInit, OnDestroy, DoChe
 
 
 	constructor(
+		@Optional() private server: ServerService, // This service only exists in SSR
 		@Inject(PLATFORM_ID) private platformId: Object,
 		private modalService: ModalService,
 		private resolver: ComponentFactoryResolver,
@@ -100,12 +101,19 @@ export class ContentComponent implements OnInit, AfterViewInit, OnDestroy, DoChe
 		if (!this._contentHost || !this._contentHost.nativeElement || !cmsContent || !cmsContent.content) {
 			return;
 		}
-		// Clean components before rebuilding.
-		this.cleanEmbeddedComponents();
 
 		// Prepare content for injection
 		const e = (<HTMLElement>this._contentHost.nativeElement);
 		let newContent = cmsContent.content;
+
+		// inject directly if it is the server
+		if (this.isPlatformServer && !!this.server) {
+			e.innerHTML = this.server.modifyContent(newContent);
+			return;
+		}
+
+		// Clean components before rebuilding.
+		this.cleanEmbeddedComponents();
 
 		// First loop; alter everything first, then inject afterwards.
 		this._dynamicContent.forEach((fac, tag) => {

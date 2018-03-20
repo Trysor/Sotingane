@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 
 import { MatSnackBar } from '@angular/material';
 
@@ -22,18 +24,29 @@ export class AuthService {
 	private _renewalSub: Subscription;
 
 	constructor(
+		@Inject(PLATFORM_ID) private platformId: Object,
 		private tokenService: TokenService,
 		private snackBar: MatSnackBar,
 		private http: HttpClient,
 		private router: Router) {
 
+		// If we're on the server, push null
+		// TODO: inject serverService, figure out how to get user from API
+		if (isPlatformServer(platformId)) {
+			this._userSubject.next(null);
+			return;
+		}
+
+		// Browser: Get the token from the tokenService, update user data accordingly.
 		const token = tokenService.token;
 		if (!token || this.jwtIsExpired(token)) {
 			tokenService.token = null;
 			return;
 		}
 		this.updateCurrentUserData(token);
-		this.engageRenewTokenTimer(token);
+
+		// Only start the renewToken timer in browser.
+		if (isPlatformBrowser(platformId)) { this.engageRenewTokenTimer(token); }
 	}
 
 	/**
