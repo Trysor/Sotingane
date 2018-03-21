@@ -1,6 +1,6 @@
 import * as express from 'express';
 import { get as configGet, util as configUtil } from 'config';
-import { TestBed } from './test/testbed';
+// import { TestBed } from '../test/testbed';
 
 // setup
 require('source-map-support').install();
@@ -63,10 +63,6 @@ class App {
 			server.listen(this.app.get('port'), () => {
 				console.log(`Sotingane running on - Port ${this.app.get('port')}...`);
 				console.timeEnd('Launch time');
-
-				if (configUtil.getEnv('NODE_ENV') === 'test') {
-					TestBed.start(this.app);
-				}
 			});
 		});
 	}

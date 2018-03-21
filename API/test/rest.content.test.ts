@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
-import { ContentModel, Content } from '../models/content';
-import { status, ROUTE_STATUS, CMS_STATUS, VALIDATION_FAILED } from '../libs/validate';
+import { ContentModel, Content } from '../src/models/content';
+import { status, ROUTE_STATUS, CMS_STATUS, VALIDATION_FAILED } from '../src/libs/validate';
 
 import { TestBed, AdminUser } from './testbed';
 
