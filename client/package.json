@@ -7,7 +7,7 @@
 		"start": "ng serve",
 		"build": "ng build --prod",
 		"build:uncommon": "ng build --prod -cc=false",
-		"build:analyze": "ng build --prod -nc --stats-json -sm && webpack-bundle-analyzer dist/stats.json",
+		"build:analyze": "ng build --prod -nc --stats-json -sm && webpack-bundle-analyzer dist/browser/stats.json",
 		"build:server": "ng build --prod --app 1 --output-hashing=false",
 		"build:ssr": "npm run build:client-and-server-bundles && npm run webpack:server",
 		"serve:ssr": "node dist/server.js",
