@@ -4,9 +4,8 @@ import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/r
 import { SteamServer } from '@app/models';
 import { SteamService } from '@app/services';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { of } from 'rxjs/observable/of';
 
 @Injectable()
 export class SteamResolver implements Resolve<SteamServer | boolean> {

@@ -9,8 +9,7 @@ import { isPlatformServer } from '@angular/common';
 import { CMSService, AuthService, ModalService, ServerService } from '@app/services';
 import { CmsContent, AccessRoles, DynamicComponent } from '@app/models';
 
-import { Subject } from 'rxjs/Subject';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { DynamicLinkComponent } from '../content-controllers/dynamic.link.component';

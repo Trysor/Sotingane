@@ -4,9 +4,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 import { ServerService } from '@app/services/server.service';
 
-import { Subject } from 'rxjs/Subject';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-
+import { Subject, BehaviorSubject } from 'rxjs';
 
 @Injectable()
 export class MobileService {

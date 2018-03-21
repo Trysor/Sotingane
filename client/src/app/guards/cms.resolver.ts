@@ -4,9 +4,8 @@ import { Router, Resolve, ActivatedRouteSnapshot } from '@angular/router';
 import { CmsContent, AccessRoles } from '@app/models';
 import { CMSService, AuthService, TokenService } from '@app/services';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { of } from 'rxjs/observable/of';
 
 @Injectable()
 export class CmsResolver implements Resolve<CmsContent | boolean> {

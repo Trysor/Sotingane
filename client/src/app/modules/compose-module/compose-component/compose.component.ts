@@ -8,9 +8,7 @@ import { MatSelectChange, ErrorStateMatcher } from '@angular/material';
 import { ModalService, CMSService, MobileService } from '@app/services';
 import { CmsContent, CmsAccess, AccessRoles } from '@app/models';
 
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { takeUntil, debounceTime } from 'rxjs/operators';
 
 

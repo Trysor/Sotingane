@@ -4,7 +4,7 @@ import { isPlatformServer } from '@angular/common';
 
 import { environment } from '@env';
 
-import { interval } from 'rxjs/observable/interval';
+import { interval } from 'rxjs';
 
 import { MatSnackBar } from '@angular/material';
 

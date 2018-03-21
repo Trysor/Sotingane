@@ -10,12 +10,8 @@ import { environment } from '@env';
 import { User, UpdatePasswordUser, UserToken, AccessRoles } from '@app/models';
 import { TokenService } from '@app/services/token.service';
 
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable, Subscription, BehaviorSubject, timer, of } from 'rxjs';
 import { map, catchError, timeout, takeUntil } from 'rxjs/operators';
-import { timer } from 'rxjs/observable/timer';
-import { of } from 'rxjs/observable/of';  // will be from 'rxjs' in v6
 
 
 @Injectable()

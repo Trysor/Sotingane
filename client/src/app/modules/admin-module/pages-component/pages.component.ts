@@ -6,7 +6,7 @@ import { DatePipe } from '@angular/common';
 import { CmsContent, AccessRoles, TableSettings, ColumnType, ColumnDir } from '@app/models';
 import { ModalService, CMSService, AdminService, MobileService } from '@app/services';
 
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 @Component({
 	selector: 'pages-component',

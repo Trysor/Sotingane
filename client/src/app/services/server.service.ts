@@ -1,7 +1,7 @@
 ﻿import { Injectable, Inject } from '@angular/core';
 
 import { Request } from 'express';
-import { REQUEST } from '@nguniversal/express-engine';
+import { REQUEST } from '@nguniversal/express-engine/tokens';
 
 @Injectable()
 export class ServerService {

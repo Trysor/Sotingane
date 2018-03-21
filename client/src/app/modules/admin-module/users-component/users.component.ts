@@ -8,7 +8,7 @@ import { User, AccessRoles, TableSettings, ColumnType, ColumnDir } from '@app/mo
 
 import { UserModalComponent, UserModalData } from '../user-modal-component/user.modal.component';
 
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 
 @Component({

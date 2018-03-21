@@ -3,8 +3,7 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CmsContent, CmsFolder, SteamServer } from '@app/models';
 import { CMSService, SteamService, MobileService } from '@app/services';
 
-import { Subject } from 'rxjs/Subject';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({

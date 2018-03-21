@@ -5,8 +5,7 @@ import { Router } from '@angular/router';
 import { environment } from '@env';
 import { GameDig, SteamServer } from '@app/models';
 
-import { Observable } from 'rxjs/Observable';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { timeout } from 'rxjs/operators';
 
 

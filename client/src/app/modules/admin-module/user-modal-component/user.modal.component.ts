@@ -6,7 +6,7 @@ import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms'
 import { CMSService, AdminService, AuthService } from '@app/services';
 import { User, AccessRoles, CmsAccess } from '@app/models';
 
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 @Component({
 	selector: 'user-modal',

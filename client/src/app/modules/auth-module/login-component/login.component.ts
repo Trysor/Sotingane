@@ -6,8 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { User } from '@app/models';
 import { AuthService } from '@app/services';
 
-import { Subject } from 'rxjs/Subject';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 

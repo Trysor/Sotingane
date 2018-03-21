@@ -2,7 +2,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { DOCUMENT } from '@angular/platform-browser';
 
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 
 @Injectable()

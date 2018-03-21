@@ -4,7 +4,7 @@ import { environment } from '@env';
 
 import { TokenService } from '@app/services/token.service';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class InterceptorService implements HttpInterceptor {

@@ -7,8 +7,7 @@ import { CmsContent } from '@app/models';
 
 import { AuthService } from '@app/services/auth.service';
 
-import { Observable } from 'rxjs/Observable';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { timeout } from 'rxjs/operators';
 
 

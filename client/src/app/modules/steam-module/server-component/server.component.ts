@@ -4,9 +4,7 @@ import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { SteamService } from '@app/services';
 import { GameDig, SteamServer } from '@app/models';
 
-import { Subject } from 'rxjs/Subject';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { interval } from 'rxjs/observable/interval';
+import { Subject, BehaviorSubject, interval } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({

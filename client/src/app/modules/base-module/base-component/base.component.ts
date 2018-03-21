@@ -7,7 +7,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { MobileService, AuthService, WorkerService } from '@app/services';
 // import { RoutingAnim } from '@app/animations';
 
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({

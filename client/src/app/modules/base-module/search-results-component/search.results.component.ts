@@ -5,8 +5,7 @@ import { DatePipe } from '@angular/common';
 import { MobileService } from '@app/services';
 import { CmsContent, TableSettings, ColumnType, ColumnDir, TableFilterSettings } from '@app/models';
 
-import { Subject } from 'rxjs/Subject';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({

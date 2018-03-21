@@ -5,10 +5,8 @@ import { Router } from '@angular/router';
 import { environment } from '@env';
 import { User, AccessRoles, CmsContent } from '@app/models';
 
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { Observable, Subscription, of } from 'rxjs';
 import { map, catchError, timeout, takeUntil } from 'rxjs/operators';
-import { of } from 'rxjs/observable/of';  // will be from 'rxjs' in v6
 
 
 @Injectable()

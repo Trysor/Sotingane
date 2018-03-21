@@ -1,8 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Input, Renderer2, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // import Alignment from '@ckeditor/ckeditor5-alignment/src/alignment';
 // import Code from '@ckeditor/ckeditor5-basic-styles/src/code';
