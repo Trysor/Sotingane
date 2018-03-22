@@ -15,8 +15,6 @@ module.exports = {
 	entry: { server: './src/index.ts' },
 	resolve: { extensions: ['.js', '.ts'] },
 	target: 'node',
-	// this makes sure we include node_modules and other 3rd party libraries
-	//externals: [/(node_modules|main\..*\.js)/],
 	externals: nodeModules,
 	output: {
 		path: path.join(__dirname, 'dist'),
@@ -34,4 +32,4 @@ module.exports = {
 			{}
 		)
 	]
-}
+};

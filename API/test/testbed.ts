@@ -27,10 +27,7 @@ export class TestBedSingleton {
 			mocha.addFile(pathjoin('dist', 'out-tsc', 'test', file));
 		});
 		console.log('Delaying tests for mongoDB..');
-		setTimeout(
-			() => { mocha.run((failures) => { process.on('exit', () => { process.exit(failures); }); }); },
-			5000
-		);
+		setTimeout(() => mocha.run((failures) => process.exit()), 5000);
 	}
 
 	public get http() {

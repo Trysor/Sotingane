@@ -53,11 +53,9 @@ describe('REST: Authorization', () => {
 		});
 
 		it('GET /api/auth/token 401', async () => {
-			try {
-				const res = await TestBed.http.get('/api/auth/token');
-			} catch (error) {
-				expect(error).to.have.status(401);
-			}
+
+			const res = await TestBed.http.get('/api/auth/token');
+			expect(res).to.have.status(401);
 		});
 	});
 
@@ -85,12 +83,8 @@ describe('REST: Authorization', () => {
 
 		it('POST /api/auth/login 401', async () => {
 			const user: Partial<User> = { username: AdminUser.username, password: AdminUser.password + 'bad' };
-
-			try {
-				const res = await TestBed.http.post('/api/auth/login').send(user);
-			} catch (error) {
-				expect(error).to.have.status(401);
-			}
+			const res = await TestBed.http.post('/api/auth/login').send(user);
+			expect(res).to.have.status(401);
 		});
 
 		it('POST /api/auth/login 422', async () => {
