@@ -8,7 +8,7 @@ import { ContentComponent } from '@app/modules/content-module/content-component/
 
 
 // Guards
-import { CmsResolver, SearchResolver, AuthGuard, AdminGuard, LoginGuard } from '@app/guards';
+import { AuthGuard, AdminGuard, LoginGuard } from '@app/guards';
 
 const routes: Routes = [
 	{
@@ -21,12 +21,12 @@ const routes: Routes = [
 			{ path: 'login', loadChildren: 'app/modules/auth-module/auth.module#AuthModule', pathMatch: 'full', canActivate: [LoginGuard] },
 			{ path: 'steam', loadChildren: 'app/modules/steam-module/steam.module#SteamModule' },
 			{ path: 'search', redirectTo: 'search/', pathMatch: 'full', data: { SearchResults: '' } },
-			{ path: 'search/:term', component: SearchResultsComponent, resolve: { SearchResults: SearchResolver } },
+			{ path: 'search/:term', component: SearchResultsComponent },
 			// User routes (all users)
 			{ path: 'user', loadChildren: 'app/modules/user-module/user.module#UserModule', pathMatch: 'full', canActivate: [AuthGuard] },
 			// CMS routes
 			{ path: '', redirectTo: 'home', pathMatch: 'full' },
-			{ path: ':content', component: ContentComponent, resolve: { CmsContent: CmsResolver } },
+			{ path: ':content', component: ContentComponent },
 		]
 	},
 ];

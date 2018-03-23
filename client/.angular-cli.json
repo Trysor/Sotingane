@@ -46,6 +46,7 @@
 				"environmentSource": "environments/environment.ts",
 				"index": "index.html",
 				"main": "main.server.ts",
+				"name": "server",
 				"outDir": "dist/server",
 				"platform": "server",
 				"prefix": "",

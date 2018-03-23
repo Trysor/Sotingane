@@ -1,5 +1,5 @@
 import {
-	Component, Input, OnInit, AfterViewInit, OnDestroy, DoCheck, Inject, PLATFORM_ID, ChangeDetectionStrategy,
+	Component, Input, AfterViewInit, OnDestroy, DoCheck, Inject, PLATFORM_ID, ChangeDetectionStrategy,
 	ComponentFactoryResolver, Injector, ComponentFactory, ViewChild, ElementRef, ComponentRef, Optional
 } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
@@ -9,7 +9,7 @@ import { isPlatformServer } from '@angular/common';
 import { CMSService, AuthService, ModalService, ServerService } from '@app/services';
 import { CmsContent, AccessRoles, DynamicComponent } from '@app/models';
 
-import { Subject, BehaviorSubject } from 'rxjs';
+import { Subject, BehaviorSubject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { DynamicLinkComponent } from '../content-controllers/dynamic.link.component';
@@ -21,7 +21,9 @@ import { DynamicImageComponent } from '../content-controllers/dynamic.image.comp
 	styleUrls: ['./content.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ContentComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
+export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
+	private _routingSub: Subscription;
+
 	private _inputSet = false;
 	@Input() public set contentInput(value: CmsContent) {
 		if (this._inputSet) { return; }
@@ -33,12 +35,20 @@ export class ContentComponent implements OnInit, AfterViewInit, OnDestroy, DoChe
 	public readonly AccessRoles = AccessRoles;
 	public readonly contentSubject = new BehaviorSubject<CmsContent>(null);
 	public isPlatformServer = false;
+	public loading = false;
 
 	private readonly _ngUnsub = new Subject();
 	@ViewChild('contentHost') private _contentHost: ElementRef;
 	private readonly _dynamicContent = new Map<string, ComponentFactory<DynamicComponent>>();
 	private readonly _embeddedComponents: ComponentRef<DynamicComponent>[] = [];
 
+	private readonly _failedToLoad: CmsContent = {
+		access: AccessRoles.everyone,
+		title: 'Page not available',
+		content: 'Uhm. There appears to be nothing here. Sorry.',
+		version: 0,
+		route: '',
+	};
 
 	constructor(
 		@Optional() private server: ServerService, // This service only exists in SSR
@@ -51,24 +61,15 @@ export class ContentComponent implements OnInit, AfterViewInit, OnDestroy, DoChe
 		public authService: AuthService,
 		public cmsService: CMSService) {
 
-
 		this.isPlatformServer = isPlatformServer(platformId);
 
 		// Map the tag to replace with the corresponding factory
 		this._dynamicContent.set('a', resolver.resolveComponentFactory(DynamicLinkComponent));
 		this._dynamicContent.set('figure', resolver.resolveComponentFactory(DynamicImageComponent));
-	}
 
-	ngOnInit() {
-		// If the contentSubject already has a value, then that's great!
-		if (!this.contentSubject.getValue()) {
-			this.contentSubject.next(this.route.snapshot.data['CmsContent']);
-		}
-
+		// Only after the above we ought to check our content
 		this.router.events.pipe(takeUntil(this._ngUnsub)).subscribe(e => {
-			if (e instanceof NavigationEnd) {
-				this.contentSubject.next(this.route.snapshot.data['CmsContent']);
-			}
+			if (e instanceof NavigationEnd) { this.queryForData(); }
 		});
 	}
 
@@ -81,6 +82,8 @@ export class ContentComponent implements OnInit, AfterViewInit, OnDestroy, DoChe
 	}
 
 	ngOnDestroy() {
+		this._routingSub.unsubscribe();
+
 		this._ngUnsub.next();
 		this._ngUnsub.complete();
 		// Clean components
@@ -89,6 +92,22 @@ export class ContentComponent implements OnInit, AfterViewInit, OnDestroy, DoChe
 
 	ngDoCheck() {
 		this._embeddedComponents.forEach(comp => comp.changeDetectorRef.detectChanges());
+	}
+
+	/**
+	 * Internal helper to query for data
+	 */
+	private queryForData() {
+		// Set loading flag
+		this.loading = true;
+		// Cancel any ongoing subscriptions
+		if (this._routingSub && !this._routingSub.closed) { this._routingSub.unsubscribe(); }
+		// Request content
+		this._routingSub = this.cmsService.requestContent(this.route.snapshot.params['content']).subscribe(
+			content => this.contentSubject.next(content),					// Success
+			err => this.contentSubject.next(this._failedToLoad),			// Error
+			() => { this._routingSub.unsubscribe(); this.loading = false; } // Request Completed, set loading false
+		);
 	}
 
 	/**
@@ -122,7 +141,6 @@ export class ContentComponent implements OnInit, AfterViewInit, OnDestroy, DoChe
 			newContent = newContent.replace(open, `<${selector} `).replace(close, `</${selector}>`);
 		});
 		e.innerHTML = newContent;
-
 
 		// Second loop; Injection time
 		this._dynamicContent.forEach((fac) => {

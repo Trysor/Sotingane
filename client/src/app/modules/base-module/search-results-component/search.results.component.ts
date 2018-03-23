@@ -1,8 +1,8 @@
 import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
-import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
+import { Router, ActivatedRoute, NavigationEnd, NavigationStart } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
-import { MobileService } from '@app/services';
+import { CMSService, MobileService } from '@app/services';
 import { CmsContent, TableSettings, ColumnType, ColumnDir, TableFilterSettings } from '@app/models';
 
 import { Subject, BehaviorSubject } from 'rxjs';
@@ -75,16 +75,19 @@ export class SearchResultsComponent implements OnDestroy {
 	constructor(
 		private router: Router,
 		private datePipe: DatePipe,
+		private cmsService: CMSService,
 		public route: ActivatedRoute,
 		public mobileService: MobileService) {
 
 		this.router.events.pipe(takeUntil(this._ngUnsub)).subscribe(e => {
+			if (e instanceof NavigationStart) { this._ngUnsub.next(); }
 			if (e instanceof NavigationEnd) { this.setResults(); }
 		});
+
+		this.setResults();
 	}
 
 	ngOnDestroy() {
-		this._ngUnsub.next();
 		this._ngUnsub.complete();
 	}
 
@@ -96,7 +99,11 @@ export class SearchResultsComponent implements OnDestroy {
 			this.router.navigateByUrl('/search/' + term);
 			return;
 		}
-		this.data.next(this.route.snapshot.data['SearchResults']);
+		const sub = this.cmsService.searchContent(this.route.snapshot.params['term']).pipe(takeUntil(this._ngUnsub)).subscribe(
+			list => this.data.next(list),
+			err => this.data.next(null),
+			() => sub.unsubscribe()
+		);
 	}
 
 }

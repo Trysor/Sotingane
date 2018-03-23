@@ -80,6 +80,19 @@ export class AuthService {
 	}
 
 	/**
+	 * Returns true if the token has expired
+	 * @param  {string}  token  the token to check the expiration date of
+	 * @param  {number}  offset number of seconds offset from now
+	 * @return {boolean}        whether the token has expired
+	 */
+	private jwtIsExpired(token: string, offset: number = 0): boolean {
+		const date = this.jwtExpirationDate(token);
+		// if we can't get a date, we assume its best to say that it has expired.
+		if (null === date) { return true; }
+		return ((new Date().valueOf() + offset * 1000) > date.valueOf());
+	}
+
+	/**
 	 * Starts a timer to renew the jwt before it exires
 	 * @param  {string}       token token to base the renewal timer on
 	 */
@@ -123,16 +136,10 @@ export class AuthService {
 	}
 
 	/**
-	 * Returns true if the token has expired
-	 * @param  {string}  token  the token to check the expiration date of
-	 * @param  {number}  offset number of seconds offset from now
-	 * @return {boolean}        whether the token has expired
+	 * Returns the expiration state of the currently loggged in user
 	 */
-	public jwtIsExpired(token: string, offset: number = 0): boolean {
-		const date = this.jwtExpirationDate(token);
-		// if we can't get a date, we assume its best to say that it has expired.
-		if (null === date) { return true; }
-		return ((new Date().valueOf() + offset * 1000) > date.valueOf());
+	public getUserSessionExpired(): boolean {
+		return this.jwtIsExpired(this.tokenService.token);
 	}
 
 	/**

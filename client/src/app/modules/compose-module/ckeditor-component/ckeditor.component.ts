@@ -16,7 +16,7 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 })
 export class CKEditorComponent implements OnInit, OnDestroy {
 	// editor
-	@ViewChild('content') editorBox: ElementRef<HTMLDivElement>;
+	@ViewChild('content') editorBox: ElementRef<HTMLTextAreaElement>;
 	private _editor: CKEditor;
 	private _control: FormControl;
 
