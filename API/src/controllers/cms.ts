@@ -42,7 +42,7 @@ export class CMSController {
 			{
 				$project: { current: { title: 1, route: 1, folder: 1 } }
 			},
-			{ $replaceRoot: { newRoot: '$current' } },
+			{ $replaceRoot: { newRoot: '$current' } }
 		]);
 		if (!contentList) {
 			return res.status(404).send(status(CMS_STATUS.NO_ROUTES));
@@ -91,12 +91,16 @@ export class CMSController {
 			{ 'current.route': route },
 			{ $inc: { 'views': 1 } },
 			{ fields: { prev: 0, 'current.content_searchable': 0, 'current.image': 0 } }
-		);
+		).populate([
+			{ path: 'current.updatedBy', select: ['username'] },
+			{ path: 'current.createdBy', select: ['username'] }
+		]);
+
 		if (!contentDoc) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
 
 		const access = contentDoc.current.access === accessRoles.everyone || (user && user.canAccess(contentDoc.current.access));
-
 		if (!access) { return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED)); }
+
 		res.status(200).send(contentDoc.current);
 	}
 

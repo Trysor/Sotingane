@@ -134,21 +134,4 @@ if (ajv.validateSchema(createPatchContentSchema)) {
 	console.error(`${JSchema.ContentSchema} did not validate`);
 }
 
-
-/*
- |--------------------------------------------------------------------------
- | Hooks
- |--------------------------------------------------------------------------
-*/
-
-
-// Before fetching one contentObject, do the following
-schema.pre('findOne', function (next: NextFunction) {
-	const content: ContentDoc = this;
-	content.populate({ path: 'current.updatedBy', select: ['username', 'role'] });
-	content.populate({ path: 'current.createdBy', select: ['username', 'role'] });
-	next();
-});
-
-
 export const ContentModel = model<ContentDoc>('Content', schema);
