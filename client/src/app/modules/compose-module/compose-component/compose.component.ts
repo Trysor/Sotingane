@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, ChangeDetectionStrategy, Optional } from '@angular/core';
 import { NgForm, FormGroupDirective, FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, CanDeactivate } from '@angular/router';
 import { DatePipe } from '@angular/common';
@@ -53,11 +53,11 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 	private _hasSaved = false;
 
 	constructor(
+		@Optional() private modalService: ModalService,
 		private datePipe: DatePipe,
 		private router: Router,
 		private route: ActivatedRoute,
 		private fb: FormBuilder,
-		private modalService: ModalService,
 		private cmsService: CMSService,
 		public mobileService: MobileService) {
 

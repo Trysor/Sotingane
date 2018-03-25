@@ -1,7 +1,7 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class TokenService {
 	private _platformID: Object;
 

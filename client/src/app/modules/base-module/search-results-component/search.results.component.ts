@@ -68,7 +68,7 @@ export class SearchResultsComponent implements OnDestroy {
 	public readonly filterSettings: TableFilterSettings = {
 		placeholder: 'Search',
 		hidden: this.mobileService.isMobile(),
-		func: (term: string) => { this.setResults(term); }
+		func: (term: string) => { this.router.navigateByUrl('/search/' + term); }
 	};
 
 
@@ -79,12 +79,9 @@ export class SearchResultsComponent implements OnDestroy {
 		public route: ActivatedRoute,
 		public mobileService: MobileService) {
 
-		this.router.events.pipe(takeUntil(this._ngUnsub)).subscribe(e => {
-			if (e instanceof NavigationStart) { this._ngUnsub.next(); }
-			if (e instanceof NavigationEnd) { this.setResults(); }
+		this.route.paramMap.pipe(takeUntil(this._ngUnsub)).subscribe(p => {
+			this.setResults(p.get('term'));
 		});
-
-		this.setResults();
 	}
 
 	ngOnDestroy() {
@@ -94,15 +91,10 @@ export class SearchResultsComponent implements OnDestroy {
 	/**
 	 * Set searchResults helper
 	 */
-	private setResults(term?: string) {
-		if (term) {
-			this.router.navigateByUrl('/search/' + term);
-			return;
-		}
-		const sub = this.cmsService.searchContent(this.route.snapshot.params['term']).pipe(takeUntil(this._ngUnsub)).subscribe(
-			list => this.data.next(list),
-			err => this.data.next(null),
-			() => sub.unsubscribe()
+	private setResults(term: string) {
+		const sub = this.cmsService.searchContent(term).pipe(takeUntil(this._ngUnsub)).subscribe(
+			list => { this.data.next(list); sub.unsubscribe(); },
+			err => { this.data.next(null); sub.unsubscribe(); }
 		);
 	}
 

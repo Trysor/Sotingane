@@ -6,14 +6,14 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 // services
 import {
 	AuthService,
+	ContentService,
 	CMSService,
 	InterceptorService,
 	IntersectionService,
 	SteamService,
 	MobileService,
 	TokenService,
-	AdminService,
-	ModalService
+	AdminService
 } from '@app/services';
 
 // Modules
@@ -74,20 +74,6 @@ export class SharedModule {
 					useClass: InterceptorService,
 					multi: true
 				},
-				// Services
-				AuthService,
-				CMSService,
-				SteamService,
-				IntersectionService,
-				MobileService,
-				TokenService,
-				AdminService,
-				ModalService,
-				// Guards
-				AuthGuard,
-				AdminGuard,
-				LoginGuard,
-				DeactivateGuard,
 				// Pipes (for use in-code)
 				DatePipe
 			]

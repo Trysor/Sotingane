@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Optional } from '@angular/core';
 
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
@@ -107,8 +107,8 @@ export class PagesComponent {
 
 
 	constructor(
+		@Optional() private modalService: ModalService,
 		private router: Router,
-		private modalService: ModalService,
 		private cmsService: CMSService,
 		private adminService: AdminService,
 		private datePipe: DatePipe) {

@@ -1,8 +1,9 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError } from '@angular/router';
+import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 
 import { Subject, Subscription, interval } from 'rxjs';
-import { takeUntil, map } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
+
+import { HttpService } from '@app/services';
 
 @Component({
 	selector: 'loadingbar-component',
@@ -10,33 +11,37 @@ import { takeUntil, map } from 'rxjs/operators';
 	styleUrls: ['./loadingbar.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LoadingbarComponent implements OnInit {
-	private _ngUnsub = new Subject();
+export class LoadingbarComponent implements OnDestroy {
+	private readonly _ngUnsub = new Subject();
+
+	public readonly loadingBarValue = new Subject<number>();
+	public readonly loadingBarVisible = new Subject<boolean>();
+
 	private _loadingBarSub: Subscription;
 
-	public loadingBarValue = new Subject<number>();
-	public loadingBarVisible = new Subject<boolean>();
+	constructor(private http: HttpService) {
+		http.isLoading.pipe(takeUntil(this._ngUnsub)).subscribe(isLoading => {
+			// Unsubscribe
+			if (this._loadingBarSub) { this._loadingBarSub.unsubscribe(); }
 
-	constructor(private router: Router) {}
+			// Set values
+			this.loadingBarVisible.next(isLoading);
+			this.loadingBarValue.next(0);
 
-	ngOnInit() {
-		this.router.events.pipe(takeUntil(this._ngUnsub)).subscribe(e => {
-			if (e instanceof NavigationStart) {
-				this.loadingBarValue.next(0);
+			// If we're not loading, stop here.
+			if (!isLoading) { return; }
 
-				if (this._loadingBarSub) { this._loadingBarSub.unsubscribe(); }
-
-				this._loadingBarSub = interval(100).subscribe(num => { // every 100ms
-					if (num === 1) { this.loadingBarVisible.next(true); }
-					this.loadingBarValue.next(Math.min(90, num * 10));
-				});
-			} else if (e instanceof NavigationEnd || e instanceof NavigationCancel || e instanceof NavigationError) {
-				if (this._loadingBarSub) { this._loadingBarSub.unsubscribe(); }
-
-				this.loadingBarValue.next(100); // 100 = max
-				this.loadingBarVisible.next(false);
-			}
+			// Start timer, ticks every 100ms
+			this._loadingBarSub = interval(100).subscribe(num => {
+				this.loadingBarValue.next(Math.min(90, num * 10));
+			});
 		});
+
+	}
+
+	ngOnDestroy() {
+		this._ngUnsub.next();
+		this._ngUnsub.complete();
 	}
 
 }

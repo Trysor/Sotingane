@@ -1,19 +1,17 @@
 import {
-	Component, Input, AfterViewInit, OnDestroy, DoCheck, Inject, PLATFORM_ID, ChangeDetectionStrategy,
-	ComponentFactoryResolver, Injector, ComponentFactory, ViewChild, ElementRef, ComponentRef, Optional
+	Component, Input, AfterViewInit, OnDestroy, DoCheck, ChangeDetectionStrategy,
+	ViewChild, ElementRef, Optional, Inject, PLATFORM_ID
 } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 
 import { isPlatformServer } from '@angular/common';
 
-import { CMSService, AuthService, ModalService, ServerService } from '@app/services';
-import { CmsContent, AccessRoles, DynamicComponent } from '@app/models';
+import { CMSService, AuthService, ModalService, ContentService } from '@app/services';
+import { CmsContent, AccessRoles } from '@app/models';
 
 import { Subject, BehaviorSubject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { DynamicLinkComponent } from '../content-controllers/dynamic.link.component';
-import { DynamicImageComponent } from '../content-controllers/dynamic.image.component';
 
 @Component({
 	selector: 'content-component',
@@ -22,50 +20,46 @@ import { DynamicImageComponent } from '../content-controllers/dynamic.image.comp
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
-	private _routingSub: Subscription;
+	// Content
+	public readonly contentSubject = new BehaviorSubject<CmsContent>(null);
+	@ViewChild('contentHost') private _contentHost: ElementRef<HTMLDivElement>;
 
+	// Input content. Used in relation to Editing previews
 	private _inputSet = false;
 	@Input() public set contentInput(value: CmsContent) {
 		if (this._inputSet) { return; }
 		this.contentSubject.next(value);
 		this._inputSet = true;
 	}
-	@Input() public previewMode = false; // used in the template
+	// previewMode controls the visiblity state of details in the template
+	@Input() public previewMode = false;
 
+	// Template Helpers
 	public readonly AccessRoles = AccessRoles;
-	public readonly contentSubject = new BehaviorSubject<CmsContent>(null);
-	public isPlatformServer = false;
-	public loading = false;
+	public readonly isPlatformServer;
 
+	// Code helpers
 	private readonly _ngUnsub = new Subject();
-	@ViewChild('contentHost') private _contentHost: ElementRef;
-	private readonly _dynamicContent = new Map<string, ComponentFactory<DynamicComponent>>();
-	private readonly _embeddedComponents: ComponentRef<DynamicComponent>[] = [];
-
 	private readonly _failedToLoad: CmsContent = {
 		access: AccessRoles.everyone,
 		title: 'Page not available',
 		content: 'Uhm. There appears to be nothing here. Sorry.',
+		description: '404 - Not found',
 		version: 0,
 		route: '',
 	};
 
+	// Constructor
 	constructor(
-		@Optional() private server: ServerService, // This service only exists in SSR
 		@Inject(PLATFORM_ID) private platformId: Object,
-		private modalService: ModalService,
-		private resolver: ComponentFactoryResolver,
-		private injector: Injector,
-		private router: Router,
+		@Optional() private modalService: ModalService,
+		private contentService: ContentService,
 		private route: ActivatedRoute,
+		private router: Router,
 		public authService: AuthService,
 		public cmsService: CMSService) {
 
 		this.isPlatformServer = isPlatformServer(platformId);
-
-		// Map the tag to replace with the corresponding factory
-		this._dynamicContent.set('a', resolver.resolveComponentFactory(DynamicLinkComponent));
-		this._dynamicContent.set('figure', resolver.resolveComponentFactory(DynamicImageComponent));
 
 		// Only after the above we ought to check our content
 		this.router.events.pipe(takeUntil(this._ngUnsub)).subscribe(e => {
@@ -75,99 +69,38 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 
 	ngAfterViewInit() {
 		this.contentSubject.pipe(takeUntil(this._ngUnsub)).subscribe(content => {
-			this.build(content); // also cleans
-			// Detect changes manually for each component.
-			this._embeddedComponents.forEach(comp => comp.changeDetectorRef.detectChanges());
+			if (!content) { return; }
+
+			// Set metadata
+			this.contentService.setContentMeta(content);
+			// Build content
+			this.contentService.buildContentForElement(this._contentHost, content);
 		});
 	}
 
 	ngOnDestroy() {
-		this._routingSub.unsubscribe();
-
+		// Also unsubscribe from other observables
 		this._ngUnsub.next();
 		this._ngUnsub.complete();
 		// Clean components
-		this.cleanEmbeddedComponents();
+		this.contentService.cleanEmbeddedComponents();
+		// Set meta back to default
+		this.contentService.setDefaultMeta();
 	}
 
 	ngDoCheck() {
-		this._embeddedComponents.forEach(comp => comp.changeDetectorRef.detectChanges());
+		this.contentService.detectChanges();
 	}
 
 	/**
 	 * Internal helper to query for data
 	 */
 	private queryForData() {
-		// Set loading flag
-		this.loading = true;
-		// Cancel any ongoing subscriptions
-		if (this._routingSub && !this._routingSub.closed) { this._routingSub.unsubscribe(); }
 		// Request content
-		this._routingSub = this.cmsService.requestContent(this.route.snapshot.params['content']).subscribe(
+		this.cmsService.requestContent(this.route.snapshot.params['content']).subscribe(
 			content => this.contentSubject.next(content),					// Success
-			err => this.contentSubject.next(this._failedToLoad),			// Error
-			() => { this._routingSub.unsubscribe(); this.loading = false; } // Request Completed, set loading false
+			err => this.contentSubject.next(this._failedToLoad)				// Error
 		);
-	}
-
-	/**
-	 * Inserts the content into DOM
-	 * @param cmsContent
-	 */
-	private build(cmsContent: CmsContent) {
-		// null ref checks
-		if (!this._contentHost || !this._contentHost.nativeElement || !cmsContent || !cmsContent.content) {
-			return;
-		}
-
-		// Prepare content for injection
-		const e = (<HTMLElement>this._contentHost.nativeElement);
-		let newContent = cmsContent.content;
-
-		// inject directly if it is the server
-		if (this.isPlatformServer && !!this.server) {
-			e.innerHTML = this.server.modifyContent(newContent);
-			return;
-		}
-
-		// Clean components before rebuilding.
-		this.cleanEmbeddedComponents();
-
-		// First loop; alter everything first, then inject afterwards.
-		this._dynamicContent.forEach((fac, tag) => {
-			const selector = fac.selector;
-			const open = new RegExp(`<${tag} `, 'g');
-			const close = new RegExp(`</${tag}>`, 'g');
-			newContent = newContent.replace(open, `<${selector} `).replace(close, `</${selector}>`);
-		});
-		e.innerHTML = newContent;
-
-		// Second loop; Injection time
-		this._dynamicContent.forEach((fac) => {
-			// query for elements we need to adjust
-			const elems = e.querySelectorAll(fac.selector);
-
-			for (let i = 0; i < elems.length; i++) {
-				const el = elems.item(i);
-				const savedTextContent = el.textContent; // save text content before we modify the element
-				// convert NodeList into an array, since Angular dosen't like having a NodeList passed for projectableNodes
-				const comp = fac.create(this.injector, [Array.prototype.slice.call(el.childNodes)], el);
-				// only static ones work here since this is the only time they're set
-				for (const attr of (el as any).attributes) {
-					comp.instance[attr.nodeName] = attr.nodeValue;
-				}
-				// do buildJob
-				comp.instance.buildJob(el, savedTextContent);
-
-				this._embeddedComponents.push(comp);
-			}
-		});
-	}
-
-	private cleanEmbeddedComponents() {
-		// destroycomponents to avoid be memory leaks
-		this._embeddedComponents.forEach(comp => comp.destroy());
-		this._embeddedComponents.length = 0;
 	}
 
 	/**
@@ -182,8 +115,8 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 	 */
 	public deletePage() {
 		const content = this.contentSubject.getValue();
-		this.modalService.openDeleteContentModal(content).afterClosed().subscribe(result => {
-			if (!result) { return; }
+		this.modalService.openDeleteContentModal(content).afterClosed().subscribe(doDelete => {
+			if (!doDelete) { return; }
 
 			const sub = this.cmsService.deleteContent(content.route).subscribe(
 				() => {

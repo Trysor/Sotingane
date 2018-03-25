@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserTransferStateModule } from '@angular/platform-browser';
 
-
-// Service Worker
-import { environment } from '@env';
-import { WorkerService } from '@app/services';
 import { ServiceWorkerModule } from '@angular/service-worker';
+
+import { environment } from '@env';
+import { WorkerService, ModalService } from '@app/services';
 
 import { AppModule } from './app.module';
 import { AppComponent } from './app.component';
@@ -14,10 +14,11 @@ import { AppComponent } from './app.component';
 	imports: [
 		BrowserAnimationsModule,
 		AppModule,
+		BrowserTransferStateModule,
 		ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })
 	],
 	providers: [
-		WorkerService,
+		WorkerService, ModalService
 	],
 	bootstrap: [AppComponent]
 })

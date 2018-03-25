@@ -1,5 +1,4 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
@@ -8,13 +7,14 @@ import { MatSnackBar } from '@angular/material';
 
 import { environment } from '@env';
 import { User, UpdatePasswordUser, UserToken, AccessRoles } from '@app/models';
-import { TokenService } from '@app/services/token.service';
+import { TokenService } from '@app/services/helpers/token.service';
+import { HttpService } from '@app/services/http/http.service';
 
 import { Observable, Subscription, BehaviorSubject, timer, of } from 'rxjs';
 import { map, catchError, timeout, takeUntil } from 'rxjs/operators';
 
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class AuthService {
 	private _userSubject = new BehaviorSubject(null);
 	private _renewalSub: Subscription;
@@ -23,7 +23,7 @@ export class AuthService {
 		@Inject(PLATFORM_ID) private platformId: Object,
 		private tokenService: TokenService,
 		private snackBar: MatSnackBar,
-		private http: HttpClient,
+		private http: HttpService,
 		private router: Router) {
 
 		// If we're on the server, push null

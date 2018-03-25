@@ -1,17 +1,12 @@
 <header-component (leftNav)="toggleLeftNav()" (rightNav)="toggleRightNav()"></header-component>
 <loadingbar-component></loadingbar-component>
-
 <!-- NAVIGATION BAR -->
 <nav-component *ngIf="!(mobileService.isMobile() | async) as notMobile" [ngClass]="{ nav: true, full: notMobile }"></nav-component>
 
 <mat-sidenav-container #sidenav>
 	<div [ngClass]="{ site: true, mobile: (mobileService.isMobile() | async) }">
-		<main class="wrapper">
-			<!-- CONTENT -->
-			<!-- [@RoutingAnim]="routerSub | async" -->
-			<router-outlet></router-outlet>
-		</main>
-
+		<!-- CONTENT -->
+		<main class="wrapper"><router-outlet></router-outlet></main>
 		<!-- FOOTER -->
 		<footer-component class="footer"></footer-component>
 	</div>

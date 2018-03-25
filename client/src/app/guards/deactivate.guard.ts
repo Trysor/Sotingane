@@ -4,7 +4,7 @@ import { CanDeactivate } from '@angular/router';
 import { ComposeComponent } from '@app/modules/compose-module/compose-component/compose.component';
 
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class DeactivateGuard implements CanDeactivate<ComposeComponent> {
 
 	/**

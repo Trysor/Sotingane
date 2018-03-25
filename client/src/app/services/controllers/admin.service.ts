@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+
+import { HttpService } from '@app/services/http/http.service';
 
 import { environment } from '@env';
-import { User, AccessRoles, CmsContent } from '@app/models';
+import { User, CmsContent } from '@app/models';
 
-import { Observable, Subscription, of } from 'rxjs';
-import { map, catchError, timeout, takeUntil } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { timeout } from 'rxjs/operators';
 
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class AdminService {
 
-	constructor(private http: HttpClient, private router: Router) { }
+	constructor(private http: HttpService) { }
 
 
 	// ---------------------------------------

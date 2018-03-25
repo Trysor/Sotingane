@@ -2,7 +2,7 @@
 
 import { DynamicComponent } from '@app/models';
 
-import { IntersectionService } from '@app/services';
+import { IntersectionService } from '@app/services/utility/intersection.service';
 import { DynamicLazyLoader } from './dynamic.lazy.loader';
 
 @Component({

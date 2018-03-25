@@ -5,7 +5,7 @@ import { DOCUMENT } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
 
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class IntersectionService {
 	private _obs: IntersectionObserver;
 	private _subject = new Subject<IntersectionObserverEntry[]>();

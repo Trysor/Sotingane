@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Optional } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
@@ -16,9 +16,9 @@ export class ChangePasswordComponent {
 	public changePasswordForm: FormGroup;
 
 	constructor(
+		@Optional() private modalService: ModalService,
 		private router: Router,
 		private fb: FormBuilder,
-		private modalService: ModalService,
 		public authService: AuthService) {
 		this.changePasswordForm = fb.group({
 			'currentPassword': ['', Validators.required],

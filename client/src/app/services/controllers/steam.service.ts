@@ -1,21 +1,22 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 import { environment } from '@env';
 import { GameDig, SteamServer } from '@app/models';
 
+import { HttpService } from '@app/services/http/http.service';
+
 import { Observable, BehaviorSubject } from 'rxjs';
 import { timeout } from 'rxjs/operators';
 
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class SteamService {
 	// Remembers one server at a time
 	private _serverData = new BehaviorSubject<GameDig>(null);
 
 	constructor(
-		private http: HttpClient,
+		private http: HttpService,
 		private router: Router) {
 	}
 

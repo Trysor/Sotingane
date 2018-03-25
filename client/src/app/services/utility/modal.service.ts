@@ -2,7 +2,7 @@
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 
-import { CMSService } from '@app/services/cms.service';
+import { CMSService } from '@app/services/controllers/cms.service';
 import { ModalData, CmsContent } from '@app/models';
 
 import { ModalComponent } from '@app/modules/shared-module/modals/modal.component';

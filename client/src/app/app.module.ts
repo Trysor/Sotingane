@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppComponent } from './app.component';
 
 // Directly load base module
@@ -18,7 +17,7 @@ import { BaseRoutingModule } from '@app/modules/base-module/base.routing-module'
 		AppComponent
 	],
 	imports: [
-		BrowserModule.withServerTransition({ appId: 'soting' }),
+		BrowserModule.withServerTransition({ appId: 'soting' }), // must be in app.module
 		BaseModule,
 		BaseRoutingModule,
 		// RouterModule.forRoot(appRoutes),

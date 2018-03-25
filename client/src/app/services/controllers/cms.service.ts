@@ -1,26 +1,26 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { environment } from '@env';
 import { CmsContent } from '@app/models';
 
-import { AuthService } from '@app/services/auth.service';
+import { AuthService } from '@app/services/controllers/auth.service';
+import { HttpService } from '@app/services/http/http.service';
 
 import { Observable, BehaviorSubject } from 'rxjs';
 import { timeout } from 'rxjs/operators';
 
-
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class CMSService {
 	private _listSubject: BehaviorSubject<CmsContent[]> = new BehaviorSubject(null);
 
 	constructor(
+		@Inject(PLATFORM_ID) private platformId: Object,
 		private authService: AuthService,
-		private http: HttpClient,
+		private http: HttpService,
 		private router: Router) {
 
-		// Whenever a user logs in or out, update
+		// Whenever a user logs in or out we should force-update.
 		authService.getUser().subscribe(user => this.getContentList(true));
 	}
 
@@ -48,7 +48,7 @@ export class CMSService {
 	 * @return {Observable<CmsContent[]>}         Server's response, as an Observable
 	 */
 	private requestContentList(): Observable<CmsContent[]> {
-		return this.http.get<CmsContent[]>(environment.URL.cms.content).pipe(timeout(environment.TIMEOUT));
+		return this.http.get<CmsContent[]>(environment.URL.cms.content);
 	}
 
 	/**
@@ -56,7 +56,7 @@ export class CMSService {
 	 * @return {Observable<CmsContent>}         Server's response, as an Observable
 	 */
 	public searchContent(searchTerm: string): Observable<CmsContent[]> {
-		return this.http.get<CmsContent[]>(environment.URL.cms.search + '/' + searchTerm).pipe(timeout(environment.TIMEOUT));
+		return this.http.get<CmsContent[]>(environment.URL.cms.search + '/' + searchTerm);
 	}
 
 	/**
@@ -64,7 +64,7 @@ export class CMSService {
 	 * @return {Observable<CmsContent>}         Server's response, as an Observable
 	 */
 	public requestContent(contentUrl: string): Observable<CmsContent> {
-		return this.http.get<CmsContent>(environment.URL.cms.content + '/' + contentUrl).pipe(timeout(environment.TIMEOUT));
+		return this.http.get<CmsContent>(environment.URL.cms.content + '/' + contentUrl);
 	}
 
 	/**
@@ -72,7 +72,7 @@ export class CMSService {
 	 * @return {Observable<CmsContent>}         Server's response, as an Observable
 	 */
 	public requestContentHistory(contentUrl: string): Observable<CmsContent[]> {
-		return this.http.get<CmsContent[]>(environment.URL.cms.history + '/' + contentUrl).pipe(timeout(environment.TIMEOUT));
+		return this.http.get<CmsContent[]>(environment.URL.cms.history + '/' + contentUrl);
 	}
 
 	/**
@@ -80,7 +80,7 @@ export class CMSService {
 	 * @return {Observable<CmsContent>}         Server's response, as an Observable
 	 */
 	public updateContent(contentUrl: string, updatedContent: CmsContent): Observable<CmsContent> {
-		return this.http.patch<CmsContent>(environment.URL.cms.content + '/' + contentUrl, updatedContent).pipe(timeout(environment.TIMEOUT));
+		return this.http.patch<CmsContent>(environment.URL.cms.content + '/' + contentUrl, updatedContent);
 	}
 
 	/**
@@ -88,7 +88,7 @@ export class CMSService {
 	 * @return {Observable<boolean>}         Server's response, as an Observable
 	 */
 	public deleteContent(contentUrl: string): Observable<boolean> {
-		return this.http.delete<boolean>(environment.URL.cms.content + '/' + contentUrl).pipe(timeout(environment.TIMEOUT));
+		return this.http.delete<boolean>(environment.URL.cms.content + '/' + contentUrl);
 	}
 
 	/**
@@ -96,6 +96,6 @@ export class CMSService {
 	 * @return {Observable<CmsContent>}         Server's response, as an Observable
 	 */
 	public createContent(newContent: CmsContent): Observable<CmsContent> {
-		return this.http.post<CmsContent>(environment.URL.cms.content, newContent).pipe(timeout(environment.TIMEOUT));
+		return this.http.post<CmsContent>(environment.URL.cms.content, newContent);
 	}
 }

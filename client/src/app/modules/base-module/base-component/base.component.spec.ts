@@ -10,7 +10,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientModule } from '@angular/common/http';
 
-import { AuthService } from '@app/services/auth.service';
+import { AuthService } from '@app/services/controllers/auth.service';
 
 import { User } from '@app/models/user';
 import { Observable } from 'rxjs/Observable';

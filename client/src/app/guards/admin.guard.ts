@@ -4,7 +4,7 @@ import { CanActivate, Router } from '@angular/router';
 import { AuthService } from '@app/services';
 import { AccessRoles } from '@app/models';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class AdminGuard implements CanActivate {
 
 	constructor(
