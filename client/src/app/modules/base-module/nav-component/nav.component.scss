@@ -5,7 +5,7 @@
 	margin: 10px 0;
 }
 
-a.active {
+a[mat-list-item].active {
 	background: $activeRouteBackground;
 }
 
