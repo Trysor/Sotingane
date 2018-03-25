@@ -92,8 +92,8 @@ export class CMSController {
 			{ $inc: { 'views': 1 } },
 			{ fields: { prev: 0, 'current.content_searchable': 0, 'current.image': 0 } }
 		).populate([
-			{ path: 'current.updatedBy', select: ['username'] },
-			{ path: 'current.createdBy', select: ['username'] }
+			{ path: 'current.updatedBy', select: 'username -_id' }, // exclude _id
+			{ path: 'current.createdBy', select: 'username -_id' }  // exclude _id
 		]);
 
 		if (!contentDoc) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
