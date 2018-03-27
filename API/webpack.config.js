@@ -12,7 +12,7 @@ fs.readdirSync('node_modules').filter(function (x) {
 
 module.exports = {
 	mode: 'production',
-	entry: { server: './src/index.ts' },
+	entry: { api: './src/index.ts' },
 	resolve: { extensions: ['.js', '.ts'] },
 	target: 'node',
 	externals: nodeModules,
@@ -25,11 +25,4 @@ module.exports = {
 			{ test: /\.ts$/, loader: 'ts-loader', exclude: '/src/test/' }
 		]
 	},
-	plugins: [
-		new webpack.ContextReplacementPlugin(
-			/(.+)?express(\\|\/)(.+)?/,
-			path.join(__dirname, 'src'),
-			{}
-		)
-	]
 };
