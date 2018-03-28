@@ -1,5 +1,4 @@
 /// <reference path="../../../scss/_theme_vars.scss" />
-@import '_theme_vars';
 
 $wrapperPadding: 20px;
 
@@ -11,14 +10,14 @@ mat-sidenav-container {
 	.sidenav {
 		position: fixed;
 		pointer-events: all;
-		top: $headerHeight;
+		top: var(--height-header);
 		width: 85vw;
 		max-width: 350px;
-		height: calc(100vh - #{$headerHeight});
+		height: calc(100vh - var(--height-header));
 		padding: 10px 7px 4px 7px;
 		box-sizing: border-box;
-		background: $sideBG;
-		box-shadow: $boxShadow inset;
+		background: var(--color-sidepanel);
+		box-shadow: var(--shadow) inset;
 	}
 }
 
@@ -28,28 +27,28 @@ mat-sidenav-container {
 	overflow-y: auto;
 
 	&.full {
-		background: $sideBG;
-		border-right: $border;
-		box-shadow: $boxShadow, $boxShadow inset;
+		background: var(--color-sidepanel);
+		border-right: var(--border);
+		box-shadow: var(--shadow), var(--shadow) inset;
 		position: fixed;
 		z-index: 100;
-		height: calc(100vh - #{$headerHeight});
-		width: $sideWidth;
-		top: $headerHeight;
+		height: calc(100vh - var(--height-header);
+		width: var(--width-side);
+		top: var(--height-header);
 		left: 0;
 	}
 }
 
 // SITE SETUP
 .site {
-	margin-top: $headerHeight;
+	margin-top: var(--height-header);
 	display: flex;
 	flex-flow: column;
-	min-height: calc(100vh - #{$headerHeight});
+	min-height: calc(100vh - var(--height-header));
 	box-sizing: border-box;
 	justify-content: space-between;
 	align-items: center;
-	padding-left: calc(#{$sideWidth} + #{$wrapperPadding});
+	padding-left: calc(var(--width-side) + #{$wrapperPadding});
 	padding-right: $wrapperPadding;
 
 	.wrapper {
@@ -57,7 +56,7 @@ mat-sidenav-container {
 		width: 100%;
 		padding-top: $wrapperPadding;
 		box-sizing: border-box;
-		max-width: $wrapperWidth;
+		max-width: var(--width-wrapper);
 	}
 
 	.footer {
@@ -101,7 +100,7 @@ mat-sidenav-container {
 
 .swipe {
 	position: fixed;
-	top: $headerHeight;
+	top: var(--height-header);
 	bottom: 0;
 	width: 6vw;
 	z-index: 10;

@@ -1,4 +1,4 @@
-@import '_theme_vars';
+/// <reference path="_theme_vars.scss" />
 
 #content {
 	a, p {
@@ -15,7 +15,7 @@
 
 		&:hover, &:active {
 			text-decoration: underline;
-			color: $primary;
+			color: var(--color-primary);
 		}
 	}
 
@@ -35,7 +35,7 @@
 			font-family: Georgia, serif;
 			font-size: 5em;
 			font-weight: bold;
-			color: $primary;
+			color: var(--color-primary);
 			position: absolute;
 			left: 0;
 			top: -0.2em;
@@ -62,9 +62,9 @@
 		box-sizing: border-box;
 		display: block;
 		clear: both;
-		border: $border;
-		background: $sideBG;
-		box-shadow: $boxShadow;
+		border: var(--border);
+		background: var(--color-sidepanel);
+		box-shadow: var(--shadow);
 		position: relative;
 
 		&:after {
@@ -75,7 +75,7 @@
 			height: 100%;
 			width: 100%;
 			z-index: 1000;
-			box-shadow: $boxShadow inset;
+			box-shadow: var(--shadow) inset;
 			pointer-events: none;
 		}
 
@@ -89,10 +89,10 @@
 		& > figcaption {
 			padding: .8em;
 			font-size: .75em;
-			background: $materialBG !important;
-			box-shadow: $boxShadow inset;
-			border-top: $border;
-			color: $textColor;
+			background: var(--color-material) !important;
+			box-shadow: var(--shadow) inset;
+			border-top: var(--border);
+			color: var(--color-text);
 		}
 
 		&.image-style-align-left,
@@ -119,7 +119,7 @@
 
 	// Lazy-load pre-sizing to fill space.
 	image-container.image.lazy {
-		height: calc(#{$wrapperWidth} / 2 * 9 / 16);
+		height: calc(var(--width-wrapper) / 2 * 9 / 16);
 	}
 }
 

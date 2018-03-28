@@ -1,12 +1,11 @@
 /// <reference path="../../../scss/_theme_vars.scss" />
-@import '_theme_vars';
 
 .search {
 	margin: 10px 0;
 }
 
 a[mat-list-item].active {
-	background: $activeRouteBackground;
+	background: var(--color-active);
 }
 
 a.mat-list-item,

@@ -1,11 +1,10 @@
 /// <reference path="../../../scss/_theme_vars.scss" />
-@import '_theme_vars';
 
 // Row definitions
 mat-header-row {
-	box-shadow: $boxShadow, $boxShadow inset;
+	box-shadow: var(--shadow), var(--shadow) inset;
 	min-height: 42px;
-	border: $border;
+	border: var(--border);
 }
 
 .mat-row {
@@ -20,7 +19,7 @@ mat-header-row {
 	background: rgba(0,0,0,0);
 
 	&:hover {
-		background: rgba($activeRouteBackground, 0.1);
+		background: rgba(var(--color-active), 0.1);
 	}
 }
 
@@ -64,8 +63,8 @@ mat-icon {
 	display: flex;
 	justify-content: center;
 	box-sizing: border-box;
-	border: $border;
-	background: $sideBG;
+	border: var(--border);
+	background: var(--color-sidepanel);
 
 	img {
 		margin: auto;
@@ -81,7 +80,7 @@ mat-icon {
 		height: 100%;
 		width: 100%;
 		z-index: 1000;
-		box-shadow: $boxShadow inset;
+		box-shadow: var(--shadow) inset;
 		pointer-events: none;
 	}
 }
@@ -89,8 +88,8 @@ mat-icon {
 
 // Paginator
 mat-paginator {
-	box-shadow: $boxShadow, $boxShadow inset;
-	border: $border;
+	box-shadow: var(--shadow), var(--shadow) inset;
+	border: var(--shadow);
 
 	::ng-deep .mat-paginator-container {
 		min-height: 42px;
@@ -114,7 +113,7 @@ mat-paginator {
 
 .count {
 	font-weight: 500;
-	color: darken($textColor, 0.2);
+	color: var(--color-text);
 	font-size: 12px;
 	position: absolute;
 	bottom: 16px;

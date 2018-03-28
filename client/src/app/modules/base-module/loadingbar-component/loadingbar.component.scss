@@ -1,12 +1,11 @@
 /// <reference path="../../../scss/_theme_vars.scss" />
-@import "_theme_vars";
 
 .loading {
 	border-bottom: 1px solid #000;
 	height: 3px;
 	// NOTE: ::ng-deep might be depricated later! Use with care!
 	::ng-deep .mat-progress-bar-buffer {
-		background: darken($background, 5%);
+		background: var(--color-background);
 	}
 }
 

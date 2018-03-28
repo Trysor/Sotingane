@@ -1,11 +1,10 @@
 /// <reference path="../../../scss/_theme_vars.scss" />
-@import '_theme_vars';
 
 :host {
 	padding: 40px 20px;
 	text-align: center;
 	font-size: 0.75em;
-	color: rgba($textColor, .6);
+	color: rgba(var(--color-text), .6);
 	box-sizing: border-box;
 
 	span {

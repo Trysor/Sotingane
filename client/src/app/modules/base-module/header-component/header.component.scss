@@ -1,6 +1,4 @@
 /// <reference path="../../../scss/_theme_vars.scss" />
-@import '_theme_vars';
-
 
 // HEADER
 .topHeader {
@@ -14,11 +12,11 @@
 	left: 0;
 	width: 100vw;
 	z-index: 1000;
-	height: $headerHeight;
-	max-height: $headerHeight;
-	background: $contentBG;
-	border-bottom: $border;
-	box-shadow: $boxShadow;
+	height: var(--height-header);
+	max-height: var(--height-header);
+	background: var(--color-content);
+	border-bottom: var(--border);
+	box-shadow: var(--shadow);
 
 	.flex {
 		flex: 1 1;
@@ -44,7 +42,7 @@
 			margin-right: 1px;
 
 			::ng-deep path {
-				fill: $primary;
+				fill: var(--color-primary);
 			}
 		}
 	}

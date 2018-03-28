@@ -1,17 +1,16 @@
 /// <reference path="../../../scss/_theme_vars.scss" />
-@import '_theme_vars';
 
 .searchBox {
 	width: 350px;
 	transition: width ease-in-out 0.5s;
-	background: $sideBG;
-	box-shadow: $boxShadow inset;
-	height: calc(#{$headerHeight} - 12px);
-	max-height: calc(#{$headerHeight} - 12px);
+	background: var(--color-sidepanel);
+	box-shadow: var(--shadow) inset;
+	height: calc(var(--height-header) - 12px);
+	max-height: calc(var(--height-header) - 12px);
 	box-sizing: border-box;
 
 	&.altCol {
-		background: $background; // darken($sideBG, 99%)
+		background: var(--color-background); // darken($sideBG, 99%)
 	}
 
 	&:not(.mobile).wide {

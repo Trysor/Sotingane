@@ -1,9 +1,8 @@
 /// <reference path="../../../scss/_theme_vars.scss" />
-@import '_theme_vars';
 
 :host {
-	background: rgba($contentBG, 0.2);
-	border: $border;
+	background: var(--color-shade);
+	border: var(--border);
 	border-top: none;
 	/*box-shadow: $boxShadow;*/
 
@@ -25,7 +24,7 @@
 	align-items: baseline;
 
 	::ng-deep label.disabled {
-		color: $disabled;
+		color: var(--color-disabled);
 	}
 
 	.full {

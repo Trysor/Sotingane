@@ -1,36 +1,49 @@
-@import "_colours";
+@import '_colours';
 
 
-// COLOUR, defaultShade, lighterShade, darkerShade
-$mat-primary: ($mat-green, 300, 300, 900);
-$mat-accent:  ($mat-black, 400, 300, 500);
-$mat-warn:    $mat-red-warn;
-
-$primary:     map-get(nth($mat-primary, 1), nth($mat-primary, 2));
-$accent:      map-get(nth($mat-accent,  1), nth($mat-accent,  2));
-
-// Generic colours
-$background: #121212;
-$headerBG: #232323;
-$sideBG: #191919;
-$disabled: #686868;
-
-$contentBG: #232323;
-$materialBG: #303030;
-
-$borderColor: #000;
-$border: 1px solid $borderColor;
+$border-color: #000;
+$primary: #668656;
+$content: #232323;
 
 
-$activeRouteBackground: rgba($primary, 0.3); // rgba(255,255,255,0.10);
-$overlayColour: rgba(0,0,0,0.10);
-$boxShadow: 0 0 1.2em 0 rgba(0,0,0,0.30);
-$textColor: #ccc;
+:root {
+	// app: primary
+	--app-prim-1: #{$primary};
+	--app-prim-2: #668656;
+	--app-prim-3: #0d2804;
+	--app-prim-c-1: #ffffff;
+	--app-prim-c-2: #ffffff;
+	--app-prim-c-3: #ffffff;
+	// app: accent
+	--app-acc-1: #262626;
+	--app-acc-2: #262626;
+	--app-acc-3: #262626;
+	--app-acc-c-1: #ffffff;
+	--app-acc-c-2: #ffffff;
+	--app-acc-c-3: #ffffff;
+	// Theme
+	--color-primary: var(--app-prim-1);
+	--color-accent: var(--app-acc-1);
+	// Text
+	--color-text: #ccc;
+	// backgrounds
+	--color-background: #121212;
+	--color-header: #232323;
+	--color-sidepanel: #191919;
+	--color-material: #303030;
+	--color-content: #{$content};
+	--color-shade: #{rgba($content, 0.1)};
+	--color-active: #{rgba($primary, 0.3)};
+	--color-overlay: rgba(0,0,0,0.10);
+	--color-border: #{$border-color};
+	--color-disabled: #686868;
+	// styles
+	--border: 1px solid #{$border-color};
+	--shadow: 0 0 1.2em 0 rgba(0,0,0,0.30);
+	// Sizing
+	--width-wrapper: 1350px;
+	--width-side: 220px;
+	--width-max-field: 400px;
+	--height-header: 40px;
+}
 
-// Sizing
-$wrapperWidth: 1350px;
-$sideWidth: 220px;
-
-$headerHeight: 40px;
-
-$maximumFieldWidth: 400px;

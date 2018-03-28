@@ -8,49 +8,50 @@
 	display: block;
 
 	::ng-deep .ck-editor .ck-sticky-panel .ck-sticky-panel__content_sticky {
-		top: $headerHeight !important;
+		top: var(--height-header) !important;
 	}
 
 	::ng-deep .ck-editor__editable {
 		min-height: 245px;
-		background: none;
-		border-color: $borderColor;
+		background: var(--color-shade);
+		border-color: var(--color-border);
 	}
 }
 
 ::ng-deep :root {
-	--ck-color-base-foreground: $headerBG;
-	--ck-color-base-background: $headerBG;
-	--ck-color-base-border: $borderColor;
-	--ck-color-base-action: $activeRouteBackground;
-	--ck-color-base-focus: $activeRouteBackground;
-	--ck-color-base-text: $textColor;
-	--ck-color-base-active: $activeRouteBackground;
-	--ck-color-base-active-focus: $activeRouteBackground;
-	--ck-color-focus-border: $borderColor;
-	--ck-color-focus-shadow: $background;
-	--ck-color-button-default-focus-background: $materialBG;
-	--ck-color-button-default-active-background: $materialBG;
-	--ck-color-button-default-active-shadow: $background;
+	--ck-color-text: var(--color-text);
+	--ck-color-base-foreground: var(--color-header);
+	--ck-color-base-background: var(--color-header);
+	--ck-color-base-border: var(--color-border);
+	--ck-color-base-action: var(--color-active);
+	--ck-color-base-focus: var(--color-active);
+	--ck-color-base-text: var(--color-text);
+	--ck-color-base-active: var(--color-active);
+	--ck-color-base-active-focus: var(--color-active);
+	--ck-color-focus-border: var(--color-border);
+	--ck-color-focus-shadow: var(--color-background);
+	--ck-color-button-default-focus-background: var(--color-material);
+	--ck-color-button-default-active-background: var(--color-material);
+	--ck-color-button-default-active-shadow: var(--color-background);
 	--ck-color-button-default-disabled-background: transparent;
-	--ck-color-button-on-background: $background;
-	--ck-color-button-on-focus-background: $activeRouteBackground;
-	--ck-color-button-on-active-background: $activeRouteBackground;
-	--ck-color-button-on-active-shadow: $background;
-	--ck-color-button-on-disabled-background: $disabled;
-	--ck-color-button-action-focus-background: $materialBG;
-	--ck-color-button-action-active-background: $activeRouteBackground;
-	--ck-color-button-action-active-shadow: $background;
-	--ck-color-button-action-disabled-background: $disabled;
+	--ck-color-button-on-background: var(--color-background);
+	--ck-color-button-on-focus-background: var(--color-active);
+	--ck-color-button-on-active-background: var(--color-active);
+	--ck-color-button-on-active-shadow: var(--color-background);
+	--ck-color-button-on-disabled-background: var(--color-disabled);
+	--ck-color-button-action-focus-background: var(--color-material);
+	--ck-color-button-action-active-background: var(--color-active);
+	--ck-color-button-action-active-shadow: var(--color-background);
+	--ck-color-button-action-disabled-background: var(--color-disabled);
 	// block a
-	--ck-color-list-item-text-active: $textColor;
+	--ck-color-list-item-text-active: var(--color-text);
 	// block b
-	--ck-color-link-default: $primary;
-	--ck-color-link-selected-background: $activeRouteBackground;
+	--ck-color-link-default: var(--color-primary);
+	--ck-color-link-selected-background: var(--color-active);
 	// block c
-	--ck-color-widget-border-blurred: $borderColor;
-	--ck-color-focus-border: $primary;
-	--ck-color-widget-border-hover: $primary;
+	--ck-color-widget-border-blurred: var(--color-border);
+	--ck-color-focus-border: var(--color-primary);
+	--ck-color-widget-border-hover: var(--color-primary);
 }
 
 
