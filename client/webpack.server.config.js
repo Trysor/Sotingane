@@ -11,6 +11,7 @@ fs.readdirSync('node_modules').filter(function (x) {
 });
 
 module.exports = {
+	mode: 'none',
 	entry: { server: './server.ts' },
 	resolve: { extensions: ['.js', '.ts'] },
 	target: 'node',

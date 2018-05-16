@@ -13,10 +13,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from '@app/services/controllers/auth.service';
 
 import { User } from '@app/models/user';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 
 import { map, catchError, timeout } from 'rxjs/operators';
-import { of } from 'rxjs/observable/of';
 
 
 import { BaseComponent } from './base.component';

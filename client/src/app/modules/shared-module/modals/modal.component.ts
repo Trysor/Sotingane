@@ -2,7 +2,6 @@ import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Router } from '@angular/router';
 
-import { CMSService } from '@app/services';
 import { ModalData } from '@app/models';
 
 @Component({

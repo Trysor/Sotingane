@@ -12,9 +12,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from '@app/services/controllers/auth.service';
 
 import { User } from '@app/models/user';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
-
+import { Observable, of } from 'rxjs';
 
 import { UserComponent } from './user.component';
 

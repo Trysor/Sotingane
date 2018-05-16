@@ -1,5 +1,7 @@
 ﻿import { Component, OnInit, Input, Inject, Renderer2, ElementRef, ChangeDetectionStrategy } from '@angular/core';
-import { DOCUMENT, DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+
+import { DOCUMENT } from '@angular/common';
 
 import { DynamicComponent } from '@app/models';
 

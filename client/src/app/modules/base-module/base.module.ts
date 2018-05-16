@@ -29,7 +29,7 @@ import { SearchResultsComponent } from './search-results-component/search.result
 		SearchResultsComponent
 	],
 	imports: [
-		SharedModule.forRoot(),
+		SharedModule,
 		ContentModule,
 		BaseRoutingModule
 	]

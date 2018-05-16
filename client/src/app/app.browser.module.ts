@@ -5,7 +5,7 @@ import { BrowserTransferStateModule } from '@angular/platform-browser';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 import { environment } from '@env';
-import { WorkerService, ModalService } from '@app/services';
+import { WorkerService } from '@app/services';
 
 import { AppModule } from './app.module';
 import { AppComponent } from './app.component';
@@ -18,7 +18,7 @@ import { AppComponent } from './app.component';
 		ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })
 	],
 	providers: [
-		WorkerService, ModalService
+		WorkerService,
 	],
 	bootstrap: [AppComponent]
 })

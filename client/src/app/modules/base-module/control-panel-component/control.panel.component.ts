@@ -1,6 +1,5 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { AuthService } from '@app/services';
-
+import { AuthService } from '@app/services/controllers/auth.service';
 
 @Component({
 	selector: 'control-panel-component',
@@ -10,5 +9,6 @@ import { AuthService } from '@app/services';
 })
 export class ControlPanelComponent {
 	@Input() layout: 'menu';
-	constructor(public authService: AuthService) { }
+	constructor(
+		public authService: AuthService) { }
 }

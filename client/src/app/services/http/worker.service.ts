@@ -13,7 +13,7 @@ export class WorkerService {
 
 	constructor(
 		@Inject(PLATFORM_ID) private platformId: Object,
-		@Optional() private ngZone: NgZone,
+		private ngZone: NgZone,
 		private updates: SwUpdate,
 		private snackBar: MatSnackBar) {
 

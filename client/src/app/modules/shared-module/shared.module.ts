@@ -60,23 +60,26 @@ import { TableComponent } from './table-component/table.component';
 		SectionComponent,
 		TableComponent
 	],
+	providers: [
+		DatePipe
+	],
 	entryComponents: [
 		ModalComponent
 	]
 })
 export class SharedModule {
-	static forRoot(): ModuleWithProviders {
-		return {
-			ngModule: SharedModule,
-			providers: [
-				{
-					provide: HTTP_INTERCEPTORS,
-					useClass: InterceptorService,
-					multi: true
-				},
-				// Pipes (for use in-code)
-				DatePipe
-			]
-		};
-	}
+	//static forRoot(): ModuleWithProviders {
+	//	return {
+	//		ngModule: SharedModule,
+	//		providers: [
+	//			//{
+	//			//	provide: HTTP_INTERCEPTORS,
+	//			//	useClass: InterceptorService,
+	//			//	multi: true
+	//			//},
+	//			// Pipes (for use in-code)
+	//			DatePipe
+	//		]
+	//	};
+	//}
 }

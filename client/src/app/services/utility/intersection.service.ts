@@ -1,6 +1,6 @@
 ﻿import { Injectable, Inject, PLATFORM_ID, ElementRef, OnInit } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { DOCUMENT } from '@angular/platform-browser';
+import { DOCUMENT } from '@angular/common';
 
 import { Subject } from 'rxjs';
 

@@ -8,7 +8,7 @@ import { ModalData, CmsContent } from '@app/models';
 import { ModalComponent } from '@app/modules/shared-module/modals/modal.component';
 
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ModalService {
 
 	constructor(

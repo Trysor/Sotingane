@@ -1,6 +1,4 @@
-﻿import { MatTableDataSource } from '@angular/material';
-
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+﻿import { BehaviorSubject } from 'rxjs';
 
 export interface TableSettings {
 	columns: ColumnSettings[];
@@ -56,4 +54,3 @@ export enum ColumnDir {
 	ASC = 'asc',
 	DESC = 'desc'
 }
-
