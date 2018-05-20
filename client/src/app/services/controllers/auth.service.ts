@@ -1,14 +1,16 @@
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, Inject, Optional, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { isPlatformServer } from '@angular/common';
 
 import { MatSnackBar } from '@angular/material';
 
 import { environment } from '@env';
 import { User, UpdatePasswordUser, UserToken, AccessRoles } from '@app/models';
+
 import { TokenService } from '@app/services/helpers/token.service';
 import { HttpService } from '@app/services/http/http.service';
+import { ServerService } from '@app/services/helpers/server.service';
 
 import { Observable, Subscription, BehaviorSubject, timer, of } from 'rxjs';
 import { map, catchError, timeout, takeUntil } from 'rxjs/operators';
@@ -21,6 +23,7 @@ export class AuthService {
 
 	constructor(
 		@Inject(PLATFORM_ID) private platformId: Object,
+		@Optional() private serverService: ServerService,
 		private tokenService: TokenService,
 		private snackBar: MatSnackBar,
 		private http: HttpService,
@@ -40,9 +43,7 @@ export class AuthService {
 			return;
 		}
 		this.updateCurrentUserData(token);
-
-		// Only start the renewToken timer in browser.
-		if (isPlatformBrowser(platformId)) { this.engageRenewTokenTimer(token); }
+		this.engageRenewTokenTimer(token);
 	}
 
 	/**

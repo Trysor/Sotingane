@@ -2,11 +2,11 @@ import { Component, OnInit, OnDestroy, Optional, Inject, PLATFORM_ID, ViewChild,
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconRegistry, MatDrawer } from '@angular/material';
 import { Router } from '@angular/router';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformServer } from '@angular/common';
 
 import { environment } from '@env';
 
-import { MobileService, AuthService, ContentService, WorkerService } from '@app/services';
+import { MobileService, AuthService, ContentService, WorkerService, ServerService } from '@app/services';
 // import { RoutingAnim } from '@app/animations';
 
 import { Subject } from 'rxjs';
@@ -27,6 +27,7 @@ export class BaseComponent implements OnInit, OnDestroy {
 	constructor(
 		@Inject(PLATFORM_ID) private platformId: Object,
 		@Optional() private workerService: WorkerService,
+		@Optional() private serverService: ServerService,
 		private contentService: ContentService,
 		public mobileService: MobileService,
 		public authService: AuthService,
@@ -36,7 +37,7 @@ export class BaseComponent implements OnInit, OnDestroy {
 
 		// Registers the logo
 		let logoPath = '/assets/logo192themed.svg';
-		if (!isPlatformBrowser(platformId)) { logoPath = environment.URL.base + logoPath; }
+		if (isPlatformServer(platformId)) { logoPath = serverService.urlBase + logoPath; }
 		iconRegistry.addSvgIcon('logo', san.bypassSecurityTrustResourceUrl(logoPath));
 
 		// Sets default metadata

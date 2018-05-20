@@ -73,9 +73,9 @@ a {
 
 // Browser changes
 
-::selection {
-	background: rgba(var(--color-primary), 0.3);
-}
+/*::selection {
+	background: var(--color-primary);
+}*/
 
 ::-webkit-scrollbar-track {
 	box-shadow: var(--shadow) inset;

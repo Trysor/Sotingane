@@ -124,13 +124,18 @@
 }
 
 .video {
-	display: inline-block;
+	//display: inline-block;
 	position: relative;
-	margin: 0;
-	width: calc(50% - 0.15em); // account for 1 space
+	margin: 0 .8em .8em 0;
+	width: calc(50% - 0.8em);
+	float: left;
+	clear: right;
+	vertical-align: top;
 
 	&.wide {
+		margin: 0 0 .8em 0;
 		width: 100%;
+		clear: both;
 	}
 
 	iframe {
@@ -167,6 +172,7 @@
 	}
 
 	.video {
+		float: none;
 		width: 100%;
 	}
 }

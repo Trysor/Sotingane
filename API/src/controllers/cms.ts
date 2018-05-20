@@ -124,10 +124,10 @@ export class CMSController {
 		const contentDoc = await ContentModel.findOne({ 'current.route': route }, {
 			current: true, prev: true
 		});
-		if (!contentDoc || contentDoc.prev.length === 0) {
+		if (!contentDoc) {
 			return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND));
 		}
-		return res.status(200).send(contentDoc.prev);
+		return res.status(200).send(contentDoc.prev); // length of 0 is also status 200
 	}
 
 

@@ -11,7 +11,6 @@ export const environment = {
 	TIMEOUT: 5000,
 
 	URL: {
-		base:				'http://localhost:4000',
 		api:				apiURL,
 		auth: {
 			login:			apiURL + '/auth/login',

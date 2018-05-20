@@ -15,16 +15,22 @@ module.exports = {
 	entry: { server: './server.ts' },
 	resolve: { extensions: ['.js', '.ts'] },
 	target: 'node',
-	// this makes sure we include node_modules and other 3rd party libraries
-	// externals: [/(node_modules|main\..*\.js)/],
-	externals: nodeModules,
+	// Make sure we include all node_modules etc
+	externals: [/node_modules/],
+	// externals: nodeModules,
 	output: {
 		path: path.join(__dirname, 'dist'),
 		filename: '[name].js'
 	},
 	module: {
 		rules: [
-			{ test: /\.ts$/, loader: 'ts-loader' }
+			{ test: /\.ts$/, loader: 'ts-loader' },
+			{
+				// Mark files inside `@angular/core` as using SystemJS style dynamic imports.
+				// Removing this will cause deprecation warnings to appear.
+				test: /[\/\\]@angular[\/\\]core[\/\\].+\.js$/,
+				parser: { system: true }
+			}
 		]
 	},
 	plugins: [
@@ -39,6 +45,6 @@ module.exports = {
 			/(.+)?express(\\|\/)(.+)?/,
 			path.join(__dirname, 'src'),
 			{}
-		),
+		)
 	]
 };

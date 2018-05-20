@@ -177,7 +177,7 @@ if (ajv.validateSchema(userAdminUpdateUser)) {
 
 // Before saving do the following
 schema.pre('save', function (next: NextFunction) {
-	const u: User = this;
+	const u = <User>this; // hard-casting
 	if (!u.isModified('password')) { return next(); }
 	hash(u.password, SALT_FACTOR, (err, hashed) => {
 		if (err) { return next(err); }

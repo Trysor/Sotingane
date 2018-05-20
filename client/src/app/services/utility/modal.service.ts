@@ -2,9 +2,7 @@
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 
-import { CMSService } from '@app/services/controllers/cms.service';
 import { ModalData, CmsContent } from '@app/models';
-
 import { ModalComponent } from '@app/modules/shared-module/modals/modal.component';
 
 
@@ -13,8 +11,7 @@ export class ModalService {
 
 	constructor(
 		private dialog: MatDialog,
-		private router: Router,
-		private cmsService: CMSService) { }
+		private router: Router) { }
 
 
 	/**

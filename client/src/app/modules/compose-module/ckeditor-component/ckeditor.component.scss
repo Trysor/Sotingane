@@ -11,7 +11,7 @@
 		top: var(--height-header) !important;
 	}
 
-	::ng-deep .ck-editor__editable {
+	::ng-deep .ck-content.ck-editor__editable {
 		min-height: 245px;
 		background: var(--color-shade);
 		border-color: var(--color-border);

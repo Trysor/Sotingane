@@ -4,6 +4,8 @@ import {
 } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 
+import { HttpErrorResponse } from '@angular/common/http';
+
 import { isPlatformServer } from '@angular/common';
 
 import { CMSService, AuthService, ModalService, ContentService } from '@app/services';
@@ -36,7 +38,7 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 
 	// Template Helpers
 	public readonly AccessRoles = AccessRoles;
-	public readonly isPlatformServer;
+	public readonly isPlatformServer: boolean;
 
 	// Code helpers
 	private readonly _ngUnsub = new Subject();
@@ -45,6 +47,15 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 		title: 'Page not available',
 		content: 'Uhm. There appears to be nothing here. Sorry.',
 		description: '404 - Not found',
+		version: 0,
+		route: '',
+	};
+
+	private readonly _serverLoading: CmsContent = {
+		access: AccessRoles.everyone,
+		title: ' ',
+		content: ' ',
+		description: ' ',
 		version: 0,
 		route: '',
 	};
@@ -99,7 +110,13 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 		// Request content
 		this.cmsService.requestContent(this.route.snapshot.params['content']).subscribe(
 			content => this.contentSubject.next(content),					// Success
-			err => this.contentSubject.next(this._failedToLoad)				// Error
+			(err: HttpErrorResponse) => {
+				this.contentSubject.next(									// Error / Unauthorized
+					err && err.status === 401 && this.isPlatformServer
+						? this._serverLoading
+						: this._failedToLoad
+				);
+			}
 		);
 	}
 

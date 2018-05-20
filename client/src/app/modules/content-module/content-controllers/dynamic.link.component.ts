@@ -7,12 +7,28 @@ import { DynamicComponent } from '@app/models';
 
 import { IntersectionService } from '@app/services/utility/intersection.service';
 import { DynamicLazyLoader } from './dynamic.lazy.loader';
+import { start } from 'repl';
 
-enum TwitchType {
-	Channel = 'channel',
-	Video = 'video',
-	Collection = 'collection'
+interface VideoFilter {
+	site: VideoSite;
+	match: string;
+	idFrom: RegExp;
+	start: RegExp;
+	prefix?: string;
 }
+interface VideoParams {
+	ID: string;
+	start?: string;
+	prefix?: string;
+}
+
+enum VideoSite {
+	twitch,
+	youtube
+}
+
+type VideoFunction = (parameters: VideoParams) => void;
+
 
 @Component({
 	selector: 'router-link',
@@ -24,14 +40,44 @@ enum TwitchType {
 		<ng-template #video>
 			<div #videoHost></div>
 		</ng-template>`,
-	changeDetection: ChangeDetectionStrategy.OnPush
+	// changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicComponent, OnInit {
+	private static readonly VideoFilters: VideoFilter[] = [
+		{
+			'site': VideoSite.youtube,
+			'match': 'youtu.be',
+			'idFrom': /be\/([a-zA-Z0-9_-]+)/,
+			'start': /[\&\?]t=([0-9]+)/
+		},
+		{
+			'site': VideoSite.youtube,
+			'match': 'youtube',
+			'idFrom': /\?v=([a-zA-Z0-9_-]+)/,
+			'start': /[&?]t=([0-9]+)/
+		},
+		{
+			'site': VideoSite.twitch,
+			'match': 'twitch.tv/videos/',
+			'idFrom': /videos\/([a-zA-Z0-9_-]+)/,
+			'start': /[&?]t=([0-9]+)/, // t=04h30m37s. TODO: fix me.
+			'prefix': 'video=v'
+		},
+		{
+			'site': VideoSite.twitch,
+			'match': 'twitch.tv/',
+			'idFrom': /tv\/([a-zA-Z0-9_-]+)/,
+			'start': /[&?]t=([0-9]+)/,  // t=04h30m37s. TODO: fix me.
+			'prefix': 'channel='
+		}
+	];
+
+
 	@Input() link: string;
 	@Input() text: string;
 
 	public get isRemoteUrl(): boolean { return this._isRemoteUrl; }
-	public get isVideo(): boolean { return this.link.includes('youtube') || this.link.includes('twitch'); }
+	public get isVideo(): boolean { return this._isVideo; }
 
 	public get safeLink(): string | SafeUrl {
 		if (this.link.startsWith('steam://')) {
@@ -41,6 +87,7 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 	}
 
 	private _isRemoteUrl = true;
+	private _isVideo = false;
 	private _iframe: HTMLElement;
 	private _img: HTMLElement;
 
@@ -62,17 +109,42 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 			this._isRemoteUrl = false;
 		}
 
-		if (!this.isVideo) { return; }
 		// Protect against template issues
 		if (!this.el.nativeElement.parentNode) { return; }
 
 		// Create video instances
 		const url = this.link;
-		if (url.includes('youtube')) {
-			this.createYoutubeVideo();
-		} else if (url.includes('twitch')) {
-			this.createTwitchVideo();
-		} else { return; } // Do nothing
+		let foundMatch = false;
+		for (const filter of DynamicLinkComponent.VideoFilters) {
+			// Is current filter a match? if not, continue.
+			if (!url.includes(filter.match)) { continue; }
+
+			// entire match, grouping, index, entire input
+			const match = filter.idFrom.exec(url);
+			const ID = match ? match[1] : undefined;
+			if (!ID) { break; }
+
+			const params: VideoParams = { 'ID': ID };
+			const startMatch = filter.start.exec(url);
+			if (startMatch) { params.start = startMatch[1]; }
+			if (filter.prefix) { params.prefix = filter.prefix; }
+
+			switch (filter.site) {
+				case VideoSite.youtube:
+					this.createYoutubeVideo(params);
+					break;
+				case VideoSite.twitch:
+					this.createTwitchVideo(params);
+					break;
+			}
+			foundMatch = true;
+			break;
+		}
+		if (!foundMatch) {
+			this._isVideo = false;
+			return;
+		}
+		this._isVideo = true;
 
 		// Create the wrapper
 		const wrapper = this.renderer.createElement('div');
@@ -116,41 +188,26 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 	/**
 	 * Creates a youtube embed
 	 */
-	private createYoutubeVideo() {
-		const split = this.link.split('v=');
-		if (!split[0] || !split[1]) { return; }
-
-		// Get vars
-		const videoId = split[1].split('&')[0];
+	private createYoutubeVideo(p: VideoParams) {
+		let startTime = '';
+		if (p.start) { startTime = '?start=' + p.start; }
 
 		// Create iframe
 		this._iframe = this.renderer.createElement('iframe');
-		this.renderer.setAttribute(this._iframe, 'data-src', 'https://www.youtube.com/embed/' + videoId);
+		this.renderer.setAttribute(this._iframe, 'data-src', 'https://www.youtube.com/embed/' + p.ID + startTime);
 
 		// Create Thumbnail image (also required for aspect ratio)
 		this._img = this.renderer.createElement('img');
-		this.renderer.setAttribute(this._img, 'src', 'https://img.youtube.com/vi/' + videoId + '/mqdefault.jpg');
+		this.renderer.setAttribute(this._img, 'src', 'https://img.youtube.com/vi/' + p.ID + '/mqdefault.jpg');
 	}
 
 	/**
 	 * Creates a Twitch embed
 	 */
-	private createTwitchVideo() {
-		const url = this.link;
-		let type = TwitchType.Video, prefix = '', source = '';
-
-		if (url.includes('/videos/')) {
-			prefix = 'v';
-			source = url.split('/videos/')[1];
-		} else {
-			// assume its a channel
-			type = TwitchType.Channel;
-			source = url.split('.tv/')[1];
-		}
-
+	private createTwitchVideo(p: VideoParams) {
 		// Create iframe
 		this._iframe = this.renderer.createElement('iframe');
-		this.renderer.setAttribute(this._iframe, 'data-src', 'https://player.twitch.tv/?' + type + '=' + prefix + source);
+		this.renderer.setAttribute(this._iframe, 'data-src', 'https://player.twitch.tv/?' + p.prefix + p.ID);
 
 		// Create Thumbnail image (also required for aspect ratio)
 		this._img = this.renderer.createElement('img');  // Creating a black 16 by 9 base64 image

@@ -1,6 +1,5 @@
 ﻿import { Injectable, Inject, PLATFORM_ID, ElementRef, OnInit } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { DOCUMENT } from '@angular/common';
 
 import { Subject } from 'rxjs';
 
@@ -13,7 +12,6 @@ export class IntersectionService {
 	public get targets() { return this._subject; }
 
 	constructor(
-		@Inject(DOCUMENT) private document: Document,
 		@Inject(PLATFORM_ID) private platformId: Object) {
 
 		if (!isPlatformBrowser(platformId)) { return; }
