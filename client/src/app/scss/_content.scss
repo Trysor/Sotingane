@@ -116,10 +116,14 @@
 			clear: right;
 		}
 	}
-
 	// Lazy-load pre-sizing to fill space.
-	image-container.image.lazy {
-		height: calc(var(--width-wrapper) / 2 * 9 / 16);
+	image-container.image {
+		&.lazy {
+			height: calc(var(--width-wrapper) / 2 * 9 / 16);
+		}
+		.click {
+			cursor: pointer;
+		}
 	}
 }
 

@@ -32,7 +32,7 @@ mat-sidenav-container {
 		box-shadow: var(--shadow), var(--shadow) inset;
 		position: fixed;
 		z-index: 100;
-		height: calc(100vh - var(--height-header);
+		height: calc(100vh - var(--height-header));
 		width: var(--width-side);
 		top: var(--height-header);
 		left: 0;

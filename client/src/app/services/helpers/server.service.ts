@@ -50,6 +50,6 @@ export class ServerService {
 	 * @param contentString
 	 */
 	public modifyContent(contentString: string): string {
-		return contentString.replace(/src/g, 'data-src');
+		return contentString; // contentString.replace(/src/g, 'data-src');
 	}
 }

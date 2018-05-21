@@ -9,3 +9,10 @@ export interface ModalData {
 	cancelColor?: string;
 	cancelText?: string;
 }
+
+export interface ImageModalData {
+	src: string;
+	alt: string;
+	images?: string[];
+	index?: number;
+}

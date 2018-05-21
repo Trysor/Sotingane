@@ -1,0 +1,33 @@
+/// <reference path="../../../scss/_theme_vars.scss" />
+
+::ng-deep .cdk-overlay-pane.imagemodal {
+	pointer-events: none !important;
+
+	.mat-dialog-container {
+		background: none;
+		box-shadow: none;
+	}
+}
+
+
+:host {
+	position: relative;
+	display: flex;
+	max-width: 90vw;
+	max-height: 90vh;
+
+	img {
+		flex: 1 1;
+		width: calc(100% + 48px);
+		margin: -24px;
+		-o-object-fit: contain;
+		object-fit: contain;
+	}
+
+	button {
+		pointer-events: initial;
+		position: absolute;
+		top: 4px;
+		right: -20px;
+	}
+}

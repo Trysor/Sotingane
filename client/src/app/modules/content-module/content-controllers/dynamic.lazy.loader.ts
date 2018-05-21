@@ -7,7 +7,7 @@ import { takeUntil } from 'rxjs/operators';
 
 
 export abstract class DynamicLazyLoader implements OnDestroy {
-	private _ngUnsub = new Subject();
+	protected _ngUnsub = new Subject();
 	private _elem: Element;
 	private _unobserved = false;
 

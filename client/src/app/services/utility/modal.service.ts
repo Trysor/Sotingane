@@ -2,9 +2,9 @@
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 
-import { ModalData, CmsContent } from '@app/models';
+import { ModalData, ImageModalData, CmsContent } from '@app/models';
 import { ModalComponent } from '@app/modules/shared-module/modals/modal.component';
-
+import { ImageModalComponent } from '@app/modules/shared-module/modals/imagemodal.component';
 
 @Injectable({ providedIn: 'root' })
 export class ModalService {
@@ -70,5 +70,13 @@ export class ModalService {
 			proceedText: 'Okay',
 		};
 		return this.dialog.open(ModalComponent, <MatDialogConfig>{ data: data });
+	}
+
+	/**
+	 * Opens a modal displaying an image
+	 * @param data
+	 */
+	public openImageModal(data: ImageModalData) {
+		this.dialog.open(ImageModalComponent, <MatDialogConfig>{ data: data, panelClass: 'imagemodal' });
 	}
 }

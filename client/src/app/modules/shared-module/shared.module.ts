@@ -1,21 +1,6 @@
 import { NgModule, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-
-// services
-import {
-	AuthService,
-	ContentService,
-	CMSService,
-	InterceptorService,
-	IntersectionService,
-	SteamService,
-	MobileService,
-	TokenService,
-	AdminService
-} from '@app/services';
-
 // Modules
 import { RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
@@ -31,6 +16,7 @@ import { DatePipe } from '@angular/common';
 
 // Components
 import { ModalComponent } from './modals/modal.component';
+import { ImageModalComponent } from './modals/imagemodal.component';
 import { SectionWrapperComponent } from './sectionwrapper-component/sectionwrapper.component';
 import { SectionComponent } from './section-component/section.component';
 import { TableComponent } from './table-component/table.component';
@@ -56,6 +42,7 @@ import { TableComponent } from './table-component/table.component';
 	declarations: [
 		TimeAgo,
 		ModalComponent,
+		ImageModalComponent,
 		SectionWrapperComponent,
 		SectionComponent,
 		TableComponent
@@ -64,22 +51,8 @@ import { TableComponent } from './table-component/table.component';
 		DatePipe
 	],
 	entryComponents: [
-		ModalComponent
+		ModalComponent,
+		ImageModalComponent
 	]
 })
-export class SharedModule {
-	//static forRoot(): ModuleWithProviders {
-	//	return {
-	//		ngModule: SharedModule,
-	//		providers: [
-	//			//{
-	//			//	provide: HTTP_INTERCEPTORS,
-	//			//	useClass: InterceptorService,
-	//			//	multi: true
-	//			//},
-	//			// Pipes (for use in-code)
-	//			DatePipe
-	//		]
-	//	};
-	//}
-}
+export class SharedModule {}
