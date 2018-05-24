@@ -1,12 +1,8 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Input, Renderer2, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-// import Alignment from '@ckeditor/ckeditor5-alignment/src/alignment';
-// import Code from '@ckeditor/ckeditor5-basic-styles/src/code';
-
-// ClassicEditor.build.plugins.push(Alignment);
-// ClassicEditor.build.plugins.push(Code);
+// import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import ClassicEditor from '@app-ckeditor';
 
 @Component({
 	selector: 'ck-editor',
@@ -28,22 +24,7 @@ export class CKEditorComponent implements OnInit, OnDestroy {
 		this._control = value;
 	}
 
-	private readonly _settings = {
-		removePlugins: ['CKFinderUploadAdapter', 'ImageUpload'],
-		toolbar: ['heading', 'bold', 'italic', 'link', 'bulletedList', // 'alignmentDropdown', 'code',
-			'numberedList', 'blockQuote', 'undo', 'redo'],
-		image: {
-			toolbar: ['imageTextAlternative', '|', 'imageStyle:alignLeft', 'imageStyle:full', 'imageStyle:alignRight'],
-			styles: [
-				{ name: 'alignLeft', icon: 'left' },
-				{ name: 'full', icon: 'full' },
-				{ name: 'alignRight', icon: 'right' },
-			]
-		}
-	};
-
 	constructor(private renderer: Renderer2) { }
-
 
 	ngOnInit() {
 		if (typeof ClassicEditor === 'undefined') { return; }
@@ -53,7 +34,8 @@ export class CKEditorComponent implements OnInit, OnDestroy {
 		const el = this.editorBox.nativeElement;
 
 		// Load CKEditor
-		ClassicEditor.create(el, this._settings).then(editor => {
+		ClassicEditor.create(el).then(editor => { // ,this._settings
+
 			this._editor = editor;
 			this.renderer.setAttribute(el.parentElement.querySelector('.ck-content'), 'id', 'content');
 
@@ -63,6 +45,7 @@ export class CKEditorComponent implements OnInit, OnDestroy {
 				this._editor.isReadOnly = disabled;
 			});
 
+			this._editor.setData(this._control.value);
 			this._control.valueChanges.subscribe((value: string) => {
 				if (this._updateFromEditor) { return; }
 

@@ -12,10 +12,11 @@
 			"node_modules/@types"
 		],
 		"baseUrl": "src",
-		"paths": {
-			"@app/*": [ "app/*" ],
-			"@env": [ "environments/environment" ]
-		},
+			"paths": {
+				"@app/*": [ "app/*" ],
+				"@env": [ "environments/environment" ],
+				"@app-ckeditor": [ "../../CKEditor/dist/ckeditor" ]
+			},
 		"lib": [
 			"es2017",
 			"dom"
