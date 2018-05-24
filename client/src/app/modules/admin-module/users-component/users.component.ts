@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 
 import { DatePipe } from '@angular/common';
@@ -8,7 +8,8 @@ import { User, AccessRoles, TableSettings, ColumnType, ColumnDir } from '@app/mo
 
 import { UserModalComponent, UserModalData } from '../user-modal-component/user.modal.component';
 
-import { Subject } from 'rxjs';
+import { Subject, BehaviorSubject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 
 @Component({
@@ -17,9 +18,9 @@ import { Subject } from 'rxjs';
 	styleUrls: ['./users.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class UsersComponent {
-
-	public data = new Subject<User[]>();
+export class UsersComponent implements OnDestroy {
+	private _ngUnsub = new Subject();
+	public data = new BehaviorSubject<User[]>(null);
 
 	public readonly settings: TableSettings = {
 		columns: [
@@ -88,13 +89,19 @@ export class UsersComponent {
 		this.updateList();
 	}
 
+
+	ngOnDestroy(): void {
+		this._ngUnsub.next();
+		this._ngUnsub.complete();
+	}
+
+
 	/**
 	 * Updates the user list
 	 */
 	private updateList() {
-		const sub = this.adminService.getAllusers().subscribe(users => {
+		this.adminService.getAllusers().pipe(takeUntil(this._ngUnsub)).subscribe(users => {
 			this.data.next(users);
-			sub.unsubscribe();
 		});
 	}
 

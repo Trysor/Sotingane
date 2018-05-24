@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, Optional } from '@angular/core';
+import { Component, Optional, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
@@ -6,7 +6,8 @@ import { DatePipe } from '@angular/common';
 import { CmsContent, AccessRoles, TableSettings, ColumnType, ColumnDir } from '@app/models';
 import { ModalService, CMSService, AdminService, MobileService } from '@app/services';
 
-import { Subject } from 'rxjs';
+import { Subject, BehaviorSubject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'pages-component',
@@ -14,9 +15,9 @@ import { Subject } from 'rxjs';
 	styleUrls: ['./pages.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PagesComponent {
-
-	public data = new Subject<CmsContent[]>();
+export class PagesComponent implements OnDestroy {
+	private _ngUnsub = new Subject();
+	public data = new BehaviorSubject<CmsContent[]>(null);
 
 	public readonly settings: TableSettings = {
 		columns: [ // ['title', 'views', 'access', 'nav', 'edit'],
@@ -113,11 +114,14 @@ export class PagesComponent {
 		private adminService: AdminService,
 		private datePipe: DatePipe) {
 
-		adminService.getAllContent().subscribe((contentList) => {
+		this.adminService.getAllContent().pipe(takeUntil(this._ngUnsub)).subscribe((contentList) => {
 			this.data.next(contentList);
 		});
 	}
 
-
+	ngOnDestroy(): void {
+		this._ngUnsub.next();
+		this._ngUnsub.complete();
+	}
 
 }
