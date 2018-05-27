@@ -4,11 +4,15 @@ import { Router } from '@angular/router';
 import { environment } from '@env';
 import { CmsContent } from '@app/models';
 
+import { makeStateKey } from '@angular/platform-browser';
+const LIST_KEY = makeStateKey<CmsContent[]>('cmslist');
+const PAGE_KEY = makeStateKey<CmsContent>('cmspage');
+
 import { AuthService } from '@app/services/controllers/auth.service';
 import { HttpService } from '@app/services/http/http.service';
 
-import { Observable, BehaviorSubject } from 'rxjs';
-import { timeout } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { timeout, tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class CMSService {
@@ -32,8 +36,7 @@ export class CMSService {
 	public getContentList(forceUpdate = false): BehaviorSubject<CmsContent[]> {
 		if (!forceUpdate) { return this._listSubject; }
 
-		const sub = this.requestContentList().subscribe(contentList => {
-			sub.unsubscribe();
+		this.requestContentList().subscribe(contentList => {
 			this._listSubject.next(contentList);
 		});
 		return this._listSubject;
@@ -45,10 +48,11 @@ export class CMSService {
 
 	/**
 	 * Requests the content list
-	 * @return {Observable<CmsContent[]>}         Server's response, as an Observable
+	 * @return {Observable<CmsContent[]>}       Server's response, as an Observable
 	 */
 	private requestContentList(): Observable<CmsContent[]> {
 		return this.http.get<CmsContent[]>(environment.URL.cms.content);
+		// return this.http.transferStateForRequest(LIST_KEY, this.http.get<CmsContent[]>(environment.URL.cms.content));
 	}
 
 	/**
@@ -64,7 +68,7 @@ export class CMSService {
 	 * @return {Observable<CmsContent>}         Server's response, as an Observable
 	 */
 	public requestContent(contentUrl: string): Observable<CmsContent> {
-		return this.http.get<CmsContent>(environment.URL.cms.content + '/' + contentUrl);
+		return this.http.transferStateForRequest(PAGE_KEY, this.http.get<CmsContent>(environment.URL.cms.content + '/' + contentUrl));
 	}
 
 	/**

@@ -53,8 +53,8 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 
 	private readonly _serverLoading: CmsContent = {
 		access: AccessRoles.everyone,
-		title: ' ',
-		content: ' ',
+		title: 'Loading',
+		content: 'Loading..',
 		description: ' ',
 		version: 0,
 		route: '',

@@ -22,14 +22,8 @@ export class ServerService {
 
 	constructor(@Inject(REQUEST) private req: Request) {
 		this._req = req;
-
-		if (req.hostname === 'localhost') {
-			this._urlBase = 'http://localhost:4000';
-			this._apiBase = 'http://localhost:2000';
-		} else {
-			this._urlBase = 'https://' + req.hostname;
-			this._apiBase = 'https://' + req.hostname;
-		}
+		this._urlBase = 'https://' + req.hostname;
+		this._apiBase = 'https://' + req.hostname;
 
 		const userAgent = (<string>req.headers['user-agent']).toLowerCase();
 		/* tslint:disable:max-line-length */

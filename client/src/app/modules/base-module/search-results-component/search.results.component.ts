@@ -6,7 +6,7 @@ import { CMSService, MobileService } from '@app/services';
 import { CmsContent, TableSettings, ColumnType, ColumnDir, TableFilterSettings } from '@app/models';
 
 import { Subject, BehaviorSubject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, take } from 'rxjs/operators';
 
 @Component({
 	selector: 'search-results-component',
@@ -92,9 +92,9 @@ export class SearchResultsComponent implements OnDestroy {
 	 * Set searchResults helper
 	 */
 	private setResults(term: string) {
-		const sub = this.cmsService.searchContent(term).pipe(takeUntil(this._ngUnsub)).subscribe(
-			list => { this.data.next(list); sub.unsubscribe(); },
-			err => { this.data.next(null); sub.unsubscribe(); }
+		this.cmsService.searchContent(term).pipe(takeUntil(this._ngUnsub), take(1)).subscribe(
+			list => this.data.next(list),
+			err => this.data.next(null)
 		);
 	}
 

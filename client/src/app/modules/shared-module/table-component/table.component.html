@@ -1,5 +1,3 @@
-
-
 <div *ngIf="((!!filterSettings.hidden && filterSettings.hidden | async) || (!filterSettings.hidden && true))" [formGroup]="filterForm"
 	 [ngClass]="{ filterBox: true, mobile: (mobileService.isMobile() | async) }">
 	<mat-form-field floatLabel="never" ngClass="filter">

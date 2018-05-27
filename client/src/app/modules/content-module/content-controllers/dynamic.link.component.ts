@@ -93,12 +93,12 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 
 	constructor(
 		@Inject(DOCUMENT) private document: Document,
-		private el: ElementRef<HTMLElement>,
+		private elRef: ElementRef<HTMLElement>,
 		private inters: IntersectionService,
 		private renderer: Renderer2,
 		private san: DomSanitizer) {
 
-		super(inters);
+		super(elRef, inters);
 	}
 
 	ngOnInit() {
@@ -110,7 +110,7 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 		}
 
 		// Protect against template issues
-		if (!this.el.nativeElement.parentNode) { return; }
+		if (!this.elRef.nativeElement.parentNode) { return; }
 
 		// Create video instances
 		const url = this.link;
@@ -158,12 +158,11 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 		// Add to DOM
 		this.renderer.appendChild(wrapper, this._img);
 		this.renderer.appendChild(wrapper, this._iframe);
-		this.renderer.insertBefore(this.el.nativeElement.parentElement, wrapper, this.el.nativeElement);
-		this.renderer.removeChild(this.renderer.parentNode(this.el.nativeElement), this.el.nativeElement);
+		this.renderer.insertBefore(this.elRef.nativeElement.parentElement, wrapper, this.elRef.nativeElement);
+		this.renderer.removeChild(this.renderer.parentNode(this.elRef.nativeElement), this.elRef.nativeElement);
 		this.renderer.destroy();
 
-		// Init with the lazy-loader
-		super.init(wrapper);
+		this.hookLazyLoader(wrapper);
 	}
 
 	/**
@@ -191,13 +190,16 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 	private createYoutubeVideo(p: VideoParams) {
 		let startTime = '';
 		if (p.start) { startTime = '?start=' + p.start; }
+		const url = 'https://www.youtube.com/embed/' + p.ID + startTime;
 
 		// Create iframe
 		this._iframe = this.renderer.createElement('iframe');
-		this.renderer.setAttribute(this._iframe, 'data-src', 'https://www.youtube.com/embed/' + p.ID + startTime);
+		this.renderer.setAttribute(this._iframe, 'data-src', url);
+		this.renderer.setAttribute(this._iframe, 'title', 'Youtube - ' + url);
 
 		// Create Thumbnail image (also required for aspect ratio)
 		this._img = this.renderer.createElement('img');
+		this.renderer.setAttribute(this._img, 'alt', 'Youtube thumbnail');
 		this.renderer.setAttribute(this._img, 'src', 'https://img.youtube.com/vi/' + p.ID + '/mqdefault.jpg');
 	}
 
@@ -205,12 +207,16 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 	 * Creates a Twitch embed
 	 */
 	private createTwitchVideo(p: VideoParams) {
+		const url = 'https://player.twitch.tv/?' + p.prefix + p.ID;
+
 		// Create iframe
 		this._iframe = this.renderer.createElement('iframe');
-		this.renderer.setAttribute(this._iframe, 'data-src', 'https://player.twitch.tv/?' + p.prefix + p.ID);
+		this.renderer.setAttribute(this._iframe, 'data-src', url);
+		this.renderer.setAttribute(this._iframe, 'title', 'Twitch - ' + url);
 
 		// Create Thumbnail image (also required for aspect ratio)
 		this._img = this.renderer.createElement('img');  // Creating a black 16 by 9 base64 image
+		this.renderer.setAttribute(this._img, 'alt', 'Twitch thumbnail');
 		this.renderer.setAttribute(this._img, 'src',
 			'data:image/bmp;base64,Qk1YAQAAAAAAADYAAAAoAAAAEAAAAAkAAAABABAAAAAAACIBAAASCwAAEgs' + 'A'.repeat(400) + '=');
 	}

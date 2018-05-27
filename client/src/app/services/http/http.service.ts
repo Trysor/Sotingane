@@ -8,8 +8,10 @@ import { User, AccessRoles, CmsContent } from '@app/models';
 
 import { ServerService } from '@app/services/helpers/server.service';
 
+import { TransferState, StateKey } from '@angular/platform-browser';
+
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map, timeout, share, distinctUntilChanged, filter, debounceTime, takeUntil } from 'rxjs/operators';
+import { map, timeout, share, distinctUntilChanged, filter, debounceTime, takeUntil, tap } from 'rxjs/operators';
 
 
 @Injectable({ providedIn: 'root' })
@@ -19,13 +21,17 @@ export class HttpService {
 
 	private readonly _options = { reportProgress: true };
 	private readonly _apiRoute: string;
+	private readonly _isServer: boolean;
 
 	public get isLoading() { return this._isLoading; }
 
 	constructor(
 		@Inject(PLATFORM_ID) private platformId: Object,
 		@Optional() private serverService: ServerService,
+		private state: TransferState,
 		private http: HttpClient) {
+
+		this._isServer = isPlatformServer(platformId);
 
 		this._apiRoute = isPlatformServer(platformId) ? serverService.apiBase : '';
 
@@ -69,4 +75,27 @@ export class HttpService {
 	public delete<T>(url: string) {
 		return this.hookRequest(this.http.delete<T>(this._apiRoute + url));
 	}
+
+	// ---------------------------------------
+	// ------------- HTTP METHODS ------------
+	// ---------------------------------------
+
+	/**
+	 * Handle request on server and transfer state to client
+	 * @param key
+	 * @param request
+	 */
+	public transferStateForRequest<T>(key: StateKey<T>, request: Observable<T>): Observable<T> {
+		// Get state
+		const state = this.state.get<T>(key, null);
+		// If state exists, remove it and deliver its content
+		if (this.state.hasKey(key) && state) {
+			this.state.remove(key);
+			return of<T>(state);
+		}
+		// Else request from API. If the request occurs on the server, save the state to the state store
+		if (this._isServer) { return request.pipe(tap(savestate => { this.state.set(key, savestate); })); }
+		return request;
+	}
+
 }

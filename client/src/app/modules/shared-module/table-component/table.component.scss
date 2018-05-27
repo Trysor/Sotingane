@@ -7,7 +7,7 @@ mat-header-row {
 	border: var(--border);
 }
 
-.mat-row {
+mat-row {
 	&:last-child {
 		border: none;
 	}
@@ -15,11 +15,11 @@ mat-header-row {
 		cursor: pointer;
 	}
 
-	transition: background 0.5s ease-in-out;
+	transition: background 0.3s ease-in-out;
 	background: rgba(0,0,0,0);
 
 	&:hover {
-		background: rgba(var(--color-active), 0.1);
+		background: var(--color-active);
 	}
 }
 
