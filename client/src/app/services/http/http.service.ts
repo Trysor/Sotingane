@@ -1,7 +1,7 @@
 ﻿import { Injectable, Optional, Inject, PLATFORM_ID, } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { isPlatformServer } from '@angular/common';
+import { isPlatformServer, DOCUMENT } from '@angular/common';
 
 import { environment } from '@env';
 import { User, AccessRoles, CmsContent } from '@app/models';
@@ -20,27 +20,33 @@ export class HttpService {
 	private _isLoading = new BehaviorSubject<boolean>(false);
 
 	private readonly _options = { reportProgress: true };
-	private readonly _apiRoute: string;
 	private readonly _isServer: boolean;
+	private readonly _docURL: string;
 
+
+	public get apiBase() { return this._isServer ? this.serverService.apiBase : ''; }
+	public get urlBase() { return this._isServer ? this.serverService.urlBase : this._docURL; }
 	public get isLoading() { return this._isLoading; }
 
 	constructor(
+		@Inject(DOCUMENT) private document: Document,
 		@Inject(PLATFORM_ID) private platformId: Object,
 		@Optional() private serverService: ServerService,
 		private state: TransferState,
 		private http: HttpClient) {
 
 		this._isServer = isPlatformServer(platformId);
-
-		this._apiRoute = isPlatformServer(platformId) ? serverService.apiBase : '';
+		if (!this._isServer) {
+			// colon included in protocol
+			this._docURL = `${document.location.protocol}//${document.location.hostname}`;
+		}
 
 		this._requests.pipe(filter(x => 1 >= x), distinctUntilChanged(), debounceTime(50))
 			.subscribe(subs => this._isLoading.next(subs > 0));
 	}
 
 	/**
-	 * Hooks onto
+	 * Hooks onto any API request
 	 * @param obs
 	 */
 	private hookRequest<T>(obs: Observable<T>, until?: Observable<any>) {
@@ -61,19 +67,19 @@ export class HttpService {
 	// ---------------------------------------
 
 	public get<T>(url: string, until?: Observable<any>) {
-		return this.hookRequest(this.http.get<T>(this._apiRoute + url), until);
+		return this.hookRequest(this.http.get<T>(this.apiBase + url), until);
 	}
 
 	public post<T>(url: string, body: object) {
-		return this.hookRequest(this.http.post<T>(this._apiRoute + url, body));
+		return this.hookRequest(this.http.post<T>(this.apiBase + url, body));
 	}
 
 	public patch<T>(url: string, body: object) {
-		return this.hookRequest(this.http.patch<T>(this._apiRoute + url, body));
+		return this.hookRequest(this.http.patch<T>(this.apiBase + url, body));
 	}
 
 	public delete<T>(url: string) {
-		return this.hookRequest(this.http.delete<T>(this._apiRoute + url));
+		return this.hookRequest(this.http.delete<T>(this.apiBase + url));
 	}
 
 	// ---------------------------------------

@@ -4,6 +4,7 @@ export * from './controllers/auth.service';
 export * from './controllers/cms.service';
 export * from './controllers/steam.service';
 // helpers
+export * from './helpers/seo.service';
 export * from './helpers/server.service';
 export * from './helpers/token.service';
 // http

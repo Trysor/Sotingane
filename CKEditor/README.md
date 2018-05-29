@@ -1,3 +1,3 @@
 ﻿# CKEditor
 
-Custom build of CKEditor 5
+A custom build of CKEditor 5. Used by the client.

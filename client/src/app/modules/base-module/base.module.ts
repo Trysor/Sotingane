@@ -9,6 +9,7 @@ import { ContentModule } from '@app/modules/content-module/content.module';
 
 // Components
 import { BaseComponent } from './base-component/base.component';
+import { SEOComponent } from './seo-component/seo.component';
 import { HeaderComponent } from './header-component/header.component';
 import { LoadingbarComponent } from './loadingbar-component/loadingbar.component';
 import { ControlPanelComponent } from './control-panel-component/control.panel.component';
@@ -20,6 +21,7 @@ import { SearchResultsComponent } from './search-results-component/search.result
 @NgModule({
 	declarations: [
 		BaseComponent,
+		SEOComponent,
 		HeaderComponent,
 		LoadingbarComponent,
 		ControlPanelComponent,

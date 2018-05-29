@@ -1,14 +1,14 @@
 ﻿import { Injectable, Inject } from '@angular/core';
 
+import { environment } from '@env';
+
 import { Request } from 'express';
 import { REQUEST } from '@nguniversal/express-engine/tokens';
 
 @Injectable()
 export class ServerService {
 	// This class is only loaded on the server. No need to verify that with isPlatformServer.
-
 	private _isMobile: boolean;
-	private _req: Request;
 	private _urlBase: string;
 	private _apiBase: string;
 
@@ -20,10 +20,10 @@ export class ServerService {
 		return this._apiBase;
 	}
 
-	constructor(@Inject(REQUEST) private req: Request) {
-		this._req = req;
-		this._urlBase = 'https://' + req.hostname;
-		this._apiBase = 'https://' + req.hostname;
+	constructor(
+		@Inject(REQUEST) private req: Request) {
+		this._urlBase = req.protocol + '://' + req.hostname;
+		this._apiBase = req.protocol + '://' + req.hostname;
 
 		const userAgent = (<string>req.headers['user-agent']).toLowerCase();
 		/* tslint:disable:max-line-length */
