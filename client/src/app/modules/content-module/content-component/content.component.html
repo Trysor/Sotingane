@@ -8,12 +8,14 @@
 			<mat-icon>more_vert</mat-icon>
 		</button>
 		<mat-menu #pageControls="matMenu" xPosition="before">
-			<button mat-menu-item (click)="navigateToEditPage()">
-				<mat-icon>mode_edit</mat-icon> Edit
-			</button>
-			<button mat-menu-item (click)="deletePage()" [disabled]="contentObject.route === 'home'">
-				<mat-icon>delete</mat-icon> Delete
-			</button>
+			<ng-template matMenuContent>
+				<button mat-menu-item (click)="navigateToEditPage()">
+					<mat-icon>mode_edit</mat-icon> Edit
+				</button>
+				<button mat-menu-item (click)="deletePage()" [disabled]="contentObject.route === 'home'">
+					<mat-icon>delete</mat-icon> Delete
+				</button>
+			</ng-template>
 		</mat-menu>
 	</div>
 </ng-container>

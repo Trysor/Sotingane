@@ -16,11 +16,11 @@
 	<div *ngIf="mobileService.isMobile() | async" class="swipe right" (swipeleft)="sidenavRight.open()"></div>
 
 	<!-- MOBILE LEFT -->
-	<mat-sidenav #sidenavLeft mode="over" position="start" ngClass="sidenav" (swipeleft)="closeSideNavs()" [style.touch-action]="'pan-y'">
+	<mat-sidenav #sidenavLeft mode="over" position="start" ngClass="sidenav" (swipeleft)="closeSideNavs()">
 		<nav-component ngClass="nav" *ngIf="mobileService.isMobile() | async"></nav-component>
 	</mat-sidenav>
 	<!-- MOBILE RIGHT -->
-	<mat-sidenav #sidenavRight mode="over" position="end" ngClass="sidenav" (swiperight)="closeSideNavs()" [style.touch-action]="'pan-y'">
+	<mat-sidenav #sidenavRight mode="over" position="end" ngClass="sidenav" (swiperight)="closeSideNavs()">
 		<ng-container *ngIf="mobileService.isMobile() | async">
 			<div *ngIf="authService.getUser() | async as user" class="mobileLoginInfo">
 				<mat-icon color="primary">person</mat-icon>

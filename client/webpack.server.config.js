@@ -18,7 +18,7 @@ module.exports = {
 			{
 				// Mark files inside `@angular/core` as using SystemJS style dynamic imports.
 				// Removing this will cause deprecation warnings to appear.
-				test: /[\/\\]@angular[\/\\]core[\/\\].+\.js$/,
+				test: /(\\|\/)@angular(\\|\/)core(\\|\/).+\.js$/,
 				parser: { system: true }
 			}
 		]
