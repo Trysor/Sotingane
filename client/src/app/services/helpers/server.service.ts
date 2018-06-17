@@ -16,7 +16,7 @@ export class ServerService {
 
 	constructor(
 		@Inject(REQUEST) private req: Request) {
-		this._urlBase = req.protocol + '://' + req.hostname + ':4000';
+		this._urlBase = req.protocol + '://' + req.hostname;
 		// env.API_BASE = this._urlBase; // Override the environment API routes to include the base
 
 		const userAgent = (<string>req.headers['user-agent']).toLowerCase();
