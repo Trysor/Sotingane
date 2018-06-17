@@ -1,35 +1,23 @@
 ﻿import { Injectable, Inject } from '@angular/core';
 
+import { env } from '@env';
+
 import { Request } from 'express';
 import { REQUEST } from '@nguniversal/express-engine/tokens';
 
 @Injectable()
 export class ServerService {
 	// This class is only loaded on the server. No need to verify that with isPlatformServer.
-
 	private _isMobile: boolean;
-	private _req: Request;
 	private _urlBase: string;
-	private _apiBase: string;
 
-	public get urlBase(): string {
-		return this._urlBase;
-	}
+	public get urlBase() { return this._urlBase; }
 
-	public get apiBase(): string {
-		return this._apiBase;
-	}
 
-	constructor(@Inject(REQUEST) private req: Request) {
-		this._req = req;
-
-		if (req.hostname === 'localhost') {
-			this._urlBase = 'http://localhost:4000';
-			this._apiBase = 'http://localhost:2000';
-		} else {
-			this._urlBase = 'https://' + req.hostname;
-			this._apiBase = 'https://' + req.hostname;
-		}
+	constructor(
+		@Inject(REQUEST) private req: Request) {
+		this._urlBase = req.protocol + '://' + req.hostname;
+		// env.API_BASE = this._urlBase; // Override the environment API routes to include the base
 
 		const userAgent = (<string>req.headers['user-agent']).toLowerCase();
 		/* tslint:disable:max-line-length */
@@ -43,13 +31,5 @@ export class ServerService {
 	 */
 	public isMobile() {
 		return this._isMobile;
-	}
-
-	/**
-	 * Modifies any content string to use data- prefixes for src attributes, denying images from loading
-	 * @param contentString
-	 */
-	public modifyContent(contentString: string): string {
-		return contentString; // contentString.replace(/src/g, 'data-src');
 	}
 }

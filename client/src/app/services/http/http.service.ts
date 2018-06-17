@@ -1,52 +1,35 @@
-﻿import { Injectable, Optional, Inject, PLATFORM_ID, } from '@angular/core';
+﻿import { Injectable, Optional, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { TransferState, StateKey } from '@angular/platform-browser';
+import { isPlatformServer, DOCUMENT } from '@angular/common';
 
-import { isPlatformServer } from '@angular/common';
-
-import { environment } from '@env';
-import { User, AccessRoles, CmsContent } from '@app/models';
-
+import { env } from '@env';
 import { ServerService } from '@app/services/helpers/server.service';
 
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map, timeout, share, distinctUntilChanged, filter, debounceTime, takeUntil } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 
 @Injectable({ providedIn: 'root' })
 export class HttpService {
-	private _requests = new BehaviorSubject<number>(0);
-	private _isLoading = new BehaviorSubject<boolean>(false);
+	private readonly _isServer: boolean;
+	private readonly _urlBase: string;
 
-	private readonly _options = { reportProgress: true };
-	private readonly _apiRoute: string;
-
-	public get isLoading() { return this._isLoading; }
+	public get urlBase() { return this._urlBase; }
+	public get client() { return this.httpClient; }
 
 	constructor(
+		@Inject(DOCUMENT) private document: Document,
 		@Inject(PLATFORM_ID) private platformId: Object,
 		@Optional() private serverService: ServerService,
-		private http: HttpClient) {
+		private state: TransferState,
+		private httpClient: HttpClient) {
 
-		this._apiRoute = isPlatformServer(platformId) ? serverService.apiBase : '';
+		this._isServer = isPlatformServer(platformId);
 
-		this._requests.pipe(filter(x => 1 >= x), distinctUntilChanged(), debounceTime(50))
-			.subscribe(subs => this._isLoading.next(subs > 0));
-	}
-
-	/**
-	 * Hooks onto
-	 * @param obs
-	 */
-	private hookRequest<T>(obs: Observable<T>, until?: Observable<any>) {
-		// Up counter by 1
-		this._requests.next(this._requests.getValue() + 1);
-		// Share and set timeout
-		let piped = obs.pipe(share(), timeout(environment.TIMEOUT));
-		if (until) { piped = piped.pipe(takeUntil(until)); }
-
-		const done = () => this._requests.next(this._requests.getValue() - 1);
-		piped.subscribe(done, done);
-		return piped;
+		this._urlBase = this._isServer
+			? this.serverService.urlBase
+			: `${document.location.protocol}//${document.location.hostname}`; // colon included in protocol
 	}
 
 
@@ -54,19 +37,22 @@ export class HttpService {
 	// ------------- HTTP METHODS ------------
 	// ---------------------------------------
 
-	public get<T>(url: string, until?: Observable<any>) {
-		return this.hookRequest(this.http.get<T>(this._apiRoute + url), until);
+	/**
+	 * Handle request on server and transfer state to client
+	 * @param key
+	 * @param request
+	 */
+	public fromState<T>(key: StateKey<T>, request: Observable<T>): Observable<T> {
+		// Get state
+		const state = this.state.get<T>(key, null);
+		// If state exists, remove it and deliver its content
+		if (this.state.hasKey(key) && state) {
+			this.state.remove(key);
+			return of<T>(state);
+		}
+		// Else request from API. If the request occurs on the server, save the state to the state store
+		if (this._isServer) { return request.pipe(tap(savestate => { this.state.set(key, savestate); })); }
+		return request;
 	}
 
-	public post<T>(url: string, body: object) {
-		return this.hookRequest(this.http.post<T>(this._apiRoute + url, body));
-	}
-
-	public patch<T>(url: string, body: object) {
-		return this.hookRequest(this.http.patch<T>(this._apiRoute + url, body));
-	}
-
-	public delete<T>(url: string) {
-		return this.hookRequest(this.http.delete<T>(this._apiRoute + url));
-	}
 }

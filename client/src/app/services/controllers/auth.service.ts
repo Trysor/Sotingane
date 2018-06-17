@@ -5,7 +5,7 @@ import { isPlatformServer } from '@angular/common';
 
 import { MatSnackBar } from '@angular/material';
 
-import { environment } from '@env';
+import { env } from '@env';
 import { User, UpdatePasswordUser, UserToken, AccessRoles } from '@app/models';
 
 import { TokenService } from '@app/services/helpers/token.service';
@@ -13,7 +13,7 @@ import { HttpService } from '@app/services/http/http.service';
 import { ServerService } from '@app/services/helpers/server.service';
 
 import { Observable, Subscription, BehaviorSubject, timer, of } from 'rxjs';
-import { map, catchError, timeout, takeUntil } from 'rxjs/operators';
+import { map, catchError, takeUntil } from 'rxjs/operators';
 
 
 @Injectable({ providedIn: 'root' })
@@ -185,7 +185,7 @@ export class AuthService {
 	 * @return {Observable<boolean>}         Server's response, as an Observable
 	 */
 	public login(user: User): Observable<boolean> {
-		return this.http.post<UserToken>(environment.URL.auth.login, user).pipe(
+		return this.http.client.post<UserToken>(env.API_BASE + env.API.auth.login, user).pipe(
 			map(userToken => {
 				// Set token
 				this.tokenService.token = userToken.token;
@@ -195,7 +195,6 @@ export class AuthService {
 				this.updateCurrentUserData(userToken.token);
 				return !!userToken.token;
 			}),
-			timeout(environment.TIMEOUT)
 		);
 	}
 
@@ -204,12 +203,11 @@ export class AuthService {
 	 * @return {Observable<boolean>} wether the JWT was successfully renewed
 	 */
 	public renewToken(): Observable<UserToken> {
-		return this.http.get<UserToken>(environment.URL.auth.token).pipe(
+		return this.http.client.get<UserToken>(env.API_BASE + env.API.auth.token).pipe(
 			map(userToken => {
 				this.tokenService.token = userToken.token;    // Set token
 				return userToken;
 			}),
-			timeout(environment.TIMEOUT)
 		);
 	}
 
@@ -219,9 +217,8 @@ export class AuthService {
 	 * @return {Observable<boolean>}      wether the password was successfully updated
 	 */
 	public updatePassword(user: UpdatePasswordUser): Observable<boolean> {
-		return this.http.post<boolean>(environment.URL.auth.updatepass, user).pipe(
+		return this.http.client.post<boolean>(env.API_BASE + env.API.auth.updatepass, user).pipe(
 			map(() => true),
-			timeout(environment.TIMEOUT),
 			catchError(err => of(false))
 		); // returns message objects
 	}

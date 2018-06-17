@@ -18,6 +18,7 @@ mat-sidenav-container {
 		box-sizing: border-box;
 		background: var(--color-sidepanel);
 		box-shadow: var(--shadow) inset;
+		touch-action: pan-y;
 	}
 }
 

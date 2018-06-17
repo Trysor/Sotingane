@@ -6,6 +6,10 @@
 	.mat-dialog-container {
 		background: none;
 		box-shadow: none;
+
+		img {
+			pointer-events: initial !important;
+		}
 	}
 }
 
@@ -13,21 +17,16 @@
 :host {
 	position: relative;
 	display: flex;
-	max-width: 90vw;
-	max-height: 90vh;
+	max-width: 80vw;
+	max-height: 80vh;
+	min-height: 80vh;
 
 	img {
 		flex: 1 1;
+		min-width: 80vw;
 		width: calc(100% + 48px);
 		margin: -24px;
 		-o-object-fit: contain;
 		object-fit: contain;
-	}
-
-	button {
-		pointer-events: initial;
-		position: absolute;
-		top: 4px;
-		right: -20px;
 	}
 }

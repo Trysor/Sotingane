@@ -4,7 +4,11 @@ interface NodeModule {
 	id: string;
 }
 
-declare var ClassicEditor;
+
+declare var ClassicEditor: {
+	build: { plugins?: any[], config?: { toolbar?: { items: string[] }, image?: { toolbar: string[] }, language: string } };
+	create: (el: HTMLElement) => Promise<CKEditor>;
+};
 
 interface CKEditor {
 	getData(): string;

@@ -5,7 +5,7 @@
 import { isPlatformServer } from '@angular/common';
 import { Meta, Title } from '@angular/platform-browser';
 
-import { environment } from '@env';
+import { env } from '@env';
 
 import { ServerService } from '@app/services/helpers/server.service';
 import { CmsContent, DynamicComponent } from '@app/models';
@@ -42,8 +42,8 @@ export class ContentService {
 	 * Sets metadata to the default values provided in the environment variables
 	 */
 	public setDefaultMeta() {
-		this.title.setTitle(environment.META.title);
-		this.meta.updateTag({ name: 'description', content: environment.META.desc });
+		this.title.setTitle(env.META.title);
+		this.meta.updateTag({ name: 'description', content: env.META.desc });
 	}
 
 
@@ -53,7 +53,7 @@ export class ContentService {
 	 */
 	public setContentMeta(cmsContent: CmsContent) {
 		this.meta.updateTag({ name: 'description', content: cmsContent.description });
-		this.title.setTitle(`${environment.META.title} - ${cmsContent.title}`);
+		this.title.setTitle(`${env.META.title} - ${cmsContent.title}`);
 	}
 
 
@@ -76,12 +76,6 @@ export class ContentService {
 		const e = element.nativeElement;
 		let newContent = cmsContent.content;
 
-		// inject directly if it is the server
-		if (this._isPlatformServer && !!this.server) {
-			e.innerHTML = this.server.modifyContent(newContent);
-			return;
-		}
-
 		// Clean components before rebuilding.
 		this.cleanEmbeddedComponents();
 
@@ -92,7 +86,7 @@ export class ContentService {
 			const close = new RegExp(`</${tag}>`, 'g');
 			newContent = newContent.replace(open, `<${selector} `).replace(close, `</${selector}>`);
 		});
-		e.innerHTML = newContent;
+		e.innerHTML = newContent.replace(/src/g, 'data-src');
 
 		// Second loop; Injection time
 		this._dynamicContent.forEach((fac) => {
@@ -101,15 +95,17 @@ export class ContentService {
 
 			for (let i = 0; i < elems.length; i++) {
 				const el = elems.item(i);
+				const origEl = el.cloneNode(true);
 				const savedTextContent = el.textContent; // save text content before we modify the element
 				// convert NodeList into an array, since Angular dosen't like having a NodeList passed for projectableNodes
 				const comp = fac.create(this.injector, [Array.prototype.slice.call(el.childNodes)], el);
 				// only static ones work here since this is the only time they're set
-				for (const attr of (el as any).attributes) {
-					comp.instance[attr.nodeName] = attr.nodeValue;
+
+				for (let j = 0; j < el.attributes.length; j++) {
+					const attr = el.attributes.item(j);
+					comp.instance[attr.name] = attr.value;
 				}
-				// do buildJob
-				comp.instance.buildJob(el, savedTextContent);
+				comp.instance.buildJob(<Element>origEl, savedTextContent);
 
 				// Add to list
 				this._embeddedComponents.push(comp);

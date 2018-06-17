@@ -1,14 +1,18 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { environment } from '@env';
+import { env } from '@env';
 import { CmsContent } from '@app/models';
+
+import { makeStateKey } from '@angular/platform-browser';
+const LIST_KEY = makeStateKey<CmsContent[]>('cmslist');
+const PAGE_KEY = makeStateKey<CmsContent>('cmspage');
 
 import { AuthService } from '@app/services/controllers/auth.service';
 import { HttpService } from '@app/services/http/http.service';
 
-import { Observable, BehaviorSubject } from 'rxjs';
-import { timeout } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class CMSService {
@@ -32,8 +36,7 @@ export class CMSService {
 	public getContentList(forceUpdate = false): BehaviorSubject<CmsContent[]> {
 		if (!forceUpdate) { return this._listSubject; }
 
-		const sub = this.requestContentList().subscribe(contentList => {
-			sub.unsubscribe();
+		this.requestContentList().subscribe(contentList => {
 			this._listSubject.next(contentList);
 		});
 		return this._listSubject;
@@ -45,10 +48,11 @@ export class CMSService {
 
 	/**
 	 * Requests the content list
-	 * @return {Observable<CmsContent[]>}         Server's response, as an Observable
+	 * @return {Observable<CmsContent[]>}       Server's response, as an Observable
 	 */
 	private requestContentList(): Observable<CmsContent[]> {
-		return this.http.get<CmsContent[]>(environment.URL.cms.content);
+		return this.http.client.get<CmsContent[]>(env.API_BASE + env.API.cms.content);
+		// return this.http.transferStateForRequest(LIST_KEY, this.http.get<CmsContent[]>(environment.URL.cms.content));
 	}
 
 	/**
@@ -56,7 +60,7 @@ export class CMSService {
 	 * @return {Observable<CmsContent>}         Server's response, as an Observable
 	 */
 	public searchContent(searchTerm: string): Observable<CmsContent[]> {
-		return this.http.get<CmsContent[]>(environment.URL.cms.search + '/' + searchTerm);
+		return this.http.client.get<CmsContent[]>(env.API_BASE + env.API.cms.search + '/' + searchTerm);
 	}
 
 	/**
@@ -64,7 +68,10 @@ export class CMSService {
 	 * @return {Observable<CmsContent>}         Server's response, as an Observable
 	 */
 	public requestContent(contentUrl: string): Observable<CmsContent> {
-		return this.http.get<CmsContent>(environment.URL.cms.content + '/' + contentUrl);
+		return this.http.fromState(
+			PAGE_KEY,
+			this.http.client.get<CmsContent>(env.API_BASE + env.API.cms.content + '/' + contentUrl)
+		);
 	}
 
 	/**
@@ -72,7 +79,7 @@ export class CMSService {
 	 * @return {Observable<CmsContent>}         Server's response, as an Observable
 	 */
 	public requestContentHistory(contentUrl: string): Observable<CmsContent[]> {
-		return this.http.get<CmsContent[]>(environment.URL.cms.history + '/' + contentUrl);
+		return this.http.client.get<CmsContent[]>(env.API_BASE + env.API.cms.history + '/' + contentUrl);
 	}
 
 	/**
@@ -80,7 +87,7 @@ export class CMSService {
 	 * @return {Observable<CmsContent>}         Server's response, as an Observable
 	 */
 	public updateContent(contentUrl: string, updatedContent: CmsContent): Observable<CmsContent> {
-		return this.http.patch<CmsContent>(environment.URL.cms.content + '/' + contentUrl, updatedContent);
+		return this.http.client.patch<CmsContent>(env.API_BASE + env.API.cms.content + '/' + contentUrl, updatedContent);
 	}
 
 	/**
@@ -88,7 +95,7 @@ export class CMSService {
 	 * @return {Observable<boolean>}         Server's response, as an Observable
 	 */
 	public deleteContent(contentUrl: string): Observable<boolean> {
-		return this.http.delete<boolean>(environment.URL.cms.content + '/' + contentUrl);
+		return this.http.client.delete<boolean>(env.API_BASE + env.API.cms.content + '/' + contentUrl);
 	}
 
 	/**
@@ -96,6 +103,6 @@ export class CMSService {
 	 * @return {Observable<CmsContent>}         Server's response, as an Observable
 	 */
 	public createContent(newContent: CmsContent): Observable<CmsContent> {
-		return this.http.post<CmsContent>(environment.URL.cms.content, newContent);
+		return this.http.client.post<CmsContent>(env.API_BASE + env.API.cms.content, newContent);
 	}
 }

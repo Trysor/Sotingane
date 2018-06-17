@@ -4,7 +4,7 @@ import { BrowserTransferStateModule } from '@angular/platform-browser';
 
 import { ServiceWorkerModule } from '@angular/service-worker';
 
-import { environment } from '@env';
+import { env } from '@env';
 import { WorkerService } from '@app/services';
 
 import { AppModule } from './app.module';
@@ -15,7 +15,7 @@ import { AppComponent } from './app.component';
 		BrowserAnimationsModule,
 		AppModule,
 		BrowserTransferStateModule,
-		ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })
+		ServiceWorkerModule.register('/ngsw-worker.js', { enabled: env.production })
 	],
 	providers: [
 		WorkerService,

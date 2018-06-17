@@ -79,19 +79,18 @@
 			pointer-events: none;
 		}
 
-		> img {
+		img {
 			display: block;
 			margin: 0 auto;
 			max-width: 100%;
 			width: 100%;
 		}
 
-		& > figcaption {
+		figcaption {
 			padding: .8em;
 			font-size: .75em;
 			background: var(--color-material) !important;
 			box-shadow: var(--shadow) inset;
-			border-top: var(--border);
 			color: var(--color-text);
 		}
 
@@ -119,8 +118,14 @@
 	// Lazy-load pre-sizing to fill space.
 	image-container.image {
 		&.lazy {
-			height: calc(var(--width-wrapper) / 2 * 9 / 16);
+			height: calc(var(--width-wrapper) * 9 / 16);
+
+			&.image-style-align-left,
+			&.image-style-align-right {
+				height: calc(var(--width-wrapper) / 2 * 9 / 16);
+			}
 		}
+
 		.click {
 			cursor: pointer;
 		}
@@ -156,8 +161,6 @@
 		height: auto;
 	}
 }
-
-
 // Mobile styling
 .site.mobile {
 	#content {

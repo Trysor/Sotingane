@@ -7,18 +7,22 @@
 		"moduleResolution": "node",
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
-		"target": "es5",
+		"target": "es2015",
 		"typeRoots": [
 			"node_modules/@types"
 		],
 		"baseUrl": "src",
 		"paths": {
 			"@app/*": [ "app/*" ],
-			"@env": [ "environments/environment" ]
+			"@env": [ "environments/environment" ],
+			"@app-ckeditor": [ "../../CKEditor/dist/ckeditor" ]
 		},
 		"lib": [
 			"es2017",
 			"dom"
 		]
-	}
+	},
+	"exclude": [
+		"node_modules"
+	]
 }

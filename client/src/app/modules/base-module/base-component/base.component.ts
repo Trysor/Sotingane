@@ -4,9 +4,7 @@ import { MatIconRegistry, MatDrawer } from '@angular/material';
 import { Router } from '@angular/router';
 import { isPlatformServer } from '@angular/common';
 
-import { environment } from '@env';
-
-import { MobileService, AuthService, ContentService, WorkerService, ServerService } from '@app/services';
+import { MobileService, AuthService, ContentService, WorkerService, ServerService, SEOService } from '@app/services';
 // import { RoutingAnim } from '@app/animations';
 
 import { Subject } from 'rxjs';
@@ -27,8 +25,9 @@ export class BaseComponent implements OnInit, OnDestroy {
 	constructor(
 		@Inject(PLATFORM_ID) private platformId: Object,
 		@Optional() private workerService: WorkerService,
-		@Optional() private serverService: ServerService,
+		@Optional() public serverService: ServerService,
 		private contentService: ContentService,
+		public seoService: SEOService,
 		public mobileService: MobileService,
 		public authService: AuthService,
 		public router: Router,

@@ -1,5 +1,5 @@
-﻿import { Injectable, Inject, PLATFORM_ID, ElementRef, OnInit } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+﻿import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformServer } from '@angular/common';
 
 import { Subject } from 'rxjs';
 
@@ -8,13 +8,15 @@ import { Subject } from 'rxjs';
 export class IntersectionService {
 	private _obs: IntersectionObserver;
 	private _subject = new Subject<IntersectionObserverEntry[]>();
+	private _isServer: boolean;
 
 	public get targets() { return this._subject; }
 
 	constructor(
 		@Inject(PLATFORM_ID) private platformId: Object) {
 
-		if (!isPlatformBrowser(platformId)) { return; }
+		this._isServer = isPlatformServer(platformId);
+		if (this._isServer) { return; }
 
 		this._obs = new IntersectionObserver(
 			(entries: IntersectionObserverEntry[]) => {
@@ -33,7 +35,22 @@ export class IntersectionService {
 	 * @param el
 	 */
 	public observe(el: Element) {
-		this._obs.observe(el);
+		if (!this._isServer) {
+			this._obs.observe(el);
+			return;
+		}
+
+		// On server
+		const intersect: IntersectionObserverEntry = {
+			target: el, // the element
+			isIntersecting: true, // isIntersecting
+			boundingClientRect: null,
+			intersectionRatio: 1,
+			intersectionRect: null,
+			rootBounds: null,
+			time: 0
+		};
+		this._subject.next([intersect]);
 	}
 
 	/**
@@ -41,6 +58,7 @@ export class IntersectionService {
 	 * @param el
 	 */
 	public unobserve(el: Element) {
+		if (this._isServer) { return; }
 		this._obs.unobserve(el);
 	}
 }

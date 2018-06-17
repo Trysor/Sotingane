@@ -113,7 +113,7 @@
 			<!-- VERSION -->
 			<mat-form-field>
 				<mat-select id="access" [disabled]="!history" [(value)]="versionIndex" (selectionChange)="versionChange($event)">
-					<ng-container *ngIf="history; else noHistoryAvailable">
+					<ng-container *ngIf="(!!history && history.length > 0); else noHistoryAvailable">
 						<mat-option [value]="VersionHistory.Draft">
 							{{getHistoryItemFormatted(history[0].version + 2, 'Current draft')}}
 						</mat-option>
@@ -123,7 +123,7 @@
 					</ng-container>
 					<ng-template #noHistoryAvailable>
 						<mat-option [value]="VersionHistory.Draft">
-							{{getHistoryItemFormatted(1, 'New draft')}}
+							{{getHistoryItemFormatted(1, 'Draft')}}
 						</mat-option>
 					</ng-template>
 				</mat-select>
