@@ -1,6 +1,6 @@
 ﻿import { Injectable, Inject } from '@angular/core';
 
-import { environment } from '@env';
+import { env } from '@env';
 
 import { HttpService } from '@app/services/http/http.service';
 
@@ -11,7 +11,7 @@ export class SEOService {
 			'@context': 'http://schema.org',
 			'@type': 'Organization',
 			'url': this.httpService.urlBase,
-			'logo': this.httpService.urlBase + '/assets/logo182themed.png' // can't be svg.
+			'logo': this.httpService.urlBase + '/assets/logo192themed.png' // can't be svg.
 		};
 	}
 
@@ -25,7 +25,7 @@ export class SEOService {
 				'position': 1,
 				'item': {
 					'@id': this.httpService.urlBase,
-					'name': environment.META.title,
+					'name': env.META.title,
 				}
 			}]
 		};

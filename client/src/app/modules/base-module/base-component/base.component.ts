@@ -4,8 +4,6 @@ import { MatIconRegistry, MatDrawer } from '@angular/material';
 import { Router } from '@angular/router';
 import { isPlatformServer } from '@angular/common';
 
-import { environment } from '@env';
-
 import { MobileService, AuthService, ContentService, WorkerService, ServerService, SEOService } from '@app/services';
 // import { RoutingAnim } from '@app/animations';
 

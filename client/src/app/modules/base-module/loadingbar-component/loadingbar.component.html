@@ -1,2 +1,2 @@
-<mat-progress-bar *ngIf="loadingBarVisible | async" color="primary" mode="determinate"
-				  [value]="loadingBarValue | async" ngClass="loading fixed"></mat-progress-bar>
+<mat-progress-bar *ngIf="loading.isLoading | async" color="primary" mode="determinate"
+				  [value]="loading.valueSubject | async" ngClass="loading fixed"></mat-progress-bar>

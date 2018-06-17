@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 
-import { environment } from '@env';
+import { env } from '@env';
 
 
 @Component({
@@ -11,8 +11,8 @@ import { environment } from '@env';
 })
 export class FooterComponent {
 
-	public desc = environment.FOOTER.desc;
-	public copyright = environment.FOOTER.copyright;
+	public desc = env.FOOTER.desc;
+	public copyright = env.FOOTER.copyright;
 
 	constructor() { }
 }

@@ -3,16 +3,16 @@ import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({ providedIn: 'root' })
 export class TokenService {
-	private _platformID: Object;
+	private readonly _isBrowser: boolean;
 
 	public get token(): string {
-		if (isPlatformBrowser(this._platformID)) {
+		if (this._isBrowser) {
 			return localStorage.getItem('token');
 		}
 		return '';
 	}
 	public set token(newToken: string) {
-		if (isPlatformBrowser(this._platformID)) {
+		if (this._isBrowser) {
 			if (newToken) {
 				localStorage.setItem('token', newToken);
 				return;
@@ -22,7 +22,7 @@ export class TokenService {
 	}
 
 	constructor( @Inject(PLATFORM_ID) private platformId: Object) {
-		this._platformID = platformId;
+		this._isBrowser = isPlatformBrowser(platformId);
 	}
 
 }

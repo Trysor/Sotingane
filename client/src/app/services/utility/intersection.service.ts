@@ -1,4 +1,4 @@
-﻿import { Injectable, Inject, PLATFORM_ID, ElementRef, OnInit } from '@angular/core';
+﻿import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
 
 import { Subject } from 'rxjs';

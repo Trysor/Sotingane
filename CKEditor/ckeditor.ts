@@ -22,10 +22,9 @@ import ListPlugin from '@ckeditor/ckeditor5-list/src/list';
 import BlockquotePlugin from '@ckeditor/ckeditor5-block-quote/src/blockquote';
 import CodePlugin from '@ckeditor/ckeditor5-basic-styles/src/code';
 
-// export at the bottom
-let ClassicEditor = void 0;
 
-class ClassicEditorDef extends ClassicEditorBase {
+
+export default class ClassicEditor extends ClassicEditorBase {
 	static build: {
 		plugins: any[];
 		config: {
@@ -40,7 +39,7 @@ class ClassicEditorDef extends ClassicEditorBase {
 	static create: (e: any, s?: any) => Promise<any>;
 }
 
-ClassicEditorDef.build = {
+ClassicEditor.build = {
 	plugins: [
 		EssentialsPlugin,
 		AlignmentPlugin,
@@ -88,7 +87,3 @@ ClassicEditorDef.build = {
 		language: 'en'
 	}
 };
-
-
-if (navigator) { ClassicEditor = ClassicEditorDef; }
-export default ClassicEditor;

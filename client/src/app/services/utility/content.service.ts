@@ -5,7 +5,7 @@
 import { isPlatformServer } from '@angular/common';
 import { Meta, Title } from '@angular/platform-browser';
 
-import { environment } from '@env';
+import { env } from '@env';
 
 import { ServerService } from '@app/services/helpers/server.service';
 import { CmsContent, DynamicComponent } from '@app/models';
@@ -42,8 +42,8 @@ export class ContentService {
 	 * Sets metadata to the default values provided in the environment variables
 	 */
 	public setDefaultMeta() {
-		this.title.setTitle(environment.META.title);
-		this.meta.updateTag({ name: 'description', content: environment.META.desc });
+		this.title.setTitle(env.META.title);
+		this.meta.updateTag({ name: 'description', content: env.META.desc });
 	}
 
 
@@ -53,7 +53,7 @@ export class ContentService {
 	 */
 	public setContentMeta(cmsContent: CmsContent) {
 		this.meta.updateTag({ name: 'description', content: cmsContent.description });
-		this.title.setTitle(`${environment.META.title} - ${cmsContent.title}`);
+		this.title.setTitle(`${env.META.title} - ${cmsContent.title}`);
 	}
 
 

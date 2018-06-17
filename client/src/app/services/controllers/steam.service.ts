@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { environment } from '@env';
+import { env } from '@env';
 import { GameDig, SteamServer } from '@app/models';
 
 import { HttpService } from '@app/services/http/http.service';
 
 import { Observable, BehaviorSubject } from 'rxjs';
-import { timeout } from 'rxjs/operators';
 
 
 @Injectable({ providedIn: 'root' })
@@ -32,7 +31,7 @@ export class SteamService {
 	 * Query for all steam servers
 	 */
 	public requestSteamServers(): Observable<SteamServer[]> {
-		return this.http.get<SteamServer[]>(environment.URL.steam.servers).pipe(timeout(environment.TIMEOUT));
+		return this.http.client.get<SteamServer[]>(env.API_BASE + env.API.steam.servers);
 	}
 
 	/**
@@ -40,7 +39,7 @@ export class SteamService {
 	 * @param  {string} route the route assgined for the steam server
 	 */
 	public requestSteamServer(route: string): Observable<SteamServer> {
-		return this.http.get<SteamServer>(environment.URL.steam.servers + '/' + route).pipe(timeout(environment.TIMEOUT));
+		return this.http.client.get<SteamServer>(env.API_BASE + env.API.steam.servers + '/' + route);
 	}
 
 	/**
@@ -48,8 +47,8 @@ export class SteamService {
 	 * @param  {string} route the route assgined for the steam server
 	 */
 	public querySteamServerData(route: string) {
-		this.http.get<GameDig>(environment.URL.steam.servers + '/' + route + '/data')
-			.pipe(timeout(environment.TIMEOUT)).subscribe(
+		this.http.client.get<GameDig>(env.API_BASE + env.API.steam.servers + '/' + route + '/data')
+			.subscribe(
 				data => {
 					data.lastUpdate = new Date();
 					const now = new Date().valueOf();

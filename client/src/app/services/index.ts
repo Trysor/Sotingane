@@ -16,3 +16,4 @@ export * from './utility/content.service';
 export * from './utility/intersection.service';
 export * from './utility/mobile.service';
 export * from './utility/modal.service';
+export * from './utility/loading.service';
