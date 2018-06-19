@@ -3,7 +3,9 @@
 		<mat-form-field class="field" floatLabel="never">
 			<button matPrefix mat-icon-button type="submit"><mat-icon>search</mat-icon></button>
 			<input matInput placeholder="Search" type="text" autocomplete="off" formControlName="search">
-			<button *ngIf="form.get('search').value.length > 0" matSuffix mat-icon-button (click)="clear()"><mat-icon>clear</mat-icon></button>
+			<button *ngIf="form.get('search').value.length > 0" matSuffix mat-icon-button (click)="clear()" aria-label="Search">
+				<mat-icon>clear</mat-icon>
+			</button>
 		</mat-form-field>
 	</form>
 </div>
