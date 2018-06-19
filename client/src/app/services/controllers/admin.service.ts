@@ -31,4 +31,8 @@ export class AdminService {
 	public getAllContent(): Observable<CmsContent[]> {
 		return this.http.client.get<CmsContent[]>(env.API_BASE + env.API.admin.cms);
 	}
+
+	public getContentPage(contentUrl: string): Observable<CmsContent> {
+		return this.http.client.get<CmsContent>(env.API_BASE + env.API.admin.cms + '/' + contentUrl);
+	}
 }

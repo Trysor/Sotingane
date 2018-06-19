@@ -110,6 +110,28 @@ export class CMSController {
 	}
 
 
+	/**
+	 * Gets all content of a given route, declared by the param
+	 * @param  {Req}		req  request
+	 * @param  {Res}		res  response
+	 * @param  {Next}		next next
+	 * @return {Res}		server response: the content object
+	 */
+	public static async getContentFull(req: Req, res: Res, next: Next) {
+		const route: string = req.params.route;
+
+		const contentDoc = <ContentDoc>await ContentModel.findOne(
+			{ 'current.route': route },
+			{ 'current': 1 }
+		).populate([
+			{ path: 'current.updatedBy', select: 'username -_id' }, // exclude _id
+			{ path: 'current.createdBy', select: 'username -_id' }  // exclude _id
+		]);
+
+		if (!contentDoc) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
+		res.status(200).send(contentDoc.current);
+	}
+
 
 	/**
 	 * Gets content history of a given route

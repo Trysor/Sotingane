@@ -10,8 +10,6 @@ import { AppRouter } from './router';
 
 // boot
 import * as mongooose from 'mongoose';
-import { readFileSync } from 'fs';
-
 
 class App {
 	public app: express.Express;

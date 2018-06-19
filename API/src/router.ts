@@ -187,6 +187,11 @@ export class AppRouter {
 			AuthController.requireRole(accessRoles.admin),
 			CMSController.getAdminContentList);
 
+		contentRoutes.get('/:route',
+			PassportConfig.requireAuth,
+			AuthController.requireRole(accessRoles.admin),
+			CMSController.getContentFull);
+
 
 
 		// admin route

@@ -5,7 +5,7 @@ import { DatePipe } from '@angular/common';
 
 import { MatSelectChange, ErrorStateMatcher } from '@angular/material';
 
-import { ModalService, CMSService, MobileService } from '@app/services';
+import { ModalService, CMSService, MobileService, AdminService } from '@app/services';
 import { CmsContent, CmsAccess, AccessRoles } from '@app/models';
 
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
@@ -59,6 +59,7 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 		private route: ActivatedRoute,
 		private fb: FormBuilder,
 		private cmsService: CMSService,
+		private adminService: AdminService,
 		public mobileService: MobileService) {
 
 		// Form
@@ -108,9 +109,10 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 		// Router: Check if we are editing or creating content. Load from API
 		const editingContentRoute = route.snapshot.params['route'];
 		if (editingContentRoute) {
-			this.cmsService.requestContent(editingContentRoute).subscribe(data => {
+			this.adminService.getContentPage(editingContentRoute).subscribe(data => {
 				this.originalContent = data;
 				this._currentDraft = data;
+				console.log(this._currentDraft.content);
 
 				this.contentForm.patchValue(data);
 				this.setFormDisabledState();
@@ -132,14 +134,18 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 		const c = this.history ? this.history[event.value] : null;
 
 		if (c) {
-			this._currentDraft = this.contentForm.value;
+			// Only store current draft when the user is actually able to draft.
+			// The form should be disabled when reviewing history.
+			if (!this.contentForm.disabled) {
+				this._currentDraft = this.contentForm.value;
+			}
 			this.contentForm.patchValue(c, { emitEvent: false });
 			this.setFormDisabledState();
 			return;
 		}
 
 		this.contentForm.patchValue(this._currentDraft, { emitEvent: false });
-		this.setFormDisabledState();
+		this.setFormDisabledState(); // Disabled state has to occur BELOW the disabled check above!
 	}
 
 	ngOnDestroy() {
