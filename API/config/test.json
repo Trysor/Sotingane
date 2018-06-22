@@ -1,5 +1,9 @@
 {
 	"secret": "testtesttesttesttesttesttesttesttesttest",
 	"database": "mongodb://localhost/sotingtest",
-	"port": 2000
+	"port": 2000,
+	"allowedOrigins": [
+		"localhost:2000"
+	],
+	"loggingMode": "dev" /*'combined' outputs the Apache style LOGs*/
 }
