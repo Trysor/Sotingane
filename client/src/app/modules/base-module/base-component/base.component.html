@@ -33,7 +33,7 @@
 		</ng-container>
 	</mat-sidenav>
 </mat-sidenav-container>
-<seo-component [json]="seoService.seoLogo"></seo-component>
-<seo-component [json]="seoService.seoBreadcrumb"></seo-component>
+<seo-component [json]="seoService.logo | async"></seo-component>
+<seo-component [json]="seoService.bread | async"></seo-component>
 
 
