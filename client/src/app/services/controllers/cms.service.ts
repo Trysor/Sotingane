@@ -5,8 +5,9 @@ import { env } from '@env';
 import { CmsContent } from '@app/models';
 
 import { makeStateKey } from '@angular/platform-browser';
-const LIST_KEY = makeStateKey<CmsContent[]>('cmslist');
-const PAGE_KEY = makeStateKey<CmsContent>('cmspage');
+const LIST_KEY = makeStateKey<CmsContent[]>('cmslist'),
+	PAGE_KEY = makeStateKey<CmsContent>('cmspage'),
+	SEARCH_KEY = makeStateKey<CmsContent[]>('cmssearch');
 
 import { AuthService } from '@app/services/controllers/auth.service';
 import { HttpService } from '@app/services/http/http.service';
@@ -60,7 +61,10 @@ export class CMSService {
 	 * @return {Observable<CmsContent>}         Server's response, as an Observable
 	 */
 	public searchContent(searchTerm: string): Observable<CmsContent[]> {
-		return this.http.client.get<CmsContent[]>(env.API_BASE + env.API.cms.search + '/' + searchTerm);
+		return this.http.fromState(
+			SEARCH_KEY,
+			this.http.client.get<CmsContent[]>(env.API_BASE + env.API.cms.search + '/' + searchTerm)
+		);
 	}
 
 	/**
