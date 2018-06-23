@@ -20,7 +20,19 @@ export class PagesComponent implements OnDestroy {
 	public data = new BehaviorSubject<CmsContent[]>(null);
 
 	public readonly settings: TableSettings = {
-		columns: [ // ['title', 'views', 'access', 'nav', 'edit'],
+		columns: [
+			{
+				header: '',
+				property: 'edit',
+				noSort: true,
+				type: ColumnType.InternalLink,
+				icon: () => 'mode_edit',
+				noText: true,
+				func: (c: CmsContent) => {
+					return `/compose/${c.route}`;
+				},
+				narrow: true,
+			},
 			{
 				header: 'Title',
 				property: 'title',
@@ -71,19 +83,7 @@ export class PagesComponent implements OnDestroy {
 				}
 			},
 			{
-				header: 'Edit',
-				property: 'edit',
-				noSort: true,
-				type: ColumnType.InternalLink,
-				icon: () => 'mode_edit',
-				noText: true,
-				func: (c: CmsContent) => {
-					return `/compose/${c.route}`;
-				},
-				narrow: true
-			},
-			{
-				header: 'Delete',
+				header: '',
 				property: 'delete',
 				noSort: true,
 				type: ColumnType.Button,

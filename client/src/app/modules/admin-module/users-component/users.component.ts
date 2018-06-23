@@ -52,7 +52,7 @@ export class UsersComponent implements OnDestroy {
 				}
 			},
 			{
-				header: 'Edit',
+				header: '',
 				property: '_id',
 				noSort: true,
 				type: ColumnType.Button,
