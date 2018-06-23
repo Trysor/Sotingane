@@ -25,6 +25,22 @@
 				width: 100%;
 			}
 		}
+
+		label {
+			display: none;
+		}
+
+		mat-form-field {
+			width: 100%;
+		}
+	}
+
+	.field {
+		display: flex;
+
+		label, mat-form-field {
+			flex: 1 1;
+		}
 	}
 
 	::ng-deep .mat-tab-body {
