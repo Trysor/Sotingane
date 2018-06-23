@@ -5,11 +5,9 @@
 		<mat-tab-group class="demo-tab-group">
 			<mat-tab label="Page Settings">
 				<sectionwrapper-component>
-					<section-component header="Page Information">
+					<section-component header="Page Details">
 						<!-- TITLE -->
 						<div class="field">
-							<label for="title" [ngClass]="{ disabled: title.disabled }">Title</label>
-
 							<mat-form-field appearance="outline">
 								<mat-label>Title</mat-label>
 								<input matInput id="title" #title formControlName="title" type="text"
@@ -23,12 +21,11 @@
 								<mat-hint align="end">{{title.value.length}} / {{maxShortInputLength}}</mat-hint>
 							</mat-form-field>
 						</div>
+
 						<!-- ROUTE -->
 						<div class="field">
-							<label for="route" [ngClass]="{ disabled: route.disabled }">Route</label>
 							<mat-form-field appearance="outline">
 								<mat-label>Route</mat-label>
-								
 								<input matInput id="route" #route formControlName="route" type="text"
 									   [errorStateMatcher]="formErrorInstant" autocomplete="off" required [maxlength]="maxShortInputLength">
 								<mat-error *ngIf="contentForm.get('route').hasError('required')">
@@ -41,13 +38,18 @@
 							</mat-form-field>
 						</div>
 
+						<!-- PUBLISHED -->
+						<div class="field">
+							<mat-checkbox formControlName="published" class="full" labelPosition="before">
+								Published
+							</mat-checkbox>
+						</div>
 					</section-component>
 
 					<section-component header="Accessibility" class="formControls">
 
 						<!-- ACCESS -->
 						<div class="field">
-							<label for="access" [ngClass]="{ disabled: access.disabled }">Access</label>
 							<mat-form-field appearance="outline">
 								<mat-label>Access</mat-label>
 								<!-- <mat-icon matPrefix>{{getAccessChoice().icon}}</mat-icon> -->
@@ -59,27 +61,27 @@
 							</mat-form-field>
 						</div>
 
-						<!-- NAV -->
-						<div class="field">
-							<mat-checkbox formControlName="nav" (change)="setFormDisabledState()" class="full" labelPosition="before">
-								Show in navigation
-							</mat-checkbox>
-						</div>
-
 						<!-- FOLDER -->
 						<div class="field">
-							<label for="folder" [ngClass]="{ disabled: folder.disabled }">Navigation Folder</label>
 							<mat-form-field appearance="outline">
 								<mat-label>Folder</mat-label>
 								<input matInput id="folder" #folder formControlName="folder" type="text"
 									   autocomplete="off" [matAutocomplete]="folderAuto" [maxlength]="maxShortInputLength">
 								<mat-hint align="end">{{folder.value.length}} / {{maxShortInputLength}}</mat-hint>
+
 								<mat-autocomplete #folderAuto="matAutocomplete">
 									<mat-option *ngFor="let folder of folders" [value]="folder">
 										{{ folder }}
 									</mat-option>
 								</mat-autocomplete>
 							</mat-form-field>
+						</div>
+
+						<!-- NAV -->
+						<div class="field">
+							<mat-checkbox formControlName="nav" (change)="setFormDisabledState()" class="full" labelPosition="before">
+								Show in navigation
+							</mat-checkbox>
 						</div>
 					</section-component>
 					<section-component header="Search Engine Optimization">
@@ -118,7 +120,7 @@
 	<div ngClass="actions">
 		<div class="group">
 			<!-- VERSION -->
-			<mat-form-field>
+			<mat-form-field appearance="outline">
 				<mat-select id="access" [disabled]="!history" [(value)]="versionIndex" (selectionChange)="versionChange($event)">
 					<ng-container *ngIf="(!!history && history.length > 0); else noHistoryAvailable">
 						<mat-option [value]="VersionHistory.Draft">

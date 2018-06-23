@@ -65,6 +65,13 @@ export class PagesComponent implements OnDestroy {
 				},
 			},
 			{
+				header: 'Published',
+				property: 'published',
+				displayFormat: (c: CmsContent): string => {
+					return c.published ? 'Published' : 'Unpublished';
+				}
+			},
+			{
 				header: 'Navigation',
 				property: 'nav',
 				displayFormat: (c: CmsContent): string => {

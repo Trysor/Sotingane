@@ -72,6 +72,7 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 				Validators.maxLength(this.maxShortInputLength),
 				this.disallowed(cmsService.getContentList(), 'title').bind(this)
 			])],
+			'published': [true],
 			'description': ['', Validators.compose([
 				Validators.required,
 				Validators.maxLength(this.maxLongInputLength)
@@ -220,7 +221,12 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 					if (newContent) {
 						this.cmsService.getContentList(true);
 						this._hasSaved = true;
-						this.router.navigateByUrl(newContent.route);
+
+						if (newContent.published) {
+							this.router.navigateByUrl(newContent.route);
+						} else {
+							this.router.navigateByUrl(''); // redirect to homepage instead.
+						}
 					}
 				},
 				error => {

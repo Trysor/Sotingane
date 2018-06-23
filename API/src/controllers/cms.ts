@@ -38,7 +38,7 @@ export class CMSController {
 		}
 
 		const contentList: Content[] = await ContentModel.aggregate([
-			{ $match: { 'current.access': { $in: accessRights }, 'current.nav': true } },
+			{ $match: { 'current.access': { $in: accessRights }, 'current.nav': true, 'current.published': true } },
 			{
 				$project: { current: { title: 1, route: 1, folder: 1 } }
 			},
@@ -62,7 +62,7 @@ export class CMSController {
 			{
 				$project: {
 					current: {
-						title: 1, route: 1, access: 1, updatedAt: 1, createdAt: 1,
+						title: 1, route: 1, published: 1, access: 1, updatedAt: 1, createdAt: 1,
 						folder: 1, description: 1, nav: 1, views: '$views'
 					}
 				}
@@ -88,7 +88,7 @@ export class CMSController {
 			user: User = <User>req.user;
 
 		const contentDoc = <ContentDoc>await ContentModel.findOneAndUpdate(
-			{ 'current.route': route },
+			{ 'current.route': route, 'current.published': true },
 			{ $inc: { 'views': 1 } },
 			{
 				fields: {
@@ -181,6 +181,7 @@ export class CMSController {
 		const newCurrent: Content = {
 			title: escape(data.title),
 			route: escape(data.route.replace(/\//g, '')).toLowerCase(),
+			published: data.published,
 			access: data.access,
 			version: 0,
 			content: sanitizedContent,
@@ -229,6 +230,7 @@ export class CMSController {
 		const patched = {
 			title: escape(data.title),
 			route: escape(data.route.replace(/\//g, '')).toLowerCase(),
+			published: data.published,
 			access: data.access,
 			version: contentDoc.current.version + 1,
 			content: sanitizedContent,
@@ -295,7 +297,7 @@ export class CMSController {
 		}
 
 		const contentList: Content[] = await ContentModel.aggregate([
-			{ $match: { $text: { $search: searchTerm }, 'current.access': { $in: accessRights } } },
+			{ $match: { $text: { $search: searchTerm }, 'current.access': { $in: accessRights }, 'current.published': true } },
 			{ $sort: { score: { $meta: 'textScore' } } },
 			{ $limit: 1000 },
 			{

@@ -15,6 +15,7 @@ const schema = new Schema({
 		title: { type: String, unique: true, required: true },
 		access: { type: String, enum: ['admin', 'user', 'everyone'], default: 'everyone', index: true },
 		route: { type: String, required: true, unique: true, index: { unique: true } },
+		published: { type: Boolean, default: true },
 		version: { type: Number, required: true },
 
 		content: { type: String, required: true },
@@ -60,6 +61,7 @@ export interface Content {
 	title: string;
 	access?: accessRoles;
 	route: string;
+	published?: boolean;
 	version?: number;
 
 	views?: number;
@@ -89,7 +91,7 @@ export interface Content {
 */
 
 const maxShortInputLength = 25;
-const maxLongInputLength = 50;
+const maxLongInputLength = 300;
 
 const createPatchContentSchema = {
 	'$id': JSchema.ContentSchema,
@@ -103,6 +105,9 @@ const createPatchContentSchema = {
 		'access': {
 			'type': 'string',
 			'enum': [accessRoles.admin, accessRoles.user, accessRoles.everyone]
+		},
+		'published': {
+			'type': 'boolean'
 		},
 		'route': {
 			'type': 'string',
@@ -123,7 +128,7 @@ const createPatchContentSchema = {
 			'type': 'boolean'
 		}
 	},
-	'required': ['title', 'access', 'route', 'content', 'description', 'folder', 'nav' ]
+	'required': ['title', 'published', 'access', 'route', 'content', 'description', 'folder', 'nav' ]
 };
 
 
