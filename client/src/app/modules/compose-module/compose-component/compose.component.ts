@@ -112,7 +112,6 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 			this.adminService.getContentPage(editingContentRoute).subscribe(data => {
 				this.originalContent = data;
 				this._currentDraft = data;
-				console.log(this._currentDraft.content);
 
 				this.contentForm.patchValue(data);
 				this.setFormDisabledState();

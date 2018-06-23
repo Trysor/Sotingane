@@ -35,7 +35,6 @@ export class SEOService {
 
 		// Handle Breadcrumb
 		const setBread = (route: string) => {
-			console.log(route);
 			const content = cmsService.getContentList(false).getValue().find(c => route.includes(c.route));
 			this._bread.next(this.seoBreadcrumb(this.httpService.urlBase + route, content));
 		};
