@@ -92,7 +92,7 @@ export class CMSController {
 			{ $inc: { 'views': 1 } },
 			{
 				fields: {
-					'current.title': 1, 'current.access': 1, 'current.route': 1, 'current.content': 1,
+					'current.title': 1, 'current.access': 1, 'current.route': 1, 'current.content': 1, 'current.description': 1,
 					'current.updatedBy': 1, 'current.createdBy': 1, 'current.updatedAt': 1, 'current.createdAt': 1
 				}
 			}
