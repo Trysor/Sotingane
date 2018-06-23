@@ -45,7 +45,7 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 	public readonly VersionHistory = VersionHistory;
 
 	public readonly maxShortInputLength = 25;
-	public readonly maxLongInputLength = 50;
+	public readonly maxLongInputLength = 300;
 
 	private _currentDraft: CmsContent; // used with the versioning
 
