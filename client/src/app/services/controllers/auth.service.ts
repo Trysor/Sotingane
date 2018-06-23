@@ -105,8 +105,7 @@ export class AuthService {
 		// Engage a new timer to go off 20 minutes before expiration token
 		const renewalDate = new Date(this.jwtExpirationDate(token).getTime() - 1000 * 60 * 20);
 		this._renewalSub = timer(renewalDate).subscribe(time => {
-			const sub = this.renewToken().subscribe(userToken => {
-				sub.unsubscribe();
+			this.renewToken().subscribe(userToken => {
 				if (userToken.token) {
 					this.engageRenewTokenTimer(userToken.token);
 					return;
