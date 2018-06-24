@@ -402,6 +402,55 @@ describe('REST: Content', () => {
 			expect(patchRes.body).property('content').to.equal(content.content);
 		});
 
+		it('PATCH /api/cms/:route 401', async () => {
+			const content: Content = {
+				title: 'patch401',
+				route: 'patch401',
+				content: 'test',
+				access: accessRoles.everyone,
+				description: 'test',
+				folder: 'test',
+				published: true,
+				nav: true
+			};
+
+			const postRes = await TestBed.http.post('/api/cms/')
+				.set('Authorization', TestBed.AdminToken) // admin creates
+				.send(content);
+
+			const [noAuthRes, memberRes] = await Promise.all([
+				TestBed.http.patch('/api/cms/' + content.route).send(content),
+				TestBed.http.patch('/api/cms/' + content.route).set('Authorization', TestBed.MemberToken).send(content)
+			]);
+
+			expect(noAuthRes).to.have.status(401);
+			expect(memberRes).to.have.status(401);
+		});
+
+		it('PATCH /api/cms/:route 404', async () => {
+			const route = 'some404route';
+
+			const content: Content = {
+				title: 'some404route',
+				route: route,
+				content: 'test',
+				access: accessRoles.everyone,
+				description: 'test',
+				folder: 'test',
+				published: true,
+				nav: true
+			};
+
+			const res = await TestBed.http.patch('/api/cms/' + route)
+				.set('Authorization', TestBed.AdminToken)
+				.send(content);
+
+			expect(res).to.have.status(404);
+			expect(res).to.have.property('body');
+			expect(res.body).to.have.property('message');
+			expect(res.body.message).to.equal(CMS_STATUS.CONTENT_NOT_FOUND);
+		});
+
 		it('PATCH /api/cms/:route 422', async () => {
 			const properContent: Content = {
 				title: 'patch422',
@@ -464,31 +513,6 @@ describe('REST: Content', () => {
 			expect(badPublishedRes).to.have.status(422);
 		});
 
-		it('PATCH /api/cms/:route 401', async () => {
-			const content: Content = {
-				title: 'patch401',
-				route: 'patch401',
-				content: 'test',
-				access: accessRoles.everyone,
-				description: 'test',
-				folder: 'test',
-				published: true,
-				nav: true
-			};
-
-			const postRes = await TestBed.http.post('/api/cms/')
-				.set('Authorization', TestBed.AdminToken) // admin creates
-				.send(content);
-
-			const [noAuthRes, memberRes] = await Promise.all([
-				TestBed.http.patch('/api/cms/' + content.route).send(content),
-				TestBed.http.patch('/api/cms/' + content.route).set('Authorization', TestBed.MemberToken).send(content)
-			]);
-
-			expect(noAuthRes).to.have.status(401);
-			expect(memberRes).to.have.status(401);
-		});
-
 
 		it('DELETE /api/cms/:route 200', async () => {
 			const content: Content = {
@@ -537,6 +561,16 @@ describe('REST: Content', () => {
 
 			expect(noAuthRes).to.have.status(401);
 			expect(memberRes).to.have.status(401);
+		});
+
+		it('DELETE /api/cms/:route 404', async () => {
+			const route = 'some404route';
+			const delRes = await TestBed.http.del('/api/cms/' + route).set('Authorization', TestBed.AdminToken);
+
+			expect(delRes).to.have.status(404);
+			expect(delRes).to.have.property('body');
+			expect(delRes.body).to.have.property('message');
+			expect(delRes.body.message).to.equal(CMS_STATUS.CONTENT_NOT_FOUND);
 		});
 	});
 
