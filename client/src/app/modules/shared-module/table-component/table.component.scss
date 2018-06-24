@@ -42,8 +42,9 @@ mat-cell {
 	text-align: right;
 	width: 100%;
 }
-.rightAlignHeader {
-	text-align: center;
+.rightAlignHeader ::ng-deep > div {
+	width: 100%;
+	justify-content: center;
 }
 
 // Icons
