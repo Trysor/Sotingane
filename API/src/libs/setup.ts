@@ -16,7 +16,7 @@ export class Setup {
 		app.use(helmet());
 
 		// set port
-		app.set('port', process.env.PORT || 2000);
+		app.set('port', process.env.PORT || configGet<number>('port') || 2000);
 
 		// bodyParser
 		app.use(urlencoded({ extended: false }));

@@ -32,14 +32,10 @@ export class UsersController {
 	public static async patchUser(req: Req, res: Res, next: Next) {
 		const user: User = req.body,
 			adminUser: User = <User>req.user,
-			routeId: string = req.params.id,
+			userId: string = req.params.id,
 			username_low = user.username.toLowerCase();
 
-		if (!adminUser.isOfRole(accessRoles.admin)) {
-			return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED));
-		}
-
-		if (routeId !== user._id) {
+		if (userId !== user._id) {
 			return res.status(400).send(status(USERS_STATUS.DATA_UNPROCESSABLE));
 		}
 
@@ -52,7 +48,7 @@ export class UsersController {
 			patchingUser.save((err2, updated) => {
 				if (err2) { return next(err2); }
 				if (updated) {
-					return res.status(200).send(status(USERS_STATUS.USER_ROLE_UPDATED));
+					return res.status(200).send(status(USERS_STATUS.USER_UPDATED));
 				}
 				// user obj with bad id
 				return res.status(400).send(status(USERS_STATUS.DATA_UNPROCESSABLE));
@@ -62,7 +58,7 @@ export class UsersController {
 		const foundUser = await UserModel.findOne({ username_lower: username_low });
 
 		if (foundUser && (foundUser.id !== user._id)) { // intentional .id
-			return res.status(400).send(status(USERS_STATUS.USERNAME_NOT_AVILIABLE));
+			return res.status(409).send(status(USERS_STATUS.USERNAME_NOT_AVILIABLE));
 		}
 
 		if (foundUser && foundUser.id === user._id) {

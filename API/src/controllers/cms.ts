@@ -310,7 +310,7 @@ export class CMSController {
 			},
 			{ $replaceRoot: { newRoot: '$current' } },
 		]);
-		if (!contentList || contentList.length === 0) { return res.status(404).send(status(CMS_STATUS.SEARCH_RESULT_NONE_FOUND)); }
+		if (!contentList || contentList.length === 0) { return res.status(200).send(status(CMS_STATUS.SEARCH_RESULT_NONE_FOUND)); }
 		return res.status(200).send(contentList);
 	}
 }

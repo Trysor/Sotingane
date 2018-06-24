@@ -174,9 +174,7 @@ export class AppRouter {
 			validateSchema(JSchema.UserAdminUpdateUser, VALIDATION_FAILED.USER_MODEL),
 			UsersController.patchUser);
 
-
-
-
+		// -------------------------------
 
 		// Content routes
 		const contentRoutes = Router();
@@ -192,7 +190,7 @@ export class AppRouter {
 			AuthController.requireRole(accessRoles.admin),
 			CMSController.getContentFull);
 
-
+		// -------------------------------
 
 		// admin route
 		adminRoutes.use('/users', usersRoutes);

@@ -25,15 +25,6 @@ const userToRegister: Partial<User> = {
 
 describe('REST: Authorization', () => {
 
-	before(async () => {
-		await UserModel.remove({}).exec();
-		TestBed.AdminUser = await new UserModel(AdminUser).save();
-		const res = await TestBed.http.post('/api/auth/login').send({
-			username: AdminUser.username, password: AdminUser.password
-		});
-		TestBed.AdminToken = (<TokenResponse>res.body).token;
-	});
-
 	// ---------------------------------
 	// -------- /api/auth/token --------
 	// ---------------------------------

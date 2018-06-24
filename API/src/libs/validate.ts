@@ -118,6 +118,6 @@ export const enum STEAM_STATUS {
 
 export const enum USERS_STATUS {
 	DATA_UNPROCESSABLE = 'The provided data could not be processed',
-	USER_ROLE_UPDATED = 'User\'s role has been updated successfully',
+	USER_UPDATED = 'User has been updated successfully',
 	USERNAME_NOT_AVILIABLE = 'Username already taken',
 }
