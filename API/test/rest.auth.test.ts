@@ -111,6 +111,21 @@ describe('REST: Authorization', () => {
 		});
 
 
+		it('POST /api/auth/register 409', async () => {
+			const user: Partial<User> = {
+				username: userToRegister.username,
+				password: userToRegister.password,
+				role: accessRoles.admin
+			};
+
+			const res = await TestBed.http.post('/api/auth/register').send(user);
+
+			expect(res).status(409);
+			expect(res).to.have.property('body');
+			expect(res.body).to.have.property('message');
+			expect(res.body).property('message').to.equal(AUTH_STATUS.USERNAME_NOT_AVILIABLE);
+		});
+
 		it('POST /api/auth/register 422', async () => {
 			const noUsername: Partial<User> = { password: 'aaa', role: accessRoles.user };
 			const noPassword: Partial<User> = { username: userToRegister.username + 'test', role: accessRoles.user };
@@ -152,22 +167,6 @@ describe('REST: Authorization', () => {
 			// badEverythingRes
 			expect(badEverythingRes).to.have.status(422);
 		});
-
-
-		it('POST /api/auth/register 409', async () => {
-			const user: Partial<User> = {
-				username: userToRegister.username,
-				password: userToRegister.password,
-				role: accessRoles.admin
-			};
-
-			const res = await TestBed.http.post('/api/auth/register').send(user);
-
-			expect(res).status(409);
-			expect(res).to.have.property('body');
-			expect(res.body).to.have.property('message');
-			expect(res.body).property('message').to.equal(AUTH_STATUS.USERNAME_NOT_AVILIABLE);
-		});
 	});
 
 
@@ -191,6 +190,38 @@ describe('REST: Authorization', () => {
 			expect(res.body).to.have.property('message');
 			expect(res.body).property('message').to.equal(AUTH_STATUS.PASSWORD_UPDATED);
 		});
+
+
+		it('POST /api/auth/updatepassword 401', async () => {
+			const noTokenAttempt = {
+				currentPassword: AdminUser.password,
+				password: AdminUser.password + '2',
+				confirm: AdminUser.password + '2',
+			};
+			const wrongCurrentPasswordAttempt = {
+				currentPassword: AdminUser.password + '1',
+				password: AdminUser.password + '2',
+				confirm: AdminUser.password + '2'
+			};
+
+			const [noTokenAttemptRes, wrongCurrentPasswordAttemptRes] = await Promise.all([
+				TestBed.http.post('/api/auth/updatepassword').send(noTokenAttempt),
+				TestBed.http.post('/api/auth/updatepassword').send(wrongCurrentPasswordAttempt).set('Authorization', TestBed.AdminToken),
+			]);
+
+			// noTokenAttemptRes
+			expect(noTokenAttemptRes).status(401);
+			// expect(noTokenAttemptRes).to.have.property('body');
+			// expect(noTokenAttemptRes.body).to.have.property('message');
+			// expect(noTokenAttemptRes.body).property('message').to.equal(ROUTE_STATUS.UNAUTHORISED);
+
+			// wrongCurrentPasswordAttemptRes
+			expect(wrongCurrentPasswordAttemptRes).status(401);
+			expect(wrongCurrentPasswordAttemptRes).to.have.property('body');
+			expect(wrongCurrentPasswordAttemptRes.body).to.have.property('message');
+			expect(wrongCurrentPasswordAttemptRes.body).property('message').to.equal(AUTH_STATUS.PASSWORD_DID_NOT_MATCH);
+		});
+
 
 		it('POST /api/auth/updatepassword 422', async () => {
 			const noCurrentPassword = { password: AdminUser.password + '2', confirm: AdminUser.password + '2' };
@@ -230,38 +261,6 @@ describe('REST: Authorization', () => {
 			// confirmMismatchRes
 			expect(noCurrentPasswordRes).to.have.status(422);
 		});
-
-
-		it('POST /api/auth/updatepassword 401', async () => {
-			const noTokenAttempt = {
-				currentPassword: AdminUser.password,
-				password: AdminUser.password + '2',
-				confirm: AdminUser.password + '2',
-			};
-			const wrongCurrentPasswordAttempt = {
-				currentPassword: AdminUser.password + '1',
-				password: AdminUser.password + '2',
-				confirm: AdminUser.password + '2'
-			};
-
-			const [noTokenAttemptRes, wrongCurrentPasswordAttemptRes] = await Promise.all([
-				TestBed.http.post('/api/auth/updatepassword').send(noTokenAttempt),
-				TestBed.http.post('/api/auth/updatepassword').send(wrongCurrentPasswordAttempt).set('Authorization', TestBed.AdminToken),
-			]);
-
-			// noTokenAttemptRes
-			expect(noTokenAttemptRes).status(401);
-			// expect(noTokenAttemptRes).to.have.property('body');
-			// expect(noTokenAttemptRes.body).to.have.property('message');
-			// expect(noTokenAttemptRes.body).property('message').to.equal(ROUTE_STATUS.UNAUTHORISED);
-
-			// wrongCurrentPasswordAttemptRes
-			expect(wrongCurrentPasswordAttemptRes).status(401);
-			expect(wrongCurrentPasswordAttemptRes).to.have.property('body');
-			expect(wrongCurrentPasswordAttemptRes.body).to.have.property('message');
-			expect(wrongCurrentPasswordAttemptRes.body).property('message').to.equal(AUTH_STATUS.PASSWORD_DID_NOT_MATCH);
-		});
-
 	});
 
 });
