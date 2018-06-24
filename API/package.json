@@ -7,6 +7,7 @@
 		"build": "tsc",
 		"dev": "concurrently \"tsc --watch\" \"nodemon node_modules/nodemon/bin/nodemon.js --watch dist dist/out-tsc/src/index.js\"",
 		"lint": "tslint -c tslint.json 'src/**/*.ts'",
+		"test:cont": "concurrently \"tsc --watch\" \"SET NODE_ENV=test&& nodemon node_modules/nodemon/bin/nodemon.js --watch dist dist/out-tsc/test/testbed.js\"",
 		"test": "npm run build && cross-env NODE_ENV=test node dist/out-tsc/test/testbed.js",
 		"test:debug": "npm run build && mocha --inspect-brk --delay --exit ./dist/out-tsc/**/*.test.js",
 		"webpack": "webpack --config webpack.config.js --progress --colors"
