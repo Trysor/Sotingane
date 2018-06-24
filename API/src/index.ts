@@ -9,7 +9,7 @@ import { Setup } from './libs/setup';
 import { AppRouter } from './router';
 
 // boot
-import * as mongooose from 'mongoose';
+import * as mongoose from 'mongoose';
 
 class App {
 	public app: express.Express;
@@ -30,20 +30,26 @@ class App {
 	}
 
 	private boot() {
-		const uri = process.env.db || configGet<string>('database');
-
-		mongooose.connect(uri, (error) => {
-			if (error) {
-				// if error is true, the problem is often with mongoDB not connection
-				console.log(error.message);
-				mongooose.disconnect();
-				process.exit(1);
-				return;
-			}
+		this.app.on('db_ready', () => {
 			this.app.listen(this.app.get('port'), () => {
 				console.log(`Sotingane running on - Port ${this.app.get('port')}...`);
 				console.timeEnd('Launch time');
+				this.app.emit('launched');
 			});
+		});
+
+
+		const uri = process.env.db || configGet<string>('database');
+
+		mongoose.connect(uri, (error) => {
+			if (error) {
+				// if error is true, the problem is often with mongoDB not connection
+				console.log(error.message);
+				mongoose.disconnect();
+				process.exit(1);
+				return;
+			}
+			this.app.emit('db_ready');
 		});
 	}
 }
