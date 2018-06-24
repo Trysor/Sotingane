@@ -55,12 +55,13 @@ export class UsersController {
 			});
 		};
 
+		// Check if the username the user wants is already in use
 		const foundUser = await UserModel.findOne({ username_lower: username_low });
-
 		if (foundUser && (foundUser.id !== user._id)) { // intentional .id
 			return res.status(409).send(status(USERS_STATUS.USERNAME_NOT_AVILIABLE));
 		}
 
+		// Else patch the user
 		if (foundUser && foundUser.id === user._id) {
 			return patchUser(null, foundUser);
 		}
