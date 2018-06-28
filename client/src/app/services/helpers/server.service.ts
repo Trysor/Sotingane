@@ -4,6 +4,8 @@ import { env } from '@env';
 
 import { Request } from 'express';
 import { REQUEST } from '@nguniversal/express-engine/tokens';
+import { BehaviorSubject } from 'rxjs';
+
 
 @Injectable()
 export class ServerService {
@@ -11,13 +13,23 @@ export class ServerService {
 	private _isMobile: boolean;
 	private _urlBase: string;
 
+	private _tokenSubject = new BehaviorSubject<string>(null);
+
 	public get urlBase() { return this._urlBase; }
+	public get token() { return this._tokenSubject; }
 
 
 	constructor(
 		@Inject(REQUEST) private req: Request) {
 		this._urlBase = req.protocol + '://' + req.hostname;
-		env.API_BASE = this._urlBase; // Override the environment API routes to include the base
+
+		// Override the environment API routes to include the base
+		if (env.API_BASE === '') { env.API_BASE = this._urlBase; }
+
+		// Set token if one exists
+		if (req.cookies && req.cookies.jwt) {
+			this._tokenSubject.next(req.cookies.jwt);
+		}
 
 		const userAgent = (<string>req.headers['user-agent']).toLowerCase();
 		/* tslint:disable:max-line-length */

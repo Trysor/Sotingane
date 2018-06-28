@@ -1,6 +1,6 @@
 import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 import { UserModel, User, accessRoles } from '../models/user';
-import { get as configGet } from 'config';
+import { get as configGet, util as configUtil } from 'config';
 import { status, ROUTE_STATUS, AUTH_STATUS } from '../libs/validate';
 import { sign } from 'jsonwebtoken';
 
@@ -37,10 +37,35 @@ export class AuthController {
 	 */
 	public static token(req: Req, res: Res): Res {
 		const user: Partial<User> = { _id: req.user._id, username: req.user.username, role: req.user.role };
-		return res.status(200).send({
-			token: 'bearer ' + sign(user, configGet<string>('secret'), { expiresIn: 10800 }), // expiresIn in seconds ( = 3hours)
-			user: user
-		});
+
+		const expires = 10800; // expiresIn in seconds ( = 3hours)
+		const token = sign(user, configGet<string>('secret'), { expiresIn: expires });
+
+		return res.cookie('jwt', token, {
+			maxAge: expires * 1000,
+			secure: configUtil.getEnv('NODE_ENV') === 'production',
+			domain: req.hostname,
+			httpOnly: true,
+			sameSite: true
+		}).status(200).send({ token: token, user: user });
+	}
+
+
+	/**
+	 * Logs out a user by deleting their session cookie
+	 * @param  {Req}      req  request
+	 * @param  {Res}     res  response
+	 * @param  {Next} next next
+	 * @return {Res}          server response: object containing token and user
+	 */
+	public static logout(req: Req, res: Res): Res {
+		return res.cookie('jwt', '', {
+			maxAge: 1000, // one second
+			secure: configUtil.getEnv('NODE_ENV') === 'production',
+			domain: req.hostname,
+			httpOnly: true,
+			sameSite: true
+		}).status(200).send(status(AUTH_STATUS.USER_LOGGED_OUT));
 	}
 
 

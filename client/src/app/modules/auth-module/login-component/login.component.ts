@@ -38,7 +38,7 @@ export class LoginComponent implements OnDestroy {
 			'username': ['', Validators.required],
 			'password': ['', Validators.required]
 		});
-		authService.getUser().pipe(takeUntil(this._ngUnsub)).subscribe(user => {
+		authService.user.pipe(takeUntil(this._ngUnsub)).subscribe(user => {
 			if (!user) { this.state.next(STATES.READY); }
 		});
 
@@ -65,9 +65,8 @@ export class LoginComponent implements OnDestroy {
 	public logIn() {
 		this.state.next(STATES.LOADING);
 		const user: User = this.loginForm.getRawValue();
-		const sub = this.authService.login(user).subscribe(
+		this.authService.login(user).subscribe(
 			(loggedIn) => {
-				sub.unsubscribe();
 				if (loggedIn) {
 					this.router.navigateByUrl('/');
 					return;
@@ -75,7 +74,6 @@ export class LoginComponent implements OnDestroy {
 				this.state.next(STATES.TRY_AGAIN);
 			},
 			(error: HttpErrorResponse) => {
-				sub.unsubscribe();
 				if (error && error.status >= 400 && error.status < 500) {
 					this.state.next(STATES.TRY_AGAIN);
 					return;

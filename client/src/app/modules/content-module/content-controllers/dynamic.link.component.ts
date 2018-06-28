@@ -190,7 +190,7 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 	private createYoutubeVideo(p: VideoParams) {
 		let startTime = '';
 		if (p.start) { startTime = '?start=' + p.start; }
-		const url = 'https://www.youtube.com/embed/' + p.ID + startTime;
+		const url = 'https://www.youtube.com/embed/' + p.ID + startTime + `${p.start ? '&' : '?'}rel=0`;
 
 		// Create iframe
 		this._iframe = this.renderer.createElement('iframe');

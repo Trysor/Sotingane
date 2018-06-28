@@ -3,6 +3,8 @@ import 'zone.js/dist/zone-node';
 import 'reflect-metadata';
 import { enableProdMode } from '@angular/core';
 
+import * as cookieParser from 'cookie-parser';
+
 // Express Engine
 import { ngExpressEngine } from '@nguniversal/express-engine';
 // Import module map for lazy loading
@@ -17,6 +19,7 @@ enableProdMode();
 
 // Express server
 const app = express();
+app.use(cookieParser());
 
 const PORT = process.env.PORT || 4000;
 const DIST_FOLDER = join(process.cwd(), 'dist');

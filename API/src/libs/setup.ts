@@ -5,6 +5,7 @@ import * as helmet from 'helmet';
 import { json, urlencoded } from 'body-parser';
 import * as logger from 'morgan';
 import * as methodOverride from 'method-override';
+import * as cookieParser from 'cookie-parser';
 
 export class Setup {
 	/**
@@ -15,8 +16,11 @@ export class Setup {
 		// Secure app with helmet
 		app.use(helmet());
 
+		// Read cookies
+		app.use(cookieParser());
+
 		// set port
-		app.set('port', process.env.PORT || 2000);
+		app.set('port', process.env.PORT || configGet<number>('port') || 2000);
 
 		// bodyParser
 		app.use(urlencoded({ extended: false }));

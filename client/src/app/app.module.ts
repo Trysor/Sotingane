@@ -19,9 +19,9 @@ import { InterceptorService } from '@app/services/http/interceptor.service';
 	],
 	imports: [
 		BrowserModule.withServerTransition({ appId: 'soting' }), // must be in app.module
+		TransferHttpCacheModule,
 		BaseModule,
-		BaseRoutingModule,
-		TransferHttpCacheModule
+		BaseRoutingModule
 	],
 	providers: [
 		{ provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true },

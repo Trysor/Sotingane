@@ -5,7 +5,7 @@ import { DatePipe } from '@angular/common';
 
 import { MatSelectChange, ErrorStateMatcher } from '@angular/material';
 
-import { ModalService, CMSService, MobileService } from '@app/services';
+import { ModalService, CMSService, MobileService, AdminService } from '@app/services';
 import { CmsContent, CmsAccess, AccessRoles } from '@app/models';
 
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
@@ -37,17 +37,18 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 		{ value: AccessRoles.user, verbose: 'Users', icon: 'verified_user' },
 		{ value: AccessRoles.admin, verbose: 'Admins', icon: 'security' }
 	];
-	// Folders: Holds a list of used Folders
-	public folders: string[] = [];
+
 	// History fields
 	public versionIndex: number = VersionHistory.Draft;
 	public history: CmsContent[] = null;
 	public readonly VersionHistory = VersionHistory;
 
 	public readonly maxShortInputLength = 25;
-	public readonly maxLongInputLength = 50;
+	public readonly maxLongInputLength = 300;
+	public readonly filteredFolders = new BehaviorSubject<string[]>(['']);
 
 	private _currentDraft: CmsContent; // used with the versioning
+	private folders: string[] = []; // Holds a list of used Folders
 
 	private _ngUnsub = new Subject();
 	private _hasSaved = false;
@@ -59,6 +60,7 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 		private route: ActivatedRoute,
 		private fb: FormBuilder,
 		private cmsService: CMSService,
+		private adminService: AdminService,
 		public mobileService: MobileService) {
 
 		// Form
@@ -71,6 +73,7 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 				Validators.maxLength(this.maxShortInputLength),
 				this.disallowed(cmsService.getContentList(), 'title').bind(this)
 			])],
+			'published': [true],
 			'description': ['', Validators.compose([
 				Validators.required,
 				Validators.maxLength(this.maxLongInputLength)
@@ -103,12 +106,18 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 				}
 			}
 			this.folders = folders.sort();
+			this.filteredFolders.next(
+				this.folders.filter(option => option.toLowerCase().includes(this.contentForm.get('folder').value.toLowerCase()))
+			);
 		});
+		this.contentForm.get('folder').valueChanges.subscribe(val => this.filteredFolders.next(
+			this.folders.filter(option => option.toLowerCase().includes(val.toLowerCase()))
+		));
 
 		// Router: Check if we are editing or creating content. Load from API
 		const editingContentRoute = route.snapshot.params['route'];
 		if (editingContentRoute) {
-			this.cmsService.requestContent(editingContentRoute).subscribe(data => {
+			this.adminService.getContentPage(editingContentRoute).subscribe(data => {
 				this.originalContent = data;
 				this._currentDraft = data;
 
@@ -132,14 +141,18 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 		const c = this.history ? this.history[event.value] : null;
 
 		if (c) {
-			this._currentDraft = this.contentForm.value;
+			// Only store current draft when the user is actually able to draft.
+			// The form should be disabled when reviewing history.
+			if (!this.contentForm.disabled) {
+				this._currentDraft = this.contentForm.value;
+			}
 			this.contentForm.patchValue(c, { emitEvent: false });
 			this.setFormDisabledState();
 			return;
 		}
 
 		this.contentForm.patchValue(this._currentDraft, { emitEvent: false });
-		this.setFormDisabledState();
+		this.setFormDisabledState(); // Disabled state has to occur BELOW the disabled check above!
 	}
 
 	ngOnDestroy() {
@@ -215,7 +228,12 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 					if (newContent) {
 						this.cmsService.getContentList(true);
 						this._hasSaved = true;
-						this.router.navigateByUrl(newContent.route);
+
+						if (newContent.published) {
+							this.router.navigateByUrl(newContent.route);
+						} else {
+							this.router.navigateByUrl(''); // redirect to homepage instead.
+						}
 					}
 				},
 				error => {

@@ -5,8 +5,9 @@ import { env } from '@env';
 import { CmsContent } from '@app/models';
 
 import { makeStateKey } from '@angular/platform-browser';
-const LIST_KEY = makeStateKey<CmsContent[]>('cmslist');
-const PAGE_KEY = makeStateKey<CmsContent>('cmspage');
+const LIST_KEY = makeStateKey<CmsContent[]>('cmslist'),
+	PAGE_KEY = makeStateKey<CmsContent>('cmspage'),
+	SEARCH_KEY = makeStateKey<CmsContent[]>('cmssearch');
 
 import { AuthService } from '@app/services/controllers/auth.service';
 import { HttpService } from '@app/services/http/http.service';
@@ -25,7 +26,7 @@ export class CMSService {
 		private router: Router) {
 
 		// Whenever a user logs in or out we should force-update.
-		authService.getUser().subscribe(user => this.getContentList(true));
+		authService.user.subscribe(user => this.getContentList(true));
 	}
 
 	/**
@@ -51,7 +52,7 @@ export class CMSService {
 	 * @return {Observable<CmsContent[]>}       Server's response, as an Observable
 	 */
 	private requestContentList(): Observable<CmsContent[]> {
-		return this.http.client.get<CmsContent[]>(env.API_BASE + env.API.cms.content);
+		return this.http.client.get<CmsContent[]>(this.http.apiUrl(env.API.cms.content));
 		// return this.http.transferStateForRequest(LIST_KEY, this.http.get<CmsContent[]>(environment.URL.cms.content));
 	}
 
@@ -60,7 +61,10 @@ export class CMSService {
 	 * @return {Observable<CmsContent>}         Server's response, as an Observable
 	 */
 	public searchContent(searchTerm: string): Observable<CmsContent[]> {
-		return this.http.client.get<CmsContent[]>(env.API_BASE + env.API.cms.search + '/' + searchTerm);
+		return this.http.fromState(
+			SEARCH_KEY,
+			this.http.client.get<CmsContent[]>(this.http.apiUrl(env.API.cms.search + '/' + searchTerm))
+		);
 	}
 
 	/**
@@ -70,7 +74,7 @@ export class CMSService {
 	public requestContent(contentUrl: string): Observable<CmsContent> {
 		return this.http.fromState(
 			PAGE_KEY,
-			this.http.client.get<CmsContent>(env.API_BASE + env.API.cms.content + '/' + contentUrl)
+			this.http.client.get<CmsContent>(this.http.apiUrl(env.API.cms.content + '/' + contentUrl))
 		);
 	}
 
@@ -79,7 +83,7 @@ export class CMSService {
 	 * @return {Observable<CmsContent>}         Server's response, as an Observable
 	 */
 	public requestContentHistory(contentUrl: string): Observable<CmsContent[]> {
-		return this.http.client.get<CmsContent[]>(env.API_BASE + env.API.cms.history + '/' + contentUrl);
+		return this.http.client.get<CmsContent[]>(this.http.apiUrl(env.API.cms.history + '/' + contentUrl));
 	}
 
 	/**
@@ -87,7 +91,7 @@ export class CMSService {
 	 * @return {Observable<CmsContent>}         Server's response, as an Observable
 	 */
 	public updateContent(contentUrl: string, updatedContent: CmsContent): Observable<CmsContent> {
-		return this.http.client.patch<CmsContent>(env.API_BASE + env.API.cms.content + '/' + contentUrl, updatedContent);
+		return this.http.client.patch<CmsContent>(this.http.apiUrl(env.API.cms.content + '/' + contentUrl), updatedContent);
 	}
 
 	/**
@@ -95,7 +99,7 @@ export class CMSService {
 	 * @return {Observable<boolean>}         Server's response, as an Observable
 	 */
 	public deleteContent(contentUrl: string): Observable<boolean> {
-		return this.http.client.delete<boolean>(env.API_BASE + env.API.cms.content + '/' + contentUrl);
+		return this.http.client.delete<boolean>(this.http.apiUrl(env.API.cms.content + '/' + contentUrl));
 	}
 
 	/**
@@ -103,6 +107,6 @@ export class CMSService {
 	 * @return {Observable<CmsContent>}         Server's response, as an Observable
 	 */
 	public createContent(newContent: CmsContent): Observable<CmsContent> {
-		return this.http.client.post<CmsContent>(env.API_BASE + env.API.cms.content, newContent);
+		return this.http.client.post<CmsContent>(this.http.apiUrl(env.API.cms.content), newContent);
 	}
 }

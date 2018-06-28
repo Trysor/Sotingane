@@ -8,12 +8,20 @@ import * as Mocha from 'mocha';
 import { readdirSync } from 'fs';
 import { join as pathjoin } from 'path';
 
-import { User, accessRoles } from '../src/models/user';
+import { UserModel, User, accessRoles } from '../src/models/user';
+import { TokenResponse } from '../src/controllers/auth';
 
 import app from '../src/index';
 
 export class TestBedSingleton {
 	private _http: ChaiHttp.Agent;
+
+	public get http() { return this._http; }
+	public AdminUser: User;
+	public AdminCookie: string;
+
+	public User: User;
+	public UserCookie: string;
 
 	constructor() {
 		if (configUtil.getEnv('NODE_ENV') !== 'test') { return; }
@@ -26,27 +34,54 @@ export class TestBedSingleton {
 		readdirSync(pathjoin('dist', 'out-tsc', 'test')).filter((file) => file.endsWith('.test.js')).forEach((file) => {
 			mocha.addFile(pathjoin('dist', 'out-tsc', 'test', file));
 		});
-		console.log('Delaying tests for mongoDB..');
-		setTimeout(() => mocha.run((failures) => process.exit()), 5000);
+
+		app.on('launched', async () => {
+			console.log('Connecting with MongoDB..');
+			console.time('Setting up DB for tests');
+
+			// Delete all current users
+			await UserModel.remove({}).exec();
+
+			// Create new users and log them in
+			const [user, admin] = await Promise.all([this.createUser(TestUser), this.createUser(AdminUser)]);
+			TestBed.User = user.user;
+			TestBed.UserCookie = user.cookie;
+			TestBed.AdminUser = admin.user;
+			TestBed.AdminCookie = admin.cookie;
+
+			// Initiate tests
+			console.timeEnd('Setting up DB for tests');
+			console.log('Initiating tests');
+			mocha.run((failures) => process.exit(failures > 0 ? 1 : 0));
+		});
 	}
 
-	public get http() {
-		return this._http;
-	}
 
-	public AdminUser: User;
-	public AdminToken: string;
+	private async createUser(user: Partial<User>): Promise<{ user: User, cookie: string }> {
+		const userObj = await new UserModel(user).save();
+		const res = await TestBed.http.post('/api/auth/login').send({ username: user.username, password: user.password });
+
+		return {
+			user: userObj,
+			cookie: 'jwt=' + (<TokenResponse>res.body).token // slightly modified
+		};
+	}
 }
 
 export const TestBed = new TestBedSingleton();
-
 export default TestBed;
 
-
-// Used in all test scenarios
+// Used in test scenarios
 export const AdminUser: Partial<User> = {
 	username: 'Admin',
 	username_lower: 'admin',
 	password: 'test',
 	role: accessRoles.admin,
 };
+export const TestUser: Partial<User> = {
+	username: 'User',
+	username_lower: 'user',
+	password: 'test',
+	role: accessRoles.user,
+};
+

@@ -51,15 +51,6 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 		route: '',
 	};
 
-	private readonly _serverLoading: CmsContent = {
-		access: AccessRoles.everyone,
-		title: 'Loading',
-		content: 'Loading..',
-		description: ' ',
-		version: 0,
-		route: '',
-	};
-
 	// Constructor
 	constructor(
 		@Inject(PLATFORM_ID) private platformId: Object,
@@ -110,13 +101,7 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 		// Request content
 		this.cmsService.requestContent(this.route.snapshot.params['content']).subscribe(
 			content => this.contentSubject.next(content),					// Success
-			(err: HttpErrorResponse) => {
-				this.contentSubject.next(									// Error / Unauthorized
-					err && err.status === 401 && this.isPlatformServer
-						? this._serverLoading
-						: this._failedToLoad
-				);
-			}
+			(err: HttpErrorResponse) => this.contentSubject.next(this._failedToLoad)
 		);
 	}
 

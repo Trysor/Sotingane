@@ -2,16 +2,18 @@
 <div class="loginForm">
 	<form [formGroup]="loginForm" (ngSubmit)="logIn()" id="loginForm">
 		<!-- USERNAME -->
-		<mat-form-field class="field">
-			<input matInput placeholder="Username" type="text" formControlName="username" required autocomplete="username">
+		<mat-form-field class="field" appearance="outline">
+			<mat-label>Username</mat-label>
+			<input matInput type="text" formControlName="username" required autocomplete="username">
 			<mat-error *ngIf="loginForm.get('username').hasError('required')">
 				Username is <strong>required</strong>
 			</mat-error>
 		</mat-form-field>
 
 		<!-- PASSWORD -->
-		<mat-form-field class="field">
-			<input matInput placeholder="Password" type="password" formControlName="password" required autocomplete="current-password">
+		<mat-form-field class="field" appearance="outline">
+			<mat-label>Password</mat-label>
+			<input matInput type="password" formControlName="password" required autocomplete="current-password">
 			<mat-error *ngIf="loginForm.get('password').hasError('required')">
 				Password is <strong>required</strong>
 			</mat-error>

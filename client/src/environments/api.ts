@@ -3,6 +3,7 @@ export const API = {
 	api: '/api',
 	auth: {
 		login: '/api/auth/login',
+		logout: '/api/auth/logout',
 		token: '/api/auth/token',
 		updatepass: '/api/auth/updatepassword',
 	},

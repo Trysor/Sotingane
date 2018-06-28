@@ -38,7 +38,7 @@ export class CMSController {
 		}
 
 		const contentList: Content[] = await ContentModel.aggregate([
-			{ $match: { 'current.access': { $in: accessRights }, 'current.nav': true } },
+			{ $match: { 'current.access': { $in: accessRights }, 'current.nav': true, 'current.published': true } },
 			{
 				$project: { current: { title: 1, route: 1, folder: 1 } }
 			},
@@ -62,7 +62,7 @@ export class CMSController {
 			{
 				$project: {
 					current: {
-						title: 1, route: 1, access: 1, updatedAt: 1, createdAt: 1,
+						title: 1, route: 1, published: 1, access: 1, updatedAt: 1, createdAt: 1,
 						folder: 1, description: 1, nav: 1, views: '$views'
 					}
 				}
@@ -88,11 +88,11 @@ export class CMSController {
 			user: User = <User>req.user;
 
 		const contentDoc = <ContentDoc>await ContentModel.findOneAndUpdate(
-			{ 'current.route': route },
+			{ 'current.route': route, 'current.published': true },
 			{ $inc: { 'views': 1 } },
 			{
 				fields: {
-					'current.title': 1, 'current.access': 1, 'current.route': 1, 'current.content': 1,
+					'current.title': 1, 'current.access': 1, 'current.route': 1, 'current.content': 1, 'current.description': 1,
 					'current.updatedBy': 1, 'current.createdBy': 1, 'current.updatedAt': 1, 'current.createdAt': 1
 				}
 			}
@@ -109,6 +109,28 @@ export class CMSController {
 		res.status(200).send(contentDoc.current);
 	}
 
+
+	/**
+	 * Gets all content of a given route, declared by the param
+	 * @param  {Req}		req  request
+	 * @param  {Res}		res  response
+	 * @param  {Next}		next next
+	 * @return {Res}		server response: the content object
+	 */
+	public static async getContentFull(req: Req, res: Res, next: Next) {
+		const route: string = req.params.route;
+
+		const contentDoc = <ContentDoc>await ContentModel.findOne(
+			{ 'current.route': route },
+			{ 'current': 1 }
+		).populate([
+			{ path: 'current.updatedBy', select: 'username -_id' }, // exclude _id
+			{ path: 'current.createdBy', select: 'username -_id' }  // exclude _id
+		]);
+
+		if (!contentDoc) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
+		res.status(200).send(contentDoc.current);
+	}
 
 
 	/**
@@ -159,6 +181,7 @@ export class CMSController {
 		const newCurrent: Content = {
 			title: escape(data.title),
 			route: escape(data.route.replace(/\//g, '')).toLowerCase(),
+			published: data.published,
 			access: data.access,
 			version: 0,
 			content: sanitizedContent,
@@ -207,6 +230,7 @@ export class CMSController {
 		const patched = {
 			title: escape(data.title),
 			route: escape(data.route.replace(/\//g, '')).toLowerCase(),
+			published: data.published,
 			access: data.access,
 			version: contentDoc.current.version + 1,
 			content: sanitizedContent,
@@ -248,8 +272,8 @@ export class CMSController {
 			return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED));
 		}
 
-		await ContentModel.remove({ 'current.route': route }).lean();
-		// if (err) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
+		const result: { n: number, ok: number } = await ContentModel.remove({ 'current.route': route }).lean();
+		if (result.n === 0) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
 		return res.status(200).send(status(CMS_STATUS.CONTENT_DELETED));
 	}
 
@@ -273,7 +297,7 @@ export class CMSController {
 		}
 
 		const contentList: Content[] = await ContentModel.aggregate([
-			{ $match: { $text: { $search: searchTerm }, 'current.access': { $in: accessRights } } },
+			{ $match: { $text: { $search: searchTerm }, 'current.access': { $in: accessRights }, 'current.published': true } },
 			{ $sort: { score: { $meta: 'textScore' } } },
 			{ $limit: 1000 },
 			{
@@ -286,7 +310,7 @@ export class CMSController {
 			},
 			{ $replaceRoot: { newRoot: '$current' } },
 		]);
-		if (!contentList || contentList.length === 0) { return res.status(404).send(status(CMS_STATUS.SEARCH_RESULT_NONE_FOUND)); }
+		if (!contentList || contentList.length === 0) { return res.status(200).send(status(CMS_STATUS.SEARCH_RESULT_NONE_FOUND)); }
 		return res.status(200).send(contentList);
 	}
 }

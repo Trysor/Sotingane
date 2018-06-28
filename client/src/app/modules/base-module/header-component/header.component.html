@@ -20,12 +20,12 @@
 
 	<!-- Right side logic -->
 	<!-- IF you are logged in -->
-	<ng-container *ngIf="authService.getUser() | async as user; else headerlogin">
+	<ng-container *ngIf="authService.user | async as user; else headerlogin">
 		<div class="flex right" [ngSwitch]="(mobileService.isMobile() | async)">
 			<!-- For MOBILE -->
 			<button mat-icon-button *ngSwitchCase="true" (click)="toggleRight()"
 					class="userToggle mobile" aria-label="Toggle user panel">
-				<mat-icon [color]="(authService.getUser() | async) ? 'primary' : ''">person</mat-icon>
+				<mat-icon [color]="(authService.user | async) ? 'primary' : ''">person</mat-icon>
 			</button>
 			<!-- For DESKTOP -->
 			<button mat-button *ngSwitchCase="false" [matMenuTriggerFor]="userPanel"

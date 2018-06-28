@@ -36,12 +36,15 @@ mat-cell {
 .narrow {
 	text-align: center;
 	max-width: 42px;
+	padding-right: 0;
 }
-.rightAlign {
+.rightAlign > * {
 	text-align: right;
+	width: 100%;
 }
-.rightAlignHeader {
-	text-align: center;
+.rightAlignHeader ::ng-deep > div {
+	width: 100%;
+	justify-content: center;
 }
 
 // Icons

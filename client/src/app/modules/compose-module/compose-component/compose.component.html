@@ -5,13 +5,12 @@
 		<mat-tab-group class="demo-tab-group">
 			<mat-tab label="Page Settings">
 				<sectionwrapper-component>
-					<section-component header="Page Information">
+					<section-component header="Page Details">
 						<!-- TITLE -->
 						<div class="field">
-							<label for="title" [ngClass]="{ disabled: title.disabled }">Title</label>
-
-							<mat-form-field floatLabel="never">
-								<input matInput id="title" #title formControlName="title" placeholder="Title" type="text"
+							<mat-form-field appearance="outline">
+								<mat-label>Title</mat-label>
+								<input matInput id="title" #title formControlName="title" type="text"
 									   [errorStateMatcher]="formErrorInstant" autocomplete="off" required [maxlength]="maxShortInputLength">
 								<mat-error *ngIf="contentForm.get('title').hasError('required')">
 									Title is <strong>required</strong>
@@ -22,12 +21,12 @@
 								<mat-hint align="end">{{title.value.length}} / {{maxShortInputLength}}</mat-hint>
 							</mat-form-field>
 						</div>
+
 						<!-- ROUTE -->
 						<div class="field">
-							<label for="route" [ngClass]="{ disabled: route.disabled }">Route</label>
-							<mat-form-field floatLabel="never">
-								<span matPrefix> / </span>
-								<input matInput id="route" #route formControlName="route" placeholder="Route" type="text"
+							<mat-form-field appearance="outline">
+								<mat-label>Route</mat-label>
+								<input matInput id="route" #route formControlName="route" type="text"
 									   [errorStateMatcher]="formErrorInstant" autocomplete="off" required [maxlength]="maxShortInputLength">
 								<mat-error *ngIf="contentForm.get('route').hasError('required')">
 									Route is <strong>required</strong>
@@ -38,17 +37,12 @@
 								<mat-hint align="end">{{route.value.length}} / {{maxShortInputLength}}</mat-hint>
 							</mat-form-field>
 						</div>
-						<!-- DESCRIPTION -->
+
+						<!-- PUBLISHED -->
 						<div class="field">
-							<label for="desc" [ngClass]="{ disabled: desc.disabled }">Description</label>
-							<mat-form-field floatLabel="never">
-								<input matInput id="desc" #desc formControlName="description" placeholder="Description" type="text"
-									   autocomplete="off" required [maxlength]="maxLongInputLength">
-								<mat-error *ngIf="contentForm.get('description').hasError('required')">
-									Description is <strong>required</strong>
-								</mat-error>
-								<mat-hint align="end">{{desc.value.length}} / {{maxLongInputLength}}</mat-hint>
-							</mat-form-field>
+							<mat-checkbox formControlName="published" class="full" labelPosition="before">
+								Published
+							</mat-checkbox>
 						</div>
 					</section-component>
 
@@ -56,14 +50,30 @@
 
 						<!-- ACCESS -->
 						<div class="field">
-							<label for="access" [ngClass]="{ disabled: access.disabled }">Access</label>
-							<mat-form-field floatLabel="never">
+							<mat-form-field appearance="outline">
+								<mat-label>Access</mat-label>
 								<!-- <mat-icon matPrefix>{{getAccessChoice().icon}}</mat-icon> -->
-								<mat-select id="access" #access formControlName="access" placeholder="Access" required>
+								<mat-select id="access" #access formControlName="access" required>
 									<mat-option *ngFor="let option of accessChoices" [value]="option.value">
 										{{ option.verbose }}
 									</mat-option>
 								</mat-select>
+							</mat-form-field>
+						</div>
+
+						<!-- FOLDER -->
+						<div class="field">
+							<mat-form-field appearance="outline">
+								<mat-label>Folder</mat-label>
+								<input matInput id="folder" #folder formControlName="folder" type="text"
+									   autocomplete="off" [matAutocomplete]="folderAuto" [maxlength]="maxShortInputLength">
+								<mat-hint align="end">{{folder.value.length}} / {{maxShortInputLength}}</mat-hint>
+
+								<mat-autocomplete #folderAuto="matAutocomplete">
+									<mat-option *ngFor="let folder of filteredFolders | async" [value]="folder">
+										{{ folder }}
+									</mat-option>
+								</mat-autocomplete>
 							</mat-form-field>
 						</div>
 
@@ -73,19 +83,18 @@
 								Show in navigation
 							</mat-checkbox>
 						</div>
-
-						<!-- FOLDER -->
-						<div class="field">
-							<label for="folder" [ngClass]="{ disabled: folder.disabled }">Navigation Folder</label>
-							<mat-form-field floatLabel="never">
-								<input matInput id="folder" #folder formControlName="folder" placeholder="Folder" type="text"
-									   autocomplete="off" [matAutocomplete]="folderAuto" [maxlength]="maxShortInputLength">
-								<mat-hint align="end">{{folder.value.length}} / {{maxShortInputLength}}</mat-hint>
-								<mat-autocomplete #folderAuto="matAutocomplete">
-									<mat-option *ngFor="let folder of folders" [value]="folder">
-										{{ folder }}
-									</mat-option>
-								</mat-autocomplete>
+					</section-component>
+					<section-component header="Search Engine Optimization">
+						<!-- DESCRIPTION -->
+						<div class="field wide">
+							<mat-form-field appearance="outline">
+								<mat-label>Description</mat-label>
+								<textarea matInput id="desc" #desc formControlName="description" type="text"
+										  autocomplete="off" required [maxlength]="maxLongInputLength" matTextareaAutosize></textarea>
+								<mat-error *ngIf="contentForm.get('description').hasError('required')">
+									Description is <strong>required</strong>
+								</mat-error>
+								<mat-hint align="end">{{desc.value.length}} / {{maxLongInputLength}}</mat-hint>
 							</mat-form-field>
 						</div>
 					</section-component>
@@ -111,7 +120,7 @@
 	<div ngClass="actions">
 		<div class="group">
 			<!-- VERSION -->
-			<mat-form-field>
+			<mat-form-field appearance="outline">
 				<mat-select id="access" [disabled]="!history" [(value)]="versionIndex" (selectionChange)="versionChange($event)">
 					<ng-container *ngIf="(!!history && history.length > 0); else noHistoryAvailable">
 						<mat-option [value]="VersionHistory.Draft">

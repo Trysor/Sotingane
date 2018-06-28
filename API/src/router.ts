@@ -69,6 +69,9 @@ export class AppRouter {
 		// Request a new token
 		authRoutes.get('/token', PassportConfig.requireAuth, AuthController.token); // requireAuth here. Intended.
 
+		// Logout a user
+		authRoutes.post('/logout', PassportConfig.requireAuth, AuthController.logout);
+
 		// Request to update password
 		authRoutes.post('/updatepassword',
 			PassportConfig.requireAuth,
@@ -174,9 +177,7 @@ export class AppRouter {
 			validateSchema(JSchema.UserAdminUpdateUser, VALIDATION_FAILED.USER_MODEL),
 			UsersController.patchUser);
 
-
-
-
+		// -------------------------------
 
 		// Content routes
 		const contentRoutes = Router();
@@ -187,7 +188,12 @@ export class AppRouter {
 			AuthController.requireRole(accessRoles.admin),
 			CMSController.getAdminContentList);
 
+		contentRoutes.get('/:route',
+			PassportConfig.requireAuth,
+			AuthController.requireRole(accessRoles.admin),
+			CMSController.getContentFull);
 
+		// -------------------------------
 
 		// admin route
 		adminRoutes.use('/users', usersRoutes);

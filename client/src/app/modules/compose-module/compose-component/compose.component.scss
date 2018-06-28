@@ -27,6 +27,14 @@
 		}
 	}
 
+	.field {
+		display: flex;
+
+		mat-form-field {
+			flex: 1 1;
+		}
+	}
+
 	::ng-deep .mat-tab-body {
 		min-height: 320px;
 	}

@@ -13,6 +13,7 @@ import { tap } from 'rxjs/operators';
 @Injectable({ providedIn: 'root' })
 export class HttpService {
 	private readonly _isServer: boolean;
+	private readonly _apiBase: string;
 	private readonly _urlBase: string;
 
 	public get urlBase() { return this._urlBase; }
@@ -30,7 +31,15 @@ export class HttpService {
 		this._urlBase = this._isServer
 			? this.serverService.urlBase
 			: `${document.location.protocol}//${document.location.hostname}`; // colon included in protocol
+
+		this._apiBase = this._isServer
+			? this.serverService.urlBase
+			: env.API_BASE;
 	}
+
+
+	public apiUrl(api: string) { return this._apiBase + api; }
+
 
 
 	// ---------------------------------------

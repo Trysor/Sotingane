@@ -5,8 +5,9 @@ export interface CmsContent {
 	title: string;
 	access: AccessRoles;
 	route: string;
-	version: number;
 	// May be present
+	published?: boolean;
+	version?: number;
 	folder?: string;
 	content?: string;
 	nav?: boolean;

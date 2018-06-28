@@ -87,6 +87,7 @@ export const enum AUTH_STATUS {
 	NO_OR_BAD_ROLE = 'Missing or bad role',
 	USERNAME_NOT_AVILIABLE = 'Username already taken',
 	USER_ID_NOT_FOUND = 'The provided ID doesn\'t exist',
+	USER_LOGGED_OUT = 'The user has been successfully logged out',
 	ACCOUNT_CREATED = 'Account created',
 	ACCOUNT_DELETED = 'Account successfully deleted',
 	NO_PASSWORD_OR_NEW_PASSWORDS = 'Missing password, newPassword or confirm',
@@ -118,6 +119,6 @@ export const enum STEAM_STATUS {
 
 export const enum USERS_STATUS {
 	DATA_UNPROCESSABLE = 'The provided data could not be processed',
-	USER_ROLE_UPDATED = 'User\'s role has been updated successfully',
+	USER_UPDATED = 'User has been updated successfully',
 	USERNAME_NOT_AVILIABLE = 'Username already taken',
 }
