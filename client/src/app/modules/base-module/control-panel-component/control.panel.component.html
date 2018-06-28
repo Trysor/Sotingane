@@ -1,4 +1,4 @@
-<ng-container *ngIf="authService.getUser() | async; let user" [ngSwitch]="layout">
+<ng-container *ngIf="authService.user | async; let user" [ngSwitch]="layout">
 	<ng-container *ngSwitchCase="'menu'">
 		<button mat-menu-item routerLink="/user" routerLinkActive="active"><mat-icon>settings</mat-icon> User Settings</button>
 		<mat-divider></mat-divider>

@@ -70,7 +70,7 @@
 								<mat-hint align="end">{{folder.value.length}} / {{maxShortInputLength}}</mat-hint>
 
 								<mat-autocomplete #folderAuto="matAutocomplete">
-									<mat-option *ngFor="let folder of folders" [value]="folder">
+									<mat-option *ngFor="let folder of filteredFolders | async" [value]="folder">
 										{{ folder }}
 									</mat-option>
 								</mat-autocomplete>

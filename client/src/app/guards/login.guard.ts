@@ -18,7 +18,7 @@ export class LoginGuard implements CanActivate {
 	 */
 	canActivate() {
 		const isExpired = this.authService.getUserSessionExpired();
-		const accessGranted = !this.authService.getUser().getValue() || isExpired;
+		const accessGranted = !this.authService.user.getValue() || isExpired;
 		if (!accessGranted) {
 			this.router.navigateByUrl('/');
 		}

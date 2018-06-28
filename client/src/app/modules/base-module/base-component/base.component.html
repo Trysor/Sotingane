@@ -22,7 +22,7 @@
 	<!-- MOBILE RIGHT -->
 	<mat-sidenav #sidenavRight mode="over" position="end" ngClass="sidenav" (swiperight)="closeSideNavs()">
 		<ng-container *ngIf="mobileService.isMobile() | async">
-			<div *ngIf="authService.getUser() | async as user" class="mobileLoginInfo">
+			<div *ngIf="authService.user | async as user" class="mobileLoginInfo">
 				<mat-icon color="primary">person</mat-icon>
 				<div class="user">
 					<h3>{{ user.username }}</h3>

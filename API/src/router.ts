@@ -69,6 +69,9 @@ export class AppRouter {
 		// Request a new token
 		authRoutes.get('/token', PassportConfig.requireAuth, AuthController.token); // requireAuth here. Intended.
 
+		// Logout a user
+		authRoutes.post('/logout', PassportConfig.requireAuth, AuthController.logout);
+
 		// Request to update password
 		authRoutes.post('/updatepassword',
 			PassportConfig.requireAuth,

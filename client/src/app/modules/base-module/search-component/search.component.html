@@ -1,9 +1,9 @@
 <div [ngClass]="{ searchBox: true, mobile: (mobileService.isMobile() | async), wide: (form.get('search').value.length > 0), 'altCol': alternativeColor }">
 	<form [formGroup]="form" (ngSubmit)="search()">
 		<mat-form-field class="field" floatLabel="never">
-			<button matPrefix mat-icon-button type="submit"><mat-icon>search</mat-icon></button>
+			<button matPrefix mat-icon-button type="submit" aria-label="Search"><mat-icon>search</mat-icon></button>
 			<input matInput placeholder="Search" type="text" autocomplete="off" formControlName="search">
-			<button *ngIf="form.get('search').value.length > 0" matSuffix mat-icon-button (click)="clear()" aria-label="Search">
+			<button *ngIf="form.get('search').value.length > 0" matSuffix mat-icon-button (click)="clear()" aria-label="Clear search">
 				<mat-icon>clear</mat-icon>
 			</button>
 		</mat-form-field>

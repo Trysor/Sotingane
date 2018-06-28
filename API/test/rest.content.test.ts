@@ -39,7 +39,7 @@ describe('REST: Content', () => {
 			};
 
 			const res = await TestBed.http.post('/api/cms/')
-				.set('Authorization', TestBed.AdminToken)
+				.set('Cookie', TestBed.AdminCookie)
 				.send(content);
 
 			expect(res).to.have.status(200);
@@ -48,7 +48,7 @@ describe('REST: Content', () => {
 			expect(res.body).have.property('content');
 			expect(res.body).property('content').to.equal(content.content); // valid; no sanitation needed
 
-			const res2 = await TestBed.http.get('/api/cms/').set('Authorization', TestBed.AdminToken);
+			const res2 = await TestBed.http.get('/api/cms/').set('Cookie', TestBed.AdminCookie);
 			expect(res2).to.have.status(200);
 			expect(res2).to.have.property('body');
 			expect(res2.body).to.be.an('array');
@@ -79,7 +79,7 @@ describe('REST: Content', () => {
 			};
 
 			const res = await TestBed.http.post('/api/cms/')
-				.set('Authorization', TestBed.AdminToken)
+				.set('Cookie', TestBed.AdminCookie)
 				.send(content);
 
 			expect(res).to.have.status(200);
@@ -138,11 +138,11 @@ describe('REST: Content', () => {
 
 
 			const [badRouteRes, badTitleRes, badContentRes, badDescRes, badPublishedRes] = await Promise.all([
-				TestBed.http.post('/api/cms').send(badRoute).set('Authorization', TestBed.AdminToken),
-				TestBed.http.post('/api/cms').send(badTitle).set('Authorization', TestBed.AdminToken),
-				TestBed.http.post('/api/cms').send(badContent).set('Authorization', TestBed.AdminToken),
-				TestBed.http.post('/api/cms').send(badDesc).set('Authorization', TestBed.AdminToken),
-				TestBed.http.post('/api/cms').send(badPublished).set('Authorization', TestBed.AdminToken)
+				TestBed.http.post('/api/cms').send(badRoute).set('Cookie', TestBed.AdminCookie),
+				TestBed.http.post('/api/cms').send(badTitle).set('Cookie', TestBed.AdminCookie),
+				TestBed.http.post('/api/cms').send(badContent).set('Cookie', TestBed.AdminCookie),
+				TestBed.http.post('/api/cms').send(badDesc).set('Cookie', TestBed.AdminCookie),
+				TestBed.http.post('/api/cms').send(badPublished).set('Cookie', TestBed.AdminCookie)
 			]);
 
 			// badRouteRes
@@ -177,10 +177,10 @@ describe('REST: Content', () => {
 			expect(res.body[0]).to.have.property('route');
 		});
 
-		it('GET /api/cms/ 200, member', async () => {
+		it('GET /api/cms/ 200, user', async () => {
 			const content: Content = {
-				title: 'list200member',
-				route: 'list200member',
+				title: 'list200user',
+				route: 'list200user',
 				content: 'test',
 				access: accessRoles.user, // USER RIGHTS REQUIRED
 				description: 'test',
@@ -190,13 +190,13 @@ describe('REST: Content', () => {
 			};
 
 			const postRes = await TestBed.http.post('/api/cms/')
-				.set('Authorization', TestBed.AdminToken)
+				.set('Cookie', TestBed.AdminCookie)
 				.send(content);
 
-			const [noAuthRes, memberRes, adminRes] = await Promise.all([
+			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/cms/'),
-				TestBed.http.get('/api/cms/').set('Authorization', TestBed.MemberToken),
-				TestBed.http.get('/api/cms/').set('Authorization', TestBed.AdminToken)
+				TestBed.http.get('/api/cms/').set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/cms/').set('Cookie', TestBed.AdminCookie)
 			]);
 
 			expect(noAuthRes).to.have.status(200);
@@ -206,11 +206,11 @@ describe('REST: Content', () => {
 			expect((<Content[]>noAuthRes.body).filter(list => list.route === content.route)).to.be.of.length(0);
 
 
-			expect(memberRes).to.have.status(200);
-			expect(memberRes).to.have.property('body');
-			expect(memberRes.body).to.be.an('array');
+			expect(userRes).to.have.status(200);
+			expect(userRes).to.have.property('body');
+			expect(userRes.body).to.be.an('array');
 			// should show up for users
-			expect((<Content[]>memberRes.body).filter(list => list.route === content.route)).to.be.of.length(1);
+			expect((<Content[]>userRes.body).filter(list => list.route === content.route)).to.be.of.length(1);
 
 			expect(adminRes).to.have.status(200);
 			expect(adminRes).to.have.property('body');
@@ -232,13 +232,13 @@ describe('REST: Content', () => {
 			};
 
 			const postRes = await TestBed.http.post('/api/cms/')
-				.set('Authorization', TestBed.AdminToken)
+				.set('Cookie', TestBed.AdminCookie)
 				.send(content);
 
-			const [noAuthRes, memberRes, adminRes] = await Promise.all([
+			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/cms/'),
-				TestBed.http.get('/api/cms/').set('Authorization', TestBed.MemberToken),
-				TestBed.http.get('/api/cms/').set('Authorization', TestBed.AdminToken)
+				TestBed.http.get('/api/cms/').set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/cms/').set('Cookie', TestBed.AdminCookie)
 			]);
 
 			expect(noAuthRes).to.have.status(200);
@@ -248,11 +248,11 @@ describe('REST: Content', () => {
 			expect((<Content[]>noAuthRes.body).filter(list => list.route === content.route)).to.be.of.length(0);
 
 
-			expect(memberRes).to.have.status(200);
-			expect(memberRes).to.have.property('body');
-			expect(memberRes.body).to.be.an('array');
+			expect(userRes).to.have.status(200);
+			expect(userRes).to.have.property('body');
+			expect(userRes.body).to.be.an('array');
 			// nor for users
-			expect((<Content[]>memberRes.body).filter(list => list.route === content.route)).to.be.of.length(0);
+			expect((<Content[]>userRes.body).filter(list => list.route === content.route)).to.be.of.length(0);
 
 			expect(adminRes).to.have.status(200);
 			expect(adminRes).to.have.property('body');
@@ -272,7 +272,7 @@ describe('REST: Content', () => {
 
 			const testRoute = 'test';
 
-			const res = await TestBed.http.get('/api/cms/' + testRoute).set('Authorization', TestBed.AdminToken);
+			const res = await TestBed.http.get('/api/cms/' + testRoute).set('Cookie', TestBed.AdminCookie);
 
 			expect(res).to.have.status(200);
 			expect(res).to.have.property('body');
@@ -282,10 +282,10 @@ describe('REST: Content', () => {
 			expect(res.body).property('content').to.equal('test');
 		});
 
-		it('GET /api/cms/:route 200, member', async () => {
+		it('GET /api/cms/:route 200, user', async () => {
 			const content: Content = {
-				title: 'get200member',
-				route: 'get200member',
+				title: 'get200user',
+				route: 'get200user',
 				content: 'test',
 				access: accessRoles.user, // user role
 				description: 'test',
@@ -295,32 +295,32 @@ describe('REST: Content', () => {
 			};
 
 			const postRes = await TestBed.http.post('/api/cms/')
-				.set('Authorization', TestBed.AdminToken) // admin creates
+				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(content);
 
 
-			const [noAuthRes, memberRes, adminRes] = await Promise.all([
+			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/cms/' + content.route),
-				TestBed.http.get('/api/cms/' + content.route).set('Authorization', TestBed.MemberToken),
-				TestBed.http.get('/api/cms/' + content.route).set('Authorization', TestBed.AdminToken)
+				TestBed.http.get('/api/cms/' + content.route).set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/cms/' + content.route).set('Cookie', TestBed.AdminCookie)
 			]);
 
 			// Unauthorized should return 401
 			expect(noAuthRes).to.have.status(401);
 
 			// The auth'd requests should have access
-			expect(memberRes).to.have.status(200);
-			expect(memberRes).to.have.property('body');
-			expect(memberRes.body).to.have.property('route');
-			expect(memberRes.body).property('route').to.equal(content.route);
-			expect(memberRes.body).to.have.property('content');
-			expect(memberRes.body).property('content').to.equal(content.content);
+			expect(userRes).to.have.status(200);
+			expect(userRes).to.have.property('body');
+			expect(userRes.body).to.have.property('route');
+			expect(userRes.body).property('route').to.equal(content.route);
+			expect(userRes.body).to.have.property('content');
+			expect(userRes.body).property('content').to.equal(content.content);
 
 			// and so should admins
 			expect(adminRes).to.have.status(200);
 			expect(adminRes).to.have.property('body');
 			expect(adminRes.body).to.have.property('route');
-			expect(adminRes.body).property('route').to.equal('get200member');
+			expect(adminRes.body).property('route').to.equal('get200user');
 			expect(adminRes.body).to.have.property('content');
 			expect(adminRes.body).property('content').to.equal('test');
 		});
@@ -338,20 +338,20 @@ describe('REST: Content', () => {
 			};
 
 			const postRes = await TestBed.http.post('/api/cms/')
-				.set('Authorization', TestBed.AdminToken) // admin creates
+				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(content);
 
 
-			const [noAuthRes, memberRes, adminRes] = await Promise.all([
+			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/cms/' + content.route),
-				TestBed.http.get('/api/cms/' + content.route).set('Authorization', TestBed.MemberToken),
-				TestBed.http.get('/api/cms/' + content.route).set('Authorization', TestBed.AdminToken)
+				TestBed.http.get('/api/cms/' + content.route).set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/cms/' + content.route).set('Cookie', TestBed.AdminCookie)
 			]);
 
 			// Unauthorized should return 401
 			expect(noAuthRes).to.have.status(401);
-			// and so should normal members
-			expect(memberRes).to.have.status(401);
+			// and so should normal users
+			expect(userRes).to.have.status(401);
 
 			// but Admin should have access
 			expect(adminRes).to.have.status(200);
@@ -387,11 +387,11 @@ describe('REST: Content', () => {
 			};
 
 			const postRes = await TestBed.http.post('/api/cms/')
-				.set('Authorization', TestBed.AdminToken) // admin creates
+				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(content);
 
 			const patchRes = await TestBed.http.patch('/api/cms/' + content.route)
-				.set('Authorization', TestBed.AdminToken) // admin patch
+				.set('Cookie', TestBed.AdminCookie) // admin patch
 				.send(content);
 
 			expect(patchRes).to.have.status(200);
@@ -415,16 +415,16 @@ describe('REST: Content', () => {
 			};
 
 			const postRes = await TestBed.http.post('/api/cms/')
-				.set('Authorization', TestBed.AdminToken) // admin creates
+				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(content);
 
-			const [noAuthRes, memberRes] = await Promise.all([
+			const [noAuthRes, userRes] = await Promise.all([
 				TestBed.http.patch('/api/cms/' + content.route).send(content),
-				TestBed.http.patch('/api/cms/' + content.route).set('Authorization', TestBed.MemberToken).send(content)
+				TestBed.http.patch('/api/cms/' + content.route).set('Cookie', TestBed.UserCookie).send(content)
 			]);
 
 			expect(noAuthRes).to.have.status(401);
-			expect(memberRes).to.have.status(401);
+			expect(userRes).to.have.status(401);
 		});
 
 		it('PATCH /api/cms/:route 404', async () => {
@@ -442,7 +442,7 @@ describe('REST: Content', () => {
 			};
 
 			const res = await TestBed.http.patch('/api/cms/' + route)
-				.set('Authorization', TestBed.AdminToken)
+				.set('Cookie', TestBed.AdminCookie)
 				.send(content);
 
 			expect(res).to.have.status(404);
@@ -480,15 +480,15 @@ describe('REST: Content', () => {
 
 
 			const postRes = await TestBed.http.post('/api/cms/')
-				.set('Authorization', TestBed.AdminToken) // admin creates
+				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(properContent);
 
 			const [badRouteRes, badTitleRes, badContentRes, badDescRes, badPublishedRes] = await Promise.all([
-				TestBed.http.patch('/api/cms/' + properContent.route).send(badRoute).set('Authorization', TestBed.AdminToken),
-				TestBed.http.patch('/api/cms/' + properContent.route).send(badTitle).set('Authorization', TestBed.AdminToken),
-				TestBed.http.patch('/api/cms/' + properContent.route).send(badContent).set('Authorization', TestBed.AdminToken),
-				TestBed.http.patch('/api/cms/' + properContent.route).send(badDesc).set('Authorization', TestBed.AdminToken),
-				TestBed.http.patch('/api/cms/' + properContent.route).send(badPublished).set('Authorization', TestBed.AdminToken)
+				TestBed.http.patch('/api/cms/' + properContent.route).send(badRoute).set('Cookie', TestBed.AdminCookie),
+				TestBed.http.patch('/api/cms/' + properContent.route).send(badTitle).set('Cookie', TestBed.AdminCookie),
+				TestBed.http.patch('/api/cms/' + properContent.route).send(badContent).set('Cookie', TestBed.AdminCookie),
+				TestBed.http.patch('/api/cms/' + properContent.route).send(badDesc).set('Cookie', TestBed.AdminCookie),
+				TestBed.http.patch('/api/cms/' + properContent.route).send(badPublished).set('Cookie', TestBed.AdminCookie)
 			]);
 
 			// badRouteRes
@@ -527,10 +527,10 @@ describe('REST: Content', () => {
 			};
 
 			const postRes = await TestBed.http.post('/api/cms/')
-				.set('Authorization', TestBed.AdminToken) // admin creates
+				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(content);
 
-			const delRes = await TestBed.http.del('/api/cms/' + content.route).set('Authorization', TestBed.AdminToken);
+			const delRes = await TestBed.http.del('/api/cms/' + content.route).set('Cookie', TestBed.AdminCookie);
 
 			expect(delRes).to.have.status(200);
 			expect(delRes).to.have.property('body');
@@ -551,21 +551,21 @@ describe('REST: Content', () => {
 			};
 
 			const postRes = await TestBed.http.post('/api/cms/')
-				.set('Authorization', TestBed.AdminToken) // admin creates
+				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(content);
 
-			const [noAuthRes, memberRes] = await Promise.all([
+			const [noAuthRes, userRes] = await Promise.all([
 				TestBed.http.del('/api/cms/' + content.route).send(content),
-				TestBed.http.del('/api/cms/' + content.route).set('Authorization', TestBed.MemberToken).send(content)
+				TestBed.http.del('/api/cms/' + content.route).set('Cookie', TestBed.UserCookie).send(content)
 			]);
 
 			expect(noAuthRes).to.have.status(401);
-			expect(memberRes).to.have.status(401);
+			expect(userRes).to.have.status(401);
 		});
 
 		it('DELETE /api/cms/:route 404', async () => {
 			const route = 'some404route';
-			const delRes = await TestBed.http.del('/api/cms/' + route).set('Authorization', TestBed.AdminToken);
+			const delRes = await TestBed.http.del('/api/cms/' + route).set('Cookie', TestBed.AdminCookie);
 
 			expect(delRes).to.have.status(404);
 			expect(delRes).to.have.property('body');
@@ -604,15 +604,15 @@ describe('REST: Content', () => {
 			};
 
 			const postRes = await TestBed.http.post('/api/cms/')
-				.set('Authorization', TestBed.AdminToken) // admin creates
+				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(content);
 
 
 			const patchRes = await TestBed.http.patch('/api/cms/' + content.route)
-				.set('Authorization', TestBed.AdminToken) // admin patches
+				.set('Cookie', TestBed.AdminCookie) // admin patches
 				.send(patched);
 
-			const getRes = await TestBed.http.get('/api/cms/history/' + content.route).set('Authorization', TestBed.AdminToken); // get as admin
+			const getRes = await TestBed.http.get('/api/cms/history/' + content.route).set('Cookie', TestBed.AdminCookie); // get as admin
 
 			expect(getRes).to.have.status(200);
 			expect(getRes).to.have.property('body');
@@ -625,13 +625,13 @@ describe('REST: Content', () => {
 
 		it('GET /api/cms/history/:route 401', async () => {
 			const route = 'history';
-			const [noAuthRes, memberRes] = await Promise.all([
+			const [noAuthRes, userRes] = await Promise.all([
 				TestBed.http.get('/api/cms/history/' + route),
-				TestBed.http.get('/api/cms/history/' + route).set('Authorization', TestBed.MemberToken)
+				TestBed.http.get('/api/cms/history/' + route).set('Cookie', TestBed.UserCookie)
 			]);
 
 			expect(noAuthRes).to.have.status(401);
-			expect(memberRes).to.have.status(401);
+			expect(userRes).to.have.status(401);
 		});
 
 	});
@@ -647,7 +647,7 @@ describe('REST: Content', () => {
 			const list = [];
 
 			for (let i = 0; i < 5; i++) {
-				list.push(TestBed.http.post('/api/cms/').set('Authorization', TestBed.AdminToken).send({
+				list.push(TestBed.http.post('/api/cms/').set('Cookie', TestBed.AdminCookie).send({
 					title: 'search' + i,
 					route: 'search' + i,
 					content: 'search',
@@ -658,7 +658,7 @@ describe('REST: Content', () => {
 					nav: true
 				}));
 
-				list.push(TestBed.http.post('/api/cms/').set('Authorization', TestBed.AdminToken).send({
+				list.push(TestBed.http.post('/api/cms/').set('Cookie', TestBed.AdminCookie).send({
 					title: 'searchUser' + i,
 					route: 'searchUser' + i,
 					content: 'search',
@@ -669,7 +669,7 @@ describe('REST: Content', () => {
 					nav: true
 				}));
 
-				list.push(TestBed.http.post('/api/cms/').set('Authorization', TestBed.AdminToken).send({
+				list.push(TestBed.http.post('/api/cms/').set('Cookie', TestBed.AdminCookie).send({
 					title: 'searchAdmin' + i,
 					route: 'searchAdmin' + i,
 					content: 'search',
@@ -686,10 +686,10 @@ describe('REST: Content', () => {
 
 			const searchTerm = 'search';
 
-			const [noAuthRes, memberRes, adminRes] = await Promise.all([
+			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/cms/search/' + searchTerm),
-				TestBed.http.get('/api/cms/search/' + searchTerm).set('Authorization', TestBed.MemberToken),
-				TestBed.http.get('/api/cms/search/' + searchTerm).set('Authorization', TestBed.AdminToken)
+				TestBed.http.get('/api/cms/search/' + searchTerm).set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/cms/search/' + searchTerm).set('Cookie', TestBed.AdminCookie)
 			]);
 
 			expect(noAuthRes).to.have.status(200);
@@ -702,8 +702,8 @@ describe('REST: Content', () => {
 			expect(noAuthRes.body[0]).to.have.property('access');
 			expect(noAuthRes.body).to.be.of.length(5);
 
-			expect(memberRes).to.have.status(200);
-			expect(memberRes.body).to.be.of.length(10);
+			expect(userRes).to.have.status(200);
+			expect(userRes.body).to.be.of.length(10);
 
 			expect(adminRes).to.have.status(200);
 			expect(adminRes.body).to.be.of.length(15);

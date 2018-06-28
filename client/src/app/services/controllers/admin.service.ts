@@ -19,20 +19,20 @@ export class AdminService {
 	// ---------------------------------------
 
 	public getAllusers(): Observable<User[]> {
-		return this.http.client.get<User[]>(env.API_BASE + env.API.admin.users);
+		return this.http.client.get<User[]>(this.http.apiUrl(env.API.admin.users));
 	}
 
 
 	public patchUser(user: User): Observable<boolean> {
-		return this.http.client.patch<boolean>(env.API_BASE + env.API.admin.users + '/' + user._id, user);
+		return this.http.client.patch<boolean>(this.http.apiUrl(env.API.admin.users + '/' + user._id), user);
 	}
 
 
 	public getAllContent(): Observable<CmsContent[]> {
-		return this.http.client.get<CmsContent[]>(env.API_BASE + env.API.admin.cms);
+		return this.http.client.get<CmsContent[]>(this.http.apiUrl(env.API.admin.cms));
 	}
 
 	public getContentPage(contentUrl: string): Observable<CmsContent> {
-		return this.http.client.get<CmsContent>(env.API_BASE + env.API.admin.cms + '/' + contentUrl);
+		return this.http.client.get<CmsContent>(this.http.apiUrl(env.API.admin.cms + '/' + contentUrl));
 	}
 }

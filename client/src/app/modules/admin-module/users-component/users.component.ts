@@ -66,7 +66,7 @@ export class UsersComponent implements OnDestroy {
 						if (closedResult) { this.updateList(); }
 					});
 				},
-				disabled: (user: User) => this.authService.isSameUser(user, this.authService.getUser().getValue()),
+				disabled: (user: User) => this.authService.isSameUser(user, this.authService.user.getValue()),
 				narrow: true
 			}
 		],

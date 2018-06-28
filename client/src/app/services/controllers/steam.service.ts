@@ -31,7 +31,7 @@ export class SteamService {
 	 * Query for all steam servers
 	 */
 	public requestSteamServers(): Observable<SteamServer[]> {
-		return this.http.client.get<SteamServer[]>(env.API_BASE + env.API.steam.servers);
+		return this.http.client.get<SteamServer[]>(this.http.apiUrl(env.API.steam.servers));
 	}
 
 	/**
@@ -39,7 +39,7 @@ export class SteamService {
 	 * @param  {string} route the route assgined for the steam server
 	 */
 	public requestSteamServer(route: string): Observable<SteamServer> {
-		return this.http.client.get<SteamServer>(env.API_BASE + env.API.steam.servers + '/' + route);
+		return this.http.client.get<SteamServer>(this.http.apiUrl(env.API.steam.servers + '/' + route));
 	}
 
 	/**
@@ -47,7 +47,7 @@ export class SteamService {
 	 * @param  {string} route the route assgined for the steam server
 	 */
 	public querySteamServerData(route: string) {
-		this.http.client.get<GameDig>(env.API_BASE + env.API.steam.servers + '/' + route + '/data')
+		this.http.client.get<GameDig>(this.http.apiUrl(env.API.steam.servers + '/' + route + '/data'))
 			.subscribe(
 				data => {
 					data.lastUpdate = new Date();

@@ -18,10 +18,10 @@ export class TestBedSingleton {
 
 	public get http() { return this._http; }
 	public AdminUser: User;
-	public AdminToken: string;
+	public AdminCookie: string;
 
-	public MemberUser: User;
-	public MemberToken: string;
+	public User: User;
+	public UserCookie: string;
 
 	constructor() {
 		if (configUtil.getEnv('NODE_ENV') !== 'test') { return; }
@@ -43,27 +43,27 @@ export class TestBedSingleton {
 			await UserModel.remove({}).exec();
 
 			// Create new users and log them in
-			const [admin, member] = await Promise.all([this.createUser(AdminUser), this.createUser(MemberUser)]);
+			const [user, admin] = await Promise.all([this.createUser(TestUser), this.createUser(AdminUser)]);
+			TestBed.User = user.user;
+			TestBed.UserCookie = user.cookie;
 			TestBed.AdminUser = admin.user;
-			TestBed.AdminToken = admin.token;
-			TestBed.MemberUser = member.user;
-			TestBed.MemberToken = member.token;
+			TestBed.AdminCookie = admin.cookie;
 
 			// Initiate tests
 			console.timeEnd('Setting up DB for tests');
 			console.log('Initiating tests');
-			mocha.run((failures) => process.exit());
+			mocha.run((failures) => process.exit(failures > 0 ? 1 : 0));
 		});
 	}
 
 
-	private async createUser(user: Partial<User>): Promise<{ user: User, token: string }> {
+	private async createUser(user: Partial<User>): Promise<{ user: User, cookie: string }> {
 		const userObj = await new UserModel(user).save();
 		const res = await TestBed.http.post('/api/auth/login').send({ username: user.username, password: user.password });
 
 		return {
 			user: userObj,
-			token: (<TokenResponse>res.body).token
+			cookie: 'jwt=' + (<TokenResponse>res.body).token // slightly modified
 		};
 	}
 }
@@ -78,9 +78,9 @@ export const AdminUser: Partial<User> = {
 	password: 'test',
 	role: accessRoles.admin,
 };
-export const MemberUser: Partial<User> = {
-	username: 'Member',
-	username_lower: 'member',
+export const TestUser: Partial<User> = {
+	username: 'User',
+	username_lower: 'user',
 	password: 'test',
 	role: accessRoles.user,
 };

@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { ContentModel, Content } from '../src/models/content';
 import { status, ROUTE_STATUS, CMS_STATUS, VALIDATION_FAILED, USERS_STATUS } from '../src/libs/validate';
 
-import { TestBed, AdminUser, MemberUser } from './testbed';
+import { TestBed, AdminUser, TestUser } from './testbed';
 import { accessRoles } from '../src/models/user';
 
 // ---------------------------------
@@ -21,7 +21,7 @@ describe('REST: Admin', () => {
 	describe('/api/admin/users/', () => {
 
 		it('GET /api/admin/users/ 200', async () => {
-			const res = await TestBed.http.get('/api/admin/users/').set('Authorization', TestBed.AdminToken);
+			const res = await TestBed.http.get('/api/admin/users/').set('Cookie', TestBed.AdminCookie);
 
 			expect(res.body).to.be.an('array');
 			expect(res.body[0]).to.have.property('_id'); // important to keep id here.
@@ -31,14 +31,14 @@ describe('REST: Admin', () => {
 		});
 
 		it('GET /api/admin/users/ 401', async () => {
-			const [noAuthRes, memberRes, adminRes] = await Promise.all([
+			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/admin/users/'),
-				TestBed.http.get('/api/admin/users/').set('Authorization', TestBed.MemberToken),
-				TestBed.http.get('/api/admin/users/').set('Authorization', TestBed.AdminToken)
+				TestBed.http.get('/api/admin/users/').set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/admin/users/').set('Cookie', TestBed.AdminCookie)
 			]);
 
 			expect(noAuthRes).to.have.status(401);
-			expect(memberRes).to.have.status(401);
+			expect(userRes).to.have.status(401);
 			expect(adminRes).to.have.status(200); // this should be allowed.
 		});
 
@@ -53,13 +53,13 @@ describe('REST: Admin', () => {
 
 		it('PATCH /api/admin/users/:id 200', async () => {
 			const patchUser = {
-				_id: TestBed.MemberUser.id,
-				username: TestBed.MemberUser.username,
-				role: TestBed.MemberUser.role,
+				_id: TestBed.User.id,
+				username: TestBed.User.username,
+				role: TestBed.User.role,
 			};
 
-			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.MemberUser.id)
-				.set('Authorization', TestBed.AdminToken)
+			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+				.set('Cookie', TestBed.AdminCookie)
 				.send(patchUser);
 
 			expect(res).to.have.status(200);
@@ -70,12 +70,12 @@ describe('REST: Admin', () => {
 		it('PATCH /api/admin/users/:id 400', async () => {
 			const patchUser = {
 				_id: TestBed.AdminUser.id, // Using AdminUser's ID instead
-				username: TestBed.MemberUser.username,
-				role: TestBed.MemberUser.role,
+				username: TestBed.User.username,
+				role: TestBed.User.role,
 			};
 
-			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.MemberUser.id)
-				.set('Authorization', TestBed.AdminToken)
+			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+				.set('Cookie', TestBed.AdminCookie)
 				.send(patchUser);
 
 			expect(res).to.have.status(400);
@@ -86,36 +86,36 @@ describe('REST: Admin', () => {
 		it('PATCH /api/admin/users/:id 401', async () => {
 
 			const patchUser = {
-				_id: TestBed.MemberUser.id,
-				username: TestBed.MemberUser.username,
-				role: TestBed.MemberUser.role,
+				_id: TestBed.User.id,
+				username: TestBed.User.username,
+				role: TestBed.User.role,
 			};
 
-			const [noAuthRes, memberRes, adminRes] = await Promise.all([
-				TestBed.http.patch('/api/admin/users/' + TestBed.MemberUser.id)
+			const [noAuthRes, userRes, adminRes] = await Promise.all([
+				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
 					.send(patchUser),
-				TestBed.http.patch('/api/admin/users/' + TestBed.MemberUser.id)
-					.set('Authorization', TestBed.MemberToken)
+				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+					.set('Cookie', TestBed.UserCookie)
 					.send(patchUser),
-				TestBed.http.patch('/api/admin/users/' + TestBed.MemberUser.id)
-					.set('Authorization', TestBed.AdminToken)
+				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+					.set('Cookie', TestBed.AdminCookie)
 					.send(patchUser)
 			]);
 
 			expect(noAuthRes).to.have.status(401);
-			expect(memberRes).to.have.status(401);
+			expect(userRes).to.have.status(401);
 			expect(adminRes).to.have.status(200);
 		});
 
 		it('PATCH /api/admin/users/:id 409', async () => {
 			const patchUser = {
-				_id: TestBed.MemberUser.id,
+				_id: TestBed.User.id,
 				username: TestBed.AdminUser.username, // Trying to use the admin user's username.
-				role: TestBed.MemberUser.role,
+				role: TestBed.User.role,
 			};
 
-			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.MemberUser.id)
-				.set('Authorization', TestBed.AdminToken)
+			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+				.set('Cookie', TestBed.AdminCookie)
 				.send(patchUser);
 
 			expect(res).to.have.status(409);
@@ -126,36 +126,36 @@ describe('REST: Admin', () => {
 		it('PATCH /api/admin/users/:id 422', async () => {
 
 			const idMissing = {
-				username: TestBed.MemberUser.username,
-				role: TestBed.MemberUser.role
+				username: TestBed.User.username,
+				role: TestBed.User.role
 			};
 			const usernameMissing = {
-				_id: TestBed.MemberUser.id,
-				role: TestBed.MemberUser.role
+				_id: TestBed.User.id,
+				role: TestBed.User.role
 			};
 			const roleMissing = {
-				_id: TestBed.MemberUser.id,
-				username: TestBed.MemberUser.username
+				_id: TestBed.User.id,
+				username: TestBed.User.username
 			};
 			const tooManyProperties = {
-				_id: TestBed.MemberUser.id,
-				username: TestBed.MemberUser.username,
-				role: TestBed.MemberUser.role,
+				_id: TestBed.User.id,
+				username: TestBed.User.username,
+				role: TestBed.User.role,
 				test: 'extra property'
 			};
 
 			const [idRes, userRes, roleRes, tooManyRes] = await Promise.all([
-				TestBed.http.patch('/api/admin/users/' + TestBed.MemberUser.id)
-					.set('Authorization', TestBed.AdminToken)
+				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+					.set('Cookie', TestBed.AdminCookie)
 					.send(idMissing),
-				TestBed.http.patch('/api/admin/users/' + TestBed.MemberUser.id)
-					.set('Authorization', TestBed.AdminToken)
+				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+					.set('Cookie', TestBed.AdminCookie)
 					.send(usernameMissing),
-				TestBed.http.patch('/api/admin/users/' + TestBed.MemberUser.id)
-					.set('Authorization', TestBed.AdminToken)
+				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+					.set('Cookie', TestBed.AdminCookie)
 					.send(roleMissing),
-				TestBed.http.patch('/api/admin/users/' + TestBed.MemberUser.id)
-					.set('Authorization', TestBed.AdminToken)
+				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+					.set('Cookie', TestBed.AdminCookie)
 					.send(tooManyProperties)
 			]);
 
@@ -194,7 +194,7 @@ describe('REST: Admin', () => {
 
 		it('GET /api/admin/cms/ 200', async () => {
 
-			const res = await TestBed.http.get('/api/admin/cms/').set('Authorization', TestBed.AdminToken);
+			const res = await TestBed.http.get('/api/admin/cms/').set('Cookie', TestBed.AdminCookie);
 
 			expect(res).to.have.status(200);
 			expect(res).to.have.property('body');
@@ -206,14 +206,14 @@ describe('REST: Admin', () => {
 		});
 
 		it('GET /api/admin/cms/ 401', async () => {
-			const [noAuthRes, memberRes, adminRes] = await Promise.all([
+			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/admin/cms/'),
-				TestBed.http.get('/api/admin/cms/').set('Authorization', TestBed.MemberToken),
-				TestBed.http.get('/api/admin/cms/').set('Authorization', TestBed.AdminToken)
+				TestBed.http.get('/api/admin/cms/').set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/admin/cms/').set('Cookie', TestBed.AdminCookie)
 			]);
 
 			expect(noAuthRes).to.have.status(401);
-			expect(memberRes).to.have.status(401);
+			expect(userRes).to.have.status(401);
 			expect(adminRes).to.have.status(200);
 		});
 	});
@@ -237,10 +237,10 @@ describe('REST: Admin', () => {
 			};
 
 			const postRes = await TestBed.http.post('/api/cms/')
-				.set('Authorization', TestBed.AdminToken)
+				.set('Cookie', TestBed.AdminCookie)
 				.send(content);
 
-			const res = await TestBed.http.get('/api/admin/cms/' + content.route).set('Authorization', TestBed.AdminToken);
+			const res = await TestBed.http.get('/api/admin/cms/' + content.route).set('Cookie', TestBed.AdminCookie);
 
 			expect(res).to.have.status(200);
 			expect(res).to.have.property('body');
@@ -262,22 +262,22 @@ describe('REST: Admin', () => {
 			};
 
 			const postRes = await TestBed.http.post('/api/cms/')
-				.set('Authorization', TestBed.AdminToken)
+				.set('Cookie', TestBed.AdminCookie)
 				.send(content);
 
-			const [noAuthRes, memberRes, adminRes] = await Promise.all([
+			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/admin/cms/' + content.route),
-				TestBed.http.get('/api/admin/cms/' + content.route).set('Authorization', TestBed.MemberToken),
-				TestBed.http.get('/api/admin/cms/' + content.route).set('Authorization', TestBed.AdminToken)
+				TestBed.http.get('/api/admin/cms/' + content.route).set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/admin/cms/' + content.route).set('Cookie', TestBed.AdminCookie)
 			]);
 
 			expect(noAuthRes).to.have.status(401);
-			expect(memberRes).to.have.status(401);
+			expect(userRes).to.have.status(401);
 			expect(adminRes).to.have.status(200);
 		});
 
 		it('GET /api/admin/cms/:route 404', async () => {
-			const res = await TestBed.http.get('/api/admin/cms/' + 'some404route').set('Authorization', TestBed.AdminToken);
+			const res = await TestBed.http.get('/api/admin/cms/' + 'some404route').set('Cookie', TestBed.AdminCookie);
 
 			expect(res).to.have.status(404);
 			expect(res).to.have.property('body');

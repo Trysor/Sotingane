@@ -37,8 +37,7 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 		{ value: AccessRoles.user, verbose: 'Users', icon: 'verified_user' },
 		{ value: AccessRoles.admin, verbose: 'Admins', icon: 'security' }
 	];
-	// Folders: Holds a list of used Folders
-	public folders: string[] = [];
+
 	// History fields
 	public versionIndex: number = VersionHistory.Draft;
 	public history: CmsContent[] = null;
@@ -46,8 +45,10 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 
 	public readonly maxShortInputLength = 25;
 	public readonly maxLongInputLength = 300;
+	public readonly filteredFolders = new BehaviorSubject<string[]>(['']);
 
 	private _currentDraft: CmsContent; // used with the versioning
+	private folders: string[] = []; // Holds a list of used Folders
 
 	private _ngUnsub = new Subject();
 	private _hasSaved = false;
@@ -105,7 +106,13 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 				}
 			}
 			this.folders = folders.sort();
+			this.filteredFolders.next(
+				this.folders.filter(option => option.toLowerCase().includes(this.contentForm.get('folder').value.toLowerCase()))
+			);
 		});
+		this.contentForm.get('folder').valueChanges.subscribe(val => this.filteredFolders.next(
+			this.folders.filter(option => option.toLowerCase().includes(val.toLowerCase()))
+		));
 
 		// Router: Check if we are editing or creating content. Load from API
 		const editingContentRoute = route.snapshot.params['route'];

@@ -87,6 +87,7 @@ export const enum AUTH_STATUS {
 	NO_OR_BAD_ROLE = 'Missing or bad role',
 	USERNAME_NOT_AVILIABLE = 'Username already taken',
 	USER_ID_NOT_FOUND = 'The provided ID doesn\'t exist',
+	USER_LOGGED_OUT = 'The user has been successfully logged out',
 	ACCOUNT_CREATED = 'Account created',
 	ACCOUNT_DELETED = 'Account successfully deleted',
 	NO_PASSWORD_OR_NEW_PASSWORDS = 'Missing password, newPassword or confirm',

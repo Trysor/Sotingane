@@ -12,7 +12,11 @@ const localOptions: localOptions = {
 };
 // Setting JWT strategy options
 const jwtOptions: jwtOptions = {
-	jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Tell Passport to check auth headers for JWT
+	jwtFromRequest: (req: Request): string => {
+		if (req.cookies && !!req.cookies.jwt) { return req.cookies.jwt; }
+		if (req.headers && !!req.headers.authorization) { return req.headers.authorization; }
+		return null;
+	},
 	secretOrKey: configGet<string>('secret') // Tell Passport where to find the secret
 	// TO-DO: Add issuer and audience checks
 };
