@@ -1,29 +1,23 @@
-language: node_js
-
-node_js:
-  - "node"
-
-services: mongodb
-
-env:
-  - project=api
-
-cache:
-  directories:
-    - "API/node_modules"
-    - "CKEditor/node_modules"
-    - "client/node_modules"
-
-before_install:
-  - cd $TRAVIS_BUILD_DIR
-
+language: node_js 
+ 
+node_js: 
+  - "node" 
+ 
+services: mongodb 
+ 
+env: 
+  - DIR="API" 
+ 
+cache: 
+  directories: 
+    - "API/node_modules" 
+    - "CKEditor/node_modules" 
+    - "client/node_modules" 
+ 
 install:
-  - cd $project
-  - npm install
-
-before_script:
-  - cd $TRAVIS_BUILD_DIR
-
-script:
-  - cd $project
-  - npm run test
+  - cd $DIR
+  - npm install 
+ 
+script: 
+  - cd $DIR
+  - npm run test 

@@ -38,11 +38,11 @@ export const sanitize = (htmlInput: string) => sanitizeHtml(htmlInput, sanitizeO
  |--------------------------------------------------------------------------
 */
 
-const stripOptions: sanitizeHtml.IOptions = {
-	allowedTags: [],
+const stripOptions = {
+	allowedTags: <string[]>[],
 	allowedAttributes: {},
-	exclusiveFilter: (frame) => !frame.text.trim(),
-	textFilter: (text) => text.trim().concat(' '),
+	exclusiveFilter: (frame: sanitizeHtml.IFrame) => !frame.text.trim(),
+	textFilter: (text: string) => text.trim().concat(' '),
 };
 
 /**
