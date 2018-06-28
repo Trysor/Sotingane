@@ -18,6 +18,5 @@ install:
   - cd $DIR
   - npm install 
  
-script: 
-  - cd $DIR
+script:
   - npm run test 
