@@ -1,23 +1,37 @@
 language: node_js 
- 
 node_js: 
   - "node" 
- 
-services: mongodb 
- 
-env: 
-  - DIR="API" 
-  - DIR="client"
- 
+
+sudo: required
+
 cache: 
   directories: 
-    - "API/node_modules" 
     - "CKEditor/node_modules" 
     - "client/node_modules" 
- 
+
 install:
-  - cd $DIR
+  - cd $PROJECT
   - npm install 
- 
 script:
-  - npm run test 
+  - npm run test
+
+matrix:
+  include:
+    - env: PROJECT="API"
+      services: mongodb
+      cache: 
+        directories: 
+          - "API/node_modules" 
+    - env: PROJECT="client"
+      addons:
+        chrome: stable
+      install:
+        - cd CKEditor && npm install && cd ../client
+        - npm install
+      script:
+        - cd ../CKEditor && npm run build && cd ../client
+        - npm run test
+    - env: PROJECT="CKEditor"
+      cache: 
+        directories: 
+          - "CKEditor/node_modules" 
