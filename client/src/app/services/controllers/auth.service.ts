@@ -6,7 +6,7 @@ import { isPlatformServer } from '@angular/common';
 import { MatSnackBar } from '@angular/material';
 
 import { env } from '@env';
-import { User, UpdatePasswordUser, UserToken, AccessRoles, GetUserResponse } from '@app/models';
+import { User, UpdatePasswordUser, UserToken, AccessRoles } from '@app/models';
 
 import { HttpService } from '@app/services/http/http.service';
 import { ServerService } from '@app/services/helpers/server.service';
