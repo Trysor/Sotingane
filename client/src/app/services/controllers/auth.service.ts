@@ -51,6 +51,11 @@ export class AuthService {
 		this.engageRenewTokenTimer(token);
 	}
 
+
+	// ---------------------------------------
+	// ------------ USER METHODS -------------
+	// ---------------------------------------
+
 	/**
 	 * Updates the user data field by decoding the JWT token
 	 * @param  {string} token the JWT token to decode
@@ -84,6 +89,13 @@ export class AuthService {
 			});
 		});
 	}
+
+
+	// ---------------------------------------
+	// ----------- HELPER METHODS ------------
+	// ---------------------------------------
+
+
 
 	/**
 	 * Opens a snackbar with the given message and action message
@@ -136,9 +148,9 @@ export class AuthService {
 	 * @return {Observable<boolean>}         Server's response, as an Observable
 	 */
 	public login(user: User): Observable<boolean> {
-		return this.http.client.post<UserToken>(this.http.apiUrl(env.API.auth.login), user).pipe(
-			map(userToken => {
-				if (!userToken) { return; }
+		return this.http.client.post<UserToken>(this.http.apiUrl(env.API.auth.login), user).pipe(map(
+			(userToken) => {
+				if (!userToken) { return false; }
 
 				// Set token
 				this.tokenService.token = userToken.token;
@@ -146,9 +158,10 @@ export class AuthService {
 				this.engageRenewTokenTimer(userToken.token);
 				// Set user data & Notify subscribers
 				this.updateCurrentUserData(userToken.token);
-				return !!userToken.token;
-			})
-		);
+				return true;
+			},
+			(err) => false
+		));
 	}
 
 	/**

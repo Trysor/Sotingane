@@ -21,8 +21,6 @@ import { UserToken } from '@app/models';
 
 import { env } from '@env';
 import { of } from 'rxjs';
-import { take } from 'rxjs/operators';
-
 
 describe('AuthService', () => {
 	let service: AuthService;
@@ -52,26 +50,19 @@ describe('AuthService', () => {
 		TestBed.get(HttpService).apiUrl.and.callFake((api: string) => api);
 	});
 
+
+	beforeEach(() => {
+		service.user.next(null); // Reset user to null
+	});
+
 	afterEach(() => {
-		// After every test, assert that there are no more pending requests.
-		httpTestingController.verify();
+		httpTestingController.verify(); // After every test, assert that there are no more pending requests.
 	});
 
 	it('login()', () => {
 		const testUser: User = { username: 'test', password: 'pass' };
-
-		/*
-		 {
-			"iss": "",
-			"iat": 946684800,
-			"exp": 32503680000,
-			"aud": "",
-			"sub": "test",
-			"_id": "123456",
-			"username": "test",
-			"role": "admin"
-		}
-		 */
+		 /* { "iss": "", "iat": 946684800, "exp": 32503680000, "aud": "", "sub": "test",
+			"_id": "123456", "username": "test", "role": "admin" }  */
 
 		// Subscribe to request
 		service.login(testUser).subscribe(success => {
@@ -85,24 +76,24 @@ describe('AuthService', () => {
 		expect(req.request.method).toEqual('POST');
 
 		// Reply with test data
-		// tslint:disable:max-line-length
-		const userToken: UserToken = {
+		req.flush(<UserToken>{ // tslint:disable:max-line-length
 			token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjk0NjY4NDgwMCwiZXhwIjozMjUwMzY4MDAwMCwiYXVkIjoiIiwic3ViIjoidGVzdCIsIl9pZCI6IjEyMzQ1NiIsInVzZXJuYW1lIjoidGVzdCIsInJvbGUiOiJhZG1pbiJ9.uI0Z1CmNRGBxG5HxC_UHZCbsx_kJ0CvRqRuy2YG-Zu0',
 			user: testUser
-		};
-		// tslint:enable:max-line-length
-		req.flush(userToken);
+		}); // tslint:enable:max-line-length
 	});
 
 	it('login() fail', () => {
 		const testUser: User = { username: 'test', password: 'pass' };
 
 		// Subscribe to request
-		service.login(testUser).pipe(take(1)).subscribe(success => {
-			// Once a reply is given, test that it is correct
-			expect(success).toBe(false, 'Should not have logged in');
-			expect(service.user.getValue()).toBe(null, 'should NOT have set user');
-		});
+		service.login(testUser).subscribe(
+			success => { fail('a status 401 should never enter the success handler'); },
+			(error: HttpErrorResponse) => {
+				// Once a reply is given, test that it is correct
+				expect(error.status).toBe(401, 'Should not have logged in');
+				expect(service.user.getValue()).toBe(null, 'should NOT have set user');
+			}
+		);
 
 		// Expect a request to be made
 		const req = httpTestingController.expectOne(env.API.auth.login);
@@ -111,8 +102,6 @@ describe('AuthService', () => {
 		req.flush({}, { status: 401, statusText: 'unauthorized' });
 
 		httpTestingController.expectNone(env.API.auth.login, 'Login route should have resolved');
-
-		// (<any>service)._renewalSub.unsubscribe();
 	});
 
 });
