@@ -1,7 +1,7 @@
 # Sotingane
 A Content Management System (CMS) based on the MEAN stack.
 
-[![Build Status](https://travis-ci.org/Trysor/Sotingane.svg?branch=master)](https://travis-ci.org/Trysor/Sotingane)
+[![Build Status](https://travis-ci.com/Trysor/Sotingane.svg?branch=master)](https://travis-ci.com/Trysor/Sotingane)
 
 ## Projects
 
