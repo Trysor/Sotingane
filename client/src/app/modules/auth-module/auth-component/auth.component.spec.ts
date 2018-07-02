@@ -4,7 +4,7 @@ import { DebugElement, Injectable, Component } from '@angular/core';
 
 
 import { MobileService } from '@app/services';
-import { mobileServiceStub } from '@app/services/stubs';
+import { mobileServiceStub } from '@app/services/tests/stubs';
 
 import { AuthComponent } from './auth.component';
 
@@ -29,8 +29,8 @@ describe('AuthComponent', () => {
 	beforeEach(() => {
 		fixture = TestBed.createComponent(AuthComponent);
 		component = fixture.componentInstance;
-		fixture.detectChanges();
 		mobileService = TestBed.get(MobileService);
+		fixture.detectChanges();
 	});
 
 	it('should create', () => {

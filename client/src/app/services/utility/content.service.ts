@@ -7,7 +7,7 @@ import { Meta, Title } from '@angular/platform-browser';
 
 import { env } from '@env';
 
-import { ServerService } from '@app/services/helpers/server.service';
+import { ServerService } from '@app/services/http/server.service';
 import { CmsContent, DynamicComponent } from '@app/models';
 
 import { DynamicLinkComponent } from '@app/modules/content-module/content-controllers/dynamic.link.component';

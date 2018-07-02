@@ -4,7 +4,7 @@ import { TransferState, StateKey } from '@angular/platform-browser';
 import { isPlatformServer, DOCUMENT } from '@angular/common';
 
 import { env } from '@env';
-import { ServerService } from '@app/services/helpers/server.service';
+import { ServerService } from '@app/services/http/server.service';
 
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';

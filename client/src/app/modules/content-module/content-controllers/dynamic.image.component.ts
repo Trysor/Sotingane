@@ -5,7 +5,7 @@ import { DynamicComponent } from '@app/models';
 import { ModalService } from '@app/services/utility/modal.service';
 import { IntersectionService } from '@app/services/utility/intersection.service';
 import { MobileService } from '@app/services/utility/mobile.service';
-import { ServerService } from '@app/services/helpers/server.service';
+import { ServerService } from '@app/services/http/server.service';
 
 
 import { DynamicLazyLoader } from './dynamic.lazy.loader';

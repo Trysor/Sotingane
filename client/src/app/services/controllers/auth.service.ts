@@ -9,8 +9,8 @@ import { env } from '@env';
 import { User, UpdatePasswordUser, UserToken, AccessRoles } from '@app/models';
 
 import { HttpService } from '@app/services/http/http.service';
-import { ServerService } from '@app/services/helpers/server.service';
-import { TokenService } from '@app/services/helpers/token.service';
+import { ServerService } from '@app/services/http/server.service';
+import { TokenService } from '@app/services/utility/token.service';
 
 import { Observable, Subscription, BehaviorSubject, timer, of } from 'rxjs';
 import { map, catchError, takeUntil } from 'rxjs/operators';
@@ -138,6 +138,8 @@ export class AuthService {
 	public login(user: User): Observable<boolean> {
 		return this.http.client.post<UserToken>(this.http.apiUrl(env.API.auth.login), user).pipe(
 			map(userToken => {
+				if (!userToken) { return; }
+
 				// Set token
 				this.tokenService.token = userToken.token;
 				// Engage token renewal timer
@@ -145,7 +147,7 @@ export class AuthService {
 				// Set user data & Notify subscribers
 				this.updateCurrentUserData(userToken.token);
 				return !!userToken.token;
-			}),
+			})
 		);
 	}
 
