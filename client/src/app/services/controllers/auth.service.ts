@@ -9,8 +9,8 @@ import { env } from '@env';
 import { User, UpdatePasswordUser, UserToken, AccessRoles } from '@app/models';
 
 import { HttpService } from '@app/services/http/http.service';
-import { ServerService } from '@app/services/helpers/server.service';
-import { TokenService } from '@app/services/helpers/token.service';
+import { ServerService } from '@app/services/http/server.service';
+import { TokenService } from '@app/services/utility/token.service';
 
 import { Observable, Subscription, BehaviorSubject, timer, of } from 'rxjs';
 import { map, catchError, takeUntil } from 'rxjs/operators';
@@ -51,6 +51,11 @@ export class AuthService {
 		this.engageRenewTokenTimer(token);
 	}
 
+
+	// ---------------------------------------
+	// ------------ USER METHODS -------------
+	// ---------------------------------------
+
 	/**
 	 * Updates the user data field by decoding the JWT token
 	 * @param  {string} token the JWT token to decode
@@ -84,6 +89,13 @@ export class AuthService {
 			});
 		});
 	}
+
+
+	// ---------------------------------------
+	// ----------- HELPER METHODS ------------
+	// ---------------------------------------
+
+
 
 	/**
 	 * Opens a snackbar with the given message and action message
@@ -136,17 +148,20 @@ export class AuthService {
 	 * @return {Observable<boolean>}         Server's response, as an Observable
 	 */
 	public login(user: User): Observable<boolean> {
-		return this.http.client.post<UserToken>(this.http.apiUrl(env.API.auth.login), user).pipe(
-			map(userToken => {
+		return this.http.client.post<UserToken>(this.http.apiUrl(env.API.auth.login), user).pipe(map(
+			(userToken) => {
+				if (!userToken) { return false; }
+
 				// Set token
 				this.tokenService.token = userToken.token;
 				// Engage token renewal timer
 				this.engageRenewTokenTimer(userToken.token);
 				// Set user data & Notify subscribers
 				this.updateCurrentUserData(userToken.token);
-				return !!userToken.token;
-			}),
-		);
+				return true;
+			},
+			(err) => false
+		));
 	}
 
 	/**

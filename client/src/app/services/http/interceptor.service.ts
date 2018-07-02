@@ -5,7 +5,7 @@ import { isPlatformServer } from '@angular/common';
 
 import { env } from '@env';
 
-import { ServerService } from '@app/services/helpers/server.service';
+import { ServerService } from '@app/services/http/server.service';
 import { LoadingService } from '@app/services/utility/loading.service';
 
 import { Observable } from 'rxjs';

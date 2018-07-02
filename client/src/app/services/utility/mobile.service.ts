@@ -1,7 +1,7 @@
 import { Injectable, Optional } from '@angular/core';
 
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ServerService } from '@app/services/helpers/server.service';
+import { ServerService } from '@app/services/http/server.service';
 import { BehaviorSubject } from 'rxjs';
 
 

@@ -32,7 +32,7 @@ export class AdminService {
 		return this.http.client.get<CmsContent[]>(this.http.apiUrl(env.API.admin.cms));
 	}
 
-	public getContentPage(contentUrl: string): Observable<CmsContent> {
-		return this.http.client.get<CmsContent>(this.http.apiUrl(env.API.admin.cms + '/' + contentUrl));
+	public getContentPage(route: string): Observable<CmsContent> {
+		return this.http.client.get<CmsContent>(this.http.apiUrl(env.API.admin.cms + '/' + route));
 	}
 }

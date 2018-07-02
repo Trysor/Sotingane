@@ -17,7 +17,7 @@ import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 
 // Services
 import { AuthService } from '@app/services';
-import { authServiceStub, AuthServiceStub } from '@app/services/stubs';
+import { authServiceStub, AuthServiceStub } from '@app/services/tests/stubs';
 
 // Self
 import { LoginComponent } from './login.component';
@@ -227,7 +227,7 @@ describe('LoginComponent', () => {
 	});
 
 
-	it('should successfully give error message on faulty login: http error', () => {
+	it('should successfully give error message on faulty login: timeout', () => {
 		const button: HTMLButtonElement = fixture.debugElement.query(By.css('.loginButton')).nativeElement;
 		const errorDebugElem = fixture.debugElement.query(By.css('mat-error'));
 
