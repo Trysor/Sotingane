@@ -19,15 +19,21 @@
 			</mat-error>
 		</mat-form-field>
 	</form>
+	<div class="actions field">
+		<button mat-raised-button form="loginForm" type="submit" [disabled]="!loginForm.valid || (state | async) == STATES.LOADING" color="primary" ngClass="loginButton">
+			Log in
+		</button>
+		<mat-progress-spinner mode="indeterminate" *ngIf="(state | async) == STATES.LOADING" ngClass="loading" diameter="36"></mat-progress-spinner>
+	</div>
 
 	<ng-container [ngSwitch]="(state | async)">
 		<!-- TRY_AGAIN MESSAGE -->
-		<mat-error *ngSwitchCase="STATES.TRY_AGAIN">
+		<mat-error *ngSwitchCase="STATES.TRY_AGAIN" class="field">
 			The email or password was incorrect.
 		</mat-error>
 
 		<!-- TIMED_OUT MESSAGE -->
-		<mat-error *ngSwitchCase="STATES.TIMED_OUT">
+		<mat-error *ngSwitchCase="STATES.TIMED_OUT" class="field">
 			Could not establish a connection with the server.
 		</mat-error>
 
@@ -36,11 +42,4 @@
 			<div class="blocker"></div>
 		</div>
 	</ng-container>
-
-	<div class="actions">
-		<button mat-raised-button form="loginForm" type="submit" [disabled]="!loginForm.valid || (state | async) == STATES.LOADING" color="primary" ngClass="loginButton">
-			Log in
-		</button>
-		<mat-progress-spinner mode="indeterminate" *ngIf="(state | async) == STATES.LOADING" ngClass="loading" diameter="36"></mat-progress-spinner>
-	</div>
 </div>
