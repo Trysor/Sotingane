@@ -27,15 +27,15 @@
 }
 
 .actions {
-	display: flex;
-	flex-flow: row nowrap;
-	justify-content: flex-start;
-
+	text-align: center;
+	.loading,
 	button {
-		margin-right: 10px;
-	}
-
-	.loading {
-		display: inline-block;
+		margin: 5px auto;
 	}
 }
+
+mat-error.field {
+	margin-top: 15px;
+	text-align: center;
+}
+
