@@ -13,7 +13,6 @@ import { AdminComponent } from './admin-component/admin.component';
 import { SettingsComponent } from './settings-component/settings.component';
 import { UsersComponent } from './users-component/users.component';
 import { PagesComponent } from './pages-component/pages.component';
-import { SteamComponent } from './steam-component/steam.component';
 import { UserModalComponent } from './user-modal-component/user.modal.component';
 
 @NgModule({
@@ -22,7 +21,6 @@ import { UserModalComponent } from './user-modal-component/user.modal.component'
 		UsersComponent,
 		PagesComponent,
 		SettingsComponent,
-		SteamComponent,
 		UserModalComponent
 	],
 	imports: [

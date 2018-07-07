@@ -19,7 +19,6 @@ const routes: Routes = [
 			{ path: 'admin', loadChildren: 'app/modules/admin-module/admin.module#AdminModule', canActivate: [AdminGuard] },
 			// generic routes
 			{ path: 'login', loadChildren: 'app/modules/auth-module/auth.module#AuthModule', pathMatch: 'full', canActivate: [LoginGuard] },
-			{ path: 'steam', loadChildren: 'app/modules/steam-module/steam.module#SteamModule' },
 			{ path: 'search', redirectTo: 'search/', pathMatch: 'full', data: { SearchResults: '' } },
 			{ path: 'search/:term', component: SearchResultsComponent },
 			// User routes (all users)

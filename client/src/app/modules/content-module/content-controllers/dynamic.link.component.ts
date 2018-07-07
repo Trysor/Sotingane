@@ -34,7 +34,7 @@ type VideoFunction = (parameters: VideoParams) => void;
 	selector: 'router-link',
 	template: `
 		<ng-container *ngIf="!isVideo; else video;" [ngSwitch]="isRemoteUrl">
-			<a *ngSwitchCase="true" [href]="safeLink" [ngStyle]="style">{{text}}</a>
+			<a *ngSwitchCase="true" [href]="link" [ngStyle]="style">{{text}}</a>
 			<a *ngSwitchCase="false" [routerLink]="link" [ngStyle]="style">{{text}}</a>
 		</ng-container>
 		<ng-template #video>
@@ -78,13 +78,6 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 
 	public get isRemoteUrl(): boolean { return this._isRemoteUrl; }
 	public get isVideo(): boolean { return this._isVideo; }
-
-	public get safeLink(): string | SafeUrl {
-		if (this.link.startsWith('steam://')) {
-			return this.san.bypassSecurityTrustUrl(this.link);
-		}
-		return this.link;
-	}
 
 	private _isRemoteUrl = true;
 	private _isVideo = false;

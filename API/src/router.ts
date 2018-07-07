@@ -13,7 +13,6 @@ import { JSchema, validateSchema, VALIDATION_FAILED } from './libs/validate';
 // Controllers
 import { AuthController } from './controllers/auth';
 import { CMSController } from './controllers/cms';
-import { SteamController } from './controllers/steam';
 import { UsersController } from './controllers/users';
 import { ErrorController } from './controllers/error';
 
@@ -35,7 +34,6 @@ export class AppRouter {
 		const apiRoutes = Router();
 		this.authRoutes(apiRoutes);
 		this.cmsRoutes(apiRoutes);
-		this.steamRoutes(apiRoutes);
 		this.adminRoutes(apiRoutes);
 		// Set a common fallback for /api/*; 404 for invalid route
 		apiRoutes.all('*', ErrorController.error);
@@ -127,32 +125,6 @@ export class AppRouter {
 		// assign to parent router
 		router.use('/cms', cmsRoutes);
 	}
-
-
-	/**
-	 * Init Steam routes
-	 * @param  {Router} router the parent router
-	 */
-	private static steamRoutes(router: Router) {
-		const steamRoutes = Router();
-
-		// Get Steam server list
-		steamRoutes.get('/', SteamController.getSteamServerList);
-		// Get Steam server info
-		steamRoutes.get('/:route', SteamController.getSteamServer);
-		// Get Steam server DATA (GameDig)
-		steamRoutes.get('/:route/data', SteamController.getSteamServerData);
-		// Patch Steam server
-		steamRoutes.patch('/:route', PassportConfig.requireAuth, SteamController.patchSteamServer);
-		// Delete Steam server
-		steamRoutes.delete('/:route', PassportConfig.requireAuth, SteamController.patchSteamServer);
-		// Create content
-		steamRoutes.post('/', PassportConfig.requireAuth, SteamController.createSteamServer);
-
-		// assign to parent router
-		router.use('/steam', steamRoutes);
-	}
-
 
 	/**
 	 *

@@ -2,7 +2,6 @@
 export * from './controllers/admin.service';
 export * from './controllers/auth.service';
 export * from './controllers/cms.service';
-export * from './controllers/steam.service';
 // http
 export * from './http/http.service';
 export * from './http/interceptor.service';
