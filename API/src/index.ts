@@ -22,6 +22,7 @@ class App {
 		// SETUP
 		Setup.initiate(this.app);
 
+
 		// CONTROLLERS & ROUTER
 		AppRouter.initiate(this.app);
 
@@ -38,13 +39,12 @@ class App {
 			});
 		});
 
-
 		const uri = process.env.db || configGet<string>('database');
 
-		mongoose.connect(uri, (error) => {
+		mongoose.connect(uri, { keepAlive: 120, useNewUrlParser: true }, (error) => {
 			if (error) {
 				// if error is true, the problem is often with mongoDB not connection
-				console.log(error.message);
+				console.error('Mongoose connection error:', error.message);
 				mongoose.disconnect();
 				process.exit(1);
 				return;
