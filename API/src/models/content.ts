@@ -22,7 +22,7 @@ const schema = new Schema({
 		content_searchable: { type: String, required: true },
 
 		description: { type: String },
-		image: { type: String }, // url
+		images: [{ type: String }],
 
 		folder: { type: String },
 		nav: { type: Boolean, default: false },
@@ -70,7 +70,7 @@ export interface Content {
 	content_searchable?: string;
 
 	description?: string;
-	image?: string; // url
+	images?: string[]; // url
 
 	folder?: string;
 	nav?: boolean;

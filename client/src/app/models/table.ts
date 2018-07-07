@@ -24,6 +24,7 @@ export interface ColumnSettings {
 	header: string;
 
 	property: string;
+	value?: (obj: object) => any;
 
 	type?: ColumnType; // Defaults to Normal
 	displayFormat?: (obj?: object, all?: object[]) => string;

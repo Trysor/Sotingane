@@ -14,10 +14,16 @@ export class CMSController {
 	 * Retrieves the src of the first image if found.
 	 * @param html
 	 */
-	private static getImageSrcFromContent(html: string): string {
+	private static getImageSrcFromContent(html: string) {
 		// entire match, grouping, index, entire input
-		const match = CMSController.ImageSrcRegex.exec(html);
-		return match ? match[1] : undefined;
+		const images: string[] = [];
+
+		let match = CMSController.ImageSrcRegex.exec(html);
+		while (match != null) {
+			images.push(match[1]);
+			match = CMSController.ImageSrcRegex.exec(html);
+		}
+		return images;
 	}
 
 
@@ -93,7 +99,8 @@ export class CMSController {
 			{
 				fields: {
 					'current.title': 1, 'current.access': 1, 'current.route': 1, 'current.content': 1, 'current.description': 1,
-					'current.updatedBy': 1, 'current.createdBy': 1, 'current.updatedAt': 1, 'current.createdAt': 1
+					'current.updatedBy': 1, 'current.createdBy': 1, 'current.updatedAt': 1, 'current.createdAt': 1,
+					'current.images': 1
 				}
 			}
 		).populate([
@@ -187,7 +194,7 @@ export class CMSController {
 			content: sanitizedContent,
 			content_searchable: stripHTML(data.content),
 			description: sanitize(data.description),
-			image: CMSController.getImageSrcFromContent(sanitizedContent),
+			images: CMSController.getImageSrcFromContent(sanitizedContent),
 			nav: !!data.nav,
 			createdBy: user._id,
 			updatedBy: user._id,
@@ -236,7 +243,7 @@ export class CMSController {
 			content: sanitizedContent,
 			content_searchable: stripHTML(data.content),
 			description: sanitize(data.description),
-			image: CMSController.getImageSrcFromContent(sanitizedContent),
+			images: CMSController.getImageSrcFromContent(sanitizedContent),
 			nav: !!data.nav,
 			folder: data.folder ? stripHTML(data.folder).replace(/\//g, '') : '',
 			updatedBy: user._id,
@@ -304,7 +311,7 @@ export class CMSController {
 				$project: {
 					current: {
 						title: 1, route: 1, access: 1, folder: 1, updatedAt: 1, views: '$views',
-						description: 1, image: 1, relevance: { $meta: 'textScore' }
+						description: 1, images: 1, relevance: { $meta: 'textScore' }
 					}
 				}
 			},

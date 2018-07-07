@@ -51,8 +51,8 @@
 
 			<!-- Image -->
 			<ng-container *ngSwitchCase="ColumnType.Image">
-				<div class="colImage" *ngIf="obj[col.property]">
-					<img [src]="obj[col.property]" [alt]="col.displayFormat ? col.displayFormat(obj, Source.data) : ''">
+				<div class="colImage" *ngIf="(col.value ? col.value(obj) : obj[col.property])">
+					<img [src]="col.value ? col.value(obj) : obj[col.property]" [alt]="col.displayFormat ? col.displayFormat(obj, Source.data) : ''">
 				</div>
 			</ng-container>
 

@@ -22,6 +22,15 @@ export class SearchResultsComponent implements OnDestroy {
 	public readonly settings: TableSettings = {
 		columns: [
 			{
+				header: ' ',
+				property: 'images',
+				narrow: true,
+				noSort: true,
+				type: ColumnType.Image,
+				displayFormat: (c: CmsContent): string => c.images[0],
+				value: (c: CmsContent): string => c.images[0]
+			},
+			{
 				header: 'Title',
 				property: 'title',
 			},
@@ -43,18 +52,8 @@ export class SearchResultsComponent implements OnDestroy {
 			{
 				header: 'Last updated',
 				property: 'updatedAt',
-				displayFormat: (c: CmsContent): string => {
-					return this.datePipe.transform(c.updatedAt);
-				}
-			},
-			{
-				header: ' ',
-				property: 'image',
-				narrow: true,
-				noSort: true,
-				type: ColumnType.Image
-			},
-
+				displayFormat: (c: CmsContent): string => this.datePipe.transform(c.updatedAt)
+			}
 		],
 		mobile: ['title', 'relevance'],
 
