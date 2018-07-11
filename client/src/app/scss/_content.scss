@@ -98,20 +98,20 @@
 		&.image-style-align-right {
 			clear: none !important;
 			display: inline-block;
-			max-width: calc(50% - .8em); // negate the padding
-			width: calc(50% - .8em);
+			max-width: calc(50% - .2m); // negate the padding
+			width: calc(50% - .2em);
 			margin-top: 0;
 		}
 
 		&.image-style-align-left {
 			float: left;
-			margin-right: .8em;
+			margin-right: .2em;
 			clear: left;
 		}
 
 		&.image-style-align-right {
 			float: right;
-			margin-left: .8em;
+			margin-left: .2em;
 			clear: right;
 		}
 	}
