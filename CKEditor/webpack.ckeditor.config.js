@@ -9,7 +9,8 @@ const MinifyPlugin = require('babel-minify-webpack-plugin');
 const WrapperPlugin = require('wrapper-webpack-plugin');
 
 module.exports = {
-	devtool: 'source-map',
+	// devtool: 'source-map',
+	mode: 'production',
 	entry: { ckeditor: './ckeditor.ts' },
 	resolve: { extensions: ['.js', '.ts'] },
 	output: {
@@ -19,6 +20,7 @@ module.exports = {
 		libraryExport: 'default',
 		library: 'ClassicEditor'
 	},
+	performance: { hints: false },
 	module: {
 		rules: [
 			{ test: /\.ts$/, loader: 'ts-loader' },
@@ -30,19 +32,17 @@ module.exports = {
 			{
 				// Or /ckeditor5-[^/]+\/theme\/[\w-/]+\.css$/ if you want to limit this loader to CKEditor 5 theme only.
 				test: /\.css$/,
-				use: [
-					{
-						loader: 'style-loader',
-						options: { singleton: true }
-					},
-					{
-						loader: 'postcss-loader',
-						options: styles.getPostCssConfig({
-							themeImporter: { themePath: require.resolve('@ckeditor/ckeditor5-theme-lark') },
-							minify: true
-						})
-					}
-				]
+				use: [{
+					loader: 'style-loader',
+					options: { singleton: true }
+				},
+				{
+					loader: 'postcss-loader',
+					options: styles.getPostCssConfig({
+						themeImporter: { themePath: require.resolve('@ckeditor/ckeditor5-theme-lark') },
+						minify: true
+					})
+				}]
 			}
 		]
 	},

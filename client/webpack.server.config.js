@@ -8,6 +8,9 @@ module.exports = {
 	target: 'node',
 	// Make sure we include all node_modules etc
 	externals: [/node_modules/],
+	optimization: {
+		minimize: false,
+	},
 	output: {
 		path: path.join(__dirname, 'dist'),
 		filename: '[name].js'
