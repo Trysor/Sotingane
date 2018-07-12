@@ -1,8 +1,6 @@
-import { Component, OnInit, OnDestroy, Optional, Inject, PLATFORM_ID, ViewChild, ChangeDetectionStrategy } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { MatIconRegistry, MatDrawer } from '@angular/material';
+import { Component, OnInit, OnDestroy, Optional, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { MatDrawer } from '@angular/material';
 import { Router } from '@angular/router';
-import { isPlatformServer } from '@angular/common';
 
 import { MobileService, AuthService, ContentService, WorkerService, ServerService, SEOService } from '@app/services';
 // import { RoutingAnim } from '@app/animations';
@@ -15,7 +13,7 @@ import { takeUntil } from 'rxjs/operators';
 	// animations: [RoutingAnim],
 	templateUrl: './base.component.html',
 	styleUrls: ['./base.component.scss'],
-	changeDetection: ChangeDetectionStrategy.OnPush
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BaseComponent implements OnInit, OnDestroy {
 	private _ngUnsub = new Subject();
@@ -23,21 +21,13 @@ export class BaseComponent implements OnInit, OnDestroy {
 	@ViewChild('sidenavRight') private sidenavRight: MatDrawer;
 
 	constructor(
-		@Inject(PLATFORM_ID) private platformId: Object,
 		@Optional() private workerService: WorkerService,
 		@Optional() public serverService: ServerService,
 		private contentService: ContentService,
 		public seoService: SEOService,
 		public mobileService: MobileService,
 		public authService: AuthService,
-		public router: Router,
-		private iconRegistry: MatIconRegistry,
-		private san: DomSanitizer) {
-
-		// Registers the logo
-		let logoPath = '/assets/logo192themed.svg';
-		if (isPlatformServer(platformId)) { logoPath = serverService.urlBase + logoPath; }
-		iconRegistry.addSvgIcon('logo', san.bypassSecurityTrustResourceUrl(logoPath));
+		public router: Router) {
 
 		// Sets default metadata
 		contentService.setDefaultMeta();
@@ -47,9 +37,7 @@ export class BaseComponent implements OnInit, OnDestroy {
 		this.mobileService.isMobile().pipe(takeUntil(this._ngUnsub)).subscribe(isMobile => {
 			if (!isMobile) { this.closeSideNavs(); }
 		});
-		this.router.events.pipe(takeUntil(this._ngUnsub)).subscribe(e => {
-			this.closeSideNavs();
-		});
+		this.router.events.pipe(takeUntil(this._ngUnsub)).subscribe(e => { this.closeSideNavs(); });
 	}
 
 	ngOnDestroy() {

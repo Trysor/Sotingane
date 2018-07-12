@@ -1,13 +1,15 @@
 ﻿import { Injectable, Optional, Inject, PLATFORM_ID } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { TransferState, StateKey } from '@angular/platform-browser';
 import { isPlatformServer, DOCUMENT } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { TransferState, StateKey, DomSanitizer } from '@angular/platform-browser';
+import { MatIconRegistry } from '@angular/material';
 
 import { env } from '@env';
 import { ServerService } from '@app/services/http/server.service';
 
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
+
 
 
 @Injectable({ providedIn: 'root' })
@@ -24,7 +26,9 @@ export class HttpService {
 		@Inject(PLATFORM_ID) private platformId: Object,
 		@Optional() private serverService: ServerService,
 		private state: TransferState,
-		private httpClient: HttpClient) {
+		private httpClient: HttpClient,
+		private iconRegistry: MatIconRegistry,
+		private san: DomSanitizer) {
 
 		this._isServer = isPlatformServer(platformId);
 
@@ -35,6 +39,10 @@ export class HttpService {
 		this._apiBase = this._isServer
 			? this.serverService.urlBase
 			: env.API_BASE;
+
+		// Registers the logo
+		const logoPath = (this._isServer ? this._urlBase : '') + '/assets/logo192themed.svg';
+		iconRegistry.addSvgIcon('logo', san.bypassSecurityTrustResourceUrl(logoPath));
 	}
 
 

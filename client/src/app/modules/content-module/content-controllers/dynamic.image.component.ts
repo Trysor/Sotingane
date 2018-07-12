@@ -10,7 +10,6 @@ import { ServerService } from '@app/services/http/server.service';
 
 import { DynamicLazyLoader } from './dynamic.lazy.loader';
 
-import { Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { isPlatformServer } from '@angular/common';
 
