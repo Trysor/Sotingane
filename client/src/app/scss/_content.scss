@@ -119,6 +119,7 @@
 	image-container.image {
 		&.lazy {
 			height: calc(var(--width-wrapper) * 9 / 16);
+			opacity: 0;
 
 			&.image-style-align-left,
 			&.image-style-align-right {
