@@ -19,7 +19,7 @@ export class SearchResultsComponent implements OnDestroy {
 
 	public data = new BehaviorSubject<CmsContent[]>([]);
 
-	public readonly settings: TableSettings = {
+	public readonly settings: TableSettings<CmsContent> = {
 		columns: [
 			{
 				header: ' ',
@@ -27,8 +27,8 @@ export class SearchResultsComponent implements OnDestroy {
 				narrow: true,
 				noSort: true,
 				type: ColumnType.Image,
-				displayFormat: (c: CmsContent): string => c.images[0],
-				value: (c: CmsContent): string => c.images[0]
+				val: c => c.images[0],
+				val2: c => c.images[0]
 			},
 			{
 				header: 'Title',
@@ -38,7 +38,7 @@ export class SearchResultsComponent implements OnDestroy {
 				header: 'Relevance',
 				property: 'relevance',
 				rightAlign: true,
-				displayFormat: (c: CmsContent) => `${(100 * c.relevance).toFixed(2)}%`,
+				val: c => `${(100 * c.relevance).toFixed(2)}%`,
 			},
 			{
 				header: 'Description',
@@ -52,7 +52,7 @@ export class SearchResultsComponent implements OnDestroy {
 			{
 				header: 'Last updated',
 				property: 'updatedAt',
-				displayFormat: (c: CmsContent): string => this.datePipe.transform(c.updatedAt)
+				val: c => this.datePipe.transform(c.updatedAt)
 			}
 		],
 		mobile: ['title', 'relevance'],
@@ -60,8 +60,8 @@ export class SearchResultsComponent implements OnDestroy {
 		active: 'relevance',
 		dir: ColumnDir.DESC,
 
-		trackBy: (index: number, c: CmsContent) => c.title,
-		rowClick: (c: CmsContent) => this.router.navigateByUrl('/' + c.route)
+		trackBy: (index, c) => c.title,
+		rowClick: c => this.router.navigateByUrl('/' + c.route)
 	};
 
 	public readonly filterSettings: TableFilterSettings = {

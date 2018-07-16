@@ -29,30 +29,29 @@
 					{{col.icon(obj, Source.data)}}
 				</mat-icon>
 				<span *ngIf="!col.noText" [ngClass]="{ 'hasIcon': col.icon }">
-					{{col.displayFormat ? col.displayFormat(obj, Source.data) : obj[col.property]}}
+					{{col.val ? col.val(obj, Source.data) : obj[col.property]}}
 				</span>
 			</button>
 
-			<!-- InternalLink -->
-			<a *ngSwitchCase="ColumnType.InternalLink" [routerLink]="col.func(obj, Source.data)" (click)="overrideClick($event)">
+			<!-- Link -->
+			<a *ngSwitchCase="ColumnType.InternalLink" (click)="overrideClick($event)" [routerLink]="col.func(obj, Source.data)">
 				<mat-icon *ngIf="col.icon">{{col.icon(obj, Source.data)}}</mat-icon>
 				<span *ngIf="!col.noText" [ngClass]="{ 'hasIcon': col.icon }">
-					{{col.displayFormat ? col.displayFormat(obj, Source.data) : obj[col.property]}}
+					{{col.val ? col.val(obj, Source.data) : obj[col.property]}}
+				</span>
+			</a>
+			<a *ngSwitchCase="ColumnType.ExternalLink" (click)="overrideClick($event)" [href]="col.func(obj, Source.data)">
+				<mat-icon *ngIf="col.icon">{{col.icon(obj, Source.data)}}</mat-icon>
+				<span *ngIf="!col.noText" [ngClass]="{ 'hasIcon': col.icon }">
+					{{col.val ? col.val(obj, Source.data) : obj[col.property]}}
 				</span>
 			</a>
 
-			<!-- ExternalLink -->
-			<a *ngSwitchCase="ColumnType.ExternalLink" [href]="col.func(obj, Source.data)" (click)="overrideClick($event)">
-				<mat-icon *ngIf="col.icon">{{col.icon(obj, Source.data)}}</mat-icon>
-				<span *ngIf="!col.noText" [ngClass]="{ 'hasIcon': col.icon }">
-					{{col.displayFormat ? col.displayFormat(obj, Source.data) : obj[col.property]}}
-				</span>
-			</a>
 
 			<!-- Image -->
 			<ng-container *ngSwitchCase="ColumnType.Image">
 				<div class="colImage" *ngIf="(col.value ? col.value(obj) : obj[col.property])">
-					<img [src]="col.value ? col.value(obj) : obj[col.property]" [alt]="col.displayFormat ? col.displayFormat(obj, Source.data) : ''">
+					<img [src]="col.val ? col.val(obj) : obj[col.property]" [alt]="col.val2 ? col.val2(obj, Source.data) : ''">
 				</div>
 			</ng-container>
 
@@ -60,7 +59,7 @@
 			<ng-container *ngSwitchDefault>
 				<mat-icon *ngIf="col.icon">{{col.icon(obj, Source.data)}}</mat-icon>
 				<span *ngIf="!col.noText" [ngClass]="{ 'hasIcon': col.icon }" [matTooltip]="col.tooltip && col.tooltip(obj, Source.data)" matTooltipPosition="above">
-					{{col.displayFormat ? col.displayFormat(obj, Source.data) : obj[col.property]}}
+					{{col.val ? col.val(obj, Source.data) : obj[col.property]}}
 				</span>
 			</ng-container>
 		</mat-cell>

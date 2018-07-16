@@ -1,16 +1,16 @@
 ﻿import { BehaviorSubject } from 'rxjs';
 
-export interface TableSettings {
-	columns: ColumnSettings[];
+export interface TableSettings<T> {
+	columns: ColumnSettings<T>[];
 	mobile: string[];
 
 	// default sort
 	active: string; // property
 	dir: ColumnDir;
 
-	trackBy: (index: number, item: any) => string;
+	trackBy: (index: number, item: T) => string;
 
-	rowClick?: (rowOjb: object) => void;
+	rowClick?: (rowOjb: T) => void;
 }
 
 export interface TableFilterSettings {
@@ -19,27 +19,26 @@ export interface TableFilterSettings {
 	hidden?: BehaviorSubject<boolean>;
 }
 
-
-export interface ColumnSettings {
-	header: string;
+export interface ColumnSettings<T> {
+	type?: ColumnType; // Defaults to Normal
 
 	property: string;
-	value?: (obj: object) => any;
 
-	type?: ColumnType; // Defaults to Normal
-	displayFormat?: (obj?: object, all?: object[]) => string;
+	header: string;
+	val?: (obj?: T, all?: T[]) => string;
+	val2?: (obj?: T, all?: T[]) => string;
 
-	func?: (obj?: object, all?: object[]) => void;
-	disabled?: (obj?: object, all?: object[]) => boolean;
-	icon?: (obj?: object) => string;
-	tooltip?: (obj?: object) => string;
+	tooltip?: (obj?: T, all?: T[]) => string;
+	icon?: (obj?: T) => string;
+
+	func?: (obj?: T, all?: T[]) => void;
+	disabled?: (obj?: T, all?: T[]) => boolean;
 	noText?: boolean;
 	narrow?: boolean;
+	noSort?: boolean;
 
 	color?: 'primary' | 'accent' | 'warn';
 
-	// classes
-	noSort?: boolean;
 	rightAlign?: boolean;
 }
 

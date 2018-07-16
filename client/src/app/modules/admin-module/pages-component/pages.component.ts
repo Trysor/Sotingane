@@ -19,7 +19,7 @@ export class PagesComponent implements OnDestroy {
 	private _ngUnsub = new Subject();
 	public data = new BehaviorSubject<CmsContent[]>(null);
 
-	public readonly settings: TableSettings = {
+	public readonly settings: TableSettings<CmsContent> = {
 		columns: [
 			{
 				header: '',
@@ -28,9 +28,7 @@ export class PagesComponent implements OnDestroy {
 				type: ColumnType.InternalLink,
 				icon: () => 'mode_edit',
 				noText: true,
-				func: (c: CmsContent) => {
-					return `/compose/${c.route}`;
-				},
+				func: c => `/compose/${c.route}`,
 				narrow: true,
 			},
 			{
@@ -41,7 +39,7 @@ export class PagesComponent implements OnDestroy {
 				header: 'Views',
 				property: 'views',
 				rightAlign: true,
-				tooltip: (c: CmsContent) => {
+				tooltip: c => {
 					const time = (Date.now() - new Date(c.createdAt).getTime()) / (1000 * 60 * 60 * 24);
 					return `Views per day: ${(c.views / time).toFixed(2)}`;
 				}
@@ -49,14 +47,14 @@ export class PagesComponent implements OnDestroy {
 			{
 				header: 'Access',
 				property: 'access',
-				icon: (c: CmsContent): string => {
+				icon: c => {
 					switch (c.access) {
 						case AccessRoles.admin: { return 'security'; }
 						case AccessRoles.user: { return 'verified_user'; }
 						case AccessRoles.everyone: { return 'group'; }
 					}
 				},
-				displayFormat: (c: CmsContent): string => {
+				val: c => {
 					switch (c.access) {
 						case AccessRoles.admin: { return 'Admins'; }
 						case AccessRoles.user: { return 'Users'; }
@@ -67,16 +65,12 @@ export class PagesComponent implements OnDestroy {
 			{
 				header: 'Published',
 				property: 'published',
-				displayFormat: (c: CmsContent): string => {
-					return c.published ? 'Published' : 'Unpublished';
-				}
+				val: c => c.published ? 'Published' : 'Unpublished'
 			},
 			{
 				header: 'Navigation',
 				property: 'nav',
-				displayFormat: (c: CmsContent): string => {
-					return c.nav ? 'Shown' : 'Hidden';
-				}
+				val: c => c.nav ? 'Shown' : 'Hidden'
 			},
 			{
 				header: 'Folder',
@@ -85,9 +79,7 @@ export class PagesComponent implements OnDestroy {
 			{
 				header: 'Last updated',
 				property: 'updatedAt',
-				displayFormat: (c: CmsContent): string => {
-					return this.datePipe.transform(c.updatedAt);
-				}
+				val: c => this.datePipe.transform(c.updatedAt)
 			},
 			{
 				header: '',
@@ -97,8 +89,8 @@ export class PagesComponent implements OnDestroy {
 				icon: () => 'delete',
 				color: 'warn',
 				noText: true,
-				func: (c: CmsContent) => this.modalService.openDeleteContentModal(c),
-				disabled: (c: CmsContent) => c.route === 'home',
+				func: c => this.modalService.openDeleteContentModal(c),
+				disabled: c => c.route === 'home',
 				narrow: true
 			}
 		],
@@ -107,8 +99,8 @@ export class PagesComponent implements OnDestroy {
 		active: 'title',
 		dir: ColumnDir.ASC,
 
-		trackBy: (index: number, item: CmsContent) => item.route,
-		rowClick: (c: CmsContent) => this.router.navigateByUrl('/' + c.route)
+		trackBy: (index, item) => item.route,
+		rowClick: c => this.router.navigateByUrl('/' + c.route)
 	};
 
 
