@@ -10,6 +10,7 @@ import { AppRouter } from './router';
 
 // boot
 import * as mongoose from 'mongoose';
+import { Server } from 'http';
 
 class App {
 	public app: express.Express;
@@ -31,8 +32,9 @@ class App {
 	}
 
 	private boot() {
+		let server: Server;
 		this.app.on('db_ready', () => {
-			this.app.listen(this.app.get('port'), () => {
+			server = this.app.listen(this.app.get('port'), () => {
 				console.log(`Sotingane running on - Port ${this.app.get('port')}...`);
 				console.timeEnd('Launch time');
 				this.app.emit('launched');
@@ -45,11 +47,16 @@ class App {
 			if (error) {
 				// if error is true, the problem is often with mongoDB not connection
 				console.error('Mongoose connection error:', error.message);
-				mongoose.disconnect();
 				process.exit(1);
 				return;
 			}
 			this.app.emit('db_ready');
+		});
+
+		process.on('exit', () => {
+			if (server) { server.close(); }
+			mongoose.disconnect();
+			mongoose.connection.close();
 		});
 	}
 }
