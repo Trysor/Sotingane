@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 
-// Modules
 import {
 	MatListModule,
 	MatIconModule,
@@ -16,8 +15,6 @@ import {
 	MatMenuModule,
 	MatDialogModule
 } from '@angular/material';
-
-
 
 
 @NgModule({

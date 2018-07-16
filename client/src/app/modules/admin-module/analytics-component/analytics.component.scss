@@ -1,0 +1,27 @@
+
+.analyze {
+
+	.field {
+		display: flex;
+
+		mat-form-field {
+			flex: 1 1;
+			margin-right: 5px;
+
+			&:last-child {
+				margin-right: 0;
+			}
+		}
+	}
+
+	&.mobile {
+		.field {
+			display: block;
+
+			mat-form-field {
+				margin: 0;
+				display: block;
+			}
+		}
+	}
+}

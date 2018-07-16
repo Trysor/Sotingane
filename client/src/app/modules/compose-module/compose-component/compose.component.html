@@ -55,9 +55,9 @@
 								
 								<mat-select id="access" #access="matSelect" formControlName="access" required>
 									<mat-select-trigger>
-										<mat-icon>{{getAccessChoice().icon}}</mat-icon>{{ getAccessChoice().verbose }}
+										<mat-icon>{{accessHandler.getAccessChoice(contentForm.get('access').value).icon}}</mat-icon>{{ accessHandler.getAccessChoice(contentForm.get('access').value).verbose }}
 									</mat-select-trigger>
-									<mat-option *ngFor="let option of accessChoices" [value]="option.value">
+									<mat-option *ngFor="let option of accessHandler.accessChoices" [value]="option.value">
 										<mat-icon matPrefix>{{ option.icon }}</mat-icon>{{ option.verbose }}
 									</mat-option>
 								</mat-select>
@@ -120,7 +120,7 @@
 
 	</form>
 
-	<div ngClass="actions">
+	<div class="actions">
 		<div class="group">
 			<!-- VERSION -->
 			<mat-form-field appearance="outline">

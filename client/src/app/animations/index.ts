@@ -1,1 +1,1 @@
-export * from './routing.anim';
+export * from './inout.anim';

@@ -1,0 +1,398 @@
+﻿/// <reference path="../../../node_modules/@angular/material/_theming.scss" />
+/// <reference path="_theme_vars.scss" />
+
+@import '../../../node_modules/@angular/material/theming';
+
+// ---------------------------------------
+// ---------------- VARS -----------------
+// ---------------------------------------
+
+$app-primary-map: ( 1: #{var(--app-prim-1)}, 2: #{var(--app-prim-2)}, 3: #{var(--app-prim-3)}, contrast: (1: #{var(--app-prim-c-1)}, 2: #{var(--app-prim-c-2)}, 3: #{var(--app-prim-c-3)}) );
+$app-accent-map: ( 1: #{var(--app-acc-1)}, 2: #{var(--app-acc-2)}, 3: #{var(--app-acc-3)}, contrast: (1: #{var(--app-acc-c-1)}, 2: #{var(--app-acc-c-2)}, 3: #{var(--app-acc-c-3)}) );
+
+$app-primary: ($app-primary-map, 1, 2, 3);
+$app-accent: ($app-accent-map, 1, 2, 3);
+
+
+// ---------------------------------------
+// -------------- FUNCTIONS --------------
+// ---------------------------------------
+
+@function mat-color($palette, $hue: default, $opacity: null) {
+	// If hueKey is a number between zero and one, then it actually contains an
+	// opacity value, so recall this function with the default hue and that given opacity.
+	@if type-of($hue) == number and $hue >= 0 and $hue <= 1 {
+		@return mat-color($palette, default, $hue);
+	}
+
+	$color: map-get($palette, $hue);
+
+	@if $opacity == null {
+		@return $color;
+	}
+
+	@return rgba($color, opacity($color));
+}
+
+
+
+// ---------------------------------------
+// --------------- MIXINS ----------------
+// ---------------------------------------
+
+
+@mixin shadedHeaderBox() {
+	background: var(--color-material);
+	border: var(--border);
+	box-shadow: var(--shadow), var(--shadow) inset;
+}
+
+
+
+
+
+// ---------------------------------------
+// -------------- MATERIAL ---------------
+// ---------------------------------------
+
+
+@mixin mat-menu-theme($theme) {
+	$background: map-get($theme, background);
+	$foreground: map-get($theme, foreground);
+
+	.mat-menu-panel {
+		background: #{var(--color-material)};
+	}
+
+	.mat-menu-item {
+		background: transparent;
+		color: mat-color($foreground, 'text');
+
+		&[disabled] {
+			color: mat-color($foreground, 'disabled');
+		}
+	}
+
+	.mat-menu-item .mat-icon:not([color]),
+	.mat-menu-item-submenu-trigger::after {
+		color: mat-color($foreground, 'icon');
+	}
+
+	.mat-menu-item:hover,
+	.mat-menu-item.cdk-program-focused,
+	.mat-menu-item.cdk-keyboard-focused,
+	.mat-menu-item-highlighted {
+		&:not([disabled]) {
+			background: mat-color($background, 'hover');
+		}
+	}
+}
+
+@mixin mat-snack-bar-theme($theme) {
+	$is-dark-theme: map-get($theme, is-dark);
+	$accent: map-get($theme, accent);
+
+	.mat-snack-bar-container {
+		background: if($is-dark-theme, var(--color-material), #323232);
+		color: var(--color-text);
+	}
+
+	.mat-simple-snackbar-action {
+		color: if($is-dark-theme, inherit, mat-color($accent));
+	}
+}
+
+@mixin mat-table-theme($theme) {
+	$background: map-get($theme, background);
+	$foreground: map-get($theme, foreground);
+
+	.mat-header-row {
+		background: mat-color($background, 'card');
+	}
+
+	.mat-row, .mat-header-row {
+		border-bottom-color: mat-color($foreground, divider);
+	}
+
+	.mat-header-cell {
+		color: mat-color($foreground, secondary-text);
+	}
+
+	.mat-cell {
+		color: mat-color($foreground, text);
+	}
+}
+
+
+
+@mixin mat-sidenav-theme($theme) {
+	$primary: map-get($theme, primary);
+	$accent: map-get($theme, accent);
+	$warn: map-get($theme, warn);
+	$background: map-get($theme, background);
+	$foreground: map-get($theme, foreground);
+
+	$drawer-backdrop-color: rgba(0,0,0,0.7);
+	$drawer-background-color: mat-color($background, dialog) !default;
+	$drawer-container-background-color: mat-color($background, background) !default;
+	$drawer-push-background-color: mat-color($background, dialog) !default;
+
+	.mat-drawer-container {
+		background-color: $drawer-container-background-color;
+		color: mat-color($foreground, text);
+	}
+
+	.mat-drawer {
+		background-color: $drawer-background-color;
+		color: mat-color($foreground, text);
+
+		&.mat-drawer-push {
+			background-color: $drawer-push-background-color;
+		}
+	}
+
+	.mat-drawer-backdrop.mat-drawer-shown {
+		background-color: $drawer-backdrop-color;
+	}
+}
+
+
+
+@mixin mat-form-field-theme($theme) {
+	$primary: map-get($theme, primary);
+	$accent: map-get($theme, accent);
+	$warn: map-get($theme, warn);
+	$background: map-get($theme, background);
+	$foreground: map-get($theme, foreground);
+	$is-dark-theme: map-get($theme, is-dark);
+
+	// Label colors. Required is used for the `*` star shown in the label.
+	$label-color: mat-color($foreground, secondary-text, if($is-dark-theme, 0.7, 0.6));
+	$focused-label-color: mat-color($primary);
+	$required-label-color: mat-color($primary);
+
+	// Underline colors.
+	$underline-color-base: mat-color($foreground, divider, if($is-dark-theme, 1, 0.87));
+	$underline-color-accent: mat-color($accent);
+	$underline-color-warn: mat-color($warn);
+	$underline-focused-color: mat-color($primary);
+
+	.mat-form-field-label {
+		color: $label-color;
+	}
+
+	.mat-hint {
+		color: $label-color;
+	}
+
+	.mat-form-field.mat-focused .mat-form-field-label {
+		color: $focused-label-color;
+
+		&.mat-accent {
+			color: $underline-color-accent;
+		}
+
+		&.mat-warn {
+			color: $underline-color-warn;
+		}
+	}
+
+	.mat-focused .mat-form-field-required-marker {
+		color: $required-label-color;
+	}
+
+	.mat-form-field-ripple {
+		background-color: $underline-color-base;
+	}
+
+	.mat-form-field.mat-focused {
+		.mat-form-field-ripple {
+			background-color: $underline-focused-color;
+
+			&.mat-accent {
+				background-color: $underline-color-accent;
+			}
+
+			&.mat-warn {
+				background-color: $underline-color-warn;
+			}
+		}
+	}
+	// Styling for the error state of the form field. Note that while the same can be
+	// achieved with the ng-* classes, we use this approach in order to ensure that the same
+	// logic is used to style the error state and to show the error messages.
+	.mat-form-field.mat-form-field-invalid {
+		.mat-form-field-label {
+			color: $underline-color-warn;
+
+			&.mat-accent,
+			.mat-form-field-required-marker {
+				color: $underline-color-warn;
+			}
+		}
+
+		.mat-form-field-ripple,
+		.mat-form-field-ripple.mat-accent {
+			background-color: $underline-color-warn;
+		}
+	}
+
+	.mat-error {
+		color: $underline-color-warn;
+	}
+
+	@include mat-form-field-standard-theme($theme);
+	@include mat-form-field-outline-theme($theme);
+}
+
+
+@mixin _mat-datepicker-color($palette) {
+	.mat-calendar-body-selected {
+		background-color: mat-color($palette);
+		color: mat-color($palette, default-contrast);
+	}
+
+	.mat-calendar-body-disabled > .mat-calendar-body-selected {
+		background-color: mat-color($palette, disabled-text); // fade-out(mat-color($palette), $mat-datepicker-selected-fade-amount);
+	}
+
+	.mat-calendar-body-today.mat-calendar-body-selected {
+		box-shadow: inset 0 0 0 $mat-datepicker-selected-today-box-shadow-width mat-color($palette, default-contrast);
+	}
+}
+
+
+
+@mixin mat-datepicker-theme($theme) {
+	$foreground: map-get($theme, foreground);
+	$background: map-get($theme, background);
+
+	.mat-calendar-arrow {
+		border-top-color: mat-color($foreground, icon);
+	}
+	// The prev/next buttons need a bit more specificity to
+	// avoid being overwritten by the .mat-icon-button.
+	.mat-datepicker-toggle,
+	.mat-datepicker-content .mat-calendar-next-button,
+	.mat-datepicker-content .mat-calendar-previous-button {
+		color: mat-color($foreground, icon);
+	}
+
+	.mat-calendar-table-header {
+		color: mat-color($foreground, hint-text);
+	}
+
+	.mat-calendar-table-header-divider::after {
+		background: mat-color($foreground, divider);
+	}
+
+	.mat-calendar-body-label {
+		color: mat-color($foreground, secondary-text);
+	}
+
+	.mat-calendar-body-cell-content {
+		color: mat-color($foreground, text);
+		border-color: transparent;
+	}
+
+	.mat-calendar-body-disabled > .mat-calendar-body-cell-content:not(.mat-calendar-body-selected) {
+		color: mat-color($foreground, disabled-text);
+	}
+
+	.mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover,
+	.cdk-keyboard-focused .mat-calendar-body-active,
+	.cdk-program-focused .mat-calendar-body-active {
+		& > .mat-calendar-body-cell-content:not(.mat-calendar-body-selected) {
+			background-color: mat-color($background, hover);
+		}
+	}
+
+	.mat-calendar-body-today:not(.mat-calendar-body-selected) {
+		// Note: though it's not text, the border is a hint about the fact that this is today's date,
+		// so we use the hint color.
+		border-color: mat-color($foreground, hint-text);
+	}
+
+	.mat-calendar-body-disabled > .mat-calendar-body-today:not(.mat-calendar-body-selected) {
+		border-color: mat-color($foreground, disabled-text); // fade-out(mat-color($foreground, hint-text), $mat-datepicker-today-fade-amount);
+	}
+
+	@include _mat-datepicker-color(map-get($theme, primary));
+
+	.mat-datepicker-content {
+		background-color: mat-color($background, card);
+		color: mat-color($foreground, text);
+
+		&.mat-accent {
+			@include _mat-datepicker-color(map-get($theme, accent));
+		}
+
+		&.mat-warn {
+			@include _mat-datepicker-color(map-get($theme, warn));
+		}
+	}
+
+	.mat-datepicker-toggle-active {
+		color: mat-color(map-get($theme, primary));
+
+		&.mat-accent {
+			color: mat-color(map-get($theme, accent));
+		}
+
+		&.mat-warn {
+			color: mat-color(map-get($theme, warn));
+		}
+	}
+}
+
+
+@mixin mat-expansion-panel-theme($theme) {
+	$background: map-get($theme, background);
+	$foreground: map-get($theme, foreground);
+
+	.mat-expansion-panel {
+		color: mat-color($foreground, text);
+		box-shadow: none !important;
+
+		.mat-expansion-panel-body {
+			padding: 0 5px;
+		}
+
+		.mat-expansion-panel-header {
+			@include shadedHeaderBox();
+			max-height: 48px;
+			// .mat-expansion-panel-header.mat-expanded:focus, .mat-expansion-panel-header.mat-expanded:hover
+			&:not([aria-disabled='true']) {
+				&.cdk-keyboard-focused,
+				&.cdk-program-focused,
+				&:hover,
+				&:focus {
+					@include shadedHeaderBox();
+				}
+			}
+		}
+	}
+
+	.mat-action-row {
+		border-top-color: mat-color($foreground, divider);
+		// background: mat-color($foreground, divider);
+	}
+
+	.mat-expansion-panel-header-title {
+		color: mat-color($foreground, text);
+	}
+
+	.mat-expansion-panel-header-description,
+	.mat-expansion-indicator::after {
+		color: mat-color($foreground, secondary-text);
+	}
+
+	.mat-expansion-panel-header[aria-disabled='true'] {
+		color: mat-color($foreground, disabled-button);
+
+		.mat-expansion-panel-header-title,
+		.mat-expansion-panel-header-description {
+			color: inherit;
+		}
+	}
+}

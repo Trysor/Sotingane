@@ -6,6 +6,8 @@ import { DatePipe } from '@angular/common';
 import { CmsContent, AccessRoles, TableSettings, ColumnType, ColumnDir } from '@app/models';
 import { ModalService, CMSService, AdminService, MobileService } from '@app/services';
 
+import { AccessHandler } from '@app/classes';
+
 import { Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -18,6 +20,8 @@ import { takeUntil } from 'rxjs/operators';
 export class PagesComponent implements OnDestroy {
 	private _ngUnsub = new Subject();
 	public data = new BehaviorSubject<CmsContent[]>(null);
+
+	private readonly _accessHandler = new AccessHandler();
 
 	public readonly settings: TableSettings<CmsContent> = {
 		columns: [
@@ -47,20 +51,8 @@ export class PagesComponent implements OnDestroy {
 			{
 				header: 'Access',
 				property: 'access',
-				icon: c => {
-					switch (c.access) {
-						case AccessRoles.admin: { return 'security'; }
-						case AccessRoles.user: { return 'verified_user'; }
-						case AccessRoles.everyone: { return 'group'; }
-					}
-				},
-				val: c => {
-					switch (c.access) {
-						case AccessRoles.admin: { return 'Admins'; }
-						case AccessRoles.user: { return 'Users'; }
-						case AccessRoles.everyone: { return 'Everyone'; }
-					}
-				},
+				icon: c => this._accessHandler.getAccessChoice(c.access).icon,
+				val: c => this._accessHandler.getAccessChoice(c.access).verbose
 			},
 			{
 				header: 'Published',

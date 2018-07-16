@@ -3,14 +3,12 @@ import { MatDrawer } from '@angular/material';
 import { Router } from '@angular/router';
 
 import { MobileService, AuthService, ContentService, WorkerService, ServerService, SEOService } from '@app/services';
-// import { RoutingAnim } from '@app/animations';
 
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'base-component',
-	// animations: [RoutingAnim],
 	templateUrl: './base.component.html',
 	styleUrls: ['./base.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush,

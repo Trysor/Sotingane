@@ -11,6 +11,7 @@ import { accessRoles } from './models/user';
 import { JSchema, validateSchema, VALIDATION_FAILED } from './libs/validate';
 
 // Controllers
+import { AdminController } from './controllers/admin';
 import { AuthController } from './controllers/auth';
 import { CMSController } from './controllers/cms';
 import { UsersController } from './controllers/users';
@@ -158,12 +159,19 @@ export class AppRouter {
 		contentRoutes.get('/',
 			PassportConfig.requireAuth,
 			AuthController.requireRole(accessRoles.admin),
-			CMSController.getAdminContentList);
+			AdminController.getAdminContentList);
 
 		contentRoutes.get('/:route',
 			PassportConfig.requireAuth,
 			AuthController.requireRole(accessRoles.admin),
-			CMSController.getContentFull);
+			AdminController.getContentFull);
+
+		contentRoutes.post('/aggregate',
+			PassportConfig.requireAuth,
+			AuthController.requireRole(accessRoles.admin),
+			validateSchema(JSchema.AdminAggregationSchema, VALIDATION_FAILED.ADMIN_MODEL),
+			AdminController.aggregateContent
+		);
 
 		// -------------------------------
 

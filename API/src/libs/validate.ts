@@ -57,8 +57,8 @@ export enum JSchema {
 	// Content
 	ContentSchema = 'ContentSchema',
 
-	// Steam
-	SteamSchema = 'SteamSchema'
+	// Admin
+	AdminAggregationSchema = 'AdminAggregationSchema'
 }
 
 
@@ -71,7 +71,7 @@ export enum JSchema {
 export const enum VALIDATION_FAILED {
 	USER_MODEL = 'User object validation failed',
 	CONTENT_MODEL = 'Content object validation failed',
-	STEAM_MODEL = 'Steam object validation failed',
+	ADMIN_MODEL = 'Query object validation failed',
 }
 
 
@@ -103,18 +103,6 @@ export const enum CMS_STATUS {
 	DATA_UNABLE_TO_SAVE = 'Could not save. Internal server error',
 	CONTENT_DELETED = 'Content was successfully deleted',
 	SEARCH_RESULT_NONE_FOUND = 'Could not find content for the given search query',
-}
-
-export const enum STEAM_STATUS {
-	NO_ROUTES = 'No routes were found',
-	SERVER_ONLINE = 'Steam server is online',
-	SERVER_OFFLINE = 'Steam server is offline',
-	SERVER_TIMED_OUT = 'Steam server request timed out',
-	SERVER_NOT_FOUND = 'Could not retrieve server data for the provided route',
-	DATA_UNPROCESSABLE = 'The provided data could not be processed',
-	DATA_UNABLE_TO_SAVE = 'Could not save. Internal server error',
-	CONTENT_DELETED = 'Server data was successfully deleted',
-	CONTENT_NOT_FOUND = 'Could not find the server content requested',
 }
 
 export const enum USERS_STATUS {

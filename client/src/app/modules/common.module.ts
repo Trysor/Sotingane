@@ -1,18 +1,14 @@
 import { NgModule } from '@angular/core';
 
-
-// Modules
 import {
 	MatAutocompleteModule,
 	MatSelectModule,
 	MatCheckboxModule,
 	MatExpansionModule,
 	MatProgressSpinnerModule,
-	MatTabsModule
+	MatTabsModule,
+	MatDatepickerModule
 } from '@angular/material';
-
-
-
 
 @NgModule({
 	exports: [
@@ -21,7 +17,8 @@ import {
 		MatCheckboxModule,
 		MatExpansionModule,
 		MatProgressSpinnerModule,
-		MatTabsModule
+		MatTabsModule,
+		MatDatepickerModule
 	]
 })
 export class CommonModule { }

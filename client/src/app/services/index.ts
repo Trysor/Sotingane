@@ -9,6 +9,7 @@ export * from './http/server.service';
 export * from './http/worker.service';
 // Utility
 export * from './utility/content.service';
+export * from './utility/dateadapter.service';
 export * from './utility/intersection.service';
 export * from './utility/mobile.service';
 export * from './utility/modal.service';
