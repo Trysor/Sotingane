@@ -14,10 +14,6 @@ import { TestBed, AdminUser } from './testbed';
 
 
 describe('REST: Content', () => {
-	before(async () => {
-		await ContentModel.remove({}).exec();
-	});
-
 
 	// ---------------------------------
 	// ----------- /api/cms/ -----------
@@ -49,11 +45,14 @@ describe('REST: Content', () => {
 			expect(res.body).property('content').to.equal(content.content); // valid; no sanitation needed
 
 			const res2 = await TestBed.http.get('/api/cms/').set('Cookie', TestBed.AdminCookie);
+
 			expect(res2).to.have.status(200);
 			expect(res2).to.have.property('body');
 			expect(res2.body).to.be.an('array');
-			expect(res2.body[0]).to.have.property('route');
-			expect(res2.body[0]).property('route').to.equal(content.route);
+
+			const resContent = (<Content[]>res2.body).find(c => c.route === content.route);
+			expect(resContent).to.have.property('route');
+			expect(resContent).property('route').to.equal(content.route);
 		});
 
 		it('POST /api/cms/ 200, sanitation', async () => {

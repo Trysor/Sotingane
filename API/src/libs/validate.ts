@@ -105,6 +105,10 @@ export const enum CMS_STATUS {
 	SEARCH_RESULT_NONE_FOUND = 'Could not find content for the given search query',
 }
 
+export const enum ADMIN_STATUS {
+	AGGREGATION_RESULT_NONE_FOUND = 'Could not find data for the given query',
+}
+
 export const enum USERS_STATUS {
 	DATA_UNPROCESSABLE = 'The provided data could not be processed',
 	USER_UPDATED = 'User has been updated successfully',

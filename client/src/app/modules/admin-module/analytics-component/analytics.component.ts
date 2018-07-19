@@ -177,7 +177,7 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 			'seenAfterDate': [''],
 			'seenBeforeDate': [''],
 			'readBy': [[]],
-			'browser': [[]],
+			'browsers': [[]],
 			'unwind': [false],
 		});
 

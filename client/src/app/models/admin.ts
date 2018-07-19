@@ -11,7 +11,7 @@ export interface AggregationQuery {
 	seenAfterDate?: Date;
 	seenBeforeDate?: Date;
 	readBy?: string[];
-	browser?: string;
+	browsers?: string[];
 	unwind?: boolean;
 }
 

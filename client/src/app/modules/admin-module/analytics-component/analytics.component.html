@@ -141,11 +141,11 @@
 						</mat-form-field>
 					</div>
 
-					<!-- BROWSER -->
+					<!-- BROWSERS -->
 					<div class="field">
 						<mat-form-field appearance="outline">
-							<mat-label>Browser</mat-label>
-							<mat-select id="browser" #browser="matSelect" formControlName="browser" multiple>
+							<mat-label>Browsers</mat-label>
+							<mat-select id="browsers" #browser="matSelect" formControlName="browsers" multiple>
 								<mat-option *ngFor="let browser of browsers" [value]="browser">
 									{{ browser }}
 								</mat-option>

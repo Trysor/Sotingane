@@ -1,6 +1,6 @@
 ﻿import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
-import { ajv, JSchema } from '../libs/validate';
+import { ajv, JSchema, ADMIN_STATUS } from '../libs/validate';
 import * as mongoose from 'mongoose';
 import { UAParser } from 'ua-parser-js';
 
@@ -77,12 +77,12 @@ export class AdminController {
 		const match: any = {};
 		if (query.createdBy) { match['current.createdBy'] = mongoose.Types.ObjectId(query.createdBy); }		// CreatedBy
 		if (query.access) { match['current.access'] = query.access; }										// Access
-		if (query.published) { match['current.published'] = query.published; }								// Published
+		if (query.hasOwnProperty('published')) { match['current.published'] = query.published; }			// Published
 		if (query.route) { match['current.route'] = query.route; }											// Route
 		if (query.folder) { match['current.folder'] = query.folder; }										// Folder
 
 		// Content Date handling
-		if (query.createdAfterDate && query.createdBeforeDate) {
+		if (!!query.createdAfterDate && !!query.createdBeforeDate) {
 			match['current.createdAt'] = { '$gte': new Date(query.createdAfterDate), '$lt': new Date(query.createdBeforeDate) };
 		} else if (query.createdAfterDate) {
 			match['current.createdAt'] = { '$gte': new Date(query.createdAfterDate) };
@@ -92,19 +92,19 @@ export class AdminController {
 
 		// User views Date handling
 		const userFilter: any[] = [];
-		if (query.seenAfterDate && query.seenBeforeDate) {
+		if (!!query.seenAfterDate && !!query.seenBeforeDate) {
 			userFilter.push({ '$gte': ['$ts', new Date(query.seenAfterDate)] });
 			userFilter.push({ '$lt': ['$ts', new Date(query.seenBeforeDate)] });
-		} else if (query.seenAfterDate) {
+		} else if (!!query.seenAfterDate) {
 			userFilter.push({ '$gte': ['$ts', new Date(query.seenAfterDate)] });
-		} else if (query.seenBeforeDate) {
+		} else if (!!query.seenBeforeDate) {
 			userFilter.push({ '$lt': ['$ts', new Date(query.seenBeforeDate)] });
 		}
-		if (query.readBy && query.readBy.length > 0) { // Read by check (must compare against ObjectId)
+		if (!!query.readBy && query.readBy.length > 0) { // Read by check (must compare against ObjectId)
 			userFilter.push({ $in: ['$user', query.readBy.map(id => mongoose.Types.ObjectId(id))] });
 		}
-		if (query.browser && query.browser.length > 0) { // equality match. 100% equal.
-			userFilter.push({ $in: [ '$browser', query.browser ] });
+		if (!!query.browsers && query.browsers.length > 0) { // equality match. 100% equal.
+			userFilter.push({ $in: ['$browser', query.browsers] });
 		}
 
 		// Projecting
@@ -114,7 +114,7 @@ export class AdminController {
 				updatedAt: 1, createdAt: 1, updatedBy: 1, createdBy: 1
 			}
 		};
-		if (query.unwind) { // Add log data since we're unwinding
+		if (query.hasOwnProperty('unwind') && query.unwind) { // Add log data since we're unwinding
 			project['current']['logDataUser'] = '$views.user';
 			project['current']['logDataTs'] = '$views.ts';
 			project['current']['logDataReferer'] = '$views.referer';
@@ -125,24 +125,19 @@ export class AdminController {
 		}
 
 		const pipeline = [];
-		// Match against document
-		pipeline.push({ $match: match });
-		// Lookup logging data
-		pipeline.push({
+		pipeline.push({ $match: match });								// Match against document
+		pipeline.push({													// Lookup logging data
 			$lookup: {
 				from: 'logs', as: 'views', let: { contentId: '$_id' },
 				pipeline: [{ $match: { $expr: { $and: [{ $eq: ['$content', '$$contentId'] }].concat(userFilter) } } }]
 			}
 		});
-		// Conditional unwind
-		if (query.unwind) { pipeline.push({ '$unwind': '$views' }); }
-		// Project results
-		pipeline.push({ $project: project });
-		// Replace root
-		pipeline.push({ $replaceRoot: { newRoot: '$current' } });
+		if (query.unwind) { pipeline.push({ '$unwind': '$views' }); }	// Conditional unwind
+		pipeline.push({ $project: project });							// Project results
+		pipeline.push({ $replaceRoot: { newRoot: '$current' } });		// Replace root
 
 		const results: any[] = await ContentModel.aggregate(pipeline);
-		if (!results || results.length === 0) { return res.status(200).send(status(CMS_STATUS.SEARCH_RESULT_NONE_FOUND)); }
+		if (!results || results.length === 0) { return res.status(200).send(status(ADMIN_STATUS.AGGREGATION_RESULT_NONE_FOUND)); }
 		return res.status(200).send(results);
 	}
 }
@@ -162,12 +157,12 @@ const adminAggregationSchema = {
 		'seenAfterDate': { 'oneOf': [{ 'type': 'string', 'format': 'date-time' }, { 'type': 'string', 'maxLength': 0 }] },
 		'seenBeforeDate': { 'oneOf': [{ 'type': 'string', 'format': 'date-time' }, { 'type': 'string', 'maxLength': 0 }] },
 		'readBy': { 'type': 'array', 'items': { 'type': 'string' }, 'uniqueItems': true },
-		'browser': { 'type': 'array', 'items': { 'type': 'string' }, 'uniqueItems': true },
+		'browsers': { 'type': 'array', 'items': { 'type': 'string' }, 'uniqueItems': true },
 		'unwind': { 'type': 'boolean' }
 	},
 };
 
-interface AggregationQuery {
+export interface AggregationQuery {
 	createdBy?: string;
 	access?: accessRoles;
 	published?: boolean;
@@ -178,7 +173,7 @@ interface AggregationQuery {
 	seenAfterDate?: Date;
 	seenBeforeDate?: Date;
 	readBy?: string[];
-	browser?: string;
+	browsers?: string[];
 	unwind?: boolean;
 }
 
