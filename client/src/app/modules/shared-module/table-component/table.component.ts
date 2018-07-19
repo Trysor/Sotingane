@@ -3,7 +3,7 @@ import { MatPaginator, MatSort, MatTable, MatTableDataSource } from '@angular/ma
 
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 
-import { ColumnSettings, ColumnType, TableSettings, TableFilterSettings } from '@app/models';
+import { ColumnSettings, ColumnType, TableSettings, TableFilterSettings, Column } from '@app/models';
 import { MobileService } from '@app/services';
 
 import { Subject, Observable, BehaviorSubject } from 'rxjs';
@@ -27,7 +27,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 
 	public readonly pageSizes = [10, 25, 50, 100];
 	public readonly Source = new MatTableDataSource<object>([]);
-	public displayedColumns: string[];
+	public displayedColumns: Column<any>[];
 
 	private readonly _ngUnsub = new Subject();
 	public readonly filterForm: FormGroup;

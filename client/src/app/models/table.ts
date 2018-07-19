@@ -2,10 +2,10 @@
 
 export interface TableSettings<T> {
 	columns: ColumnSettings<T>[];
-	mobile: string[];
+	mobile: Column<T>[];
 
 	// default sort
-	active: string; // property
+	active: Column<T>;
 	dir: ColumnDir;
 
 	trackBy: (index: number, item: T) => string;
@@ -22,7 +22,7 @@ export interface TableFilterSettings {
 export interface ColumnSettings<T> {
 	type?: ColumnType; // Defaults to Normal
 
-	property: string;
+	property: Column<T>;
 
 	header: string;
 	val?: (obj?: T, all?: T[]) => string;
@@ -53,4 +53,12 @@ export enum ColumnType {
 export enum ColumnDir {
 	ASC = 'asc',
 	DESC = 'desc'
+}
+
+export type Column<T> = keyof T | keyof ExtraColumns;
+
+
+interface ExtraColumns {
+	edit: string;
+	delete: string;
 }
