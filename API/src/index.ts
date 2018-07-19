@@ -1,8 +1,7 @@
 import * as express from 'express';
 import { get as configGet, util as configUtil } from 'config';
+import 'source-map-support/register';
 
-// setup
-require('source-map-support').install();
 import { Setup } from './libs/setup';
 
 // routing
