@@ -50,7 +50,7 @@
 
 			<!-- Image -->
 			<ng-container *ngSwitchCase="ColumnType.Image">
-				<div class="colImage" *ngIf="(col.value ? col.value(obj) : obj[col.property])">
+				<div class="colImage" *ngIf="(col.val ? col.val(obj) : obj[col.property])">
 					<img [src]="col.val ? col.val(obj) : obj[col.property]" [alt]="col.val2 ? col.val2(obj, Source.data) : ''">
 				</div>
 			</ng-container>
