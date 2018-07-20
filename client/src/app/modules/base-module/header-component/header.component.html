@@ -32,6 +32,10 @@
 					class="userToggle" aria-label="Show user menu">
 				<mat-icon color="primary">person</mat-icon> {{ user.username }}
 			</button>
+			<!-- Menu for DESKTOP -->
+			<mat-menu #userPanel="matMenu" xPosition="before" yPosition="below" [overlapTrigger]="false">
+				<control-panel-component *ngIf="!(mobileService.isMobile() | async)" layout="menu"></control-panel-component>
+			</mat-menu>
 		</div>
 	</ng-container>
 
@@ -49,8 +53,3 @@
 		</div>
 	</ng-template>
 </header>
-
-<!-- Menu for DESKTOP -->
-<mat-menu #userPanel="matMenu" xPosition="before" yPosition="below" [overlapTrigger]="false">
-	<control-panel-component *ngIf="!(mobileService.isMobile() | async)" layout="menu"></control-panel-component>
-</mat-menu>

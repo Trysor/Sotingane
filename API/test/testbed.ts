@@ -8,6 +8,8 @@ import * as Mocha from 'mocha';
 import { readdirSync } from 'fs';
 import { join as pathjoin } from 'path';
 
+import { ContentModel } from '../src/models/content';
+import { LogModel } from '../src/models/log';
 import { UserModel, User, accessRoles } from '../src/models/user';
 import { TokenResponse } from '../src/controllers/auth';
 
@@ -19,6 +21,9 @@ export class TestBedSingleton {
 	public get http() { return this._http; }
 	public AdminUser: User;
 	public AdminCookie: string;
+
+	public AdminUser2: User;
+	public Admin2Cookie: string;
 
 	public User: User;
 	public UserCookie: string;
@@ -39,15 +44,25 @@ export class TestBedSingleton {
 			console.log('Connecting with MongoDB..');
 			console.time('Setting up DB for tests');
 
-			// Delete all current users
-			await UserModel.remove({}).exec();
+			// Drop Test collections
+			await Promise.all([
+				UserModel.remove({}).exec(),
+				ContentModel.remove({}).exec(),
+				LogModel.remove({}).exec()
+			]);
 
 			// Create new users and log them in
-			const [user, admin] = await Promise.all([this.createUser(TestUser), this.createUser(AdminUser)]);
+			const [user, admin, admin2] = await Promise.all([
+				this.createUser(TestUser),
+				this.createUser(AdminUser),
+				this.createUser(AdminUser2)
+			]);
 			TestBed.User = user.user;
 			TestBed.UserCookie = user.cookie;
 			TestBed.AdminUser = admin.user;
 			TestBed.AdminCookie = admin.cookie;
+			TestBed.AdminUser2 = admin2.user;
+			TestBed.Admin2Cookie = admin2.cookie;
 
 			// Initiate tests
 			console.timeEnd('Setting up DB for tests');
@@ -75,6 +90,12 @@ export default TestBed;
 export const AdminUser: Partial<User> = {
 	username: 'Admin',
 	username_lower: 'admin',
+	password: 'test',
+	role: accessRoles.admin,
+};
+export const AdminUser2: Partial<User> = {
+	username: 'Admin2',
+	username_lower: 'admin2',
 	password: 'test',
 	role: accessRoles.admin,
 };

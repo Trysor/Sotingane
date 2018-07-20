@@ -1,0 +1,178 @@
+
+
+<mat-accordion [ngClass]="{ analyze: true, mobile: (mobileService.isMobile() | async) }">
+
+	<mat-expansion-panel [expanded]="(state | async) == AnalyticsState.QUERY" (opened)="setState(AnalyticsState.QUERY)">
+		<mat-expansion-panel-header>Query</mat-expansion-panel-header>
+
+		<form [formGroup]="aggregateForm" id="aggregateForm" autocomplete="off" (ngSubmit)="submitForm()">
+
+			<sectionwrapper-component>
+				<section-component header="Content Filters">
+					<!-- ROUTE -->
+					<div class="field">
+						<mat-form-field appearance="outline">
+							<mat-label>Route</mat-label>
+							<input matInput id="route" #route formControlName="route" type="text" autocomplete="off">
+						</mat-form-field>
+					</div>
+
+					<!-- FOLDER -->
+					<div class="field">
+						<mat-form-field appearance="outline">
+							<mat-label>Folder</mat-label>
+							<input matInput id="folder" #folder formControlName="folder" type="text" autocomplete="off">
+						</mat-form-field>
+					</div>
+
+
+					<div class="field">
+						<!-- CREATED AFTER -->
+						<mat-form-field appearance="outline">
+							<mat-label>Created After</mat-label>
+							<input matInput id="createdAfter" #createdAfterDate [matDatepicker]="createdAfterPicker"
+								   [max]="maxCreatedAfterDate"
+								   formControlName="createdAfterDate" type="text" autocomplete="off">
+							<mat-datepicker-toggle matPrefix [for]="createdAfterPicker"></mat-datepicker-toggle>
+							<mat-datepicker #createdAfterPicker [touchUi]="mobileService.isMobile() | async"></mat-datepicker>
+							<button *ngIf="aggregateForm.get('createdAfterDate').value" matSuffix mat-icon-button
+									(click)="aggregateForm.get('createdAfterDate').reset('')">
+								<mat-icon>clear</mat-icon>
+							</button>
+						</mat-form-field>
+						<!-- CREATED BEFORE -->
+						<mat-form-field appearance="outline">
+							<mat-label>Created Before</mat-label>
+							<input matInput id="createdBefore" #createdBeforeDate [matDatepicker]="createdBeforePicker"
+								   [max]="today" [min]="minCreatedBeforeDate"
+								   formControlName="createdBeforeDate" type="text" autocomplete="off">
+							<mat-datepicker-toggle matPrefix [for]="createdBeforePicker"></mat-datepicker-toggle>
+							<button *ngIf="aggregateForm.get('createdBeforeDate').value" matSuffix mat-icon-button
+									(click)="aggregateForm.get('createdBeforeDate').reset('')">
+								<mat-icon>clear</mat-icon>
+							</button>
+							<mat-datepicker #createdBeforePicker [touchUi]="mobileService.isMobile() | async"></mat-datepicker>
+						</mat-form-field>
+					</div>
+
+					<!-- WRITTEN BY -->
+					<div class="field">
+						<mat-form-field appearance="outline">
+							<mat-label>Written by</mat-label>
+							<mat-select id="createdBy" #createdBy="matSelect" formControlName="createdBy">
+								<mat-option [disabled]="!aggregateForm.get('createdBy').value">-- Clear Selection --</mat-option>
+								<mat-option *ngFor="let user of users | async" [value]="user._id">
+									{{ user.username }}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+
+					<!-- ACCESS -->
+					<div class="field">
+						<mat-form-field appearance="outline">
+							<mat-label>Access</mat-label>
+							<mat-select id="access" #access="matSelect" formControlName="access">
+								<mat-select-trigger *ngIf="aggregateForm.get('access').value">
+									<mat-icon>{{accessHandler.getAccessChoice(aggregateForm.get('access').value).icon}}</mat-icon>
+									{{ accessHandler.getAccessChoice(aggregateForm.get('access').value).verbose }}
+								</mat-select-trigger>
+								<mat-option [disabled]="!aggregateForm.get('access').value">-- Clear Selection --</mat-option>
+								<mat-option *ngFor="let option of accessHandler.accessChoices" [value]="option.value">
+									<mat-icon matPrefix>{{ option.icon }}</mat-icon>{{ option.verbose }}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+
+					<!-- Published -->
+					<div class="field">
+						<mat-form-field appearance="outline">
+							<mat-label>Article Published State</mat-label>
+							<mat-select id="published" #published="matSelect" formControlName="published">
+								<mat-option [disabled]="aggregateForm.get('published').value == undefined">-- Clear Selection --</mat-option>
+								<mat-option [value]="true">Published</mat-option>
+								<mat-option [value]="false">Unpublished</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+				</section-component>
+
+
+				<section-component header="User Filters">
+					<div class="field">
+						<!-- SEEN AFTER -->
+						<mat-form-field appearance="outline">
+							<mat-label>Seen After</mat-label>
+							<input matInput id="seenAfter" #seenAfterDate [matDatepicker]="seenAfterPicker"
+								   [max]="maxSeenAfterDate"
+								   formControlName="seenAfterDate" type="text" autocomplete="off">
+							<mat-datepicker-toggle matPrefix [for]="seenAfterPicker"></mat-datepicker-toggle>
+							<button *ngIf="aggregateForm.get('seenAfterDate').value" matSuffix mat-icon-button
+									(click)="aggregateForm.get('seenAfterDate').reset('')">
+								<mat-icon>clear</mat-icon>
+							</button>
+							<mat-datepicker #seenAfterPicker [touchUi]="mobileService.isMobile() | async"></mat-datepicker>
+						</mat-form-field>
+						<!-- SEEN BEFORE -->
+						<mat-form-field appearance="outline">
+							<mat-label>Seen Before</mat-label>
+							<input matInput id="seenBefore" #seenBeforeDate [matDatepicker]="seenBeforePicker"
+								   [max]="today" [min]="minSeenBeforeDate"
+								   formControlName="seenBeforeDate" type="text" autocomplete="off">
+							<mat-datepicker-toggle matPrefix [for]="seenBeforePicker"></mat-datepicker-toggle>
+							<button *ngIf="aggregateForm.get('seenBeforeDate').value" matSuffix mat-icon-button
+									(click)="aggregateForm.get('seenBeforeDate').reset('')">
+								<mat-icon>clear</mat-icon>
+							</button>
+							<mat-datepicker #seenBeforePicker [touchUi]="mobileService.isMobile() | async"></mat-datepicker>
+						</mat-form-field>
+					</div>
+
+					<!-- READ BY -->
+					<div class="field">
+						<mat-form-field appearance="outline">
+							<mat-label>Read by</mat-label>
+							<mat-select id="readBy" #readBy="matSelect" formControlName="readBy" multiple>
+								<mat-option *ngFor="let user of users | async" [value]="user._id">
+									{{ user.username }}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+
+					<!-- BROWSERS -->
+					<div class="field">
+						<mat-form-field appearance="outline">
+							<mat-label>Browsers</mat-label>
+							<mat-select id="browsers" #browser="matSelect" formControlName="browsers" multiple>
+								<mat-option *ngFor="let browser of browsers" [value]="browser">
+									{{ browser }}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+
+					<!-- UNWIND -->
+					<div class="field">
+						<mat-checkbox formControlName="unwind" class="full" labelPosition="before">
+							Show Log entries
+						</mat-checkbox>
+					</div>
+				</section-component>
+			</sectionwrapper-component>
+
+
+			<mat-action-row>
+				<button mat-raised-button class="submit" type="submit" [disabled]="!aggregateForm.valid || loading" color="primary">
+					Analyze
+				</button>
+			</mat-action-row>
+		</form>
+	</mat-expansion-panel>
+	<mat-expansion-panel [disabled]="!(data | async)" [expanded]="(state | async) == AnalyticsState.RESULTS" (opened)="setState(AnalyticsState.RESULTS)">
+		<mat-expansion-panel-header>Results</mat-expansion-panel-header>
+		<table-component *ngIf="aggregateForm.get('unwind').value" [settings]="unwindSettings" [data]="data | async"></table-component>
+		<table-component *ngIf="!aggregateForm.get('unwind').value" [settings]="settings" [data]="data | async"></table-component>
+	</mat-expansion-panel>
+</mat-accordion>

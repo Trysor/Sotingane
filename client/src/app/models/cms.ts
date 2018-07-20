@@ -1,5 +1,9 @@
 import { AccessRoles } from '@app/models/user';
 
+interface UserObject {
+	username: string;
+}
+
 export interface CmsContent {
 	// Always present
 	title: string;
@@ -12,9 +16,9 @@ export interface CmsContent {
 	content?: string;
 	nav?: boolean;
 	description?: string;
-	image?: string;
-	createdBy?: string;
-	updatedBy?: string;
+	images?: string[];
+	createdBy?: UserObject;
+	updatedBy?: UserObject;
 	createdAt?: Date;
 	updatedAt?: Date;
 	views?: number;
@@ -24,7 +28,7 @@ export interface CmsContent {
 export interface CmsAccess {
 	verbose: string;
 	icon: string;
-	value: string;
+	value: AccessRoles;
 }
 
 export interface CmsFolder {

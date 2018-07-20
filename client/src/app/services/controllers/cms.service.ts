@@ -2,7 +2,7 @@ import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { env } from '@env';
-import { CmsContent } from '@app/models';
+import { CmsContent, AccessRoles } from '@app/models';
 
 import { makeStateKey } from '@angular/platform-browser';
 const LIST_KEY = makeStateKey<CmsContent[]>('cmslist'),
@@ -18,6 +18,16 @@ import { tap } from 'rxjs/operators';
 @Injectable({ providedIn: 'root' })
 export class CMSService {
 	private _listSubject: BehaviorSubject<CmsContent[]> = new BehaviorSubject(null);
+	private _pageSubject: BehaviorSubject<CmsContent> = new BehaviorSubject(null);
+
+	private readonly _failedToLoad: CmsContent = {
+		access: AccessRoles.everyone,
+		title: 'Page not available',
+		content: 'Uhm. There appears to be nothing here. Sorry.',
+		description: '404 - Not found',
+		version: 0,
+		route: '',
+	};
 
 	constructor(
 		@Inject(PLATFORM_ID) private platformId: Object,
@@ -28,6 +38,11 @@ export class CMSService {
 		// Whenever a user logs in or out we should force-update.
 		authService.user.subscribe(user => this.getContentList(true));
 	}
+
+	public get content() {
+		return this._pageSubject;
+	}
+
 
 	/**
 	 * Gets the cmsRoutes as a BehaviorSubject
@@ -71,10 +86,13 @@ export class CMSService {
 	 * Requests the content from the given url
 	 * @return {Observable<CmsContent>}         Server's response, as an Observable
 	 */
-	public requestContent(contentUrl: string): Observable<CmsContent> {
-		return this.http.fromState(
+	public requestContent(contentUrl: string) {
+		this.http.fromState(
 			PAGE_KEY,
 			this.http.client.get<CmsContent>(this.http.apiUrl(env.API.cms.content + '/' + contentUrl))
+		).subscribe(
+			content => this._pageSubject.next(content),
+			error => this._pageSubject.next(this._failedToLoad)
 		);
 	}
 

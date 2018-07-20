@@ -1,24 +1,19 @@
 import { Component, OnDestroy, ChangeDetectionStrategy, Optional } from '@angular/core';
-import { NgForm, FormGroupDirective, FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, CanDeactivate } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
-import { MatSelectChange, ErrorStateMatcher } from '@angular/material';
+import { MatSelectChange } from '@angular/material';
 
 import { ModalService, CMSService, MobileService, AdminService } from '@app/services';
 import { CmsContent, CmsAccess, AccessRoles } from '@app/models';
+import { FormErrorInstant, AccessHandler } from '@app/classes';
 
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { takeUntil, debounceTime } from 'rxjs/operators';
 
 
 enum VersionHistory { Draft = -1 }
-
-export class FormErrorInstant implements ErrorStateMatcher {
-	isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-		return !!(control && control.errors && (control.touched || control.value.length > 0));
-	}
-}
 
 @Component({
 	selector: 'compose-component',
@@ -32,11 +27,7 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 	public originalContent: CmsContent; // When editing, the original content is kept here
 	// Access
 	public readonly AccessRoles = AccessRoles;
-	public readonly accessChoices: CmsAccess[] = [
-		{ value: AccessRoles.everyone, verbose: 'Everyone', icon: 'group' },
-		{ value: AccessRoles.user, verbose: 'Users', icon: 'verified_user' },
-		{ value: AccessRoles.admin, verbose: 'Admins', icon: 'security' }
-	];
+	public readonly accessHandler = new AccessHandler();
 
 	// History fields
 	public versionIndex: number = VersionHistory.Draft;
@@ -110,7 +101,7 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 				this.folders.filter(option => option.toLowerCase().includes(this.contentForm.get('folder').value.toLowerCase()))
 			);
 		});
-		this.contentForm.get('folder').valueChanges.subscribe(val => this.filteredFolders.next(
+		this.contentForm.get('folder').valueChanges.pipe(takeUntil(this._ngUnsub)).subscribe(val => this.filteredFolders.next(
 			this.folders.filter(option => option.toLowerCase().includes(val.toLowerCase()))
 		));
 
@@ -250,15 +241,6 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 			return;
 		}
 		onSubmit(this.cmsService.createContent(content));
-	}
-
-
-	/**
-	 * returns the CmsAccess value of the selected access privileges
-	 * @return {CmsAccess} the selected value
-	 */
-	public getAccessChoice(): CmsAccess {
-		return this.accessChoices.find(choice => this.contentForm.get('access').value === choice.value);
 	}
 
 	/**

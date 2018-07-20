@@ -1,5 +1,9 @@
 ﻿import { Request as Req, Response as Res, NextFunction as Next } from 'express';
+
+import { ajv, JSchema } from '../libs/validate';
+
 import { UserModel, User, accessRoles } from '../models/user';
+
 import { get as configGet } from 'config';
 import { status, ROUTE_STATUS, USERS_STATUS } from '../libs/validate';
 
@@ -68,3 +72,31 @@ export class UsersController {
 		UserModel.findById(user._id, patchUser);
 	}
 }
+
+const userAdminUpdateUser = {
+	'$id': JSchema.UserAdminUpdateUser,
+	'type': 'object',
+	'additionalProperties': false,
+	'properties': {
+		'_id': {
+			'type': 'string',
+			'maxLength': 24,
+			'minLength': 24
+		},
+		'username': {
+			'type': 'string',
+		},
+		'role': {
+			'type': 'string',
+			'enum': [accessRoles.admin, accessRoles.user]
+		}
+	},
+	'required': ['_id', 'username', 'role']
+};
+
+if (ajv.validateSchema(userAdminUpdateUser)) {
+	ajv.addSchema(userAdminUpdateUser, JSchema.UserAdminUpdateUser);
+} else {
+	console.error(`${JSchema.UserAdminUpdateUser} did not validate`);
+}
+

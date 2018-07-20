@@ -6,8 +6,11 @@ module.exports = {
 	entry: { server: './server.ts' },
 	resolve: { extensions: ['.js', '.ts'] },
 	target: 'node',
-	// Make sure we include all node_modules etc
+	// Make sure we don't include all node_modules
 	externals: [/node_modules/],
+	optimization: {
+		minimize: false,
+	},
 	output: {
 		path: path.join(__dirname, 'dist'),
 		filename: '[name].js'

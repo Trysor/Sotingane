@@ -1,8 +1,13 @@
 import { Request as Req, Response as Res, NextFunction as Next } from 'express';
+
+import { ajv, JSchema } from '../libs/validate';
+
 import { UserModel, User, accessRoles } from '../models/user';
+
 import { get as configGet, util as configUtil } from 'config';
-import { status, ROUTE_STATUS, AUTH_STATUS } from '../libs/validate';
 import { sign } from 'jsonwebtoken';
+
+import { status, ROUTE_STATUS, AUTH_STATUS } from '../libs/validate';
 
 const userTypes: accessRoles[] = [accessRoles.admin, accessRoles.user];
 
@@ -140,3 +145,90 @@ export class AuthController {
 		return res.status(200).send(status(AUTH_STATUS.ACCOUNT_DELETED));
 	}
 }
+
+
+
+/*
+ |--------------------------------------------------------------------------
+ | JSON schema
+ |--------------------------------------------------------------------------
+*/
+
+
+// Registration
+const userRegistrationSchema = {
+	'$id': JSchema.UserRegistrationSchema,
+	'type': 'object',
+	'additionalProperties': false,
+	'properties': {
+		'username': {
+			'type': 'string'
+		},
+		'role': {
+			'type': 'string',
+			'enum': [accessRoles.admin, accessRoles.user]
+		},
+		'password': {
+			'type': 'string'
+		}
+	},
+	'required': ['username', 'role', 'password']
+};
+
+if (ajv.validateSchema(userRegistrationSchema)) {
+	ajv.addSchema(userRegistrationSchema, JSchema.UserRegistrationSchema);
+} else {
+	console.error(`${JSchema.UserRegistrationSchema} did not validate`);
+}
+
+
+// Login
+const loginSchema = {
+	'$id': JSchema.UserLoginSchema,
+	'type': 'object',
+	'additionalProperties': false,
+	'properties': {
+		'username': {
+			'type': 'string'
+		},
+		'password': {
+			'type': 'string',
+		},
+	},
+	'required': ['username', 'password']
+};
+
+if (ajv.validateSchema(loginSchema)) {
+	ajv.addSchema(loginSchema, JSchema.UserLoginSchema);
+} else {
+	console.error(`${JSchema.UserLoginSchema} did not validate`);
+}
+
+
+
+// UpdatePassword
+const userUpdatePasswordSchema = {
+	'$id': JSchema.UserUpdatePasswordSchema,
+	'type': 'object',
+	'additionalProperties': false,
+	'properties': {
+		'currentPassword': {
+			'type': 'string'
+		},
+		'password': {
+			'type': 'string',
+		},
+		'confirm': {
+			'constant': { '$data': '1/password' } // equal to password
+		}
+	},
+	'required': ['currentPassword', 'password', 'confirm']
+};
+
+if (ajv.validateSchema(userUpdatePasswordSchema)) {
+	ajv.addSchema(userUpdatePasswordSchema, JSchema.UserUpdatePasswordSchema);
+} else {
+	console.error(`${JSchema.UserUpdatePasswordSchema} did not validate`);
+}
+
+

@@ -4,7 +4,7 @@ export * from './base-module/base.module';
 export * from './compose-module/compose.module';
 export * from './content-module/content.module';
 export * from './shared-module/shared.module';
-export * from './steam-module/steam.module';
 export * from './user-module/user.module';
+export * from './material.date.module';
 export * from './material.module';
 export * from './common.module';

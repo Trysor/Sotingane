@@ -15,10 +15,12 @@ import { filter, take } from 'rxjs/operators';
 export class SEOService {
 	private readonly _logo = new BehaviorSubject<object>(null);
 	private readonly _bread = new BehaviorSubject<object>(null);
+	private readonly _article = new BehaviorSubject<object>(null);
 
 
 	public get logo() { return this._logo; }
 	public get bread() { return this._bread; }
+	public get article() { return this._article; }
 
 	constructor(
 		private router: Router,
@@ -34,22 +36,29 @@ export class SEOService {
 		});
 
 		// Handle Breadcrumb
-		const setBread = (route: string) => {
-			const content = cmsService.getContentList(false).getValue().find(c => route.includes(c.route));
-			this._bread.next(this.seoBreadcrumb(this.httpService.urlBase + route, content));
+		const setRouteSEO = (route: string) => {
+			const content = cmsService.content.getValue();
+			const url = this.httpService.urlBase + route;
+
+			// Breadcrumbs go for all pages
+			this._bread.next(this.seoBreadcrumb(url, content));
+
+			// Articles go for CMS content only
+			if (content && content.images && content.images.length > 0) {
+				this._article.next(this.seoArticle(url, content));
+			} else {
+				this._article.next(null);
+			}
 		};
-		// Set breadcrumb for current url, once we have route data from CMS
-		// take(2) -- first is null, second is received from server
-		// The hook below is used for future navigation
-		cmsService.getContentList(false).pipe(take(2)).subscribe(contentList => {
-			if (contentList) { setBread(router.routerState.snapshot.url); }
+
+		// Hook content change
+		cmsService.content.subscribe((content) => {
+			if (content) { setRouteSEO(router.routerState.snapshot.url); }
 		});
 
 		// Hook for navigation events
-		router.events.pipe(
-			filter(e => e instanceof NavigationStart)
-		).subscribe(
-			(e: NavigationStart) => setBread(e.url)
+		router.events.pipe(filter(e => e instanceof NavigationStart)).subscribe(
+			(e: NavigationStart) => setRouteSEO(e.url)
 		);
 	}
 
@@ -80,5 +89,20 @@ export class SEOService {
 			}
 		});
 		return json;
+	}
+
+	private seoArticle(fullUrl: string, content: CmsContent): object {
+		return {
+			'@context': 'http://schema.org',
+			'@type': 'Article',
+			'headline': content.title,
+			'description': content.description,
+			'image': content.images,
+			'datePublished': content.createdAt,
+			'dateModified': content.updatedAt,
+			'author': {
+				'name': content.createdBy.username
+			}
+		};
 	}
 }

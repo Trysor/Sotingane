@@ -11,6 +11,7 @@ fs.readdirSync('node_modules').filter(function (x) {
 });
 
 module.exports = {
+	devtool: 'source-map',
 	mode: 'production',
 	entry: { api: './src/index.ts' },
 	resolve: { extensions: ['.js', '.ts'] },

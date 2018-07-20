@@ -1,10 +1,19 @@
 import { Request as Req, Response as Res, NextFunction as Next } from 'express';
+
+import { ajv, JSchema } from '../libs/validate';
+import { UAParser } from 'ua-parser-js';
+
 import { User, accessRoles } from '../models/user';
+import { Log, LogModel } from '../models/log';
 import { ContentModel, Content, ContentDoc } from '../models/content';
+
 import { status, ROUTE_STATUS, CMS_STATUS } from '../libs/validate';
-import { escape, isURL } from 'validator';
 import { sanitize, stripHTML } from '../libs/sanitizer';
 
+import { util as configUtil } from 'config';
+import { escape, isURL } from 'validator';
+
+const isProduction = configUtil.getEnv('NODE_ENV') === 'production';
 
 export class CMSController {
 
@@ -14,10 +23,16 @@ export class CMSController {
 	 * Retrieves the src of the first image if found.
 	 * @param html
 	 */
-	private static getImageSrcFromContent(html: string): string {
+	private static getImageSrcFromContent(html: string) {
 		// entire match, grouping, index, entire input
-		const match = CMSController.ImageSrcRegex.exec(html);
-		return match ? match[1] : undefined;
+		const images: string[] = [];
+
+		let match = CMSController.ImageSrcRegex.exec(html);
+		while (match != null) {
+			images.push(match[1]);
+			match = CMSController.ImageSrcRegex.exec(html);
+		}
+		return images;
 	}
 
 
@@ -51,32 +66,6 @@ export class CMSController {
 	}
 
 	/**
-	 * Gets all content
-	 * @param  {Req}		req  request
-	 * @param  {Res}		res  response
-	 * @param  {Next}		next next
-	 * @return {Res}		server response: a list of partial content information
-	 */
-	public static async getAdminContentList(req: Req, res: Res, next: Next) {
-		const contentList: Content[] = await ContentModel.aggregate([
-			{
-				$project: {
-					current: {
-						title: 1, route: 1, published: 1, access: 1, updatedAt: 1, createdAt: 1,
-						folder: 1, description: 1, nav: 1, views: '$views'
-					}
-				}
-			},
-			{ $replaceRoot: { newRoot: '$current' } },
-		]);
-		if (!contentList) {
-			return res.status(404).send(status(CMS_STATUS.NO_ROUTES));
-		}
-		res.status(200).send(contentList);
-	}
-
-
-	/**
 	 * Gets content of a given route, declared by the param
 	 * @param  {Req}		req  request
 	 * @param  {Res}		res  response
@@ -87,14 +76,12 @@ export class CMSController {
 		const route: string = req.params.route,
 			user: User = <User>req.user;
 
-		const contentDoc = <ContentDoc>await ContentModel.findOneAndUpdate(
+		const contentDoc = <ContentDoc>await ContentModel.findOne(
 			{ 'current.route': route, 'current.published': true },
-			{ $inc: { 'views': 1 } },
 			{
-				fields: {
-					'current.title': 1, 'current.access': 1, 'current.route': 1, 'current.content': 1, 'current.description': 1,
-					'current.updatedBy': 1, 'current.createdBy': 1, 'current.updatedAt': 1, 'current.createdAt': 1
-				}
+				'current.title': 1, 'current.access': 1, 'current.route': 1, 'current.content': 1, 'current.description': 1,
+				'current.updatedBy': 1, 'current.createdBy': 1, 'current.updatedAt': 1, 'current.createdAt': 1,
+				'current.images': 1
 			}
 		).populate([
 			{ path: 'current.updatedBy', select: 'username -_id' }, // exclude _id
@@ -107,29 +94,24 @@ export class CMSController {
 		if (!access) { return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED)); }
 
 		res.status(200).send(contentDoc.current);
-	}
 
-
-	/**
-	 * Gets all content of a given route, declared by the param
-	 * @param  {Req}		req  request
-	 * @param  {Res}		res  response
-	 * @param  {Next}		next next
-	 * @return {Res}		server response: the content object
-	 */
-	public static async getContentFull(req: Req, res: Res, next: Next) {
-		const route: string = req.params.route;
-
-		const contentDoc = <ContentDoc>await ContentModel.findOne(
-			{ 'current.route': route },
-			{ 'current': 1 }
-		).populate([
-			{ path: 'current.updatedBy', select: 'username -_id' }, // exclude _id
-			{ path: 'current.createdBy', select: 'username -_id' }  // exclude _id
-		]);
-
-		if (!contentDoc) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
-		res.status(200).send(contentDoc.current);
+		// Logging
+		const dnt = req.headers.dnt && isProduction; // Do not track header
+		const log = <Log>{
+			user: (user && !dnt) ? user._id : undefined,
+			route: contentDoc.current.route,
+			content: contentDoc._id,
+			ts: new Date()
+		};
+		if (!dnt) {
+			log.referer = <string>req.headers['referer'];
+			const browser = new UAParser(<string>req.headers['user-agent']).getBrowser();
+			if (browser && browser.name) {
+				log.browser = browser.name;
+				log.browser_ver = browser.version;
+			}
+		}
+		new LogModel(log).save();
 	}
 
 
@@ -187,7 +169,7 @@ export class CMSController {
 			content: sanitizedContent,
 			content_searchable: stripHTML(data.content),
 			description: sanitize(data.description),
-			image: CMSController.getImageSrcFromContent(sanitizedContent),
+			images: CMSController.getImageSrcFromContent(sanitizedContent),
 			nav: !!data.nav,
 			createdBy: user._id,
 			updatedBy: user._id,
@@ -236,7 +218,7 @@ export class CMSController {
 			content: sanitizedContent,
 			content_searchable: stripHTML(data.content),
 			description: sanitize(data.description),
-			image: CMSController.getImageSrcFromContent(sanitizedContent),
+			images: CMSController.getImageSrcFromContent(sanitizedContent),
 			nav: !!data.nav,
 			folder: data.folder ? stripHTML(data.folder).replace(/\//g, '') : '',
 			updatedBy: user._id,
@@ -298,13 +280,14 @@ export class CMSController {
 
 		const contentList: Content[] = await ContentModel.aggregate([
 			{ $match: { $text: { $search: searchTerm }, 'current.access': { $in: accessRights }, 'current.published': true } },
+			{ $lookup: { from: 'logs', localField: '_id', 'foreignField': 'content', as: 'views' } },
 			{ $sort: { score: { $meta: 'textScore' } } },
 			{ $limit: 1000 },
 			{
 				$project: {
 					current: {
-						title: 1, route: 1, access: 1, folder: 1, updatedAt: 1, views: '$views',
-						description: 1, image: 1, relevance: { $meta: 'textScore' }
+						title: 1, route: 1, access: 1, folder: 1, updatedAt: 1, views: { $size: '$views' },
+						description: 1, images: 1, relevance: { $meta: 'textScore' }
 					}
 				}
 			},
@@ -314,3 +297,57 @@ export class CMSController {
 		return res.status(200).send(contentList);
 	}
 }
+
+/*
+ |--------------------------------------------------------------------------
+ | JSON schema
+ |--------------------------------------------------------------------------
+*/
+
+const maxShortInputLength = 25;
+const maxLongInputLength = 300;
+
+const createPatchContentSchema = {
+	'$id': JSchema.ContentSchema,
+	'type': 'object',
+	'additionalProperties': false,
+	'properties': {
+		'title': {
+			'type': 'string',
+			'maxLength': maxShortInputLength
+		},
+		'access': {
+			'type': 'string',
+			'enum': [accessRoles.admin, accessRoles.user, accessRoles.everyone]
+		},
+		'published': {
+			'type': 'boolean'
+		},
+		'route': {
+			'type': 'string',
+			'maxLength': maxShortInputLength
+		},
+		'content': {
+			'type': 'string'
+		},
+		'description': {
+			'type': 'string',
+			'maxLength': maxLongInputLength
+		},
+		'folder': {
+			'type': 'string',
+			'maxLength': maxShortInputLength
+		},
+		'nav': {
+			'type': 'boolean'
+		}
+	},
+	'required': ['title', 'published', 'access', 'route', 'content', 'description', 'folder', 'nav']
+};
+
+if (ajv.validateSchema(createPatchContentSchema)) {
+	ajv.addSchema(createPatchContentSchema, JSchema.ContentSchema);
+} else {
+	console.error(`${JSchema.ContentSchema} did not validate`);
+}
+

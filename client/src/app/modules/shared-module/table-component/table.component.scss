@@ -11,6 +11,7 @@ mat-row {
 	&:last-child {
 		border: none;
 	}
+
 	&.click {
 		cursor: pointer;
 	}
@@ -27,8 +28,19 @@ mat-row {
 mat-header-cell,
 mat-cell {
 	padding-right: 3em;
+
+	span {
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+
+	&:first-child {
+		padding-left: 10px;
+	}
+
 	&:last-child {
-		padding: 0;
+		padding-right: 10px;
 	}
 }
 
@@ -36,12 +48,15 @@ mat-cell {
 .narrow {
 	text-align: center;
 	max-width: 42px;
-	padding-right: 0;
+	padding-right: 15px;
+	padding-left: 15px;
 }
+
 .rightAlign > * {
 	text-align: right;
 	width: 100%;
 }
+
 .rightAlignHeader ::ng-deep > div {
 	width: 100%;
 	justify-content: center;
@@ -51,6 +66,7 @@ mat-cell {
 span.hasIcon {
 	margin-left: 0.2em;
 }
+
 mat-icon {
 	vertical-align: middle;
 }

@@ -1,4 +1,7 @@
 /// <reference path="_theme_vars.scss" />
+/// <reference path="_mixins.scss" />
+
+@import '_mixins';
 
 html {
 	background: center top fixed linear-gradient(120deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 75%, var(--color-shade) 75%, var(--color-shade) 100%),
@@ -25,12 +28,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
+	@include shadedHeaderBox();
 	font-size: 1.4em;
 	margin: 0 0 1em 0;
 	padding: 7px;
-	background: var(--color-material);
-	border: var(--border);
-	box-shadow: var(--shadow), var(--shadow) inset;
 }
 
 h2 {
@@ -59,17 +60,16 @@ a {
 	background: rgba(0,0,0,0.7) !important;
 }*/
 
-.mat-expansion-panel {
-	background: none;
+
+mat-select {
+	mat-icon.mat-icon {
+		font-size: 1.2em;
+		margin: 0 2px 0 0;
+		vertical-align: text-top;
+		height: 18px; // fixing display bugs in Material
+	}
 }
 
-.mat-action-row,
-.mat-expansion-panel-header,
-.mat-expansion-panel-header.mat-expanded,
-.mat-expansion-panel-header:hover,
-.mat-expansion-panel-header.mat-expanded:hover {
-	background: var(--color-material) !important;
-}
 
 // Browser changes
 

@@ -22,7 +22,7 @@ export class UsersComponent implements OnDestroy {
 	private _ngUnsub = new Subject();
 	public data = new BehaviorSubject<User[]>(null);
 
-	public readonly settings: TableSettings = {
+	public readonly settings: TableSettings<User> = {
 		columns: [
 			{
 				header: 'Username',
@@ -31,13 +31,13 @@ export class UsersComponent implements OnDestroy {
 			{
 				header: 'Role',
 				property: 'role',
-				icon: (user: User): string => {
+				icon: user => {
 					switch (user.role) {
 						case AccessRoles.admin: { return 'security'; }
 						case AccessRoles.user: { return 'verified_user'; }
 					}
 				},
-				displayFormat: (user: User): string => {
+				val: user => {
 					switch (user.role) {
 						case AccessRoles.admin: { return 'Admin'; }
 						case AccessRoles.user: { return 'User'; }
@@ -47,7 +47,7 @@ export class UsersComponent implements OnDestroy {
 			{
 				header: 'Joined date',
 				property: 'createdAt',
-				displayFormat: (user: User): string => {
+				val: (user: User): string => {
 					return this.datePipe.transform(user.createdAt);
 				}
 			},
@@ -58,7 +58,7 @@ export class UsersComponent implements OnDestroy {
 				type: ColumnType.Button,
 				icon: () => 'settings',
 				noText: true,
-				func: (user: User, users: User[]) => {
+				func: (user, users) => {
 					this.dialog.open(
 						UserModalComponent,
 						<MatDialogConfig>{ data: <UserModalData>{ user: user, userList: users } }
@@ -66,7 +66,7 @@ export class UsersComponent implements OnDestroy {
 						if (closedResult) { this.updateList(); }
 					});
 				},
-				disabled: (user: User) => this.authService.isSameUser(user, this.authService.user.getValue()),
+				disabled: user => this.authService.isSameUser(user, this.authService.user.getValue()),
 				narrow: true
 			}
 		],

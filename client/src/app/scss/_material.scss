@@ -1,148 +1,8 @@
 /// <reference path="../../../node_modules/@angular/material/_theming.scss" />
 /// <reference path="_theme_vars.scss" />
+/// <reference path="_mixins.scss" />
 @import '../../../node_modules/@angular/material/theming';
-
-
-// ---------------------------------------
-// ---------------- VARS -----------------
-// ---------------------------------------
-
-$app-primary-map: (
-	1: #{var(--app-prim-1)}, 2:  #{var(--app-prim-2)}, 3:  #{var(--app-prim-3)},
-	contrast: (1: #{var(--app-prim-c-1)}, 2:  #{var(--app-prim-c-2)}, 3:  #{var(--app-prim-c-3)})
-);
-$app-accent-map: (
-	1: #{var(--app-acc-1)}, 2:  #{var(--app-acc-2)}, 3:  #{var(--app-acc-3)},
-	contrast: (1: #{var(--app-acc-c-1)}, 2:  #{var(--app-acc-c-2)}, 3:  #{var(--app-acc-c-3)})
-);
-
-$app-primary: ($app-primary-map, 1, 2, 3);
-$app-accent: ($app-accent-map, 1, 2, 3);
-
-// ---------------------------------------
-// ---------------- MXINS ----------------
-// ---------------------------------------
-
-@function mat-color($palette, $hue: default, $opacity: null) {
-	// If hueKey is a number between zero and one, then it actually contains an
-	// opacity value, so recall this function with the default hue and that given opacity.
-	@if type-of($hue) == number and $hue >= 0 and $hue <= 1 {
-		@return mat-color($palette, default, $hue);
-	}
-	$color: map-get($palette, $hue);
-	@if $opacity == null {
-		@return $color;
-	}
-	@return rgba($color, opacity($color));
-}
-
-
-// ---------------------------------------
-// ---------------- MXINS ----------------
-// ---------------------------------------
-
-
-@mixin mat-menu-theme($theme) {
-	$background: map-get($theme, background);
-	$foreground: map-get($theme, foreground);
-
-	.mat-menu-panel {
-		background: #{var(--color-material)};
-	}
-
-	.mat-menu-item {
-		background: transparent;
-		color: mat-color($foreground, 'text');
-
-		&[disabled] {
-			color: mat-color($foreground, 'disabled');
-		}
-	}
-
-	.mat-menu-item .mat-icon:not([color]),
-	.mat-menu-item-submenu-trigger::after {
-		color: mat-color($foreground, 'icon');
-	}
-
-	.mat-menu-item:hover,
-	.mat-menu-item.cdk-program-focused,
-	.mat-menu-item.cdk-keyboard-focused,
-	.mat-menu-item-highlighted {
-		&:not([disabled]) {
-			background: mat-color($background, 'hover');
-		}
-	}
-}
-
-@mixin mat-snack-bar-theme($theme) {
-	$is-dark-theme: map-get($theme, is-dark);
-	$accent: map-get($theme, accent);
-
-	.mat-snack-bar-container {
-		background: if($is-dark-theme, var(--color-material), #323232);
-		color: var(--color-text);
-	}
-
-	.mat-simple-snackbar-action {
-		color: if($is-dark-theme, inherit, mat-color($accent));
-	}
-}
-
-@mixin mat-table-theme($theme) {
-	$background: map-get($theme, background);
-	$foreground: map-get($theme, foreground);
-
-	.mat-header-row {
-		background: mat-color($background, 'card');
-	}
-
-	.mat-row, .mat-header-row {
-		border-bottom-color: mat-color($foreground, divider);
-	}
-
-	.mat-header-cell {
-		color: mat-color($foreground, secondary-text);
-	}
-
-	.mat-cell {
-		color: mat-color($foreground, text);
-	}
-} 
-
-
-
-@mixin mat-sidenav-theme($theme) {
-	$primary: map-get($theme, primary);
-	$accent: map-get($theme, accent);
-	$warn: map-get($theme, warn);
-	$background: map-get($theme, background);
-	$foreground: map-get($theme, foreground);
-
-	$drawer-backdrop-color: rgba(0,0,0,0.7);
-	$drawer-background-color: mat-color($background, dialog) !default;
-	$drawer-container-background-color: mat-color($background, background) !default;
-	$drawer-push-background-color: mat-color($background, dialog) !default;
-
-	.mat-drawer-container {
-		background-color: $drawer-container-background-color;
-		color: mat-color($foreground, text);
-	}
-
-	.mat-drawer {
-		background-color: $drawer-background-color;
-		color: mat-color($foreground, text);
-
-		&.mat-drawer-push {
-			background-color: $drawer-push-background-color;
-		}
-	}
-
-	.mat-drawer-backdrop.mat-drawer-shown {
-		background-color: $drawer-backdrop-color;
-	}
-}
-
-
+@import '_mixins';
 
 // ---------------------------------------
 // ---------------- THEME ----------------
@@ -226,6 +86,7 @@ $app-theme: custom-dark-theme(
 @include mat-form-field-theme($app-theme);
 @include mat-checkbox-theme($app-theme);
 @include mat-autocomplete-theme($app-theme);
+@include mat-datepicker-theme($app-theme);
 
 // Layout
 // @include mat-card-theme($app-theme);

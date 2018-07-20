@@ -3,7 +3,7 @@ import { MatPaginator, MatSort, MatTable, MatTableDataSource } from '@angular/ma
 
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 
-import { ColumnSettings, ColumnType, TableSettings, TableFilterSettings } from '@app/models';
+import { ColumnSettings, ColumnType, TableSettings, TableFilterSettings, Column } from '@app/models';
 import { MobileService } from '@app/services';
 
 import { Subject, Observable, BehaviorSubject } from 'rxjs';
@@ -19,7 +19,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 	@ViewChild(MatTable) table: MatTable<object>;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
 	@ViewChild(MatSort) sort: MatSort;
-	@Input() settings: TableSettings;
+	@Input() settings: TableSettings<any>;
 	@Input() filterSettings: TableFilterSettings = {}; // default empty object
 	@Input() set data(value: object[]) { this.Source.data = value || []; }
 
@@ -27,7 +27,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 
 	public readonly pageSizes = [10, 25, 50, 100];
 	public readonly Source = new MatTableDataSource<object>([]);
-	public displayedColumns: string[];
+	public displayedColumns: Column<any>[];
 
 	private readonly _ngUnsub = new Subject();
 	public readonly filterForm: FormGroup;
@@ -58,9 +58,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 				// only match against columns that are properties
 				if (!data.hasOwnProperty(col.property)) { continue; }
 
-				const val = col.displayFormat
-					? col.displayFormat(data, this.Source.data)
-					: data[col.property];
+				const val = col.val ? col.val(data, this.Source.data) : data[col.property];
 
 				// toString() for non-strings (e.g. views = number)
 				if (val.toString().trim().toLowerCase().includes(filter)) {
@@ -91,6 +89,12 @@ export class TableComponent implements OnInit, AfterViewInit {
 		this.Source.sort = this.sort;
 	}
 
+
+	public isInternalLink(link: string) {
+		return link.startsWith('/');
+	}
+
+
 	/**
 	 * method to perform the click function on a row
 	 * @param row
@@ -107,7 +111,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 	 * @param obj
 	 * @param e
 	 */
-	public buttonClick(col: ColumnSettings, obj: object, e: MouseEvent) {
+	public buttonClick(col: ColumnSettings<any>, obj: object, e: MouseEvent) {
 		col.func(obj, this.Source.data);
 		this.overrideClick(e);
 	}

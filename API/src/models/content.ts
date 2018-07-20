@@ -1,6 +1,5 @@
 import { Document, model, Model, Schema } from 'mongoose';
 import { NextFunction } from 'express';
-import { ajv, JSchema } from '../libs/validate';
 import { accessRoles } from '../models/user';
 
 /*
@@ -22,7 +21,7 @@ const schema = new Schema({
 		content_searchable: { type: String, required: true },
 
 		description: { type: String },
-		image: { type: String }, // url
+		images: [{ type: String }],
 
 		folder: { type: String },
 		nav: { type: Boolean, default: false },
@@ -34,12 +33,12 @@ const schema = new Schema({
 		createdAt: { type: Date, default: Date.now },
 	},
 
-	views: { type: Number, required: true, default: 0 },
 	prev: []
 },
 {
 	timestamps: true
 });
+
 // Searchable compound index
 schema.index(
 	{ 'current.title': 'text', 'current.content_searchable': 'text', 'current.description': 'text' },
@@ -70,7 +69,7 @@ export interface Content {
 	content_searchable?: string;
 
 	description?: string;
-	image?: string; // url
+	images?: string[]; // url
 
 	folder?: string;
 	nav?: boolean;
@@ -80,63 +79,6 @@ export interface Content {
 
 	updatedAt?: Date;
 	createdAt?: Date;
-}
-
-
-
-/*
- |--------------------------------------------------------------------------
- | JSON schema
- |--------------------------------------------------------------------------
-*/
-
-const maxShortInputLength = 25;
-const maxLongInputLength = 300;
-
-const createPatchContentSchema = {
-	'$id': JSchema.ContentSchema,
-	'type': 'object',
-	'additionalProperties': false,
-	'properties': {
-		'title': {
-			'type': 'string',
-			'maxLength': maxShortInputLength
-		},
-		'access': {
-			'type': 'string',
-			'enum': [accessRoles.admin, accessRoles.user, accessRoles.everyone]
-		},
-		'published': {
-			'type': 'boolean'
-		},
-		'route': {
-			'type': 'string',
-			'maxLength': maxShortInputLength
-		},
-		'content': {
-			'type': 'string'
-		},
-		'description': {
-			'type': 'string',
-			'maxLength': maxLongInputLength
-		},
-		'folder': {
-			'type': 'string',
-			'maxLength': maxShortInputLength
-		},
-		'nav': {
-			'type': 'boolean'
-		}
-	},
-	'required': ['title', 'published', 'access', 'route', 'content', 'description', 'folder', 'nav' ]
-};
-
-
-
-if (ajv.validateSchema(createPatchContentSchema)) {
-	ajv.addSchema(createPatchContentSchema, JSchema.ContentSchema);
-} else {
-	console.error(`${JSchema.ContentSchema} did not validate`);
 }
 
 export const ContentModel = model<ContentDoc>('Content', schema);

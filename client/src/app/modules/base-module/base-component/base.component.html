@@ -35,5 +35,5 @@
 </mat-sidenav-container>
 <seo-component [json]="seoService.logo | async"></seo-component>
 <seo-component [json]="seoService.bread | async"></seo-component>
-
+<seo-component *ngIf="seoService.article | async as article" [json]="article"></seo-component>
 

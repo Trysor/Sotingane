@@ -18,5 +18,6 @@ export const API = {
 	admin: {
 		users: '/api/admin/users',
 		cms: '/api/admin/cms',
+		aggregate: '/api/admin/cms/aggregate'
 	}
 };

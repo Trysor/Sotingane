@@ -1,6 +1,6 @@
 {
 	"secret": "testtesttesttesttesttesttesttesttesttest",
-	"database": "mongodb://localhost/sotingtest",
+	"database": "mongodb://localhost:27017/sotingtest",
 	"port": 2001,
 	"allowedOrigins": [
 		"localhost:2001"

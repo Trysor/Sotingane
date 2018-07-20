@@ -6,12 +6,11 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TransferHttpCacheModule } from '@nguniversal/common';
 
 // Directly load base module
-import { BaseModule } from '@app/modules';
+import { BaseModule, MaterialDateModule } from '@app/modules';
 import { BaseRoutingModule } from '@app/modules/base-module/base.routing-module';
 
-// Interceptors
+// Services
 import { InterceptorService } from '@app/services/http/interceptor.service';
-
 
 @NgModule({
 	declarations: [
@@ -21,10 +20,11 @@ import { InterceptorService } from '@app/services/http/interceptor.service';
 		BrowserModule.withServerTransition({ appId: 'soting' }), // must be in app.module
 		TransferHttpCacheModule,
 		BaseModule,
-		BaseRoutingModule
+		BaseRoutingModule,
+		MaterialDateModule
 	],
 	providers: [
-		{ provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true },
+		{ provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }
 	],
 	bootstrap: [AppComponent]
 })
