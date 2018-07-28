@@ -31,7 +31,6 @@ export interface AggregationResult {
 
 	logDataUser?: string; // id
 	logDataTs?: Date;
-	logDataReferer?: string;
 	logDataBrowser?: string;
 	logDataBrowserVer?: string;
 }
