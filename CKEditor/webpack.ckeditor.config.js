@@ -23,7 +23,7 @@ module.exports = {
 	},
 
 	optimization: { // Preserve CKEditor 5 license comments.
-		minimizer: [ new UglifyJsWebpackPlugin({ sourceMap: true, uglifyOptions: { output: { comments: /^!/ } }  }) ]
+		minimizer: [ new UglifyJsWebpackPlugin({ sourceMap: true, parallel: true, cache: true, uglifyOptions: { output: { comments: /^!/ } }  }) ]
 	},
 	module: {
 		rules: [
