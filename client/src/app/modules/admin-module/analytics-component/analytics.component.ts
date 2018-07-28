@@ -94,7 +94,7 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 			{
 				header: 'Timestamp',
 				property: 'logDataTs',
-				val: a => this.datePipe.transform(a.logDataTs, 'yyyy-MM-dd hh:mm:ss')
+				val: a => this.datePipe.transform(a.logDataTs, 'yyyy-MM-dd HH:mm:ss')
 				// DatePipe does not follow ISO standard for date formats
 			},
 			{
