@@ -104,7 +104,6 @@ export class CMSController {
 			ts: new Date()
 		};
 		if (!dnt) {
-			log.referer = <string>req.headers['referer'];
 			const browser = new UAParser(<string>req.headers['user-agent']).getBrowser();
 			if (browser && browser.name) {
 				log.browser = browser.name;
@@ -125,10 +124,6 @@ export class CMSController {
 	public static async getContentHistory(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route,
 			user: User = <User>req.user;
-
-		if (!user.isOfRole(accessRoles.admin)) {
-			return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED));
-		}
 
 		const contentDoc = await ContentModel.findOne({ 'current.route': route }, {
 			current: true, prev: true

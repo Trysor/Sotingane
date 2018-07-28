@@ -117,7 +117,6 @@ export class AdminController {
 		if (query.hasOwnProperty('unwind') && query.unwind) { // Add log data since we're unwinding
 			project['current']['logDataUser'] = '$views.user';
 			project['current']['logDataTs'] = '$views.ts';
-			project['current']['logDataReferer'] = '$views.referer';
 			project['current']['logDataBrowser'] = '$views.browser';
 			project['current']['logDataBrowserVer'] = '$views.browser_ver';
 		} else { // add views count if we're not unwinding

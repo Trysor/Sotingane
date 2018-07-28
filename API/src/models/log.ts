@@ -14,7 +14,6 @@ const schema = new Schema({
 	user: { type: Schema.Types.ObjectId, ref: 'User', required: false, index: true },
 	route: { type: String, required: true, index: true },
 	content: { type: Schema.Types.ObjectId, ref: 'Content', required: false },
-	referer: { type: String, required: false },
 	browser: { type: String, required: false },
 	browser_ver: { type: String, required: false },
 	ts: { type: Date, default: Date.now, required: true },
@@ -24,7 +23,6 @@ export interface Log extends Document {
 	user?: User;
 	route: string;
 	content: ContentDoc;
-	referer?: string;
 	browser?: string;
 	browser_ver?: string;
 	ts: Date;

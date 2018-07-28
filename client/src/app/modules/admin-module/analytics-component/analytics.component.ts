@@ -114,16 +114,12 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 				header: 'Browser',
 				property: 'logDataBrowser',
 				val: a => a.logDataBrowser ? `${a.logDataBrowser} ${a.logDataBrowserVer}` : 'Unknown'
-			},
-			{
-				header: 'Referer',
-				property: 'logDataReferer',
-			},
+			}
 		],
 		mobile: ['logDataTs', 'title', 'logDataUser'],
 
 		active: 'logDataTs',
-		dir: ColumnDir.ASC,
+		dir: ColumnDir.DESC,
 
 		trackBy: (index: number, a) => a.route
 	};
