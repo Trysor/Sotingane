@@ -1,7 +1,5 @@
-import { Injectable, Inject, Optional, PLATFORM_ID } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-
-import { isPlatformServer } from '@angular/common';
 
 import { MatSnackBar } from '@angular/material';
 
@@ -9,11 +7,12 @@ import { env } from '@env';
 import { User, UpdatePasswordUser, UserToken, AccessRoles } from '@app/models';
 
 import { HttpService } from '@app/services/http/http.service';
-import { ServerService } from '@app/services/http/server.service';
 import { TokenService } from '@app/services/utility/token.service';
+import { PlatformService } from '@app/services/utility/platform.service';
+
 
 import { Observable, Subscription, BehaviorSubject, timer, of } from 'rxjs';
-import { map, catchError, takeUntil } from 'rxjs/operators';
+import { map, catchError, takeUntil, finalize } from 'rxjs/operators';
 
 
 
@@ -27,28 +26,15 @@ export class AuthService {
 	}
 
 	constructor(
-		@Inject(PLATFORM_ID) private platformId: Object,
-		@Optional() private serverService: ServerService,
+		private platform: PlatformService,
 		private tokenService: TokenService,
 		private snackBar: MatSnackBar,
 		private http: HttpService,
 		private router: Router) {
 
-		// If we're on the server, request data about the user directly.
-		// This data is used for display-purposes only, for the initial browser render
-		if (isPlatformServer(platformId)) {
-			serverService.token.subscribe(serverToken => this.updateCurrentUserData(serverToken));
-			return;
-		}
-
-		// Browser: Get the token from the tokenService, update user data accordingly.
 		const token = tokenService.token;
-		if (!token || this.tokenService.jwtIsExpired(token)) {
-			tokenService.token = null;
-			return;
-		}
 		this.updateCurrentUserData(token);
-		this.engageRenewTokenTimer(token);
+		if (platform.isBrowser) { this.engageRenewTokenTimer(token); }
 	}
 
 
@@ -168,13 +154,18 @@ export class AuthService {
 	 * Log out current user
 	 */
 	public logOut() {
-		return this.http.client.post(this.http.apiUrl(env.API.auth.logout), null).subscribe(res => {
-			this.tokenService.token = null;
-			if (this._renewalSub) { this._renewalSub.unsubscribe(); }
-			this._userSubject.next(null);
+		if (this._userSubject.getValue() === null) { return; }
 
-			this.router.navigateByUrl('/');
-		});
+		// If this post errors out (401), then the API already deems you as an unauthorized user
+		return this.http.client.post(this.http.apiUrl(env.API.auth.logout), null).pipe(
+			finalize(() => {
+				this.tokenService.token = null;
+				if (this._renewalSub) { this._renewalSub.unsubscribe(); }
+				this._userSubject.next(null);
+
+				this.router.navigateByUrl('/');
+			})
+		).subscribe();
 	}
 
 	/**

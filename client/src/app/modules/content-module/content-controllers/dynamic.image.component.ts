@@ -1,17 +1,15 @@
-﻿import { Component, Renderer2, ElementRef, Optional, ChangeDetectionStrategy, ViewChild, Inject, PLATFORM_ID } from '@angular/core';
+﻿import { Component, Renderer2, ElementRef, Optional, ChangeDetectionStrategy, ViewChild } from '@angular/core';
 
 import { DynamicComponent } from '@app/models';
-
 import { ModalService } from '@app/services/utility/modal.service';
 import { IntersectionService } from '@app/services/utility/intersection.service';
 import { MobileService } from '@app/services/utility/mobile.service';
-import { ServerService } from '@app/services/http/server.service';
+import { PlatformService } from '@app/services/utility/platform.service';
 
 
 import { DynamicLazyLoader } from './dynamic.lazy.loader';
 
 import { takeUntil } from 'rxjs/operators';
-import { isPlatformServer } from '@angular/common';
 
 interface PictureSource {
 	src: string;
@@ -28,18 +26,16 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 	private _srcset: string;
 	private _imgEl: HTMLImageElement;
 	private readonly _sources: PictureSource[] = [];
-	private readonly _isServer: boolean;
 
 	constructor(
 		private elRef: ElementRef<HTMLElement>,
 		private inters: IntersectionService,
 		private renderer: Renderer2,
 		private mobileService: MobileService,
-		@Inject(PLATFORM_ID) private platformId: Object,
+		private platform: PlatformService,
 		@Optional() private modalService: ModalService) {
 
 		super(elRef, inters);
-		this._isServer = isPlatformServer(platformId);
 	}
 
 	buildJob(): void {
@@ -48,7 +44,7 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 		this.renderer.removeAttribute(this._imgEl, 'data-src');
 
 		// Add lazy tag
-		this.renderer.addClass(this.elRef.nativeElement, 'lazy');
+		if (!this.platform.isServer) { this.renderer.addClass(this.elRef.nativeElement, 'lazy'); }
 
 		// check for CDN logic
 		const output = /ucarecdn.com\/([A-Z0-9-]+)\//i.exec(src);
@@ -56,8 +52,8 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 			// Build our CDN image url string
 			const cdnstring = 'https://ucarecdn.com/' + output[1] + '/-/format/auto/';
 			// Add sources
-			if (this._isServer) {
-				 // small image for server side. We want the SPA to load asap.
+			if (this.platform.isServer) {
+				// small image for server side. We want the SPA to load asap.
 				this._sources.push({ media: null, src: cdnstring + '-/resize/500x/' });
 			} else {
 				this._sources.push({ media: '1500w', src: cdnstring });
@@ -81,7 +77,11 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 			}
 		});
 
-		this.hookLazyLoader(this.elRef.nativeElement);
+		if (this.platform.isServer) {
+			this.load();
+		} else {
+			this.hookLazyLoader(this.elRef.nativeElement);
+		}
 	}
 
 	load() {

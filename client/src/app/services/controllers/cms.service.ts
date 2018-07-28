@@ -1,4 +1,4 @@
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { env } from '@env';
@@ -30,7 +30,6 @@ export class CMSService {
 	};
 
 	constructor(
-		@Inject(PLATFORM_ID) private platformId: Object,
 		private authService: AuthService,
 		private http: HttpService,
 		private router: Router) {

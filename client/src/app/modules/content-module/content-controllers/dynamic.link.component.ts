@@ -1,10 +1,9 @@
-﻿import { Component, OnInit, Input, Inject, Renderer2, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+﻿import { Component, OnInit, Input, Renderer2, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-
-import { DOCUMENT } from '@angular/common';
 
 import { DynamicComponent } from '@app/models';
 
+import { PlatformService } from '@app/services/utility/platform.service';
 import { IntersectionService } from '@app/services/utility/intersection.service';
 import { DynamicLazyLoader } from './dynamic.lazy.loader';
 import { start } from 'repl';
@@ -85,7 +84,7 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 	private _img: HTMLElement;
 
 	constructor(
-		@Inject(DOCUMENT) private document: Document,
+		private platform: PlatformService,
 		private elRef: ElementRef<HTMLElement>,
 		private inters: IntersectionService,
 		private renderer: Renderer2,
@@ -95,8 +94,8 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 	}
 
 	ngOnInit() {
-		if (!this.document) { return; }
-		const origin = this.document.location.origin;
+		if (this.platform.isServer || !this.platform.document) { return; }
+		const origin = this.platform.document.location.origin;
 		if (this.link.startsWith('/') || this.link.startsWith(origin)) {
 			this.link = this.link.replace(origin, '');
 			this._isRemoteUrl = false;

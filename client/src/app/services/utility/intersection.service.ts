@@ -1,5 +1,6 @@
-﻿import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformServer } from '@angular/common';
+﻿import { Injectable } from '@angular/core';
+
+import { PlatformService } from '@app/services/utility/platform.service';
 
 import { Subject } from 'rxjs';
 
@@ -8,15 +9,11 @@ import { Subject } from 'rxjs';
 export class IntersectionService {
 	private _obs: IntersectionObserver;
 	private _subject = new Subject<IntersectionObserverEntry[]>();
-	private _isServer: boolean;
 
 	public get targets() { return this._subject; }
 
-	constructor(
-		@Inject(PLATFORM_ID) private platformId: Object) {
-
-		this._isServer = isPlatformServer(platformId);
-		if (this._isServer) { return; }
+	constructor(private platform: PlatformService) {
+		if (platform.isServer) { return; }
 
 		this._obs = new IntersectionObserver(
 			(entries: IntersectionObserverEntry[]) => {
@@ -35,7 +32,7 @@ export class IntersectionService {
 	 * @param el
 	 */
 	public observe(el: Element) {
-		if (!this._isServer) {
+		if (this.platform.isBrowser) {
 			this._obs.observe(el);
 			return;
 		}
@@ -58,7 +55,7 @@ export class IntersectionService {
 	 * @param el
 	 */
 	public unobserve(el: Element) {
-		if (this._isServer) { return; }
+		if (this.platform.isServer) { return; }
 		this._obs.unobserve(el);
 	}
 }

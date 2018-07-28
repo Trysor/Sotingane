@@ -1,24 +1,26 @@
-import { Injectable, NgZone, PLATFORM_ID, Inject, Optional } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
-import { isPlatformServer } from '@angular/common';
+
+import { MatSnackBar } from '@angular/material';
 
 import { env } from '@env';
+import { PlatformService } from '@app/services/utility/platform.service';
+
 
 import { interval } from 'rxjs';
 
-import { MatSnackBar } from '@angular/material';
 
 @Injectable()
 export class WorkerService {
 
 	constructor(
-		@Inject(PLATFORM_ID) private platformId: Object,
+		private platform: PlatformService,
 		private ngZone: NgZone,
 		private updates: SwUpdate,
 		private snackBar: MatSnackBar) {
 
 		if (!env.production) { return; }
-		if (isPlatformServer(platformId)) { return; }
+		if (platform.isServer) { return; }
 
 		// TODO: revert this back when it has been fixed
 		// interval(6 * 60 * 60).subscribe(() => updates.checkForUpdate());

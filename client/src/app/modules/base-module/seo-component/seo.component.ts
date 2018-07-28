@@ -1,4 +1,4 @@
-import { Component, PLATFORM_ID, Inject, HostBinding, Input, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
+import { Component, HostBinding, Input, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
@@ -10,11 +10,7 @@ export class SEOComponent implements OnChanges {
 	@Input() json: object;
 	@HostBinding('innerHTML') script: SafeHtml;
 
-	constructor(
-		@Inject(PLATFORM_ID) private platformId: Object,
-		private san: DomSanitizer) {
-
-	}
+	constructor( private san: DomSanitizer) { }
 
 	ngOnChanges(changes: SimpleChanges) {
 		this.script = this.toScript(changes.json.currentValue);

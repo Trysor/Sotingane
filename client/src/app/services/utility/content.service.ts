@@ -1,33 +1,26 @@
-﻿import {
-	Injectable, ElementRef, Optional, Inject, Injector, PLATFORM_ID,
-	ComponentRef, ComponentFactory, ComponentFactoryResolver
-} from '@angular/core';
-import { isPlatformServer } from '@angular/common';
+﻿import { Injectable, ElementRef, Optional, Injector, ComponentRef, ComponentFactory, ComponentFactoryResolver } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 
 import { env } from '@env';
-
 import { ServerService } from '@app/services/http/server.service';
+
 import { CmsContent, DynamicComponent } from '@app/models';
 
 import { DynamicLinkComponent } from '@app/modules/content-module/content-controllers/dynamic.link.component';
 import { DynamicImageComponent } from '@app/modules/content-module/content-controllers/dynamic.image.component';
 
+
 @Injectable({ providedIn: 'root' })
 export class ContentService {
-	private readonly _isPlatformServer;
 	private readonly _dynamicContent = new Map<string, ComponentFactory<DynamicComponent>>();
 	private readonly _embeddedComponents: ComponentRef<DynamicComponent>[] = [];
 
 	constructor(
 		@Optional() private server: ServerService, // This service only exists in SSR
-		@Inject(PLATFORM_ID) private platformId: Object,
 		private resolver: ComponentFactoryResolver,
 		private injector: Injector,
 		private title: Title,
 		private meta: Meta) {
-
-		this._isPlatformServer = isPlatformServer(platformId);
 
 		// Map the tag to replace with the corresponding factory
 		this._dynamicContent.set('a', resolver.resolveComponentFactory(DynamicLinkComponent));

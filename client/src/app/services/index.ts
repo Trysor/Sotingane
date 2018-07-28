@@ -13,6 +13,8 @@ export * from './utility/dateadapter.service';
 export * from './utility/intersection.service';
 export * from './utility/mobile.service';
 export * from './utility/modal.service';
+export * from './utility/platform.service';
 export * from './utility/loading.service';
 export * from './utility/seo.service';
+export * from './utility/storage.service';
 export * from './utility/token.service';
