@@ -66,8 +66,10 @@ export class CMSService {
 	 * @return {Observable<CmsContent[]>}       Server's response, as an Observable
 	 */
 	private requestContentList(): Observable<CmsContent[]> {
-		return this.http.client.get<CmsContent[]>(this.http.apiUrl(env.API.cms.content));
-		// return this.http.transferStateForRequest(LIST_KEY, this.http.get<CmsContent[]>(environment.URL.cms.content));
+		return this.http.fromState(
+			LIST_KEY,
+			this.http.client.get<CmsContent[]>(this.http.apiUrl(env.API.cms.content))
+		);
 	}
 
 	/**
