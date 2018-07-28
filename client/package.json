@@ -17,7 +17,6 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "analyze": "webpack-bundle-analyzer dist/browser/stats.json",
-    "smexplore": "source-map-explorer",
     "analyze:build": "ng build --prod --named-chunks --stats-json --source-map && webpack-bundle-analyzer dist/browser/stats.json"
   },
   "private": true,
@@ -68,7 +67,6 @@
     "karma-jasmine": "^1.1.2",
     "karma-jasmine-html-reporter": "^1.2.0",
     "karma-scss-preprocessor": "^3.0.0",
-    "source-map-explorer": "^1.5.0",
     "protractor": "^5.4.0",
     "ts-loader": "4.4.2",
     "ts-node": "^7.0.0",
