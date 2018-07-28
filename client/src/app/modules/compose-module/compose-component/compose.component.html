@@ -2,7 +2,7 @@
 <div class="compose" [ngClass]="{ mobile: (mobileService.isMobile() | async) }">
 	<form [formGroup]="contentForm" (ngSubmit)="submitForm()" id="contentForm">
 
-		<mat-tab-group class="demo-tab-group">
+		<mat-tab-group class="demo-tab-group" [(selectedIndex)]="tabIndex">
 			<mat-tab label="Page Settings">
 				<sectionwrapper-component>
 					<section-component header="Page Details">

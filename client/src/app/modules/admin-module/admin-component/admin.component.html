@@ -1,6 +1,6 @@
 <h1>Administration Control Panel</h1>
 
-<mat-tab-group>
+<mat-tab-group [(selectedIndex)]="tabIndex">
 	<mat-tab label="Users">
 		<ng-template matTabContent>
 			<users-component></users-component>

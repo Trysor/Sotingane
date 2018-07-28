@@ -1,4 +1,5 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { StorageService } from '@app/services';
 
 
 @Component({
@@ -7,4 +8,12 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 	styleUrls: ['./admin.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AdminComponent { }
+export class AdminComponent {
+
+	public get tabIndex() { return this.storage.getSession('adminTabIndex'); }
+	public set tabIndex(value: string) { this.storage.setSession('adminTabIndex', value); }
+
+	constructor(private storage: StorageService) {}
+
+
+}
