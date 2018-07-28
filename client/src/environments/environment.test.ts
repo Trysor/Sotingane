@@ -13,6 +13,8 @@ export const env = {
 		desc: 'Test desc',
 	},
 
+	ORG: 'Testers Org',
+
 	FOOTER: {
 		desc: 'Tests',
 		copyright: 'test copyright'

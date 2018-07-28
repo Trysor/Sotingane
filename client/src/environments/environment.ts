@@ -9,12 +9,14 @@ export const env = {
 	API_BASE: 'http://localhost:2000',
 
 	META: {
-		title: 'Sotingane',
-		desc: 'The home of Sotingane',
+		title: '<Page title>',
+		desc: '<Page desc>',
 	},
 
+	ORG: '<business>',
+
 	FOOTER: {
-		desc: 'Sotingane',
+		desc: '<footer text>',
 		copyright: 'Copyright © 2018 <name | business>. All rights reserved.'
 	}
 };
