@@ -49,7 +49,6 @@ export class AuthController {
 		return res.cookie('jwt', token, {
 			maxAge: expires * 1000,
 			secure: configUtil.getEnv('NODE_ENV') === 'production',
-			domain: req.hostname,
 			httpOnly: true,
 			sameSite: true
 		}).status(200).send({ token: token, user: user });
