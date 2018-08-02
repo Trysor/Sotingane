@@ -103,7 +103,7 @@ export class CMSController {
 			content: contentDoc._id,
 			ts: new Date()
 		};
-		if (!dnt) {
+		if (user || !dnt) {
 			const browser = new UAParser(<string>req.headers['user-agent']).getBrowser();
 			if (browser && browser.name) {
 				log.browser = browser.name;

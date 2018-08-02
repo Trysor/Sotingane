@@ -107,6 +107,7 @@ export const enum CMS_STATUS {
 
 export const enum ADMIN_STATUS {
 	AGGREGATION_RESULT_NONE_FOUND = 'Could not find data for the given query',
+	AGGREGATION_MONGOOSE_ERROR = 'There was an issue processing the aggregation',
 }
 
 export const enum USERS_STATUS {

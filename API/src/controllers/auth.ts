@@ -87,7 +87,7 @@ export class AuthController {
 
 		const userAlreadyExists = await UserModel.findOne({ username_lower: username.toLowerCase() }).lean();
 
-		// check if the email is already in use first
+		// check if the username is already in use first
 		if (userAlreadyExists) { return res.status(409).send(status(AUTH_STATUS.USERNAME_NOT_AVILIABLE)); }
 
 		const user = await new UserModel({
