@@ -20,12 +20,14 @@ export class AdminController {
 	 */
 	public static async getAdminContentList(req: Req, res: Res, next: Next) {
 		const contentList: Content[] = await ContentModel.aggregate([
-			{ $lookup: { from: 'logs', localField: '_id', 'foreignField': 'content', as: 'views' } },
+			{ $lookup: { from: 'logs', localField: '_id', foreignField: 'content', as: 'logData' } },
+			{ $unwind: { path: '$logData', preserveNullAndEmptyArrays: true } },
+			{ $group: { _id: '$_id', 'current': { $first: '$current' }, 'views': { $sum: 1 } } },
 			{
 				$project: {
 					current: {
 						title: 1, route: 1, published: 1, access: 1, updatedAt: 1, createdAt: 1,
-						folder: 1, description: 1, nav: 1, views: { $size: '$views' }
+						folder: 1, description: 1, nav: 1, views: '$views'
 					}
 				}
 			},
@@ -73,6 +75,7 @@ export class AdminController {
 	 */
 	public static async aggregateContent(req: Req, res: Res, next: Next) {
 		const query: AggregationQuery = req.body;
+		const unwind = query.hasOwnProperty('unwind') && query.unwind;
 
 		const match: any = {};
 		if (query.createdBy) { match['current.createdBy'] = mongoose.Types.ObjectId(query.createdBy); }		// CreatedBy
@@ -91,53 +94,64 @@ export class AdminController {
 		}
 
 		// User views Date handling
-		const userFilter: any[] = [];
+		const userFilter: any = {};
 		if (!!query.seenAfterDate && !!query.seenBeforeDate) {
-			userFilter.push({ '$gte': ['$ts', new Date(query.seenAfterDate)] });
-			userFilter.push({ '$lt': ['$ts', new Date(query.seenBeforeDate)] });
+			userFilter['logData.ts'] = { '$gte': new Date(query.seenAfterDate) };
+			userFilter['logData.ts'] = { '$lt': new Date(query.seenBeforeDate) };
 		} else if (!!query.seenAfterDate) {
-			userFilter.push({ '$gte': ['$ts', new Date(query.seenAfterDate)] });
+			userFilter['logData.ts'] = { '$gte': new Date(query.seenAfterDate) };
 		} else if (!!query.seenBeforeDate) {
-			userFilter.push({ '$lt': ['$ts', new Date(query.seenBeforeDate)] });
+			userFilter['logData.ts'] = { '$lt': new Date(query.seenBeforeDate) };
 		}
 		if (!!query.readBy && query.readBy.length > 0) { // Read by check (must compare against ObjectId)
-			userFilter.push({ $in: ['$user', query.readBy.map(id => mongoose.Types.ObjectId(id))] });
+			userFilter['logData.user'] = { $in: query.readBy.map(id => mongoose.Types.ObjectId(id)) };
 		}
 		if (!!query.browsers && query.browsers.length > 0) { // equality match. 100% equal.
-			userFilter.push({ $in: ['$browser', query.browsers] });
+			userFilter['logData.browser'] = { $in: query.browsers };
 		}
 
 		// Projecting
 		const project: any = {
 			current: {
-				title: 1, route: 1, access: 1, folder: 1, description: 1, images: 1,
+				title: 1, route: 1, access: 1, folder: 1, description: 1, // images: 1,
 				updatedAt: 1, createdAt: 1, updatedBy: 1, createdBy: 1
 			}
 		};
-		if (query.hasOwnProperty('unwind') && query.unwind) { // Add log data since we're unwinding
-			project['current']['logDataUser'] = '$views.user';
-			project['current']['logDataTs'] = '$views.ts';
-			project['current']['logDataBrowser'] = '$views.browser';
-			project['current']['logDataBrowserVer'] = '$views.browser_ver';
+		if (unwind) { // Add log data since we're unwinding
+			project['current']['logDataUser'] = '$logData.user';
+			project['current']['logDataTs'] = '$logData.ts';
+			project['current']['logDataBrowser'] = '$logData.browser';
+			project['current']['logDataBrowserVer'] = '$logData.browser_ver';
 		} else { // add views count if we're not unwinding
-			project['current']['views'] = { $size: '$views' };
+			project['current']['views'] = '$views';
 		}
 
 		const pipeline = [];
-		pipeline.push({ $match: match });								// Match against document
-		pipeline.push({													// Lookup logging data
-			$lookup: {
-				from: 'logs', as: 'views', let: { contentId: '$_id' },
-				pipeline: [{ $match: { $expr: { $and: [{ $eq: ['$content', '$$contentId'] }].concat(userFilter) } } }]
-			}
-		});
-		if (query.unwind) { pipeline.push({ '$unwind': '$views' }); }	// Conditional unwind
+		// Match against document
+		pipeline.push({ $match: match });
+		// Exclude uneeded data early
+		pipeline.push({ $project: { 'prev': false, 'current.content_searchable': false } });
+		// Lookup logData
+		pipeline.push({ $lookup: { from: 'logs', localField: '_id', foreignField: 'content', as: 'logData' } });
+		pipeline.push({ $unwind: { path: '$logData', preserveNullAndEmptyArrays: true } }); // Always unwind
+		pipeline.push({ $match: userFilter });
+		if (!unwind) { // Group up if we're aggregating log data
+			pipeline.push({ $group: { _id: '$_id', 'current': { $first: '$current' }, 'views': { $sum: 1 } } });
+		}
 		pipeline.push({ $project: project });							// Project results
 		pipeline.push({ $replaceRoot: { newRoot: '$current' } });		// Replace root
 
-		const results: any[] = await ContentModel.aggregate(pipeline);
-		if (!results || results.length === 0) { return res.status(200).send(status(ADMIN_STATUS.AGGREGATION_RESULT_NONE_FOUND)); }
-		return res.status(200).send(results);
+		try {
+			// Allow disk usage for this particular aggregation
+			const results: any[] = await ContentModel.aggregate(pipeline).allowDiskUse(true);
+			// console.log(JSON.stringify(results, null, 4));
+			// console.log('length: ', results.length);
+			if (!results || results.length === 0) { return res.status(200).send(status(ADMIN_STATUS.AGGREGATION_RESULT_NONE_FOUND)); }
+			return res.status(200).send(results);
+
+		} catch (e) {
+			return res.status(200).send(status(ADMIN_STATUS.AGGREGATION_MONGOOSE_ERROR));
+		}
 	}
 }
 

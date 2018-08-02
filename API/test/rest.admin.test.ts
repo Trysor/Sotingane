@@ -196,7 +196,6 @@ describe('REST: Admin', () => {
 	describe('/api/admin/cms/', () => {
 
 		it('GET /api/admin/cms/ 200', async () => {
-
 			const res = await TestBed.http.get('/api/admin/cms/').set('Cookie', TestBed.AdminCookie);
 
 			expect(res).to.have.status(200);
@@ -598,10 +597,8 @@ describe('REST: Admin', () => {
 
 			expect(resAfter2).to.have.status(200);
 			expect(resAfter2).to.have.property('body');
-			expect(resAfter2.body).to.be.an('array');
-			const contentFind2 = (<any[]>resAfter2.body).find((c: any) => c.route === content.route);
-			expect(contentFind2).to.not.be.an('undefined'); // to NOT be.
-			expect(contentFind2.views).to.equal(0); // the query after date is set *after* we checked out the page
+			expect(resAfter2.body).to.have.property('message');
+			expect(resAfter2.body.message).to.equal(ADMIN_STATUS.AGGREGATION_RESULT_NONE_FOUND);
 		});
 
 		it('POST /api/admin/cms/aggregate 200, seen before only', async () => {
@@ -638,8 +635,7 @@ describe('REST: Admin', () => {
 			expect(resBefore).to.have.property('body');
 			expect(resBefore.body).to.be.an('array');
 			const contentFind = (<any[]>resBefore.body).find((c: any) => c.route === content.route);
-			expect(contentFind).to.not.be.an('undefined'); // to NOT be undefined.
-			expect(contentFind.views).to.be.equal(0);
+			expect(contentFind).to.be.an('undefined'); // to be undefined. It wasn't seen before the date specified
 
 			// the second before was created AFTER the new content, and should thus include the content we POSTed above
 			expect(resBefore2).to.have.status(200);
@@ -678,14 +674,13 @@ describe('REST: Admin', () => {
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(query3),
 			]);
 
-			const resEdgeContent = (<Content[]>resEdge.body).find(c => c.route === content.route);
-			const resChromeContent = (<Content[]>resChrome.body).find(c => c.route === content.route);
-			const resBothContent = (<Content[]>resBoth.body).find(c => c.route === content.route);
-
 			expect(resEdge).to.have.status(200);
 			expect(resEdge).to.have.property('body');
-			expect(resEdge.body).to.be.an('array');
-			expect(resEdgeContent.views).to.be.equal(0);
+			expect(resEdge.body).to.have.property('message');
+			expect(resEdge.body.message).to.equal(ADMIN_STATUS.AGGREGATION_RESULT_NONE_FOUND);
+
+			const resChromeContent = (<Content[]>resChrome.body).find(c => c.route === content.route);
+			const resBothContent = (<Content[]>resBoth.body).find(c => c.route === content.route);
 
 			expect(resChrome).to.have.status(200);
 			expect(resChrome).to.have.property('body');
