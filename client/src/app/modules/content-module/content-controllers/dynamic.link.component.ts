@@ -94,15 +94,16 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 	}
 
 	ngOnInit() {
-		if (this.platform.isServer || !this.platform.document) { return; }
-		const origin = this.platform.document.location.origin;
-		if (this.link.startsWith('/') || this.link.startsWith(origin)) {
-			this.link = this.link.replace(origin, '');
-			this._isRemoteUrl = false;
-		}
-
 		// Protect against template issues
 		if (!this.elRef.nativeElement.parentNode) { return; }
+
+		if (this.platform.document) {
+			const origin = this.platform.document.location.origin;
+			if (this.link.startsWith('/') || this.link.startsWith(origin)) {
+				this.link = this.link.replace(origin, '');
+				this._isRemoteUrl = false;
+			}
+		}
 
 		// Create video instances
 		const url = this.link;
