@@ -26,7 +26,7 @@ export class HttpService {
 		private httpClient: HttpClient,
 		private iconRegistry: MatIconRegistry,
 		private san: DomSanitizer) {
-		
+
 		this._urlBase = platform.isServer
 			? this.serverService.urlBase
 			: `${document.location.protocol}//${document.location.hostname}`; // colon included in protocol

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpHeaders } from '@angular/common/http';
 
 import { env } from '@env';
 
@@ -7,7 +7,7 @@ import { TokenService } from '@app/services/utility/token.service';
 import { LoadingService } from '@app/services/utility/loading.service';
 
 import { Observable } from 'rxjs';
-import { timeout, take, finalize } from 'rxjs/operators';
+import { timeout, finalize } from 'rxjs/operators';
 
 
 @Injectable()
@@ -31,7 +31,7 @@ export class InterceptorService implements HttpInterceptor {
 
 		// Send it off to the next handle
 		return next.handle(req.clone({ headers: headers, withCredentials: true })).pipe(
-			timeout(env.TIMEOUT),						// Set global TIMEOUT for all API calls
+			timeout(env.TIMEOUT), // Set global TIMEOUT for all API calls
 			finalize(() => this.loadingService.removeRequest())
 		);
 	}
