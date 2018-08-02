@@ -27,8 +27,8 @@ export class SearchResultsComponent implements OnDestroy {
 				narrow: true,
 				noSort: true,
 				type: ColumnType.Image,
-				val: c => c.images[0],
-				val2: c => c.images[0]
+				val: c => (c.images && c.images.length > 0) ? c.images[0] : null,
+				val2: c => (c.images && c.images.length > 0) ? c.images[0] : null,
 			},
 			{
 				header: 'Title',
