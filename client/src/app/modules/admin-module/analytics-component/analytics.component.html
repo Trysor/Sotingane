@@ -1,8 +1,6 @@
-
-
 <mat-accordion [ngClass]="{ analyze: true, mobile: (mobileService.isMobile() | async) }">
 
-	<mat-expansion-panel [expanded]="(state | async) == AnalyticsState.QUERY" (opened)="setState(AnalyticsState.QUERY)">
+	<mat-expansion-panel [expanded]="(state | async) !== AnalyticsState.RESULTS" (opened)="setState(AnalyticsState.QUERY)">
 		<mat-expansion-panel-header>Query</mat-expansion-panel-header>
 
 		<form [formGroup]="aggregateForm" id="aggregateForm" autocomplete="off" (ngSubmit)="submitForm()">
@@ -164,7 +162,7 @@
 
 
 			<mat-action-row>
-				<button mat-raised-button class="submit" type="submit" [disabled]="!aggregateForm.valid || loading" color="primary">
+				<button mat-raised-button class="submit" type="submit" [disabled]="!aggregateForm.valid || (state | async) == AnalyticsState.LOADING" color="primary">
 					Analyze
 				</button>
 			</mat-action-row>

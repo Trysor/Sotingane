@@ -21,6 +21,7 @@ import { takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
 enum AnalyticsState {
 	QUERY,
+	LOADING,
 	RESULTS
 }
 
@@ -41,7 +42,6 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 	// Form handlers
 	public readonly aggregateForm: FormGroup; // Form
 	public readonly formErrorInstant = new FormErrorInstant(); // Form validation errors trigger instantly
-	public loading = false;
 
 	// Helpers
 	public readonly AccessRoles = AccessRoles;
@@ -206,16 +206,18 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 	public submitForm() {
 		const query: AggregationQuery = this.aggregateForm.value;
 
-		this.loading = true;
+		this.setState(AnalyticsState.LOADING);
 		this.adminService.getAggregatedData(query).subscribe(data => {
-			this.loading = false;
 			if (Array.isArray(data)) {
 				this.data.next(data);
 				this.setState(AnalyticsState.RESULTS);
 				return;
 			}
+			this.setState(AnalyticsState.QUERY);
 			this.data.next(null);
 			this.openSnackBar((<any>data).message);
+		}, err => {
+			this.setState(AnalyticsState.QUERY);
 		});
 	}
 
