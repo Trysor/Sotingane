@@ -6,8 +6,9 @@ import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 
 import {
-	CmsContent, AccessRoles, User, AggregationQuery, AggregationResult,
 	TableSettings, ColumnType, ColumnDir, ColumnSettings
+	CmsContent, AccessRoles, User,
+	AggregationQuery, AggregationResult, AggregationResultSummarized, AggregationResultUnwinded,
 } from '@app/models';
 import { ModalService, CMSService, AdminService, MobileService } from '@app/services';
 
@@ -89,7 +90,7 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 
 
 	// Results Settings
-	public readonly unwindSettings: TableSettings<AggregationResult> = {
+	public readonly unwindSettings: TableSettings<AggregationResultUnwinded> = {
 		columns: [
 			{
 				header: 'Timestamp',
@@ -125,7 +126,7 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 	};
 
 
-	public readonly settings: TableSettings<AggregationResult> = {
+	public readonly settings: TableSettings<AggregationResultSummarized> = {
 		columns: [
 			{
 				header: 'Title',
@@ -139,6 +140,12 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 				header: 'Views',
 				property: 'views',
 				val: (a) => a.views.toString()
+			},
+			{
+				header: 'Last visited',
+				property: 'lastVisit',
+				rightAlign: true,
+				val: (a) => this.datePipe.transform(a.lastVisit, 'yyyy-MM-dd HH:mm:ss')
 			}
 		],
 		mobile: ['title', 'route', 'views'],

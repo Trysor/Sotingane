@@ -15,7 +15,7 @@ export interface AggregationQuery {
 	unwind?: boolean;
 }
 
-export interface AggregationResult {
+interface AggregationResultGeneric {
 	title: string;
 	route: string;
 	access: AccessRoles;
@@ -26,12 +26,22 @@ export interface AggregationResult {
 	createdAt: Date;
 	updatedBy: User;
 	createdBy: User;
+}
 
+export interface AggregationResultSummarized extends AggregationResultGeneric {
 	views?: number;
+	lastVisit: Date;
+}
 
+export interface AggregationResultUnwinded extends AggregationResultGeneric {
 	logDataUser?: string; // id
 	logDataTs?: Date;
 	logDataBrowser?: string;
 	logDataBrowserVer?: string;
 }
+
+
+export type AggregationResult = AggregationResultSummarized | AggregationResultUnwinded;
+
+
 

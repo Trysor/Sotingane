@@ -124,7 +124,15 @@ export class AdminController {
 			project['current']['logDataBrowserVer'] = '$logData.browser_ver';
 		} else { // add views count if we're not unwinding
 			project['current']['views'] = '$views';
+			project['current']['lastVisit'] = '$lastVisit';
 		}
+
+		const group = {
+			_id: '$_id',
+			'current': { $first: '$current' },
+			'views': { $sum: 1 },
+			'lastVisit': { $last: '$logData.ts' }
+		};
 
 		const pipeline = [];
 		// Match against document
@@ -136,7 +144,7 @@ export class AdminController {
 		pipeline.push({ $unwind: { path: '$logData', preserveNullAndEmptyArrays: true } }); // Always unwind
 		pipeline.push({ $match: userFilter });
 		if (!unwind) { // Group up if we're aggregating log data
-			pipeline.push({ $group: { _id: '$_id', 'current': { $first: '$current' }, 'views': { $sum: 1 } } });
+			pipeline.push({ $group: group });
 		}
 		pipeline.push({ $project: project });							// Project results
 		pipeline.push({ $replaceRoot: { newRoot: '$current' } });		// Replace root
@@ -144,8 +152,6 @@ export class AdminController {
 		try {
 			// Allow disk usage for this particular aggregation
 			const results: any[] = await ContentModel.aggregate(pipeline).allowDiskUse(true);
-			// console.log(JSON.stringify(results, null, 4));
-			// console.log('length: ', results.length);
 			if (!results || results.length === 0) { return res.status(200).send(status(ADMIN_STATUS.AGGREGATION_RESULT_NONE_FOUND)); }
 			return res.status(200).send(results);
 
