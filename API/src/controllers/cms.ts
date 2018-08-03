@@ -273,23 +273,28 @@ export class CMSController {
 			if (user.role === accessRoles.admin) { accessRights.push(accessRoles.admin); }
 		}
 
-		const contentList: Content[] = await ContentModel.aggregate([
-			{ $match: { $text: { $search: searchTerm }, 'current.access': { $in: accessRights }, 'current.published': true } },
-			{ $lookup: { from: 'logs', localField: '_id', 'foreignField': 'content', as: 'views' } },
-			{ $sort: { score: { $meta: 'textScore' } } },
-			{ $limit: 1000 },
-			{
-				$project: {
-					current: {
-						title: 1, route: 1, access: 1, folder: 1, updatedAt: 1, views: { $size: '$views' },
-						description: 1, images: 1, relevance: { $meta: 'textScore' }
-					}
-				}
-			},
-			{ $replaceRoot: { newRoot: '$current' } },
-		]);
-		if (!contentList || contentList.length === 0) { return res.status(200).send(status(CMS_STATUS.SEARCH_RESULT_NONE_FOUND)); }
-		return res.status(200).send(contentList);
+		try {
+			const contentList: Content[] = await ContentModel.aggregate([
+				{ $match: { $text: { $search: searchTerm }, 'current.access': { $in: accessRights }, 'current.published': true } },
+				{ $project: { current: 1, relevance: { $meta: 'textScore' } } },
+				{ $lookup: { from: 'logs', localField: '_id', 'foreignField': 'content', as: 'logData' } },
+				{ $unwind: { path: '$logData', preserveNullAndEmptyArrays: true } },
+				{ $group: { _id: '$_id', 'current': { $first: '$current' }, 'views': { $sum: 1 }, 'relevance': { $first: '$relevance' } } },
+				{ $sort: { 'relevance': 1 } },
+				{ $limit: 1000 },
+				{ $project: { current: {
+					title: 1, route: 1, access: 1, folder: 1, updatedAt: 1, views: '$views',
+					description: 1, images: 1, relevance: '$relevance'
+				} } },
+				{ $replaceRoot: { newRoot: '$current' } }
+			]).allowDiskUse(true);
+
+			if (!contentList || contentList.length === 0) { return res.status(200).send(status(CMS_STATUS.SEARCH_RESULT_NONE_FOUND)); }
+			return res.status(200).send(contentList);
+
+		} catch (e) {
+			return res.status(200).send(status(CMS_STATUS.SEARCH_RESULT_MONGOOSE_ERROR));
+		}
 	}
 }
 
