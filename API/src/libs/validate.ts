@@ -103,6 +103,7 @@ export const enum CMS_STATUS {
 	DATA_UNABLE_TO_SAVE = 'Could not save. Internal server error',
 	CONTENT_DELETED = 'Content was successfully deleted',
 	SEARCH_RESULT_NONE_FOUND = 'Could not find content for the given search query',
+	SEARCH_RESULT_MONGOOSE_ERROR = 'There was an issue processing the search query',
 }
 
 export const enum ADMIN_STATUS {
