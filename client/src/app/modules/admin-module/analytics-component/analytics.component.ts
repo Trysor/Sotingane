@@ -6,9 +6,9 @@ import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 
 import {
-	TableSettings, ColumnType, ColumnDir, ColumnSettings
 	CmsContent, AccessRoles, User,
 	AggregationQuery, AggregationResult, AggregationResultSummarized, AggregationResultUnwinded,
+	TableSettings, ColumnType, ColumnSettings
 } from '@app/models';
 import { ModalService, CMSService, AdminService, MobileService } from '@app/services';
 
@@ -120,7 +120,7 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 		mobile: ['logDataTs', 'title', 'logDataUser'],
 
 		active: 'logDataTs',
-		dir: ColumnDir.DESC,
+		dir: 'desc',
 
 		trackBy: (index: number, a) => a.route
 	};
@@ -139,7 +139,8 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 			{
 				header: 'Views',
 				property: 'views',
-				val: (a) => a.views.toString()
+				rightAlign: true,
+				val: (a) => a.views
 			},
 			{
 				header: 'Last visited',
@@ -151,7 +152,7 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 		mobile: ['title', 'route', 'views'],
 
 		active: 'title',
-		dir: ColumnDir.ASC,
+		dir: 'asc',
 
 		trackBy: (index: number, a) => a.route
 	};

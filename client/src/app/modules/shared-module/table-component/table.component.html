@@ -22,31 +22,28 @@
 
 		<mat-cell *matCellDef="let obj" [ngClass]="{ narrow: col.narrow, rightAlign: col.rightAlign }" [ngSwitch]="col.type">
 
+			<ng-template #text>
+				<mat-icon *ngIf="col.icon" [color]="!!col.disabled && col.disabled(obj, Source.data) ? '' : (col.icon.color || 'primary')">
+					{{col.icon.val(obj)}}
+				</mat-icon>
+				<span *ngIf="!col.noText" [ngClass]="{ 'hasIcon': col.icon }">
+					{{ (col.val ? col.val(obj, Source.data) : obj[col.property]) | number }}
+				</span>
+			</ng-template>
+
 			<!-- Button -->
 			<button *ngSwitchCase="ColumnType.Button" mat-mini-fab (click)="buttonClick(col, obj, $event)"
 					[disabled]="!!col.disabled && col.disabled(obj, Source.data)">
-				<mat-icon *ngIf="col.icon" [color]="!!col.disabled && col.disabled(obj, Source.data) ? '' : (col.color || 'primary')">
-					{{col.icon(obj, Source.data)}}
-				</mat-icon>
-				<span *ngIf="!col.noText" [ngClass]="{ 'hasIcon': col.icon }">
-					{{col.val ? col.val(obj, Source.data) : obj[col.property]}}
-				</span>
+				<ng-container *ngTemplateOutlet="text"></ng-container>
 			</button>
 
 			<!-- Link -->
 			<a *ngSwitchCase="ColumnType.InternalLink" (click)="overrideClick($event)" [routerLink]="col.func(obj, Source.data)">
-				<mat-icon *ngIf="col.icon">{{col.icon(obj, Source.data)}}</mat-icon>
-				<span *ngIf="!col.noText" [ngClass]="{ 'hasIcon': col.icon }">
-					{{col.val ? col.val(obj, Source.data) : obj[col.property]}}
-				</span>
+				<ng-container *ngTemplateOutlet="text"></ng-container>
 			</a>
 			<a *ngSwitchCase="ColumnType.ExternalLink" (click)="overrideClick($event)" [href]="col.func(obj, Source.data)">
-				<mat-icon *ngIf="col.icon">{{col.icon(obj, Source.data)}}</mat-icon>
-				<span *ngIf="!col.noText" [ngClass]="{ 'hasIcon': col.icon }">
-					{{col.val ? col.val(obj, Source.data) : obj[col.property]}}
-				</span>
+				<ng-container *ngTemplateOutlet="text"></ng-container>
 			</a>
-
 
 			<!-- Image -->
 			<ng-container *ngSwitchCase="ColumnType.Image">
@@ -57,19 +54,17 @@
 
 			<!-- Default -->
 			<ng-container *ngSwitchDefault>
-				<mat-icon *ngIf="col.icon">{{col.icon(obj, Source.data)}}</mat-icon>
-				<span *ngIf="!col.noText" [ngClass]="{ 'hasIcon': col.icon }" [matTooltip]="col.tooltip && col.tooltip(obj, Source.data)" matTooltipPosition="above">
-					{{col.val ? col.val(obj, Source.data) : obj[col.property]}}
-				</span>
+				<ng-container *ngTemplateOutlet="text"></ng-container>
 			</ng-container>
 		</mat-cell>
 	</ng-container>
 </mat-table>
 
-<mat-paginator [length]="Source.data.length" [pageSize]="25" [hidePageSize]="mobileService.isMobile() | async"
-			   [pageSizeOptions]="pageSizes" showFirstLastButtons="true">
-</mat-paginator>
-
-<div class="count">
-	{{this.Source.data.length}}
+<div class="paginatorContainer">
+	<mat-paginator [length]="Source.data.length" [pageSize]="25" [hidePageSize]="mobileService.isMobile() | async"
+				   [pageSizeOptions]="pageSizes" showFirstLastButtons="true">
+	</mat-paginator>
+	<span class="count" *ngIf="Source.data && !(mobileService.isMobile() | async)">
+		Total: {{ this.Source.data.length | number }}
+	</span>
 </div>

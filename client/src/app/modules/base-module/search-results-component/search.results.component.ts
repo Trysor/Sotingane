@@ -3,7 +3,7 @@ import { Router, ActivatedRoute, NavigationEnd, NavigationStart } from '@angular
 import { DatePipe } from '@angular/common';
 
 import { CMSService, MobileService } from '@app/services';
-import { CmsContent, TableSettings, ColumnType, ColumnDir, TableFilterSettings } from '@app/models';
+import { CmsContent, TableSettings, ColumnType, TableFilterSettings } from '@app/models';
 
 import { Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil, take } from 'rxjs/operators';
@@ -58,7 +58,7 @@ export class SearchResultsComponent implements OnDestroy {
 		mobile: ['title', 'relevance'],
 
 		active: 'relevance',
-		dir: ColumnDir.DESC,
+		dir: 'desc',
 
 		trackBy: (index, c) => c.title,
 		rowClick: c => this.router.navigateByUrl('/' + c.route)

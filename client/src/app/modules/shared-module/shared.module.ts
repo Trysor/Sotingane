@@ -11,7 +11,7 @@ import { MaterialModule } from '../material.module';
 import { AuthGuard, AdminGuard, LoginGuard, DeactivateGuard } from '@app/guards';
 
 // Pipes
-import { TimeAgo } from '@app/pipes';
+import { TimeAgoPipe, NumberPipe } from '@app/pipes';
 import { DatePipe } from '@angular/common';
 
 // Components
@@ -34,13 +34,15 @@ import { TableComponent } from './table-component/table.component';
 		ReactiveFormsModule,
 		RouterModule,
 		HttpClientModule,
-		TimeAgo,
+		TimeAgoPipe,
+		NumberPipe,
 		SectionWrapperComponent,
 		SectionComponent,
 		TableComponent
 	],
 	declarations: [
-		TimeAgo,
+		TimeAgoPipe,
+		NumberPipe,
 		ModalComponent,
 		ImageModalComponent,
 		SectionWrapperComponent,

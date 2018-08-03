@@ -1,5 +1,19 @@
 /// <reference path="../../../scss/_theme_vars.scss" />
 
+
+.filterBox {
+	margin: 0 auto;
+	width: 250px;
+
+	&.mobile {
+		width: 80%;
+	}
+
+	.filter {
+		width: 100%;
+	}
+}
+
 // Row definitions
 mat-header-row {
 	box-shadow: var(--shadow), var(--shadow) inset;
@@ -117,29 +131,17 @@ mat-paginator {
 	}
 }
 
-.filterBox {
-	margin: 0 auto;
-	width: 250px;
-
-	&.mobile {
-		width: 80%;
-	}
-
-	.filter {
-		width: 100%;
-	}
-}
-
-.count {
-	font-weight: 500;
-	color: var(--color-text);
-	font-size: 12px;
-	position: absolute;
-	bottom: 16px;
-	left: 24px;
-	width: 100px;
-}
-
-:host {
+.paginatorContainer {
 	position: relative;
+
+	.count {
+		font-weight: 500;
+		color: var(--color-text);
+		font-size: 12px;
+		position: absolute;
+		bottom: 0;
+		left: 24px;
+		height: 42px;
+		line-height: 42px;
+	}
 }

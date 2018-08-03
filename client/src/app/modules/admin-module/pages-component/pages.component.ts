@@ -3,7 +3,7 @@ import { Component, Optional, OnDestroy, ChangeDetectionStrategy } from '@angula
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
-import { CmsContent, AccessRoles, TableSettings, ColumnType, ColumnDir } from '@app/models';
+import { CmsContent, AccessRoles, TableSettings, ColumnType } from '@app/models';
 import { ModalService, CMSService, AdminService, MobileService } from '@app/services';
 
 import { AccessHandler } from '@app/classes';
@@ -30,7 +30,7 @@ export class PagesComponent implements OnDestroy {
 				property: 'edit',
 				noSort: true,
 				type: ColumnType.InternalLink,
-				icon: () => 'mode_edit',
+				icon: { val: () => 'mode_edit' },
 				noText: true,
 				func: c => `/compose/${c.route}`,
 				narrow: true,
@@ -51,7 +51,7 @@ export class PagesComponent implements OnDestroy {
 			{
 				header: 'Access',
 				property: 'access',
-				icon: c => this._accessHandler.getAccessChoice(c.access).icon,
+				icon: { val: c => this._accessHandler.getAccessChoice(c.access).icon },
 				val: c => this._accessHandler.getAccessChoice(c.access).verbose
 			},
 			{
@@ -78,8 +78,10 @@ export class PagesComponent implements OnDestroy {
 				property: 'delete',
 				noSort: true,
 				type: ColumnType.Button,
-				icon: () => 'delete',
-				color: 'warn',
+				icon: {
+					val: () => 'delete',
+					color: 'warn'
+				},
 				noText: true,
 				func: c => this.modalService.openDeleteContentModal(c),
 				disabled: c => c.route === 'home',
@@ -89,7 +91,7 @@ export class PagesComponent implements OnDestroy {
 		mobile: ['title', 'views', 'edit'],
 
 		active: 'title',
-		dir: ColumnDir.ASC,
+		dir: 'asc',
 
 		trackBy: (index, item) => item.route,
 		rowClick: c => this.router.navigateByUrl('/' + c.route)
