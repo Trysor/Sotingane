@@ -1,10 +1,9 @@
 ﻿import { expect } from 'chai';
 
-import { ContentModel, Content } from '../src/models/content';
+import { ContentModel, Content, accessRoles } from '../src/models';
 import { status, ROUTE_STATUS, CMS_STATUS, VALIDATION_FAILED, USERS_STATUS } from '../src/libs/validate';
 
 import { TestBed, AdminUser, TestUser } from './testbed';
-import { accessRoles } from '../src/models/user';
 
 // ---------------------------------
 // ------- Content TestSuite -------

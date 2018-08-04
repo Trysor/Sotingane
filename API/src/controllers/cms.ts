@@ -1,17 +1,14 @@
 import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
-import { ajv, JSchema } from '../libs/validate';
 import { UAParser } from 'ua-parser-js';
-
-import { User, accessRoles } from '../models/user';
-import { Log, LogModel } from '../models/log';
-import { ContentModel, Content, ContentDoc } from '../models/content';
-
-import { status, ROUTE_STATUS, CMS_STATUS } from '../libs/validate';
-import { sanitize, stripHTML } from '../libs/sanitizer';
-
 import { util as configUtil } from 'config';
 import { escape, isURL } from 'validator';
+
+import { sanitize, stripHTML } from '../libs/sanitizer';
+
+import { status, ajv, JSchema, ROUTE_STATUS, CMS_STATUS } from '../libs/validate';
+import { UserModel, User, accessRoles, Log, LogModel, ContentModel, Content, ContentEntry } from '../models';
+
 
 const isProduction = configUtil.getEnv('NODE_ENV') === 'production';
 
@@ -76,7 +73,7 @@ export class CMSController {
 		const route: string = req.params.route,
 			user: User = <User>req.user;
 
-		const contentDoc = <ContentDoc>await ContentModel.findOne(
+		const contentDoc = <ContentEntry>await ContentModel.findOne(
 			{ 'current.route': route, 'current.published': true },
 			{
 				'current.title': 1, 'current.access': 1, 'current.route': 1, 'current.content': 1, 'current.description': 1,
@@ -86,7 +83,7 @@ export class CMSController {
 		).populate([
 			{ path: 'current.updatedBy', select: 'username -_id' }, // exclude _id
 			{ path: 'current.createdBy', select: 'username -_id' }  // exclude _id
-		]);
+		]).lean();
 
 		if (!contentDoc) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
 
@@ -122,12 +119,11 @@ export class CMSController {
 	 * @return {Res}		server response: the content history array
 	 */
 	public static async getContentHistory(req: Req, res: Res, next: Next) {
-		const route: string = req.params.route,
-			user: User = <User>req.user;
+		const route: string = req.params.route;
 
 		const contentDoc = await ContentModel.findOne({ 'current.route': route }, {
 			current: true, prev: true
-		});
+		}).lean();
 		if (!contentDoc) {
 			return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND));
 		}
@@ -147,10 +143,6 @@ export class CMSController {
 	public static async createContent(req: Req, res: Res, next: Next) {
 		const data: Content = req.body,
 			user: User = <User>req.user;
-
-		if (!user.isOfRole(accessRoles.admin)) {
-			return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED));
-		}
 
 		// insert ONLY sanitized and escaped data!
 		const sanitizedContent = sanitize(data.content);
@@ -194,12 +186,8 @@ export class CMSController {
 			data: Content = req.body,
 			user: User = <User>req.user;
 
-		if (!user.isOfRole(accessRoles.admin)) {
-			return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED));
-		}
-
 		// Fetch current version
-		const contentDoc = <ContentDoc>await ContentModel.findOne({ 'current.route': route }, { prev: false }).lean();
+		const contentDoc = <ContentEntry>await ContentModel.findOne({ 'current.route': route }, { prev: false }).lean();
 
 		if (!contentDoc) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
 
@@ -228,7 +216,7 @@ export class CMSController {
 				$push: { prev: { $each: [contentDoc.current], $position: 0, $slice: 10 } }
 			},
 			{ new: true }
-		);
+		).lean();
 
 		if (!updated) { return res.status(500).send(status(CMS_STATUS.DATA_UNABLE_TO_SAVE)); }
 		return res.status(200).send(updated.current);

@@ -2,10 +2,10 @@
 	"name": "sotingserver",
 	"version": "1.0.0",
 	"description": "Server backend for Sotingane",
-	"main": "dist/index.js",
+	"main": "dist/api.js",
 	"scripts": {
 		"build": "tsc",
-		"dev": "tsc-watch --onSuccess \"node dist/out-tsc/src/index.js\"",
+		"dev": "tsc-watch --onSuccess \"node dist/out-tsc/src/app.js\"",
 		"lint": "tslint -c tslint.json 'src/**/*.ts'",
 		"test:cont": "tsc-watch --onSuccess \"cross-env NODE_ENV=test node dist/out-tsc/test/testbed.js\"",
 		"test": "npm run build && cross-env NODE_ENV=test node dist/out-tsc/test/testbed.js",

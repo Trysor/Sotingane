@@ -1,6 +1,7 @@
 import { Document, model, Model, Schema } from 'mongoose';
 import { hash, compare } from 'bcrypt';
 import { NextFunction } from 'express';
+
 import { ajv, JSchema } from '../libs/validate';
 
 const SALT_FACTOR = 12;
@@ -44,7 +45,7 @@ const schema = new Schema({
 	timestamps: { createdAt: true, updatedAt: false }
 });
 
-export interface User extends Document {
+export interface User {
 	username: string;
 	username_lower?: string;
 	password?: string;
@@ -53,6 +54,7 @@ export interface User extends Document {
 	comparePassword?: (candidatePassword: string) => Promise<boolean>;
 	isOfRole?: (role: accessRoles) => boolean;
 	canAccess?: (level: accessRoles) => boolean;
+	_id: any;
 }
 
 /*
@@ -64,7 +66,7 @@ export interface User extends Document {
 
 // Before saving do the following
 schema.pre('save', function (next: NextFunction) {
-	const u = <User>this; // hard-casting
+	const u = <UserDoc>this; // hard-casting
 	if (!u.isModified('password')) { return next(); }
 	hash(u.password, SALT_FACTOR, (err, hashed) => {
 		if (err) { return next(err); }
@@ -97,5 +99,5 @@ schema.methods.canAccess = function (level: accessRoles): boolean {
 	return level === accessRoles.everyone || u.role === accessRoles.admin || u.isOfRole(level);
 };
 
-
-export let UserModel = model<User>('User', schema);
+export interface UserDoc extends User, Document { }
+export let UserModel = model<UserDoc>('User', schema);

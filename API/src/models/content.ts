@@ -46,7 +46,7 @@ schema.index(
 );
 
 
-export interface ContentDoc extends Document {
+export interface ContentEntry {
 	current: Content;
 	prev: Content[];
 
@@ -54,7 +54,9 @@ export interface ContentDoc extends Document {
 
 	updatedAt?: Date;
 	createdAt?: Date;
+	_id: any;
 }
+
 
 export interface Content {
 	title: string;
@@ -81,4 +83,5 @@ export interface Content {
 	createdAt?: Date;
 }
 
+interface ContentDoc extends ContentEntry, Document { }
 export const ContentModel = model<ContentDoc>('Content', schema);

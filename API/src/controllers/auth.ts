@@ -1,13 +1,11 @@
 import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
-import { ajv, JSchema } from '../libs/validate';
-
-import { UserModel, User, accessRoles } from '../models/user';
-
 import { get as configGet, util as configUtil } from 'config';
 import { sign } from 'jsonwebtoken';
 
-import { status, ROUTE_STATUS, AUTH_STATUS } from '../libs/validate';
+import { status, ajv, JSchema, ROUTE_STATUS, AUTH_STATUS } from '../libs/validate';
+import { UserModel, User, UserDoc, accessRoles } from '../models';
+
 
 const userTypes: accessRoles[] = [accessRoles.admin, accessRoles.user];
 
@@ -113,7 +111,7 @@ export class AuthController {
 		const currentPassword: string = req.body.currentPassword,
 			password: string = req.body.password,
 			confirm: string = req.body.confirm,
-			user: User = <User>req.user;
+			user: UserDoc = <UserDoc>req.user;
 
 		const isMatch = await user.comparePassword(currentPassword);
 		if (!isMatch) { return res.status(401).send(status(AUTH_STATUS.PASSWORD_DID_NOT_MATCH)); }
@@ -132,15 +130,13 @@ export class AuthController {
 	 * @return {Res}          server response
 	 */
 	public static async deleteAccount(req: Req, res: Res, next: Next) {
-		const id: string = req.body.id,
-			user: User = <User>req.user;
+		const id: string = req.body.id;
 
-		if (!user.isOfRole(accessRoles.admin)) {
-			return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED));
+		try {
+			await UserModel.findByIdAndRemove(id).lean();
+		} catch (e) {
+			return res.status(400).send(status(AUTH_STATUS.USER_ID_NOT_FOUND));
 		}
-		await UserModel.findByIdAndRemove(id).lean();
-
-		// if (err) { return res.status(400).send(status(AUTH_STATUS.USER_ID_NOT_FOUND)); }
 		return res.status(200).send(status(AUTH_STATUS.ACCOUNT_DELETED));
 	}
 }

@@ -8,12 +8,10 @@ import * as Mocha from 'mocha';
 import { readdirSync } from 'fs';
 import { join as pathjoin } from 'path';
 
-import { ContentModel } from '../src/models/content';
-import { LogModel } from '../src/models/log';
-import { UserModel, User, accessRoles } from '../src/models/user';
-import { TokenResponse } from '../src/controllers/auth';
+import { ContentModel, LogModel, UserModel, User, accessRoles } from '../src/models';
+import { TokenResponse } from '../src/controllers';
 
-import app from '../src/index';
+import app from '../src/app';
 
 export class TestBedSingleton {
 	private _http: ChaiHttp.Agent;

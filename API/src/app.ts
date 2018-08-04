@@ -2,14 +2,12 @@ import * as express from 'express';
 import { get as configGet, util as configUtil } from 'config';
 import 'source-map-support/register';
 
-import { Setup } from './libs/setup';
-
-// routing
-import { AppRouter } from './router';
-
-// boot
 import * as mongoose from 'mongoose';
 import { Server } from 'http';
+
+import { Setup } from './libs/setup';
+import { AppRouter } from './router';
+
 
 class App {
 	public app: express.Express;

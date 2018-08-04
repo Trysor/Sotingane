@@ -1,6 +1,6 @@
 ﻿import { Document, model, Schema } from 'mongoose';
 import { User } from '../models/user';
-import { ContentDoc } from '../models/content';
+import { ContentEntry } from '../models/content';
 
 /*
  |--------------------------------------------------------------------------
@@ -19,13 +19,15 @@ const schema = new Schema({
 	ts: { type: Date, default: Date.now, required: true },
 });
 
-export interface Log extends Document {
+export interface Log {
 	user?: User;
 	route: string;
-	content: ContentDoc;
+	content: ContentEntry;
 	browser?: string;
 	browser_ver?: string;
 	ts: Date;
+	_id: any;
 }
 
-export let LogModel = model<Log>('Log', schema);
+export interface LogDoc extends Log, Document { }
+export let LogModel = model<LogDoc>('Log', schema);

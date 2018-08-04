@@ -2,10 +2,12 @@ import { get as configGet } from 'config';
 import { ExtractJwt, Strategy as JwtStrategy, StrategyOptions as jwtOptions, VerifiedCallback } from 'passport-jwt';
 import { verify } from 'jsonwebtoken';
 import { Strategy as LocalStrategy, IStrategyOptions as localOptions } from 'passport-local';
-import { UserModel, User } from '../models/user';
 import { use as passportUse, authenticate, Strategy } from 'passport';
 import { Handler } from 'express';
 import { Request, Response, NextFunction } from 'express';
+
+import { UserModel, User } from '../models';
+
 
 const localOptions: localOptions = {
 	usernameField: 'username'
@@ -60,8 +62,7 @@ const configureForUser = (req: Request, res: Response, next: NextFunction) => {
 	const token = jwtOptions.jwtFromRequest(req);
 	verify(token, jwtOptions.secretOrKey, jwtOptions, async (err, tokenPayload: any) => {
 		if (err) { return next(); }
-		const user = await UserModel.findById(tokenPayload._id);
-		req.user = user;
+		req.user = await UserModel.findById(tokenPayload._id);
 		next();
 	});
 };

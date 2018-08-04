@@ -5,17 +5,14 @@ import { util as configUtil } from 'config';
 import { authenticate } from 'passport';
 import { PassportConfig } from './libs/passportConfig';
 
-import { accessRoles } from './models/user';
+import { accessRoles } from './models';
 
 // Validation
 import { JSchema, validateSchema, VALIDATION_FAILED } from './libs/validate';
 
 // Controllers
-import { AdminController } from './controllers/admin';
-import { AuthController } from './controllers/auth';
-import { CMSController } from './controllers/cms';
-import { UsersController } from './controllers/users';
-import { ErrorController } from './controllers/error';
+import { AdminController, AuthController, CMSController, UsersController, ErrorController } from './controllers';
+
 
 
 // Require login/auth

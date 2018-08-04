@@ -1,14 +1,12 @@
 ﻿import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
-import { ajv, JSchema, ADMIN_STATUS } from '../libs/validate';
 import * as mongoose from 'mongoose';
+import { Document, MongooseDocument } from 'mongoose';
 import { UAParser } from 'ua-parser-js';
 
-import { User, accessRoles } from '../models/user';
-import { Log, LogModel } from '../models/log';
-import { ContentModel, Content, ContentDoc } from '../models/content';
+import { status, ajv, JSchema, ADMIN_STATUS, ROUTE_STATUS, CMS_STATUS } from '../libs/validate';
+import { User, accessRoles, Log, LogModel, ContentModel, Content, ContentEntry } from '../models';
 
-import { status, ROUTE_STATUS, CMS_STATUS } from '../libs/validate';
 
 export class AdminController {
 	/**
@@ -51,13 +49,13 @@ export class AdminController {
 	public static async getContentFull(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route;
 
-		const contentDoc = <ContentDoc>await ContentModel.findOne(
+		const contentDoc = <ContentEntry>await ContentModel.findOne(
 			{ 'current.route': route },
 			{ 'current': 1 }
 		).populate([
 			{ path: 'current.updatedBy', select: 'username -_id' }, // exclude _id
 			{ path: 'current.createdBy', select: 'username -_id' }  // exclude _id
-		]);
+		]).lean();
 
 		if (!contentDoc) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
 		res.status(200).send(contentDoc.current);

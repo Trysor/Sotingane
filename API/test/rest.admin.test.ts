@@ -1,13 +1,13 @@
 import { expect } from 'chai';
+import { fail } from 'assert';
 
-import { ContentModel, Content } from '../src/models/content';
+
+import { ContentModel, Content, accessRoles, LogModel } from '../src/models';
 import { status, ROUTE_STATUS, CMS_STATUS, VALIDATION_FAILED, USERS_STATUS, ADMIN_STATUS } from '../src/libs/validate';
+import { AggregationQuery } from '../src/controllers';
 
 import { TestBed, AdminUser, TestUser } from './testbed';
-import { accessRoles } from '../src/models/user';
-import { AggregationQuery } from '../src/controllers/admin';
-import { fail } from 'assert';
-import { LogModel } from '../src/models/log';
+
 
 // ---------------------------------
 // ------- Content TestSuite -------
@@ -764,6 +764,7 @@ describe('REST: Admin', () => {
 			expect(resContent).to.have.property('title');
 			expect(resContent).to.have.property('route');
 			expect(resContent).to.have.property('views');
+			expect(resContent).to.have.property('lastVisit');
 
 			expect(resContent.title).to.be.equal(content.title);
 			expect(resContent.route).to.be.equal(content.route);

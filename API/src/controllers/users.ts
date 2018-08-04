@@ -1,14 +1,12 @@
 ﻿import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
-import { ajv, JSchema } from '../libs/validate';
-
-import { UserModel, User, accessRoles } from '../models/user';
-
 import { get as configGet } from 'config';
-import { status, ROUTE_STATUS, USERS_STATUS } from '../libs/validate';
+
+import { status, ajv, JSchema, ROUTE_STATUS, USERS_STATUS } from '../libs/validate';
+import { UserModel, User, accessRoles, UserDoc } from '../models';
+
 
 const userTypes: accessRoles[] = [accessRoles.admin, accessRoles.user];
-
 
 
 export class UsersController {
@@ -43,7 +41,7 @@ export class UsersController {
 			return res.status(400).send(status(USERS_STATUS.DATA_UNPROCESSABLE));
 		}
 
-		const patchUser = (err: any, patchingUser: User) => {
+		const patchUser = (err: any, patchingUser: UserDoc) => {
 			if (err) { return res.status(400).send(status(USERS_STATUS.DATA_UNPROCESSABLE)); }
 
 			patchingUser.username = user.username;
