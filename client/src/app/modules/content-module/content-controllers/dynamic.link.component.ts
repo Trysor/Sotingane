@@ -6,7 +6,6 @@ import { DynamicComponent } from '@app/models';
 import { PlatformService } from '@app/services/utility/platform.service';
 import { IntersectionService } from '@app/services/utility/intersection.service';
 import { DynamicLazyLoader } from './dynamic.lazy.loader';
-import { start } from 'repl';
 
 interface VideoFilter {
 	site: VideoSite;
@@ -140,8 +139,16 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 		this._isVideo = true;
 
 		// Create the wrapper
-		const wrapper = this.renderer.createElement('div');
+		const wrapper: HTMLDivElement = this.renderer.createElement('div');
 		this.renderer.addClass(wrapper, 'video');
+
+		// Add lazy tag
+		if (this.platform.isBrowser) {
+			this.renderer.addClass(this._iframe, 'iframelazy');
+			this.renderer.addClass(wrapper, 'lazy');
+		}
+		this.renderer.listen(this._img, 'load', () => this.renderer.removeClass(wrapper, 'lazy'));
+
 
 		// Set common attributes
 		this.renderer.setAttribute(this._iframe, 'frameBorder', '0');
@@ -175,6 +182,7 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 	load() {
 		this.renderer.setAttribute(this._iframe, 'src', this._iframe.getAttribute('data-src'));
 		this.renderer.removeAttribute(this._iframe, 'data-src');
+		this.renderer.listen(this._iframe, 'load', () => this.renderer.removeClass(this._iframe, 'iframelazy'));
 	}
 
 	/**

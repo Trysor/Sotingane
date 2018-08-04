@@ -44,7 +44,7 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 		this.renderer.removeAttribute(this._imgEl, 'data-src');
 
 		// Add lazy tag
-		if (!this.platform.isServer) { this.renderer.addClass(this.elRef.nativeElement, 'lazy'); }
+		if (this.platform.isBrowser) { this.renderer.addClass(this.elRef.nativeElement, 'lazy'); }
 
 		// check for CDN logic
 		const output = /ucarecdn.com\/([A-Z0-9-]+)\//i.exec(src);
