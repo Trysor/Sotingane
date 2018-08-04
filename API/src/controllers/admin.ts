@@ -77,15 +77,15 @@ export class AdminController {
 		const query: AggregationQuery = req.body;
 		const unwind = query.hasOwnProperty('unwind') && query.unwind;
 
+		// Content filtering
 		const match: any = {};
 		if (query.createdBy) { match['current.createdBy'] = mongoose.Types.ObjectId(query.createdBy); }		// CreatedBy
 		if (query.access) { match['current.access'] = query.access; }										// Access
 		if (query.hasOwnProperty('published')) { match['current.published'] = query.published; }			// Published
-		if (query.route) { match['current.route'] = query.route; }											// Route
+		if (query.route) { match['current.route'] = query.route.toLowerCase(); }							// Route
 		if (query.folder) { match['current.folder'] = query.folder; }										// Folder
 
-		// Content Date handling
-		if (!!query.createdAfterDate && !!query.createdBeforeDate) {
+		if (!!query.createdAfterDate && !!query.createdBeforeDate) {										// CreatedAt
 			match['current.createdAt'] = { '$gte': new Date(query.createdAfterDate), '$lt': new Date(query.createdBeforeDate) };
 		} else if (query.createdAfterDate) {
 			match['current.createdAt'] = { '$gte': new Date(query.createdAfterDate) };
@@ -93,11 +93,10 @@ export class AdminController {
 			match['current.createdAt'] = { '$lt': new Date(query.createdBeforeDate) };
 		}
 
-		// User views Date handling
+		// LogData filtering
 		const userFilter: any = {};
 		if (!!query.seenAfterDate && !!query.seenBeforeDate) {
-			userFilter['logData.ts'] = { '$gte': new Date(query.seenAfterDate) };
-			userFilter['logData.ts'] = { '$lt': new Date(query.seenBeforeDate) };
+			userFilter['logData.ts'] = { '$gte': new Date(query.seenAfterDate), '$lt': new Date(query.seenBeforeDate) };
 		} else if (!!query.seenAfterDate) {
 			userFilter['logData.ts'] = { '$gte': new Date(query.seenAfterDate) };
 		} else if (!!query.seenBeforeDate) {
@@ -109,6 +108,14 @@ export class AdminController {
 		if (!!query.browsers && query.browsers.length > 0) { // equality match. 100% equal.
 			userFilter['logData.browser'] = { $in: query.browsers };
 		}
+
+		// Content-LogData grouping
+		const group = {
+			_id: '$_id',
+			'current': { $first: '$current' },
+			'views': { $sum: 1 },
+			'lastVisit': { $last: '$logData.ts' }
+		};
 
 		// Projecting
 		const project: any = {
@@ -127,12 +134,6 @@ export class AdminController {
 			project['current']['lastVisit'] = '$lastVisit';
 		}
 
-		const group = {
-			_id: '$_id',
-			'current': { $first: '$current' },
-			'views': { $sum: 1 },
-			'lastVisit': { $last: '$logData.ts' }
-		};
 
 		const pipeline = [];
 		// Match against document
@@ -142,10 +143,8 @@ export class AdminController {
 		// Lookup logData
 		pipeline.push({ $lookup: { from: 'logs', localField: '_id', foreignField: 'content', as: 'logData' } });
 		pipeline.push({ $unwind: { path: '$logData', preserveNullAndEmptyArrays: true } }); // Always unwind
-		pipeline.push({ $match: userFilter });
-		if (!unwind) { // Group up if we're aggregating log data
-			pipeline.push({ $group: group });
-		}
+		pipeline.push({ $match: userFilter });							// Run another match to filter on logData
+		if (!unwind) { pipeline.push({ $group: group }); }				// Group up if we're aggregating log data
 		pipeline.push({ $project: project });							// Project results
 		pipeline.push({ $replaceRoot: { newRoot: '$current' } });		// Replace root
 
@@ -201,3 +200,4 @@ if (ajv.validateSchema(adminAggregationSchema)) {
 } else {
 	console.error(`${JSchema.AdminAggregationSchema} did not validate`);
 }
+
