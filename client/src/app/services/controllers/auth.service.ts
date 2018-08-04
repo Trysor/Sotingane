@@ -65,14 +65,17 @@ export class AuthService {
 		// Engage a new timer to go off 20 minutes before expiration token
 		const renewalDate = new Date(this.tokenService.jwtExpirationDate(token).getTime() - 1000 * 60 * 20);
 		this._renewalSub = timer(renewalDate).subscribe(time => {
-			this.renewToken().subscribe(userToken => {
-				if (userToken.token) {
-					this.engageRenewTokenTimer(userToken.token);
-					return;
-				}
-				this.openSnackBar('Session expired', '');
-				this.logOut();
-			});
+			this.renewToken().subscribe(
+				userToken => {
+					if (userToken.token) {
+						this.tokenService.token = userToken.token;
+						this.engageRenewTokenTimer(userToken.token);
+						return;
+					}
+					this.logOut({ expired: true });
+				},
+				err => this.logOut({ expired: true })
+			);
 		});
 	}
 
@@ -88,7 +91,7 @@ export class AuthService {
 	 * @param  {string} message The message that is to be displayed
 	 * @param  {string} action  the action message that is to be displayed
 	 */
-	private openSnackBar(message: string, action: string) {
+	private openSnackBar(message: string, action?: string) {
 		this.snackBar.open(message, action, {
 			duration: 5000,
 		});
@@ -153,7 +156,8 @@ export class AuthService {
 	/**
 	 * Log out current user
 	 */
-	public logOut() {
+	public logOut(opts?: { expired: boolean }) {
+		if (opts && opts.expired) { this.openSnackBar('Session expired'); }
 		if (this._userSubject.getValue() === null) { return; }
 
 		// If this post errors out (401), then the API already deems you as an unauthorized user
@@ -170,15 +174,10 @@ export class AuthService {
 
 	/**
 	 * Attempt to renew JWT token
-	 * @return {Observable<boolean>} wether the JWT was successfully renewed
+	 * @return {Observable<boolean>} whether the JWT was successfully renewed
 	 */
-	public renewToken(): Observable<UserToken> {
-		return this.http.client.get<UserToken>(this.http.apiUrl(env.API.auth.token)).pipe(
-			map(userToken => {
-				this.tokenService.token = userToken.token;    // Set token
-				return userToken;
-			}),
-		);
+	private renewToken(): Observable<UserToken> {
+		return this.http.client.get<UserToken>(this.http.apiUrl(env.API.auth.token));
 	}
 
 	/**
