@@ -8,7 +8,7 @@ import * as Mocha from 'mocha';
 import { readdirSync } from 'fs';
 import { join as pathjoin } from 'path';
 
-import { ContentModel, LogModel, UserModel, User, accessRoles } from '../src/models';
+import { ContentModel, LogModel, UserModel, User, accessRoles, UserDoc } from '../src/models';
 import { TokenResponse } from '../src/controllers';
 
 import app from '../src/app';
@@ -17,13 +17,13 @@ export class TestBedSingleton {
 	private _http: ChaiHttp.Agent;
 
 	public get http() { return this._http; }
-	public AdminUser: User;
+	public AdminUser: UserDoc;
 	public AdminCookie: string;
 
-	public AdminUser2: User;
+	public AdminUser2: UserDoc;
 	public Admin2Cookie: string;
 
-	public User: User;
+	public User: UserDoc;
 	public UserCookie: string;
 
 	constructor() {
@@ -70,7 +70,7 @@ export class TestBedSingleton {
 	}
 
 
-	private async createUser(user: Partial<User>): Promise<{ user: User, cookie: string }> {
+	private async createUser(user: Partial<User>): Promise<{ user: UserDoc, cookie: string }> {
 		const userObj = await new UserModel(user).save();
 		const res = await TestBed.http.post('/api/auth/login').send({ username: user.username, password: user.password });
 
