@@ -1,11 +1,11 @@
 ﻿import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
 import * as mongoose from 'mongoose';
-import { Document, MongooseDocument } from 'mongoose';
 import { UAParser } from 'ua-parser-js';
 
 import { status, ajv, JSchema, ADMIN_STATUS, ROUTE_STATUS, CMS_STATUS } from '../libs/validate';
 import { User, accessRoles, Log, LogModel, ContentModel, Content, ContentEntry } from '../models';
+
 
 
 export class AdminController {
@@ -91,6 +91,18 @@ export class AdminController {
 			match['current.createdAt'] = { '$lt': new Date(query.createdBeforeDate) };
 		}
 
+		// Early exclude
+		const earlyExclude = {
+			prev: 0, updatedAt: 0, createdAt: 0,
+			current: {
+				content: 0, content_searchable: 0, folder: 0, nav: 0, description: 0, images: 0
+			}
+		};
+
+		// Lookup and unwind
+		const lookup = { from: 'logs', localField: '_id', foreignField: 'content', as: 'logData' };
+		const unwindPipeline = { path: '$logData', preserveNullAndEmptyArrays: true };
+
 		// LogData filtering
 		const userFilter: any = {};
 		if (!!query.seenAfterDate && !!query.seenBeforeDate) {
@@ -117,30 +129,25 @@ export class AdminController {
 
 		// Projecting
 		const project: any = {
-			current: {
-				title: 1, route: 1, access: 1, folder: 1, description: 1, // images: 1,
-				updatedAt: 1, createdAt: 1, updatedBy: 1, createdBy: 1
-			}
+			current: { title: 1, route: 1, access: 1 }
 		};
 		if (unwind) { // Add log data since we're unwinding
+			project['current']['logDataId'] = '$logData._id';
 			project['current']['logDataUser'] = '$logData.user';
 			project['current']['logDataTs'] = '$logData.ts';
 			project['current']['logDataBrowser'] = '$logData.browser';
 			project['current']['logDataBrowserVer'] = '$logData.browser_ver';
-		} else { // add views count if we're not unwinding
+		} else { // Else we summarize
 			project['current']['views'] = '$views';
 			project['current']['lastVisit'] = '$lastVisit';
 		}
 
-
+		// Pipeline
 		const pipeline = [];
-		// Match against document
-		pipeline.push({ $match: match });
-		// Exclude uneeded data early
-		pipeline.push({ $project: { 'prev': false, 'current.content_searchable': false } });
-		// Lookup logData
-		pipeline.push({ $lookup: { from: 'logs', localField: '_id', foreignField: 'content', as: 'logData' } });
-		pipeline.push({ $unwind: { path: '$logData', preserveNullAndEmptyArrays: true } }); // Always unwind
+		pipeline.push({ $match: match });								// Match against document
+		pipeline.push({ $project: earlyExclude });						// Exclude uneeded data early
+		pipeline.push({ $lookup: lookup });								// Lookup logData
+		pipeline.push({ $unwind: unwindPipeline });						// Always unwind
 		pipeline.push({ $match: userFilter });							// Run another match to filter on logData
 		if (!unwind) { pipeline.push({ $group: group }); }				// Group up if we're aggregating log data
 		pipeline.push({ $project: project });							// Project results

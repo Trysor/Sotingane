@@ -29,13 +29,14 @@ interface AggregationResultGeneric {
 }
 
 export interface AggregationResultSummarized extends AggregationResultGeneric {
-	views?: number;
-	lastVisit: Date;
+	views: number;
+	lastVisit: string; // comes through as string
 }
 
 export interface AggregationResultUnwinded extends AggregationResultGeneric {
-	logDataUser?: string; // id
-	logDataTs?: Date;
+	logDataId: string;
+	logDataTs: string; // comes through as string
+	logDataUser?: string; // userid
 	logDataBrowser?: string;
 	logDataBrowserVer?: string;
 }

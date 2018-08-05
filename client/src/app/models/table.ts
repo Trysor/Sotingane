@@ -8,7 +8,7 @@ export interface TableSettings<T> {
 	active: Column<T>;
 	dir: keyof ColumnDir;
 
-	trackBy: (index: number, item: T) => string;
+	trackBy: (index: number, item: T) => string | number;
 
 	rowClick?: (rowOjb: T) => void;
 }

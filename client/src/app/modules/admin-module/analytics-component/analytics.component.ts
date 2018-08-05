@@ -94,11 +94,10 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 				header: 'Timestamp',
 				property: 'logDataTs',
 				val: a => this.datePipe.transform(a.logDataTs, 'yyyy-MM-dd HH:mm:ss')
-				// DatePipe does not follow ISO standard for date formats
 			},
 			{
-				header: 'Page',
-				property: 'title',
+				header: 'Route',
+				property: 'route',
 			},
 			{
 				header: 'User',
@@ -120,7 +119,7 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 		active: 'logDataTs',
 		dir: 'desc',
 
-		trackBy: (index: number, a) => a.route
+		trackBy: (index: number, a) => a.logDataId
 	};
 
 
