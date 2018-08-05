@@ -6,9 +6,8 @@ import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 
 import {
-	CmsContent, AccessRoles, User,
 	AggregationQuery, AggregationResult, AggregationResultSummarized, AggregationResultUnwinded,
-	TableSettings, ColumnType, ColumnSettings
+	CmsContent, User, TableSettings, ColumnType, ColumnSettings
 } from '@app/models';
 import { ModalService, CMSService, AdminService, MobileService } from '@app/services';
 
@@ -44,7 +43,6 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 	public readonly formErrorInstant = new FormErrorInstant(); // Form validation errors trigger instantly
 
 	// Helpers
-	public readonly AccessRoles = AccessRoles;
 	public readonly accessHandler = new AccessHandler();
 	public readonly AnalyticsState = AnalyticsState;
 
@@ -135,6 +133,12 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 			{
 				header: 'Route',
 				property: 'route',
+			},
+			{
+				header: 'Access',
+				property: 'access',
+				icon: { val: a => this.accessHandler.getAccessChoice(a.access).icon },
+				val: a => this.accessHandler.getAccessChoice(a.access).plural
 			},
 			{
 				header: 'Views',

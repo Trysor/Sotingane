@@ -1,11 +1,11 @@
-<h2 mat-dialog-title align="start">{{data.user.username}}</h2>
+<h2 mat-dialog-title align="center">{{data.user.username}}</h2>
 <div mat-dialog-content align="start" class="wrapper">
 	<form [formGroup]="patchUserForm" id="patchUserForm" autocomplete="off" (ngSubmit)="submitForm()">
 		<!-- USERNAME -->
 		<div class="row">
-			<label for="username">Username</label>
+			<mat-form-field class="field" appearance="outline">
+				<mat-label>New username</mat-label>
 
-			<mat-form-field class="field">
 				<input matInput id="username" #username type="text" formControlName="username" required>
 				<mat-error *ngIf="patchUserForm.get('username').hasError('required')">
 					Username is <strong>required</strong>
@@ -18,12 +18,15 @@
 
 		<!-- ROLE -->
 		<div class="row">
-			<label for="role">Role</label>
-
-			<mat-form-field ngClass="field">
-				<mat-select id="role" formControlName="role" required>
-					<mat-option *ngFor="let option of accessChoices" [value]="option.value">
-						{{ option.verbose }}
+			<mat-form-field ngClass="field" appearance="outline">
+				<mat-label>New role</mat-label>
+				<mat-select formControlName="role" required>
+					<mat-select-trigger *ngIf="patchUserForm.get('role').value">
+						<mat-icon>{{accessHandler.getAccessChoice(patchUserForm.get('role').value).icon}}</mat-icon>
+						{{ accessHandler.getAccessChoice(patchUserForm.get('role').value).single }}
+					</mat-select-trigger>
+					<mat-option *ngFor="let option of accessHandler.accessChoices" [value]="option.value">
+						<mat-icon matPrefix>{{ option.icon }}</mat-icon>{{ option.single }}
 					</mat-option>
 				</mat-select>
 			</mat-form-field>
@@ -33,7 +36,7 @@
 		{{ issue | async }}
 	</p>
 </div>
-<div mat-dialog-actions align="end">
+<div mat-dialog-actions align="center">
 	<button mat-button (click)="close()">Cancel</button>
 	<button mat-raised-button type="submit" form="patchUserForm"
 			[disabled]="(!patchUserForm.valid || !patchUserForm.dirty)">Save</button>

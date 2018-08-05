@@ -6,7 +6,7 @@ import { DatePipe } from '@angular/common';
 import { MatSelectChange } from '@angular/material';
 
 import { ModalService, CMSService, MobileService, AdminService, StorageService } from '@app/services';
-import { CmsContent, CmsAccess, AccessRoles } from '@app/models';
+import { CmsContent, AccessRoles } from '@app/models';
 import { FormErrorInstant, AccessHandler } from '@app/classes';
 
 import { BehaviorSubject, Observable, Subject } from 'rxjs';

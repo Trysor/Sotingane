@@ -55,10 +55,10 @@
 								
 								<mat-select id="access" #access="matSelect" formControlName="access" required>
 									<mat-select-trigger>
-										<mat-icon>{{accessHandler.getAccessChoice(contentForm.get('access').value).icon}}</mat-icon>{{ accessHandler.getAccessChoice(contentForm.get('access').value).verbose }}
+										<mat-icon>{{accessHandler.getAccessChoice(contentForm.get('access').value).icon}}</mat-icon>{{ accessHandler.getAccessChoice(contentForm.get('access').value).plural }}
 									</mat-select-trigger>
 									<mat-option *ngFor="let option of accessHandler.accessChoices" [value]="option.value">
-										<mat-icon matPrefix>{{ option.icon }}</mat-icon>{{ option.verbose }}
+										<mat-icon matPrefix>{{ option.icon }}</mat-icon>{{ option.plural }}
 									</mat-option>
 								</mat-select>
 							</mat-form-field>

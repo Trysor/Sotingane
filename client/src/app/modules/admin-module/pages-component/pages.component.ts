@@ -3,7 +3,7 @@ import { Component, Optional, OnDestroy, ChangeDetectionStrategy } from '@angula
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
-import { CmsContent, AccessRoles, TableSettings, ColumnType } from '@app/models';
+import { CmsContent, TableSettings, ColumnType } from '@app/models';
 import { ModalService, CMSService, AdminService, MobileService } from '@app/services';
 
 import { AccessHandler } from '@app/classes';
@@ -52,7 +52,7 @@ export class PagesComponent implements OnDestroy {
 				header: 'Access',
 				property: 'access',
 				icon: { val: c => this._accessHandler.getAccessChoice(c.access).icon },
-				val: c => this._accessHandler.getAccessChoice(c.access).verbose
+				val: c => this._accessHandler.getAccessChoice(c.access).single
 			},
 			{
 				header: 'Published',

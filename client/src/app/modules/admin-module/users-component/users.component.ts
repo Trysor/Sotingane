@@ -4,12 +4,14 @@ import { MatDialog, MatDialogConfig } from '@angular/material';
 import { DatePipe } from '@angular/common';
 
 import { AdminService, AuthService } from '@app/services';
-import { User, AccessRoles, TableSettings, ColumnType } from '@app/models';
+import { User, TableSettings, ColumnType } from '@app/models';
+import { AccessHandler } from '@app/classes';
 
 import { UserModalComponent, UserModalData } from '../user-modal-component/user.modal.component';
 
 import { Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+
 
 
 @Component({
@@ -22,6 +24,8 @@ export class UsersComponent implements OnDestroy {
 	private _ngUnsub = new Subject();
 	public data = new BehaviorSubject<User[]>(null);
 
+	private readonly _accessHandler = new AccessHandler();
+
 	public readonly settings: TableSettings<User> = {
 		columns: [
 			{
@@ -31,20 +35,8 @@ export class UsersComponent implements OnDestroy {
 			{
 				header: 'Role',
 				property: 'role',
-				icon: {
-					val: user => {
-						switch (user.role) {
-							case AccessRoles.admin: { return 'security'; }
-							case AccessRoles.user: { return 'verified_user'; }
-						}
-					}
-				},
-				val: user => {
-					switch (user.role) {
-						case AccessRoles.admin: { return 'Admin'; }
-						case AccessRoles.user: { return 'User'; }
-					}
-				},
+				icon: { val: user => this._accessHandler.getAccessChoice(user.role).icon },
+				val: user => this._accessHandler.getAccessChoice(user.role).single
 			},
 			{
 				header: 'Joined date',

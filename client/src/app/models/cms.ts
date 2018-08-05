@@ -26,7 +26,8 @@ export interface CmsContent {
 }
 
 export interface CmsAccess {
-	verbose: string;
+	single: string;
+	plural: string;
 	icon: string;
 	value: AccessRoles;
 }

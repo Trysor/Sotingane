@@ -4,9 +4,12 @@ import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 
 import { CMSService, AdminService, AuthService } from '@app/services';
-import { User, AccessRoles, CmsAccess } from '@app/models';
+import { User, CmsAccess } from '@app/models';
+
+import { AccessHandler } from '@app/classes';
 
 import { Subject } from 'rxjs';
+
 
 @Component({
 	selector: 'user-modal',
@@ -19,10 +22,7 @@ export class UserModalComponent {
 	public otherUsernames: string[];
 	public issue = new Subject<string>();
 
-	public accessChoices: CmsAccess[] = [
-		{ value: AccessRoles.user, verbose: 'User', icon: 'verified_user' },
-		{ value: AccessRoles.admin, verbose: 'Admin', icon: 'security' }
-	];
+	public readonly accessHandler = new AccessHandler();
 
 	constructor(
 		public dialogRef: MatDialogRef<UserModalComponent>,
@@ -30,6 +30,8 @@ export class UserModalComponent {
 		public authService: AuthService,
 		private fb: FormBuilder,
 		@Inject(MAT_DIALOG_DATA) public data: UserModalData) {
+
+		console.log('constructor trigger');
 
 		// Have to init this list before the form group
 		this.otherUsernames = this.data.userList.filter(user => user !== data.user).map(user => user.username.toLowerCase());
