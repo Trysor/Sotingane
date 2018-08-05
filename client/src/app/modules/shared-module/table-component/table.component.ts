@@ -32,6 +32,8 @@ export class TableComponent implements OnInit, AfterViewInit {
 	private readonly _ngUnsub = new Subject();
 	public readonly filterForm: FormGroup;
 
+	private filterRegex: RegExp;
+
 	constructor(
 		private fb: FormBuilder,
 		public mobileService: MobileService) {
@@ -44,30 +46,26 @@ export class TableComponent implements OnInit, AfterViewInit {
 			distinctUntilChanged(), takeUntil(this._ngUnsub), debounceTime(300)
 		).subscribe(value => {
 			if (this.filterSettings.func) {
-				this.Source.filter = '';
 				this.filterSettings.func(value);
 				return;
 			}
-			this.Source.filter = '';
+			this.filterRegex = new RegExp(value, 'i');
 			this.Source.filter = value.trim().toLowerCase();
 		});
+
 
 		// Filter based on what the user sees rather than the data property values
 		this.Source.filterPredicate = (data: object, filter: string) => {
 			for (const col of this.settings.columns) {
-				// only match against columns that are properties
-				if (!data.hasOwnProperty(col.property)) { continue; }
+				if (!(col.property in data)) { continue; } // only match against columns that are properties
 
 				const val = col.val ? col.val(data, this.Source.data) : data[col.property];
-
-				// toString() for non-strings (e.g. views = number)
-				if (val.toString().trim().toLowerCase().includes(filter)) {
-					return true; // only return if there is a positive match
-				}
+				if (this.filterRegex.test(val)) { return true; }
 			}
 			return false;
 		};
 	}
+
 
 	ngOnInit() {
 		if (!this.settings) { throw Error('No settings'); }
@@ -75,11 +73,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 		this.table.trackBy = this.settings.trackBy;
 
 		this.mobileService.isMobile().subscribe(isMobile => {
-			if (isMobile) {
-				this.displayedColumns = this.settings.mobile;
-			} else {
-				this.displayedColumns = this.settings.columns.map(col => col.property);
-			}
+			this.displayedColumns = isMobile ? this.settings.mobile : this.settings.columns.map(col => col.property);
 		});
 	}
 
@@ -88,12 +82,6 @@ export class TableComponent implements OnInit, AfterViewInit {
 		this.Source.paginator = this.paginator;
 		this.Source.sort = this.sort;
 	}
-
-
-	public isInternalLink(link: string) {
-		return link.startsWith('/');
-	}
-
 
 	/**
 	 * method to perform the click function on a row
