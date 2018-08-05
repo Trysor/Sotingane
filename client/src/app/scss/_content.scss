@@ -138,10 +138,9 @@ $lazy-transition: ease-in-out opacity 0.3s;
 .video {
 	//display: inline-block;
 	position: relative;
-	margin: 0 .8em .8em 0;
+	margin: 0 .8em 1em 0;
 	width: calc(50% - 0.8em);
 	float: left;
-	clear: right;
 	vertical-align: top;
 	transition: $lazy-transition;
 

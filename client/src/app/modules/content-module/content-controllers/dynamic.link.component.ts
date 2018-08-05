@@ -158,8 +158,10 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 		// Add to DOM
 		this.renderer.appendChild(wrapper, this._img);
 		this.renderer.appendChild(wrapper, this._iframe);
-		this.renderer.insertBefore(this.elRef.nativeElement.parentElement, wrapper, this.elRef.nativeElement);
-		this.renderer.removeChild(this.renderer.parentNode(this.elRef.nativeElement), this.elRef.nativeElement);
+		const parent = this.renderer.parentNode(this.elRef.nativeElement);
+		const parentParent = this.renderer.parentNode(parent);
+		this.renderer.insertBefore(parentParent, wrapper, parent);
+		this.renderer.removeChild(parent, this.elRef.nativeElement);
 		this.renderer.destroy();
 
 		this.hookLazyLoader(wrapper);
