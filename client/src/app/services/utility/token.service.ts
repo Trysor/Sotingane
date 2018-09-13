@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 
 import { User } from '@app/models';
-import { StorageService } from '@app/services/utility/storage.service';
+import { StorageService, StorageKey } from '@app/services/utility/storage.service';
 
 @Injectable({ providedIn: 'root' })
 export class TokenService {
 
-	public get token() { return this.storage.getLocal('token'); }
+	public get token() { return this.storage.getLocal(StorageKey.JWT); }
 	public set token(newToken: string) {
-		this.storage.setLocal('token', this.jwtIsExpired(newToken) ? null : newToken);
+		this.storage.setLocal(StorageKey.JWT, this.jwtIsExpired(newToken) ? null : newToken);
 	}
 
 	constructor(private storage: StorageService) { }

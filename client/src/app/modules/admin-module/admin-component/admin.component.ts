@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { StorageService } from '@app/services';
+import { StorageService, StorageKey } from '@app/services';
 
 
 @Component({
@@ -10,8 +10,8 @@ import { StorageService } from '@app/services';
 })
 export class AdminComponent {
 
-	public get tabIndex() { return this.storage.getSession('adminTabIndex'); }
-	public set tabIndex(value: string) { this.storage.setSession('adminTabIndex', value); }
+	public get tabIndex() { return this.storage.getSession(StorageKey.AdminTabIndex); }
+	public set tabIndex(value: string) { this.storage.setSession(StorageKey.AdminTabIndex, value); }
 
 	constructor(private storage: StorageService) {}
 

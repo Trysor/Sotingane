@@ -1,4 +1,4 @@
-﻿import { Injectable, Inject } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { Router, NavigationStart } from '@angular/router';
 
 import { env } from '@env';
@@ -8,7 +8,7 @@ import { HttpService } from '@app/services/http/http.service';
 import { CMSService } from '@app/services/controllers/cms.service';
 
 import { BehaviorSubject } from 'rxjs';
-import { filter, take } from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
 
 
 @Injectable({ providedIn: 'root' })

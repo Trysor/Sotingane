@@ -2,6 +2,13 @@
 
 import { PlatformService } from '@app/services/utility/platform.service';
 
+
+export enum StorageKey {
+	AdminTabIndex = 'adminTabIndex',
+	ComposeTabIndex = 'composeTabIndex',
+	JWT = 'token'
+}
+
 @Injectable({ providedIn: 'root' })
 export class StorageService {
 	private readonly _serverMap: Map<string, string>;
@@ -19,7 +26,7 @@ export class StorageService {
 	 * @param key
 	 * @param value
 	 */
-	public setSession(key: string, value: string) {
+	public setSession(key: StorageKey, value: string) {
 		if (this.platform.isBrowser) {
 			if (value) {
 				sessionStorage.setItem(key, value);
@@ -35,7 +42,7 @@ export class StorageService {
 	 * Gets a session storage item
 	 * @param key
 	 */
-	public getSession(key: string) {
+	public getSession(key: StorageKey) {
 		return this.platform.isBrowser ? sessionStorage.getItem(key) : this._serverMap.get(key);
 	}
 
@@ -48,7 +55,7 @@ export class StorageService {
 	 * @param key
 	 * @param value
 	 */
-	public setLocal(key: string, value: string) {
+	public setLocal(key: StorageKey, value: string) {
 		if (this.platform.isBrowser) {
 			if (value) {
 				localStorage.setItem(key, value);
@@ -64,7 +71,7 @@ export class StorageService {
 	 * Gets a local storage item
 	 * @param key
 	 */
-	public getLocal(key: string) {
+	public getLocal(key: StorageKey) {
 		return this.platform.isBrowser ? localStorage.getItem(key) : this._serverMap.get(key);
 	}
 }

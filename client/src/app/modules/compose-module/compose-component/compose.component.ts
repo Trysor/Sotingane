@@ -5,7 +5,7 @@ import { DatePipe } from '@angular/common';
 
 import { MatSelectChange } from '@angular/material';
 
-import { ModalService, CMSService, MobileService, AdminService, StorageService } from '@app/services';
+import { ModalService, CMSService, MobileService, AdminService, StorageService, StorageKey } from '@app/services';
 import { CmsContent, AccessRoles } from '@app/models';
 import { FormErrorInstant, AccessHandler } from '@app/classes';
 
@@ -44,8 +44,8 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 	private _ngUnsub = new Subject();
 	private _hasSaved = false;
 
-	public get tabIndex() { return this.storage.getSession('composeTabIndex'); }
-	public set tabIndex(value: string) { this.storage.setSession('composeTabIndex', value); }
+	public get tabIndex() { return this.storage.getSession(StorageKey.ComposeTabIndex); }
+	public set tabIndex(value: string) { this.storage.setSession(StorageKey.ComposeTabIndex, value); }
 
 	constructor(
 		@Optional() private modalService: ModalService,
