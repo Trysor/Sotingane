@@ -1,12 +1,10 @@
 import { expect } from 'chai';
-import { fail } from 'assert';
 
-
-import { ContentModel, Content, accessRoles, LogModel } from '../src/models';
-import { status, ROUTE_STATUS, CMS_STATUS, VALIDATION_FAILED, USERS_STATUS, ADMIN_STATUS } from '../src/libs/validate';
+import { ContentModel, Content, accessRoles } from '../src/models';
+import { CMS_STATUS, VALIDATION_FAILED, USERS_STATUS, ADMIN_STATUS } from '../src/libs/validate';
 import { AggregationQuery } from '../src/controllers';
 
-import { TestBed, AdminUser, TestUser } from './testbed';
+import { TestBed } from './testbed';
 
 
 // ---------------------------------

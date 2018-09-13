@@ -1,4 +1,3 @@
-import { Express } from 'express';
 import { request, use as chaiUse } from 'chai';
 import ChaiHttp = require('chai-http');
 
@@ -28,10 +27,9 @@ export class TestBedSingleton {
 
 	constructor() {
 		if (configUtil.getEnv('NODE_ENV') !== 'test') { return; }
-		const db = configGet<string>('database');
 
 		chaiUse(ChaiHttp);
-		this._http = (<any>request(app)).keepOpen(); // TODO: Update @types/chai-http
+		this._http = request(app).keepOpen();
 
 		const mocha = new Mocha();
 		readdirSync(pathjoin('dist', 'out-tsc', 'test')).filter((file) => file.endsWith('.test.js')).forEach((file) => {
@@ -44,9 +42,9 @@ export class TestBedSingleton {
 
 			// Drop Test collections
 			await Promise.all([
-				UserModel.remove({}).exec(),
-				ContentModel.remove({}).exec(),
-				LogModel.remove({}).exec()
+				UserModel.deleteMany({}).exec(),
+				ContentModel.deleteMany({}).exec(),
+				LogModel.deleteMany({}).exec()
 			]);
 
 			// Create new users and log them in

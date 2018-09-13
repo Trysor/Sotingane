@@ -1,9 +1,8 @@
 import { expect } from 'chai';
-import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
-import { UserModel, User, accessRoles } from '../src/models';
-import { status, ROUTE_STATUS, AUTH_STATUS, VALIDATION_FAILED } from '../src/libs/validate';
-import { AuthController, TokenResponse } from '../src/controllers';
+import { User, accessRoles } from '../src/models';
+import { AUTH_STATUS, VALIDATION_FAILED } from '../src/libs/validate';
+import { TokenResponse } from '../src/controllers';
 
 import { TestBed, AdminUser } from './testbed';
 
