@@ -1,11 +1,11 @@
 ﻿import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
 import * as mongoose from 'mongoose';
-import { UAParser } from 'ua-parser-js';
 
-import { status, ajv, JSchema, ADMIN_STATUS, ROUTE_STATUS, CMS_STATUS } from '../libs/validate';
-import { User, accessRoles, Log, LogModel, ContentModel, Content, ContentEntry } from '../models';
+import { status, ajv, JSchema, ADMIN_STATUS, CMS_STATUS } from '../libs/validate';
+import { accessRoles, ContentModel, Content, ContentEntry } from '../models';
 
+import { MongoStream } from '../libs/MongoStreamer';
 
 
 export class AdminController {
@@ -91,11 +91,10 @@ export class AdminController {
 			match['current.createdAt'] = { '$lt': new Date(query.createdBeforeDate) };
 		}
 
-		// Early exclude
-		const earlyExclude = {
-			prev: 0, updatedAt: 0, createdAt: 0,
+		// Early project
+		const earlyProject = {
 			current: {
-				content: 0, content_searchable: 0, folder: 0, nav: 0, description: 0, images: 0
+				createdBy: 1, access: 1, published: 1, route: 1, title: 1, folder: 1, createdAt: 1
 			}
 		};
 
@@ -143,9 +142,9 @@ export class AdminController {
 		}
 
 		// Pipeline
-		const pipeline = [];
+		const pipeline: object[] = [];
 		pipeline.push({ $match: match });								// Match against document
-		pipeline.push({ $project: earlyExclude });						// Exclude uneeded data early
+		pipeline.push({ $project: earlyProject });						// Exclude uneeded data early
 		pipeline.push({ $lookup: lookup });								// Lookup logData
 		pipeline.push({ $unwind: unwindPipeline });						// Always unwind
 		pipeline.push({ $match: userFilter });							// Run another match to filter on logData
@@ -155,9 +154,22 @@ export class AdminController {
 
 		try {
 			// Allow disk usage for this particular aggregation
-			const results: any[] = await ContentModel.aggregate(pipeline).allowDiskUse(true);
-			if (!results || results.length === 0) { return res.status(200).send(status(ADMIN_STATUS.AGGREGATION_RESULT_NONE_FOUND)); }
-			return res.status(200).send(results);
+			const stream = true;
+			if (stream) {
+				return MongoStream({
+					type: 'aggregation',
+					res: res,
+					query: () => ContentModel.aggregate(pipeline),
+					errStatus: status(ADMIN_STATUS.AGGREGATION_MONGOOSE_ERROR),
+					noneFoundStatus: status(ADMIN_STATUS.AGGREGATION_RESULT_NONE_FOUND)
+				});
+			} else {
+				const results: any[] = await ContentModel.aggregate(pipeline).allowDiskUse(true);
+				if (!results || results.length === 0) { return res.status(200).send(status(ADMIN_STATUS.AGGREGATION_RESULT_NONE_FOUND)); }
+				return res.status(200).send(results);
+			}
+
+
 
 		} catch (e) {
 			return res.status(200).send(status(ADMIN_STATUS.AGGREGATION_MONGOOSE_ERROR));

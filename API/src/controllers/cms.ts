@@ -237,7 +237,7 @@ export class CMSController {
 			return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED));
 		}
 
-		const result: { n: number, ok: number } = await ContentModel.remove({ 'current.route': route }).lean();
+		const result: { n: number, ok: number } = await ContentModel.deleteOne({ 'current.route': route }).lean();
 		if (result.n === 0) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
 		return res.status(200).send(status(CMS_STATUS.CONTENT_DELETED));
 	}

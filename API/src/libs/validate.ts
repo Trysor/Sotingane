@@ -2,7 +2,7 @@ import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 import * as Ajv from 'ajv';
 import { ErrorObject } from 'ajv';
 
-interface StatusMessage {
+export interface StatusMessage {
 	message: string;
 	errors?: ErrorMessage[];
 }

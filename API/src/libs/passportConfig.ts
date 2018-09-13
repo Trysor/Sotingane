@@ -1,17 +1,18 @@
 import { get as configGet } from 'config';
-import { ExtractJwt, Strategy as JwtStrategy, StrategyOptions as jwtOptions, VerifiedCallback } from 'passport-jwt';
+import { Strategy as JwtStrategy, StrategyOptions as jwtOptions, VerifiedCallback } from 'passport-jwt';
 import { verify } from 'jsonwebtoken';
 import { Strategy as LocalStrategy, IStrategyOptions as localOptions } from 'passport-local';
-import { use as passportUse, authenticate, Strategy } from 'passport';
+import { use as passportUse, authenticate } from 'passport';
 import { Handler } from 'express';
 import { Request, Response, NextFunction } from 'express';
 
-import { UserModel, User } from '../models';
+import { UserModel } from '../models';
 
 
 const localOptions: localOptions = {
 	usernameField: 'username'
 };
+
 // Setting JWT strategy options
 const jwtOptions: jwtOptions = {
 	jwtFromRequest: (req: Request): string => {

@@ -7,8 +7,6 @@ import { status, ajv, JSchema, ROUTE_STATUS, AUTH_STATUS } from '../libs/validat
 import { UserModel, User, UserDoc, accessRoles } from '../models';
 
 
-const userTypes: accessRoles[] = [accessRoles.admin, accessRoles.user];
-
 export interface TokenResponse {
 	token: string;
 	user: User;
@@ -112,6 +110,10 @@ export class AuthController {
 			password: string = req.body.password,
 			confirm: string = req.body.confirm,
 			user: UserDoc = <UserDoc>req.user;
+
+		if (password !== confirm) {
+			return res.status(401).send(status(AUTH_STATUS.PASSWORD_DID_NOT_MATCH));
+		}
 
 		const isMatch = await user.comparePassword(currentPassword);
 		if (!isMatch) { return res.status(401).send(status(AUTH_STATUS.PASSWORD_DID_NOT_MATCH)); }
