@@ -4,64 +4,6 @@
 @import '../../../node_modules/@angular/material/theming';
 @import '_mixins';
 
-// ---------------------------------------
-// ---------------- THEME ----------------
-// ---------------------------------------
-
-
-$custom-dark-theme-background: (
-	status-bar: black,
-	app-bar: map_get($mat-grey, 900),
-	background: var(--color-text), /* Checkbox ticks etc */
-	hover: rgba(white, 0.04),
-	card: var(--color-material),
-	dialog: var(--color-material),
-	disabled-button: rgba(white, 0.12),
-	raised-button: map-get($mat-grey, 800),
-	focused-button: $light-focused,
-	selected-button: map_get($mat-grey, 900),
-	selected-disabled-button: map_get($mat-grey, 800),
-	disabled-button-toggle: black,
-	unselected-chip: map_get($mat-grey, 700),
-	disabled-list-option: black,
-);
-
-$custom-dark-theme-foreground: (
-	base:              white,
-	divider:           $light-dividers,
-	dividers:          $light-dividers,
-	disabled:          var(--color-disabled), // $light-disabled-text
-	disabled-button:   rgba(white, 0.3),
-	disabled-text:     var(--color-disabled), // $light-disabled-text
-	hint-text:         var(--color-disabled), // $light-disabled-text
-	secondary-text:    $light-secondary-text,
-	icon:              white,
-	icons:             white,
-	text:              var(--color-text),
-	slider-min:        white,
-	slider-off:        rgba(white, 0.3),
-	slider-off-active: rgba(white, 0.3),
-);
-
-
-@function custom-dark-theme($primary, $accent, $warn: mat-palette($mat-red)) {
-	@return (
-		primary: $primary,
-		accent: $accent,
-		warn: $warn,
-		is-dark: true,
-		foreground: $custom-dark-theme-foreground,
-		background: $custom-dark-theme-background
-	);
-}
-
-
-$app-theme: custom-dark-theme(
-	mat-palette(nth($app-primary, 1), nth($app-primary, 2), nth($app-primary, 3), nth($app-primary, 4)),
-	mat-palette(nth($app-accent,  1), nth($app-accent,  2), nth($app-accent,  3), nth($app-accent,  4))
-);
-
-
 
 // ---------------------------------------
 // --------------- INCLUDE ---------------
@@ -71,7 +13,6 @@ $app-theme: custom-dark-theme(
 
 // Core
 @include mat-core();
-
 @include mat-core-theme($app-theme);
 
 
@@ -84,29 +25,14 @@ $app-theme: custom-dark-theme(
 // Forms
 @include mat-input-theme($app-theme);
 @include mat-form-field-theme($app-theme);
-@include mat-checkbox-theme($app-theme);
-@include mat-autocomplete-theme($app-theme);
-@include mat-datepicker-theme($app-theme);
 
 // Layout
-// @include mat-card-theme($app-theme);
 @include mat-sidenav-theme($app-theme);
-@include mat-expansion-panel-theme($app-theme);
-@include mat-tabs-theme($app-theme);
 
 // Features
-@include mat-snack-bar-theme($app-theme);
 @include mat-menu-theme($app-theme);
-@include mat-select-theme($app-theme);
-@include mat-dialog-theme($app-theme);
 @include mat-paginator-theme($app-theme);
 @include mat-table-theme($app-theme);
-
-// User Feedback
-@include mat-progress-bar-theme($app-theme);
-@include mat-progress-spinner-theme($app-theme);
-@include mat-tooltip-theme($app-theme);
-
 
 // This here includes everything.
 // @include angular-material-theme($app-theme);
