@@ -25,7 +25,7 @@ const PORT = process.env.PORT || 4000;
 const DIST_FOLDER = join(process.cwd(), 'dist');
 
 
-// * NOTE :: leave this as require() since this file is built Dynamically from webpack
+// * NOTE :: leave this as require()
 const { AppServerModuleNgFactory, LAZY_MODULE_MAP } = require('./dist/server/main');
 
 app.engine('html', ngExpressEngine({
@@ -38,7 +38,7 @@ app.engine('html', ngExpressEngine({
 app.set('view engine', 'html');
 app.set('views', join(DIST_FOLDER, 'browser'));
 app.get('*.*', express.static(join(DIST_FOLDER, 'browser'), { maxAge: '1y' })); // Files
-app.get('*', (req, res) => res.render('index', { req })); // Catch-all
+app.get('*', (req, res) => res.render('index', { req: req, cache: true })); // Catch-all
 
 // Start up the Node server
 app.listen(PORT, () => {

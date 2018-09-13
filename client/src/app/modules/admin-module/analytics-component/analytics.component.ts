@@ -1,15 +1,14 @@
-import { Component, Optional, OnDestroy, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 
 import {
-	AggregationQuery, AggregationResult, AggregationResultSummarized, AggregationResultUnwinded,
-	CmsContent, User, TableSettings, ColumnType, ColumnSettings
+	AggregationQuery, AggregationResult, AggregationResultSummarized, AggregationResultUnwinded, User, TableSettings
 } from '@app/models';
-import { ModalService, CMSService, AdminService, MobileService } from '@app/services';
+import { CMSService, AdminService, MobileService } from '@app/services';
 
 import { FormErrorInstant, AccessHandler } from '@app/classes';
 
