@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Input, Renderer2, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { PlatformService } from '@app/services/utility/platform.service';
 
 // import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import ClassicEditor from '@app-ckeditor';
@@ -24,9 +25,10 @@ export class CKEditorComponent implements OnInit, OnDestroy {
 		this._control = value;
 	}
 
-	constructor(private renderer: Renderer2) { }
+	constructor(private renderer: Renderer2, private platform: PlatformService) { }
 
 	ngOnInit() {
+		if (this.platform.isServer) { return; }
 		if (typeof ClassicEditor === 'undefined') { return; }
 		if (this._editor) { return; } // if editor ALREADY exist.
 		if (!this._control) { return; } // if control DOESNT exist.
@@ -34,7 +36,7 @@ export class CKEditorComponent implements OnInit, OnDestroy {
 		const el = this.editorBox.nativeElement;
 
 		// Load CKEditor
-		ClassicEditor.create(el).then(editor => { // ,this._settings
+		ClassicEditor.create(el).then(editor => {
 
 			this._editor = editor;
 			this.renderer.setAttribute(el.parentElement.querySelector('.ck-content'), 'id', 'content');
