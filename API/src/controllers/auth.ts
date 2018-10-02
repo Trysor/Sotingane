@@ -3,8 +3,11 @@ import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 import { get as configGet, util as configUtil } from 'config';
 import { sign } from 'jsonwebtoken';
 
-import { status, ajv, JSchema, ROUTE_STATUS, AUTH_STATUS } from '../libs/validate';
+import { status, ajv, JSchema, ROUTE_STATUS, AUTH_STATUS, validateSchema, VALIDATION_FAILED } from '../libs/validate';
 import { UserModel, User, UserDoc, accessRoles } from '../models';
+
+import { GET, POST, PATCH, DELETE, isProduction } from '../libs/routingDecorators';
+import { Auth } from '../libs/auth';
 
 
 export interface TokenResponse {
@@ -13,21 +16,7 @@ export interface TokenResponse {
 }
 
 export class AuthController {
-
-	/**
-	 * Require the user to be at least of the provided role
-	 * @param role
-	 */
-	public static requireRole(role: accessRoles) {
-		return (req: Req, res: Res, next: Next) => {
-			const user = <User>req.user;
-			if (user && (user.isOfRole(role) || user.isOfRole(accessRoles.admin))) {
-				return next();
-			}
-			return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED));
-		};
-	}
-
+	get router() { return (<any>this)._router; }
 
 	/**
 	 * Returns a new token for a user in a session which is about to expire, if authorized to do so
@@ -36,7 +25,9 @@ export class AuthController {
 	 * @param  {Next} next next
 	 * @return {Res}          server response: object containing token and user
 	 */
-	public static token(req: Req, res: Res): Res {
+	@GET({ path: '/token', handlers: [Auth.ByToken] })
+	@POST({ path: '/login', handlers: [validateSchema(JSchema.UserLoginSchema, VALIDATION_FAILED.USER_MODEL), Auth.ByLogin] })
+	public token(req: Req, res: Res): Res {
 		const user: Partial<User> = { _id: req.user._id, username: req.user.username, role: req.user.role };
 
 		const expires = 10800; // expiresIn in seconds ( = 3hours)
@@ -58,10 +49,11 @@ export class AuthController {
 	 * @param  {Next} next next
 	 * @return {Res}          server response: object containing token and user
 	 */
-	public static logout(req: Req, res: Res): Res {
+	@POST({ path: '/logout', handlers: [Auth.ByToken] })
+	public logout(req: Req, res: Res): Res {
 		return res.cookie('jwt', '', {
 			maxAge: 1000, // one second
-			secure: configUtil.getEnv('NODE_ENV') === 'production',
+			secure: isProduction,
 			domain: req.hostname,
 			httpOnly: true,
 			sameSite: true
@@ -76,7 +68,12 @@ export class AuthController {
 	 * @param  {Next} next next
 	 * @return {Res}          server response
 	 */
-	public static async register(req: Req, res: Res, next: Next) {
+	@POST({
+		path: '/register',
+		ignore: isProduction, // Not enabled in production for the time being
+		handlers: [validateSchema(JSchema.UserRegistrationSchema, VALIDATION_FAILED.USER_MODEL)]
+	})
+	public async register(req: Req, res: Res, next: Next) {
 		const password: string = req.body.password,
 			role: accessRoles = req.body.role,
 			username: string = req.body.username;
@@ -105,7 +102,11 @@ export class AuthController {
 	 * @param  {Next} next next
 	 * @return {Res}          server response:
 	 */
-	public static async updatePassword(req: Req, res: Res, next: Next) {
+	@POST({
+		path: '/updatepassword',
+		handlers: [Auth.ByToken, validateSchema(JSchema.UserUpdatePasswordSchema, VALIDATION_FAILED.USER_MODEL)]
+	})
+	public async updatePassword(req: Req, res: Res, next: Next) {
 		const currentPassword: string = req.body.currentPassword,
 			password: string = req.body.password,
 			confirm: string = req.body.confirm,
@@ -131,7 +132,12 @@ export class AuthController {
 	 * @param  {Next} next next
 	 * @return {Res}          server response
 	 */
-	public static async deleteAccount(req: Req, res: Res, next: Next) {
+	@POST({
+		path: '/deleteaccount',
+		ignore: true, // TODO: Implement my security
+		handlers: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)]
+	})
+	public async deleteAccount(req: Req, res: Res, next: Next) {
 		const id: string = req.body.id;
 
 		try {

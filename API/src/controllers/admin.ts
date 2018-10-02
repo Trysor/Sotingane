@@ -2,13 +2,18 @@
 
 import * as mongoose from 'mongoose';
 
-import { status, ajv, JSchema, ADMIN_STATUS, CMS_STATUS } from '../libs/validate';
+import { status, ajv, JSchema, ADMIN_STATUS, CMS_STATUS, VALIDATION_FAILED, validateSchema } from '../libs/validate';
 import { accessRoles, ContentModel, Content, ContentEntry } from '../models';
 
 import { MongoStream } from '../libs/MongoStreamer';
-
+import { GET, POST } from '../libs/routingDecorators';
+import { Auth } from '../libs/auth';
 
 export class AdminController {
+	get router() { return (<any>this)._router; }
+
+
+
 	/**
 	 * Gets all content
 	 * @param  {Req}		req  request
@@ -16,7 +21,8 @@ export class AdminController {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: a list of partial content information
 	 */
-	public static async getAdminContentList(req: Req, res: Res, next: Next) {
+	@GET({ path: '/cms/', handlers: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)] })
+	public async getAdminContentList(req: Req, res: Res, next: Next) {
 		const contentList: Content[] = await ContentModel.aggregate([
 			{ $lookup: { from: 'logs', localField: '_id', foreignField: 'content', as: 'logData' } },
 			{ $unwind: { path: '$logData', preserveNullAndEmptyArrays: true } },
@@ -46,7 +52,8 @@ export class AdminController {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the content object
 	 */
-	public static async getContentFull(req: Req, res: Res, next: Next) {
+	@GET({ path: '/cms/:route', handlers: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)] })
+	public async getContentFull(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route;
 
 		const contentDoc = <ContentEntry>await ContentModel.findOne(
@@ -71,7 +78,13 @@ export class AdminController {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the aggregated data
 	 */
-	public static async aggregateContent(req: Req, res: Res, next: Next) {
+	@POST({
+		path: '/cms/aggregate', handlers: [
+			Auth.ByToken, Auth.RequireRole(accessRoles.admin),
+			validateSchema(JSchema.AdminAggregationSchema, VALIDATION_FAILED.ADMIN_MODEL),
+		]
+	})
+	public async aggregateContent(req: Req, res: Res, next: Next) {
 		const query: AggregationQuery = req.body;
 		const unwind = query.hasOwnProperty('unwind') && query.unwind;
 

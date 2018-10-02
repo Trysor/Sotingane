@@ -1,18 +1,22 @@
-import { Request as Req, Response as Res, NextFunction as Next } from 'express';
+import { Request as Req, Response as Res, NextFunction as Next, Router } from 'express';
 
 import { UAParser } from 'ua-parser-js';
-import { util as configUtil } from 'config';
-import { escape, isURL } from 'validator';
+import { escape } from 'validator';
+import * as xml from 'xml';
 
 import { sanitize, stripHTML } from '../libs/sanitizer';
 
-import { status, ajv, JSchema, ROUTE_STATUS, CMS_STATUS } from '../libs/validate';
-import { UserModel, User, accessRoles, Log, LogModel, ContentModel, Content, ContentEntry } from '../models';
+import { status, ajv, JSchema, ROUTE_STATUS, CMS_STATUS, validateSchema, VALIDATION_FAILED } from '../libs/validate';
+import { User, accessRoles, Log, LogModel, ContentModel, Content, ContentEntry } from '../models';
+import { GET, POST, PATCH, DELETE, isProduction } from '../libs/routingDecorators';
+import { Auth } from '../libs/auth';
 
 
-const isProduction = configUtil.getEnv('NODE_ENV') === 'production';
 
 export class CMSController {
+	get router() { return (<any>this)._router; }
+
+
 
 	private static ImageSrcRegex = /<img[^>]*src="([^"]*)"/g;
 
@@ -38,9 +42,9 @@ export class CMSController {
 	 * @param  {Req}		req  request
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
-	 * @return {Res}		server response: a list of partial content information
 	 */
-	public static async getContentList(req: Req, res: Res, next: Next) {
+	@GET({ path: '/', handlers: [Auth.Personalize] })
+	public async getContentList(req: Req, res: Res, next: Next) {
 		const user: User = <User>req.user;
 
 		const accessRights: accessRoles[] = [accessRoles.everyone];
@@ -57,9 +61,10 @@ export class CMSController {
 			{ $replaceRoot: { newRoot: '$current' } }
 		]);
 		if (!contentList) {
-			return res.status(404).send(status(CMS_STATUS.NO_ROUTES));
+			res.status(404).send(status(CMS_STATUS.NO_ROUTES));
+		} else {
+			res.status(200).send(contentList);
 		}
-		res.status(200).send(contentList);
 	}
 
 	/**
@@ -69,7 +74,8 @@ export class CMSController {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the content object
 	 */
-	public static async getContent(req: Req, res: Res, next: Next) {
+	@GET({ path: '/:route', handlers: [Auth.Personalize] })
+	public async getContent(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route,
 			user: User = <User>req.user;
 
@@ -118,7 +124,8 @@ export class CMSController {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the content history array
 	 */
-	public static async getContentHistory(req: Req, res: Res, next: Next) {
+	@GET({ path: '/history/:route', handlers: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)] })
+	public async getContentHistory(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route;
 
 		const contentDoc = await ContentModel.findOne({ 'current.route': route }, {
@@ -140,7 +147,14 @@ export class CMSController {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the contentDoc.current object
 	 */
-	public static async createContent(req: Req, res: Res, next: Next) {
+	@POST({
+		path: '/',
+		handlers: [
+			Auth.ByToken, Auth.RequireRole(accessRoles.admin),
+			validateSchema(JSchema.ContentSchema, VALIDATION_FAILED.CONTENT_MODEL),
+		]
+	})
+	public async createContent(req: Req, res: Res, next: Next) {
 		const data: Content = req.body,
 			user: User = <User>req.user;
 
@@ -181,7 +195,14 @@ export class CMSController {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the updated content object
 	 */
-	public static async patchContent(req: Req, res: Res, next: Next) {
+	@PATCH({
+		path: '/:route',
+		handlers: [
+			Auth.ByToken, Auth.RequireRole(accessRoles.admin),
+			validateSchema(JSchema.ContentSchema, VALIDATION_FAILED.CONTENT_MODEL),
+		]
+	})
+	public async patchContent(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route,
 			data: Content = req.body,
 			user: User = <User>req.user;
@@ -229,7 +250,14 @@ export class CMSController {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: message declaring success or failure
 	 */
-	public static async deleteContent(req: Req, res: Res, next: Next) {
+	@DELETE({
+		path: '/:route',
+		handlers: [
+			Auth.ByToken,
+			Auth.RequireRole(accessRoles.admin),
+		]
+	})
+	public async deleteContent(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route,
 			user: User = <User>req.user;
 
@@ -243,6 +271,26 @@ export class CMSController {
 	}
 
 
+	public static async sitemap(req: Req, res: Res, next: Next) {
+		const site = req.baseUrl;
+		res.type('application/xml');
+
+
+		const contentList: Content[] = await ContentModel.aggregate([
+			{ $match: { 'current.access': accessRoles.everyone, 'current.published': true } },
+			{
+				$project: { current: { title: 1, route: 1 } }
+			},
+			{ $replaceRoot: { newRoot: '$current' } }
+		]);
+
+
+
+
+		const x = xml();
+	}
+
+
 
 	/**
 	 * Returns search results for a given search term provided in the body
@@ -251,7 +299,8 @@ export class CMSController {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the search results
 	 */
-	public static async searchContent(req: Req, res: Res, next: Next) {
+	@GET({ path: '/search/:searchTerm', handlers: [Auth.Personalize] })
+	public async searchContent(req: Req, res: Res, next: Next) {
 		const searchTerm: string = req.params.searchTerm || '',
 			user: User = <User>req.user;
 
@@ -270,10 +319,14 @@ export class CMSController {
 				{ $group: { _id: '$_id', 'current': { $first: '$current' }, 'views': { $sum: 1 }, 'relevance': { $first: '$relevance' } } },
 				{ $sort: { 'relevance': 1 } },
 				{ $limit: 1000 },
-				{ $project: { current: {
-					title: 1, route: 1, access: 1, folder: 1, updatedAt: 1, views: '$views',
-					description: 1, images: 1, relevance: '$relevance'
-				} } },
+				{
+					$project: {
+						current: {
+							title: 1, route: 1, access: 1, folder: 1, updatedAt: 1, views: '$views',
+							description: 1, images: 1, relevance: '$relevance'
+						}
+					}
+				},
 				{ $replaceRoot: { newRoot: '$current' } }
 			]).allowDiskUse(true);
 

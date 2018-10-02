@@ -1,15 +1,14 @@
 ﻿import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
-import { get as configGet } from 'config';
-
-import { status, ajv, JSchema, ROUTE_STATUS, USERS_STATUS } from '../libs/validate';
+import { status, ajv, JSchema, ROUTE_STATUS, USERS_STATUS, validateSchema, VALIDATION_FAILED } from '../libs/validate';
 import { UserModel, User, accessRoles, UserDoc } from '../models';
 
-
-const userTypes: accessRoles[] = [accessRoles.admin, accessRoles.user];
+import { GET, PATCH } from '../libs/routingDecorators';
+import { Auth } from '../libs/auth';
 
 
 export class UsersController {
+	get router() { return (<any>this)._router; }
 
 	/**
 	 * Gets All registered users
@@ -17,7 +16,8 @@ export class UsersController {
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
 	 */
-	public static async getAllUsers(req: Req, res: Res, next: Next) {
+	@GET({ path: '/users/', handlers: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)] })
+	public async getAllUsers(req: Req, res: Res, next: Next) {
 		const users = <User[]>await UserModel.find({}, {
 			username: 1, role: 1, createdAt: 1
 		}).lean().sort('username_lower');
@@ -31,7 +31,13 @@ export class UsersController {
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
 	 */
-	public static async patchUser(req: Req, res: Res, next: Next) {
+	@PATCH({
+		path: '/users/:id', handlers: [
+			Auth.ByToken, Auth.RequireRole(accessRoles.admin),
+			validateSchema(JSchema.UserAdminUpdateUser, VALIDATION_FAILED.USER_MODEL),
+		]
+	})
+	public async patchUser(req: Req, res: Res, next: Next) {
 		const user: User = req.body,
 			adminUser: User = <User>req.user,
 			userId: string = req.params.id,

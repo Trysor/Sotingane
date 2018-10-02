@@ -81,7 +81,6 @@ describe('REST: Authorization', () => {
 
 		it('POST /api/auth/login 422', async () => {
 			const user: Partial<User> = { username: AdminUser.username }; // missing password
-
 			const res = await TestBed.http.post('/api/auth/login').send(user);
 
 			expect(res).to.have.status(422);

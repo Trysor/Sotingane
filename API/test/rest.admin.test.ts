@@ -5,6 +5,7 @@ import { CMS_STATUS, VALIDATION_FAILED, USERS_STATUS, ADMIN_STATUS } from '../sr
 import { AggregationQuery } from '../src/controllers';
 
 import { TestBed } from './testbed';
+import { fail } from 'assert';
 
 
 // ---------------------------------
@@ -436,11 +437,11 @@ describe('REST: Admin', () => {
 			const queryAdmin1: AggregationQuery = { createdBy: TestBed.AdminUser._id };
 			const queryAdmin2: AggregationQuery = { createdBy: TestBed.AdminUser2._id };
 
-			const [resAdmin1, resAdmin2, allContentDocs] = await Promise.all([
+			const [resAdmin1, resAdmin2] = await Promise.all([
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryAdmin1),
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryAdmin2),
-				ContentModel.find({}, { current: 1 })
 			]);
+			const allContentDocs = await ContentModel.find({}, { current: 1 });
 
 			expect(resAdmin1).to.have.status(200);
 			expect(resAdmin1).to.have.property('body');
@@ -485,12 +486,12 @@ describe('REST: Admin', () => {
 			expect(res2).to.have.status(200);
 			expect(res3).to.have.status(200);
 
-			const [resEveryone, resUsers, resAdmins, allContentDocs] = await Promise.all([
+			const [resEveryone, resUsers, resAdmins] = await Promise.all([
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryEveryone),
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryUsers),
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryAdmins),
-				ContentModel.find({}, { current: 1 })
 			]);
+			const allContentDocs = await ContentModel.find({}, { current: 1 });
 
 			expect(resEveryone).to.have.status(200);
 			expect(resEveryone).to.have.property('body');
@@ -535,11 +536,11 @@ describe('REST: Admin', () => {
 
 			expect(pushUnpublishedContentRes).to.have.status(200);
 
-			const [resPublished, resUnpublished, allContentDocs] = await Promise.all([
+			const [resPublished, resUnpublished] = await Promise.all([
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryPublished),
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryUnpublished),
-				ContentModel.find({}, { current: 1 })
 			]);
+			const allContentDocs = await ContentModel.find({}, { current: 1 });
 
 			expect(resPublished).to.have.status(200);
 			expect(resPublished).to.have.property('body');
