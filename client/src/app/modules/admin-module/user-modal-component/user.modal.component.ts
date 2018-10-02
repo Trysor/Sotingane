@@ -31,8 +31,6 @@ export class UserModalComponent {
 		private fb: FormBuilder,
 		@Inject(MAT_DIALOG_DATA) public data: UserModalData) {
 
-		console.log('constructor trigger');
-
 		// Have to init this list before the form group
 		this.otherUsernames = this.data.userList.filter(user => user !== data.user).map(user => user.username.toLowerCase());
 

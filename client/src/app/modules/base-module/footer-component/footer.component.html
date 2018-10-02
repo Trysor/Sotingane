@@ -1,2 +1,2 @@
-<span>{{desc}}</span>
-<span>{{copyright}}</span>
+<span>{{ (settingsService.settings | async).footer.text }}</span>
+<span>{{ (settingsService.settings | async).footer.copyright }}</span>

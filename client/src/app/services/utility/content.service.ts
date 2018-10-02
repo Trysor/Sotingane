@@ -3,6 +3,7 @@ import { Meta, Title } from '@angular/platform-browser';
 
 import { env } from '@env';
 import { ServerService } from '@app/services/http/server.service';
+import { SettingsService } from '@app/services/controllers/settings.service';
 
 import { CmsContent, DynamicComponent } from '@app/models';
 
@@ -17,6 +18,7 @@ export class ContentService {
 
 	constructor(
 		@Optional() private server: ServerService, // This service only exists in SSR
+		private settingsService: SettingsService,
 		private resolver: ComponentFactoryResolver,
 		private injector: Injector,
 		private title: Title,
@@ -35,8 +37,8 @@ export class ContentService {
 	 * Sets metadata to the default values provided in the environment variables
 	 */
 	public setDefaultMeta() {
-		this.title.setTitle(env.META.title);
-		this.meta.updateTag({ name: 'description', content: env.META.desc });
+		this.title.setTitle(this.settingsService.settings.getValue().meta.title);
+		this.meta.updateTag({ name: 'description', content: this.settingsService.settings.getValue().meta.desc });
 	}
 
 
@@ -46,7 +48,7 @@ export class ContentService {
 	 */
 	public setContentMeta(cmsContent: CmsContent) {
 		this.meta.updateTag({ name: 'description', content: cmsContent.description });
-		this.title.setTitle(`${env.META.title} - ${cmsContent.title}`);
+		this.title.setTitle(`${this.settingsService.settings.getValue().meta.title} - ${cmsContent.title}`);
 	}
 
 

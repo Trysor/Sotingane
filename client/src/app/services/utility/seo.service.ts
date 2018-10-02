@@ -6,6 +6,8 @@ import { CmsContent } from '@app/models';
 
 import { HttpService } from '@app/services/http/http.service';
 import { CMSService } from '@app/services/controllers/cms.service';
+import { SettingsService } from '@app/services/controllers/settings.service';
+
 
 import { BehaviorSubject } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -25,6 +27,7 @@ export class SEOService {
 
 	constructor(
 		private router: Router,
+		private settingsService: SettingsService,
 		private cmsService: CMSService,
 		private httpService: HttpService) {
 
@@ -77,7 +80,7 @@ export class SEOService {
 				'position': 1,
 				'item': {
 					'@id': this.httpService.urlBase,
-					'name': env.META.title,
+					'name': this.settingsService.settings.getValue().meta.title,
 				}
 			}]
 		};
@@ -111,7 +114,7 @@ export class SEOService {
 			'mainEntityOfPage': fullUrl,
 			'publisher': {
 				'@type': 'Organization',
-				'name': env.ORG,
+				'name': this.settingsService.settings.getValue().org,
 				'logo': {
 					'@type': 'ImageObject',
 					'url': this._orgLogoURL
