@@ -34,5 +34,7 @@
 @include mat-paginator-theme($app-theme);
 @include mat-table-theme($app-theme);
 
+@import 'lazy';
+
 // This here includes everything.
 // @include angular-material-theme($app-theme);
