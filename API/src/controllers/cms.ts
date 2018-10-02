@@ -231,7 +231,7 @@ export class CMSController {
 			createdAt: contentDoc.current.createdAt
 		};
 
-		const updated = await ContentModel.findByIdAndUpdate(contentDoc._id,
+		const updated: ContentEntry = await ContentModel.findByIdAndUpdate(contentDoc._id,
 			{
 				$set: { current: patched },
 				$push: { prev: { $each: [contentDoc.current], $position: 0, $slice: 10 } }

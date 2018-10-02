@@ -1,5 +1,5 @@
 import { Express, Router } from 'express';
-import { AdminController, AuthController, CMSController, UsersController, ErrorController } from './controllers';
+import { AdminController, AuthController, CMSController, UsersController, ErrorController, SettingsController } from './controllers';
 
 
 export class AppRouter {
@@ -15,6 +15,7 @@ export class AppRouter {
 		apiRoutes.use('/admin', new AdminController().router);
 		apiRoutes.use('/admin', new UsersController().router);
 		apiRoutes.use('/auth', new AuthController().router);
+		apiRoutes.use('/settings', new SettingsController().router);
 		// Set a common fallback for /api/*; 404 for invalid route
 		apiRoutes.all('*', ErrorController.error);
 

@@ -19,7 +19,6 @@ export const MongoStream = (opts: StreamerOptions) => {
 	const cursorOpts = { batchSize: opts.batchSize || 2000 };
 
 	// Set response content type
-	console.time('CURSOR TIME');
 	opts.res.type('application/json');
 
 	// Create cursor

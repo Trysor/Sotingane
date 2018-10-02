@@ -1,6 +1,4 @@
 ﻿import { Document, model, Schema } from 'mongoose';
-import { User } from '../models/user';
-import { ContentEntry } from '../models/content';
 
 /*
  |--------------------------------------------------------------------------
@@ -18,6 +16,15 @@ const schema = new Schema({
 		'--app-prim-c-1': { type: String, required: true },
 		'--app-prim-c-2': { type: String, required: true },
 		'--app-prim-c-3': { type: String, required: true },
+
+		'--app-acc-1': { type: String, required: true },
+		'--app-acc-2': { type: String, required: true },
+		'--app-acc-3': { type: String, required: true },
+		'--app-acc-c-1': { type: String, required: true },
+		'--app-acc-c-2': { type: String, required: true },
+		'--app-acc-c-3': { type: String, required: true },
+
+		'--color-text': { type: String, required: true },
 
 		'--color-background': { type: String, required: true },
 		'--color-header': { type: String, required: true },
@@ -57,6 +64,15 @@ export interface Settings {
 		'--app-prim-c-1': string;
 		'--app-prim-c-2': string;
 		'--app-prim-c-3': string;
+
+		'--app-acc-1': string;
+		'--app-acc-2': string;
+		'--app-acc-3': string;
+		'--app-acc-c-1': string;
+		'--app-acc-c-2': string;
+		'--app-acc-c-3': string;
+
+		'--color-text': string;
 
 		'--color-background': string;
 		'--color-header': string;

@@ -51,7 +51,6 @@ export function GET(opts: RoutingOptions) {
 export function POST(opts: RoutingOptions) {
 	return (target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) => {
 		if (opts.ignore) { return; }
-		console.log(propertyKey);
 		opts.handlers.push(descriptor.value);
 		getRouter(target).post(opts.path, opts.handlers);
 	};

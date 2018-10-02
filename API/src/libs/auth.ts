@@ -56,21 +56,6 @@ const ByToken = new JwtStrategy(jwtOptions, async (payload: any, done: VerifiedC
 });
 
 
-/*
- |--------------------------------------------------------------------------
- | Passport Use
- |--------------------------------------------------------------------------
-*/
-
-passportUse(ByLogin);
-passportUse(ByTokenName, ByToken);
-
-
-/*
- |--------------------------------------------------------------------------
- | Auth
- |--------------------------------------------------------------------------
-*/
 
 const Personalize = (req: Request, res: Response, next: NextFunction) => {
 	const token = jwtOptions.jwtFromRequest(req);
@@ -90,6 +75,23 @@ const RequireRole = (role: accessRoles) => {
 		return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED));
 	};
 };
+
+
+/*
+ |--------------------------------------------------------------------------
+ | Passport Use
+ |--------------------------------------------------------------------------
+*/
+
+passportUse(ByLogin);
+passportUse(ByTokenName, ByToken);
+
+
+/*
+ |--------------------------------------------------------------------------
+ | Auth
+ |--------------------------------------------------------------------------
+*/
 
 
 export class Auth {
