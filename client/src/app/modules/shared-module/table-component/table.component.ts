@@ -43,7 +43,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 		// Filter form
 		this.filterForm = fb.group({ filterControl: [''] });
 		this.filterForm.get('filterControl').valueChanges.pipe(
-			distinctUntilChanged(), takeUntil(this._ngUnsub), debounceTime(300)
+			distinctUntilChanged(), debounceTime(300), takeUntil(this._ngUnsub)
 		).subscribe(value => {
 			if (this.filterSettings.func) {
 				this.filterSettings.func(value);

@@ -33,8 +33,8 @@ export class LoadingService {
 
 			// Start timer, ticks every 100ms
 			interval(100).pipe(
-				takeUntil(this._isLoading),
-				takeWhile(num => (num * 100) < env.TIMEOUT)
+				takeWhile(num => (num * 100) < env.TIMEOUT),
+				takeUntil(this._isLoading)
 			).subscribe(num => {
 				this._loadingBarValue.next((num * 10000) / env.TIMEOUT);
 			});

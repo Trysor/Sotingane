@@ -50,8 +50,8 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 		public cmsService: CMSService) {
 
 		this.router.events.pipe(
-			takeUntil(this._ngUnsub),
-			filter(e => e instanceof NavigationEnd)
+			filter(e => e instanceof NavigationEnd),
+			takeUntil(this._ngUnsub)
 		).subscribe(e => {
 			this.cmsService.requestContent(this.route.snapshot.params['content']);
 		});

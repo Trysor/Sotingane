@@ -91,7 +91,7 @@ export class SearchResultsComponent implements OnDestroy {
 	 * Set searchResults helper
 	 */
 	private setResults(term: string) {
-		this.cmsService.searchContent(term).pipe(takeUntil(this._ngUnsub), take(1)).subscribe(
+		this.cmsService.searchContent(term).pipe(take(1), takeUntil(this._ngUnsub)).subscribe(
 			list => this.data.next(Array.isArray(list) ? list : null),
 			err => this.data.next(null)
 		);
