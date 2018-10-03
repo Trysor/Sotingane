@@ -2,12 +2,11 @@
 
 import { SettingsModel, accessRoles, Settings } from '../models';
 
-import { GET, PATCH } from '../libs/routingDecorators';
+import { Controller, GET, PATCH } from '../libs/routing';
 import { Auth } from '../libs/auth';
 
 
-export class SettingsController {
-	get router() { return (<any>this)._router; }
+export class SettingsController extends Controller {
 
 	@PATCH({ path: '/', handlers: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)] }) // TODO: REQUIRE VALIDATION!!
 	public async patchSettings(req: Req, res: Res, next: Next) {

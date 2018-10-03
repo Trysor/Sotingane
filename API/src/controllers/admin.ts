@@ -6,13 +6,10 @@ import { status, ajv, JSchema, ADMIN_STATUS, CMS_STATUS, VALIDATION_FAILED, vali
 import { accessRoles, ContentModel, Content, ContentEntry } from '../models';
 
 import { MongoStream } from '../libs/MongoStreamer';
-import { GET, POST } from '../libs/routingDecorators';
+import { Controller, GET, POST } from '../libs/routing';
 import { Auth } from '../libs/auth';
 
-export class AdminController {
-	get router() { return (<any>this)._router; }
-
-
+export class AdminController extends Controller {
 
 	/**
 	 * Gets all content

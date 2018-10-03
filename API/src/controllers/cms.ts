@@ -8,16 +8,12 @@ import { sanitize, stripHTML } from '../libs/sanitizer';
 
 import { status, ajv, JSchema, ROUTE_STATUS, CMS_STATUS, validateSchema, VALIDATION_FAILED } from '../libs/validate';
 import { User, accessRoles, Log, LogModel, ContentModel, Content, ContentEntry } from '../models';
-import { GET, POST, PATCH, DELETE, isProduction } from '../libs/routingDecorators';
+import { Controller, GET, POST, PATCH, DELETE, isProduction } from '../libs/routing';
 import { Auth } from '../libs/auth';
 
 
 
-export class CMSController {
-	get router() { return (<any>this)._router; }
-
-
-
+export class CMSController extends Controller {
 	private static ImageSrcRegex = /<img[^>]*src="([^"]*)"/g;
 
 	/**

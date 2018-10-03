@@ -3,12 +3,11 @@
 import { status, ajv, JSchema, ROUTE_STATUS, USERS_STATUS, validateSchema, VALIDATION_FAILED } from '../libs/validate';
 import { UserModel, User, accessRoles, UserDoc } from '../models';
 
-import { GET, PATCH } from '../libs/routingDecorators';
+import { Controller, GET, PATCH } from '../libs/routing';
 import { Auth } from '../libs/auth';
 
 
-export class UsersController {
-	get router() { return (<any>this)._router; }
+export class UsersController extends Controller {
 
 	/**
 	 * Gets All registered users

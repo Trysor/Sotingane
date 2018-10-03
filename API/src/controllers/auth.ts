@@ -6,7 +6,7 @@ import { sign } from 'jsonwebtoken';
 import { status, ajv, JSchema, ROUTE_STATUS, AUTH_STATUS, validateSchema, VALIDATION_FAILED } from '../libs/validate';
 import { UserModel, User, UserDoc, accessRoles } from '../models';
 
-import { GET, POST, PATCH, DELETE, isProduction } from '../libs/routingDecorators';
+import { Controller, GET, POST, PATCH, DELETE, isProduction } from '../libs/routing';
 import { Auth } from '../libs/auth';
 
 
@@ -15,8 +15,7 @@ export interface TokenResponse {
 	user: User;
 }
 
-export class AuthController {
-	get router() { return (<any>this)._router; }
+export class AuthController extends Controller {
 
 	/**
 	 * Returns a new token for a user in a session which is about to expire, if authorized to do so
