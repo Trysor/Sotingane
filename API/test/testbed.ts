@@ -7,7 +7,7 @@ import * as Mocha from 'mocha';
 import { readdirSync } from 'fs';
 import { join as pathjoin } from 'path';
 
-import { ContentModel, LogModel, UserModel, User, accessRoles, UserDoc } from '../src/models';
+import { ContentModel, LogModel, SettingsModel, UserModel, User, accessRoles, UserDoc } from '../src/models';
 import { TokenResponse } from '../src/controllers';
 
 import app from '../src/app';
@@ -44,7 +44,8 @@ export class TestBedSingleton {
 			await Promise.all([
 				UserModel.deleteMany({}).exec(),
 				ContentModel.deleteMany({}).exec(),
-				LogModel.deleteMany({}).exec()
+				LogModel.deleteMany({}).exec(),
+				SettingsModel.deleteMany({}).exec()
 			]);
 
 			// Create new users and log them in
@@ -101,4 +102,3 @@ export const TestUser: Partial<User> = {
 	password: 'test',
 	role: accessRoles.user,
 };
-

@@ -1,4 +1,4 @@
-﻿import { Injectable, Renderer2, RendererFactory2, RendererStyleFlags2 } from '@angular/core';
+﻿import { Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 
 import { AppSettings } from '@app/models';
 
@@ -113,6 +113,6 @@ export class SettingsService {
 	}
 
 	public patchSettings(settings: AppSettings) {
-		return this.http.client.patch<boolean>(this.http.apiUrl(env.API.settings), settings);
+		return this.http.client.post<boolean>(this.http.apiUrl(env.API.settings), settings);
 	}
 }

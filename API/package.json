@@ -15,7 +15,7 @@
 	"author": "",
 	"dependencies": {
 		"ajv": "6.5.4",
-		"bcrypt": "3.0.0",
+		"bcrypt": "^3.0.0",
 		"body-parser": "^1.18.3",
 		"config": "^2.0.1",
 		"cookie-parser": "^1.4.3",

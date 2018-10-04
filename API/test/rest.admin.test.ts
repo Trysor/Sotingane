@@ -5,8 +5,6 @@ import { CMS_STATUS, VALIDATION_FAILED, USERS_STATUS, ADMIN_STATUS } from '../sr
 import { AggregationQuery } from '../src/controllers';
 
 import { TestBed } from './testbed';
-import { fail } from 'assert';
-
 
 // ---------------------------------
 // ------- Content TestSuite -------

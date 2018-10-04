@@ -58,7 +58,10 @@ export enum JSchema {
 	ContentSchema = 'ContentSchema',
 
 	// Admin
-	AdminAggregationSchema = 'AdminAggregationSchema'
+	AdminAggregationSchema = 'AdminAggregationSchema',
+
+	// Settings
+	SettingsSchema = 'SettingsSchema'
 }
 
 
@@ -72,6 +75,7 @@ export const enum VALIDATION_FAILED {
 	USER_MODEL = 'User object validation failed',
 	CONTENT_MODEL = 'Content object validation failed',
 	ADMIN_MODEL = 'Query object validation failed',
+	SETTING_MODEL = 'Setting object validation failed'
 }
 
 
@@ -115,4 +119,10 @@ export const enum USERS_STATUS {
 	DATA_UNPROCESSABLE = 'The provided data could not be processed',
 	USER_UPDATED = 'User has been updated successfully',
 	USERNAME_NOT_AVILIABLE = 'Username already taken',
+}
+
+export const enum SETTINGS_STATUS {
+	DATA_UNPROCESSABLE = 'The provided data could not be processed',
+	SETTINGS_UPDATED = 'Settings has been updated successfully',
+	SETTINGS_NONE_FOUND = 'Could not find settings',
 }
