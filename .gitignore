@@ -53,3 +53,5 @@ bin
 obj
 *.sln
 *.njsproj
+*.code-workspace
+*.vscode
