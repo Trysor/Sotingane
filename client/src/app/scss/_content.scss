@@ -92,7 +92,7 @@ $figure-margin: 0.8em;
 			left: 0;
 			height: 100%;
 			width: 100%;
-			z-index: 1000;
+			z-index: 100;
 			box-shadow: var(--shadow) inset;
 			pointer-events: none;
 		}
@@ -181,15 +181,19 @@ $figure-margin: 0.8em;
 			border-collapse: collapse;
 			border: none;
 			background: var(--color-shade);
-			display: block;
+			
+			table-layout: fixed;
 			width: 100%;
-			max-width: 100%;
-			overflow: auto;
+			white-space: nowrap;
 			
 			th, td {
 				border: var(--border);
 				background: none;
 				padding: 0.5em;
+
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
 			}
 		}
 	}
@@ -199,7 +203,7 @@ $figure-margin: 0.8em;
 // Mobile styling
 .site.mobile {
 	#content {
-		.image {
+		figure.image {
 			&.image-style-align-right,
 			&.image-style-align-left {
 				float: none;
@@ -210,10 +214,10 @@ $figure-margin: 0.8em;
 				margin-right: 0;
 			}
 		}
-	}
 
-	.media {
-		float: none;
-		width: 100%;
+		figure.media {
+			float: none;
+			width: 100%;
+		}
 	}
 }

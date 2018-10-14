@@ -47,10 +47,6 @@
 	overflow: hidden;
 	display: block;
 
-	::ng-deep .ck-editor .ck-sticky-panel .ck-sticky-panel__content_sticky {
-		top: var(--height-header) !important;
-	}
-
 	::ng-deep .ck-content.ck-editor__editable {
 		min-height: 245px;
 		background: var(--color-shade);
