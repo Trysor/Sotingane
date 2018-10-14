@@ -8,6 +8,7 @@
 		   routerLinkActive="active">{{ navEntry.title }}</a>
 
 		<ng-container *ngFor="let folderEntry of nav.folders">
+			<mat-divider></mat-divider>
 			<h2 mat-subheader>{{ folderEntry.title }}</h2>
 			<a mat-list-item *ngFor="let navEntry of folderEntry.content; trackBy: trackBy"
 			   routerLink="/{{navEntry.route}}"

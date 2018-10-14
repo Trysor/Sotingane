@@ -8,11 +8,6 @@ a[mat-list-item].active {
 	background: var(--color-active);
 }
 
-a.mat-list-item,
-h2.mat-subheader {
-	height: 32px;
-}
-
 .subItem {
 	padding-left: 14px;
 
@@ -21,11 +16,10 @@ h2.mat-subheader {
 	}
 }
 
-.mat-subheader {
-	/*background: $headerBG;
-	border: $border;
-	border-style: solid none;
-	box-shadow: $boxShadow, $boxShadow inset;*/
+mat-nav-list h2.mat-subheader {
 	font-weight: bold;
-	margin: 0.8em 0;
+}
+
+mat-divider {
+	margin-top: 1em;
 }
