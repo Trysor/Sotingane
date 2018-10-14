@@ -1,8 +1,7 @@
-import { Express, Request, Response, NextFunction } from 'express';
+import { Express, Request, Response, NextFunction, json, urlencoded } from 'express';
 import { util as configUtil, get as configGet } from 'config';
 
 import * as helmet from 'helmet';
-import { json, urlencoded } from 'body-parser';
 import * as logger from 'morgan';
 import * as methodOverride from 'method-override';
 import * as cookieParser from 'cookie-parser';

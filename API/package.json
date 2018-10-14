@@ -16,7 +16,6 @@
 	"dependencies": {
 		"ajv": "6.5.4",
 		"bcrypt": "^3.0.0",
-		"body-parser": "^1.18.3",
 		"config": "^2.0.1",
 		"cookie-parser": "^1.4.3",
 		"express": "^4.16.3",
@@ -36,7 +35,6 @@
 	},
 	"devDependencies": {
 		"@types/bcrypt": "^2.0.0",
-		"@types/body-parser": "^1.17.0",
 		"@types/chai": "4.1.6",
 		"@types/chai-http": "3.0.5",
 		"@types/config": "0.0.34",
