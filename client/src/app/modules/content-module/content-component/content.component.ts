@@ -24,11 +24,13 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 	@ViewChild('contentHost') private _contentHost: ElementRef<HTMLDivElement>;
 
 	// Input content. Used in relation to Editing previews
-	private _inputSet = false;
 	@Input() public set contentInput(value: CmsContent) {
-		if (this._inputSet) { return; }
+		if (!value) { return; }
+		const old = this.cmsService.content.getValue();
+		if (old && old.content === value.content && old.title === value.title) {
+			return; // Visually the same as what we've got
+		}
 		this.cmsService.content.next(value);
-		this._inputSet = true;
 	}
 	// previewMode controls the visiblity state of details in the template
 	@Input() public previewMode = false;
