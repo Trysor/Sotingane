@@ -1,8 +1,7 @@
-import { Request as Req, Response as Res, NextFunction as Next, Router } from 'express';
+import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
 import { UAParser } from 'ua-parser-js';
 import { escape } from 'validator';
-import * as xml from 'xml';
 
 import { sanitize, stripHTML } from '../libs/sanitizer';
 
@@ -157,6 +156,11 @@ export class CMSController extends Controller {
 		// insert ONLY sanitized and escaped data!
 		const sanitizedContent = sanitize(data.content);
 
+		let searchable = stripHTML(sanitizedContent);
+		if (!searchable || searchable.length === 0) {
+			searchable = ' '; // Cannot be empty.
+		}
+
 		const newCurrent: Content = {
 			title: escape(data.title),
 			route: escape(data.route.replace(/\//g, '')).toLowerCase(),
@@ -164,7 +168,7 @@ export class CMSController extends Controller {
 			access: data.access,
 			version: 0,
 			content: sanitizedContent,
-			content_searchable: stripHTML(data.content),
+			content_searchable: searchable,
 			description: sanitize(data.description),
 			images: CMSController.getImageSrcFromContent(sanitizedContent),
 			nav: !!data.nav,
@@ -265,27 +269,6 @@ export class CMSController extends Controller {
 		if (result.n === 0) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
 		return res.status(200).send(status(CMS_STATUS.CONTENT_DELETED));
 	}
-
-
-	public static async sitemap(req: Req, res: Res, next: Next) {
-		const site = req.baseUrl;
-		res.type('application/xml');
-
-
-		const contentList: Content[] = await ContentModel.aggregate([
-			{ $match: { 'current.access': accessRoles.everyone, 'current.published': true } },
-			{
-				$project: { current: { title: 1, route: 1 } }
-			},
-			{ $replaceRoot: { newRoot: '$current' } }
-		]);
-
-
-
-
-		const x = xml();
-	}
-
 
 
 	/**
