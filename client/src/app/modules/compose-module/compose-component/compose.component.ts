@@ -5,12 +5,17 @@ import { DatePipe } from '@angular/common';
 
 import { MatSelectChange } from '@angular/material';
 
+import { ChangeEvent } from '@ckeditor/ckeditor5-angular/ckeditor.component';
+import ClassicEditor from '@app/ckeditor';
+
+
 import { ModalService, CMSService, MobileService, AdminService, StorageService, StorageKey } from '@app/services';
 import { CmsContent, AccessRoles } from '@app/models';
 import { FormErrorInstant, AccessHandler } from '@app/classes';
 
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { takeUntil, debounceTime } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
+import { CKEditor5 } from '@ckeditor/ckeditor5-angular/ckeditor';
 
 
 enum VersionHistory { Draft = -1 }
@@ -24,6 +29,7 @@ enum VersionHistory { Draft = -1 }
 export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeComponent> {
 	public readonly contentForm: FormGroup; // Form
 	public readonly formErrorInstant = new FormErrorInstant(); // Form validation errors trigger instantly
+	public readonly ClassicEditor = ClassicEditor; // CKEditor
 	public originalContent: CmsContent; // When editing, the original content is kept here
 	// Access
 	public readonly AccessRoles = AccessRoles;
@@ -46,6 +52,7 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 
 	public get tabIndex() { return this.storage.getSession(StorageKey.ComposeTabIndex); }
 	public set tabIndex(value: string) { this.storage.setSession(StorageKey.ComposeTabIndex, value); }
+
 
 	constructor(
 		@Optional() private modalService: ModalService,
@@ -135,18 +142,13 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 	public versionChange(event: MatSelectChange) {
 		const c = this.history ? this.history[event.value] : null;
 
-		if (c) {
+		if (c && !this.contentForm.disabled) {
 			// Only store current draft when the user is actually able to draft.
 			// The form should be disabled when reviewing history.
-			if (!this.contentForm.disabled) {
-				this._currentDraft = this.contentForm.value;
-			}
-			this.contentForm.patchValue(c, { emitEvent: false });
-			this.setFormDisabledState();
-			return;
+			this._currentDraft = this.contentForm.value;
 		}
 
-		this.contentForm.patchValue(this._currentDraft, { emitEvent: false });
+		this.contentForm.patchValue(c ? c : this._currentDraft);
 		this.setFormDisabledState(); // Disabled state has to occur BELOW the disabled check above!
 	}
 

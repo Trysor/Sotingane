@@ -8,22 +8,21 @@ import { ComposeRoutingModule } from './compose.routing-module';
 import { ContentModule } from '@app/modules/content-module/content.module';
 import { SharedModule } from '@app/modules/shared-module/shared.module';
 import { CommonModule } from '@app/modules/common.module';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 // Components
 import { ComposeComponent } from './compose-component/compose.component';
-import { CKEditorComponent } from './ckeditor-component/ckeditor.component';
-
 
 
 @NgModule({
 	declarations: [
-		ComposeComponent,
-		CKEditorComponent,
+		ComposeComponent
 	],
 	imports: [
 		SharedModule,
 		ContentModule,
 		CommonModule,
+		CKEditorModule,
 		ComposeRoutingModule
 	]
 })

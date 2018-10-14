@@ -106,13 +106,15 @@
 
 			<mat-tab label="Content">
 				<!-- CONTENT -->
-				<ck-editor class="editor" [control]="contentForm.get('content')"></ck-editor>
+				<ng-template matTabContent>
+					<ckeditor class="editor" id="content" [editor]="ClassicEditor" formControlName="content"></ckeditor>
+				</ng-template>
 			</mat-tab>
 
 
 			<mat-tab label="Preview" #previewTab>
 				<ng-template matTabContent>
-					<content-component [contentInput]="contentForm.getRawValue()" previewMode="true"></content-component>
+					<content-component previewMode="true" [contentInput]="contentForm.getRawValue()"></content-component>
 				</ng-template>
 			</mat-tab>
 

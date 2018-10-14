@@ -5,6 +5,7 @@
 		"sourceMap": true,
 		"declaration": false,
 		"moduleResolution": "node",
+		"allowJs": true,
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"target": "es2015",
@@ -15,7 +16,7 @@
 		"paths": {
 			"@app/*": [ "app/*" ],
 			"@env": [ "environments/environment" ],
-			"@app-ckeditor": [ "../../CKEditor/dist/ckeditor" ]
+			"@app/ckeditor": [ "../../CKEditor" ]
 		},
 		"lib": [
 			"es2017",

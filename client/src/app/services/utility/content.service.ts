@@ -1,14 +1,13 @@
-﻿import { Injectable, ElementRef, Optional, Injector, ComponentRef, ComponentFactory, ComponentFactoryResolver } from '@angular/core';
+﻿import { Injectable, ElementRef, Injector, ComponentRef, ComponentFactory, ComponentFactoryResolver } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 
-import { env } from '@env';
-import { ServerService } from '@app/services/http/server.service';
 import { SettingsService } from '@app/services/controllers/settings.service';
 
 import { CmsContent, DynamicComponent } from '@app/models';
 
 import { DynamicLinkComponent } from '@app/modules/content-module/content-controllers/dynamic.link.component';
 import { DynamicImageComponent } from '@app/modules/content-module/content-controllers/dynamic.image.component';
+import { DynamicMediaComponent } from '@app/modules/content-module/content-controllers/dynamic.media.component';
 
 
 @Injectable({ providedIn: 'root' })
@@ -17,7 +16,6 @@ export class ContentService {
 	private readonly _embeddedComponents: ComponentRef<DynamicComponent>[] = [];
 
 	constructor(
-		@Optional() private server: ServerService, // This service only exists in SSR
 		private settingsService: SettingsService,
 		private resolver: ComponentFactoryResolver,
 		private injector: Injector,
@@ -25,8 +23,9 @@ export class ContentService {
 		private meta: Meta) {
 
 		// Map the tag to replace with the corresponding factory
-		this._dynamicContent.set('a', resolver.resolveComponentFactory(DynamicLinkComponent));
-		this._dynamicContent.set('figure', resolver.resolveComponentFactory(DynamicImageComponent));
+		this._dynamicContent.set('a', this.resolver.resolveComponentFactory(DynamicLinkComponent));
+		this._dynamicContent.set('figure.media', this.resolver.resolveComponentFactory(DynamicMediaComponent));
+		this._dynamicContent.set('figure.image', this.resolver.resolveComponentFactory(DynamicImageComponent));
 	}
 
 	// ---------------------------------------
@@ -69,24 +68,15 @@ export class ContentService {
 
 		// Prepare content for injection
 		const e = element.nativeElement;
-		let newContent = cmsContent.content;
 
 		// Clean components before rebuilding.
 		this.cleanEmbeddedComponents();
+		e.innerHTML = cmsContent.content.replace(/src/g, 'data-src');
 
-		// First loop; alter everything first, then inject afterwards.
-		this._dynamicContent.forEach((fac, tag) => {
-			const selector = fac.selector;
-			const open = new RegExp(`<${tag} `, 'g');
-			const close = new RegExp(`</${tag}>`, 'g');
-			newContent = newContent.replace(open, `<${selector} `).replace(close, `</${selector}>`);
-		});
-		e.innerHTML = newContent.replace(/src/g, 'data-src');
-
-		// Second loop; Injection time
-		this._dynamicContent.forEach((fac) => {
+		// Inject
+		this._dynamicContent.forEach((fac, selector) => {
 			// query for elements we need to adjust
-			const elems = e.querySelectorAll(fac.selector);
+			const elems = e.querySelectorAll(selector);
 
 			for (let i = 0; i < elems.length; i++) {
 				const el = elems.item(i);

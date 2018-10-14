@@ -1,6 +1,7 @@
 /// <reference path="_theme_vars.scss" />
 
 $lazy-transition: ease-in-out opacity 0.3s;
+$figure-margin: 0.8em;
 
 #content {
 	a, p {
@@ -8,7 +9,7 @@ $lazy-transition: ease-in-out opacity 0.3s;
 		overflow-wrap: break-word;
 	}
 
-	& > h1, & > h2, & > h3, & > h4, & > h5, & > h6 {
+	h1, h2, h3, h4, h5, h6 {
 		clear: both;
 	}
 
@@ -57,16 +58,32 @@ $lazy-transition: ease-in-out opacity 0.3s;
 		}
 	}
 
-	.image {
-		text-align: center;
-		margin: 0 0 1em 0; // 1em margin bottom
+	figure {
+		margin: 0 0 1em 0;
+		width: calc(50% - #{$figure-margin});
 		box-sizing: border-box;
 		display: block;
-		clear: both;
+		box-shadow: var(--shadow);
+	}
+
+	figure.image {
+		text-align: center;
+		position: relative;
+		transition: $lazy-transition;
+
 		border: var(--border);
 		background: var(--color-sidepanel);
-		box-shadow: var(--shadow);
-		position: relative;
+
+		// Lazy-load pre-sizing to fill space.
+		&.lazy {
+			height: calc(var(--width-wrapper) * 9 / 16);
+			opacity: 0;
+
+			&.image-style-align-left,
+			&.image-style-align-right {
+				height: calc(var(--width-wrapper) / 2 * 9 / 16);
+			}
+		}
 
 		&:after {
 			content: "";
@@ -78,6 +95,10 @@ $lazy-transition: ease-in-out opacity 0.3s;
 			z-index: 1000;
 			box-shadow: var(--shadow) inset;
 			pointer-events: none;
+		}
+
+		.click {
+			cursor: pointer;
 		}
 
 		img {
@@ -98,81 +119,83 @@ $lazy-transition: ease-in-out opacity 0.3s;
 		&.image-style-align-left,
 		&.image-style-align-right {
 			display: inline-block;
-			max-width: calc(50% - .4m); // negate the padding
-			width: calc(50% - .4em);
+			max-width: calc(50% - #{$figure-margin}); // negate the padding
+			width: calc(50% - #{$figure-margin});
 			margin-top: 0;
 		}
 
 		&.image-style-align-left {
-			margin-right: .4em;
+			margin-right: $figure-margin;
 			float: left;
 			clear: left;
 		}
 
 		&.image-style-align-right {
-			margin-left: .4em;
+			margin-left: $figure-margin;
 			float: right;
 			clear: right;
 		}
 	}
-	// Lazy-load pre-sizing to fill space.
-	image-container.image {
+
+	figure.media {
+		//display: inline-block;
+		margin: 0 $figure-margin 1em 0;
+		position: relative;
+		float: left;
+		vertical-align: top;
 		transition: $lazy-transition;
 
 		&.lazy {
-			height: calc(var(--width-wrapper) * 9 / 16);
 			opacity: 0;
+		}
 
-			&.image-style-align-left,
-			&.image-style-align-right {
-				height: calc(var(--width-wrapper) / 2 * 9 / 16);
+		&.wide {
+			margin: 0;
+			width: 100%;
+			clear: both;
+		}
+
+		iframe {
+			position: absolute;
+			top: 0;
+			right: 0;
+			width: 100%;
+			height: 100%;
+			transition: $lazy-transition;
+
+			&.iframelazy {
+				opacity: 0;
 			}
 		}
 
-		.click {
-			cursor: pointer;
+		img {
+			display: block;
+			width: 100%;
+			height: auto;
+		}
+	}
+
+	figure.table {
+		width: initial;
+		table {
+			border-collapse: collapse;
+			border: none;
+			background: var(--color-shade);
+			display: block;
+			width: 100%;
+			max-width: 100%;
+			overflow: auto;
+			
+			th, td {
+				border: var(--border);
+				background: none;
+				padding: 0.5em;
+			}
 		}
 	}
 }
 
-.video {
-	//display: inline-block;
-	position: relative;
-	margin: 0 .8em 1em 0;
-	width: calc(50% - 0.8em);
-	float: left;
-	vertical-align: top;
-	transition: $lazy-transition;
 
-	&.lazy {
-		opacity: 0;
-	}
-
-	&.wide {
-		margin: 0 0 .8em 0;
-		width: 100%;
-		clear: both;
-	}
-
-	iframe {
-		position: absolute;
-		top: 0;
-		right: 0;
-		width: 100%;
-		height: 100%;
-		transition: $lazy-transition;
-
-		&.iframelazy {
-			opacity: 0;
-		}
-	}
-
-	img {
-		display: block;
-		width: 100%;
-		height: auto;
-	}
-}
 // Mobile styling
 .site.mobile {
 	#content {
@@ -189,7 +212,7 @@ $lazy-transition: ease-in-out opacity 0.3s;
 		}
 	}
 
-	.video {
+	.media {
 		float: none;
 		width: 100%;
 	}

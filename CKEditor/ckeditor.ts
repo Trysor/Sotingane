@@ -1,7 +1,6 @@
 ﻿import ClassicEditorBase from '@ckeditor/ckeditor5-editor-classic/src/classiceditor';
 import EssentialsPlugin from '@ckeditor/ckeditor5-essentials/src/essentials';
 
-
 // Text manipulation
 import AlignmentPlugin from '@ckeditor/ckeditor5-alignment/src/alignment';
 import BoldPlugin from '@ckeditor/ckeditor5-basic-styles/src/bold';
@@ -21,9 +20,15 @@ import LinkPlugin from '@ckeditor/ckeditor5-link/src/link';
 import ListPlugin from '@ckeditor/ckeditor5-list/src/list';
 import BlockquotePlugin from '@ckeditor/ckeditor5-block-quote/src/blockquote';
 import CodePlugin from '@ckeditor/ckeditor5-basic-styles/src/code';
+import MediaEmbedPlugin from '@ckeditor/ckeditor5-media-embed/src/mediaembed';
+import TablePlugin from '@ckeditor/ckeditor5-table/src/table';
+import TableToolbarPlugin from '@ckeditor/ckeditor5-table/src/tabletoolbar';
+
+// Typings
+import { CKEditorDefaultConfig } from './model';
 
 export default class ClassicEditor extends ClassicEditorBase {
-	static defaultConfig: { toolbar: { items: string[]; }; image?: { toolbar: string[]; styles: { name: string; icon: string; }[]; }; language: string; };
+	static defaultConfig: CKEditorDefaultConfig;
 	static builtinPlugins: any[];
 	static create: (e?: HTMLElement) => Promise<any>
 }
@@ -42,10 +47,14 @@ ClassicEditor.builtinPlugins = [
 	LinkPlugin,
 	ListPlugin,
 	BlockquotePlugin,
-	CodePlugin
+	CodePlugin,
+	MediaEmbedPlugin,
+	TablePlugin,
+	TableToolbarPlugin
 ];
 ClassicEditor.defaultConfig = {
 	toolbar: {
+		viewportTopOffset: 40,
 		items: [
 			'heading',
 			'|',
@@ -55,8 +64,21 @@ ClassicEditor.defaultConfig = {
 			'|',
 			'blockQuote', 'code',
 			'|',
+			'mediaEmbed', 'insertTable',
+			'|',
 			'undo', 'redo'
 		]
+	},
+
+	mediaEmbed: {
+		previewsInData: false,
+		toolbar: ['imageTextAlternative', '|', 'imageStyle:alignLeft', 'imageStyle:full', 'imageStyle:alignRight'],
+		styles: [
+			{ name: 'alignLeft', icon: 'left' },
+			{ name: 'full', icon: 'full' },
+			{ name: 'alignRight', icon: 'right' },
+		],
+		removeProviders: [ 'instagram', 'twitter', 'googleMaps', 'flickr', 'facebook' ]
 	},
 
 	image: {
@@ -67,6 +89,8 @@ ClassicEditor.defaultConfig = {
 			{ name: 'alignRight', icon: 'right' },
 		]
 	},
-
+	table: {
+		contentToolbar: [ 'tableColumn', 'tableRow', 'mergeTableCells' ]
+	},
 	language: 'en'
 };

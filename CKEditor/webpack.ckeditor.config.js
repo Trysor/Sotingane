@@ -1,6 +1,4 @@
 ﻿const path = require('path');
-const webpack = require('webpack');
-
 const { styles } = require('@ckeditor/ckeditor5-dev-utils');
 const CKEditorWebpackPlugin = require('@ckeditor/ckeditor5-dev-webpack-plugin');
 const WrapperPlugin = require('wrapper-webpack-plugin');

@@ -1,4 +1,4 @@
-﻿import { Component, Renderer2, ElementRef, Optional, ChangeDetectionStrategy, ViewChild } from '@angular/core';
+﻿import { Component, Renderer2, ElementRef, Optional, ChangeDetectionStrategy } from '@angular/core';
 
 import { DynamicComponent } from '@app/models';
 import { ModalService } from '@app/services/utility/modal.service';
@@ -18,8 +18,7 @@ interface PictureSource {
 
 @Component({
 	selector: 'image-container',
-	template: `<figure><ng-content></ng-content></figure>`,
-	styles: ['figure { margin: 0; }'],
+	template: `<ng-content></ng-content>`,
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DynamicImageComponent extends DynamicLazyLoader implements DynamicComponent {
@@ -46,25 +45,7 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 		// Add lazy tag
 		if (this.platform.isBrowser) { this.renderer.addClass(this.elRef.nativeElement, 'lazy'); }
 
-		// check for CDN logic
-		const output = /ucarecdn.com\/([A-Z0-9-]+)\//i.exec(src);
-		if (output) {
-			// Build our CDN image url string
-			const cdnstring = 'https://ucarecdn.com/' + output[1] + '/-/format/auto/';
-			// Add sources
-			if (this.platform.isServer) {
-				// small image for server side. We want the SPA to load asap.
-				this._sources.push({ media: null, src: cdnstring + '-/resize/500x/' });
-			} else {
-				this._sources.push({ media: '1500w', src: cdnstring });
-				this._sources.push({ media: '1000w', src: cdnstring + '-/resize/1000x/' });
-				this._sources.push({ media: '750w', src: cdnstring + '-/resize/750x/' });
-				this._sources.push({ media: '500w', src: cdnstring + '-/resize/500x/' });
-			}
-		} else {
-			// If the image is not from the CDN, push just the src we found with no additional info to a srcset
-			this._sources.push({ media: null, src: src });
-		}
+		this._sources.push({ media: null, src: src });
 
 		this._srcset = this._sources.map((s) => `${s.src} ${(s.media ? s.media : '')}`).join(', ');
 		this.renderer.listen(this._imgEl, 'click', this.onclick.bind(this));

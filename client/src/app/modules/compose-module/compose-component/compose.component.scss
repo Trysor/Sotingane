@@ -40,3 +40,106 @@
 	}
 }
 
+
+.editor {
+	box-sizing: border-box;
+	margin: 0;
+	overflow: hidden;
+	display: block;
+
+	::ng-deep .ck-editor .ck-sticky-panel .ck-sticky-panel__content_sticky {
+		top: var(--height-header) !important;
+	}
+
+	::ng-deep .ck-content.ck-editor__editable {
+		min-height: 245px;
+		background: var(--color-shade);
+		border-color: var(--color-border);
+	}
+}
+
+::ng-deep :root {
+	--ck-color-text: var(--color-text);
+	--ck-color-base-foreground: var(--color-header);
+	--ck-color-base-background: var(--color-header);
+	--ck-color-base-border: var(--color-border);
+	--ck-color-base-action: var(--color-active);
+	--ck-color-base-focus: var(--color-active);
+	--ck-color-base-text: var(--color-text);
+	--ck-color-base-active: var(--color-active);
+	--ck-color-base-active-focus: var(--color-active);
+	--ck-color-focus-border: var(--color-border);
+	--ck-color-focus-shadow: var(--color-background);
+	--ck-color-button-default-hover-background: var(--color-material);
+	--ck-color-button-default-focus-background: var(--color-material);
+	--ck-color-button-default-active-background: var(--color-material);
+	--ck-color-button-default-active-shadow: var(--color-background);
+	--ck-color-button-default-disabled-background: transparent;
+	--ck-color-button-on-background: var(--color-background);
+	--ck-color-button-on-hover-background: var(--color-material);
+	--ck-color-button-on-focus-background: var(--color-active);
+	--ck-color-button-on-active-background: var(--color-active);
+	--ck-color-button-on-active-shadow: var(--color-background);
+	--ck-color-button-on-disabled-background: var(--color-disabled);
+	--ck-color-button-action-focus-background: var(--color-material);
+	--ck-color-button-action-active-background: var(--color-active);
+	--ck-color-button-action-active-shadow: var(--color-background);
+	--ck-color-button-action-disabled-background: var(--color-disabled);
+	// block a
+	--ck-color-list-item-text-active: var(--color-text);
+	// block b
+	--ck-color-link-default: var(--color-primary);
+	--ck-color-link-selected-background: var(--color-active);
+	// block c
+	--ck-color-widget-border-blurred: var(--color-border);
+	--ck-color-focus-border: var(--color-primary);
+	--ck-color-widget-border-hover: var(--color-primary);
+
+	// table
+	--ck-color-table-focused-cell-background:  var(--color-active);
+}
+
+
+/*
+	block a
+
+	--ck-color-dropdown-panel-background: var(--ck-color-base-background);
+	--ck-color-dropdown-panel-border: var(--ck-color-base-border);
+	--ck-color-input-background: var(--ck-color-base-background);
+	--ck-color-input-border: #c7c7c7;
+	--ck-color-input-text: var(--ck-color-base-text);
+	--ck-color-input-disabled-background: #f2f2f2;
+	--ck-color-input-disabled-border: #c7c7c7;
+	--ck-color-input-disabled-text: #5c5c5c;
+	--ck-color-list-background: var(--ck-color-base-background);
+	--ck-color-list-item-background-hover: var(--ck-color-base-foreground);
+	--ck-color-list-item-background-active: var(--ck-color-base-active);
+	--ck-color-list-item-background-active-focus: var(--ck-color-base-active-focus);
+
+	block b
+
+	--ck-color-panel-background: var(--ck-color-base-background);
+	--ck-color-panel-border: var(--ck-color-base-border);
+	--ck-color-toolbar-background: var(--ck-color-base-foreground);
+	--ck-color-toolbar-border: var(--ck-color-base-border);
+	--ck-color-tooltip-background: var(--ck-color-base-text);
+	--ck-color-tooltip-text: var(--ck-color-base-background);
+	--ck-color-engine-placeholder-text: #c2c2c2;
+	--ck-color-upload-bar-background: #6cb5f9;
+	--ck-color-upload-infinite-background: rgba(0,0,0,.1);
+
+	block c
+
+	--ck-disabled-opacity: .5;
+	--ck-focus-outer-shadow: 0 0 3px var(--ck-color-focus-shadow);
+	--ck-focus-ring: 1px solid var(--ck-color-focus-border);
+	--ck-font-size-base: 13px;
+	--ck-line-height-base: 1.84615;
+	--ck-font-face: Helvetica, Arial, Tahoma, Verdana, Sans-Serif;
+	--ck-font-size-tiny: 0.7em;
+	--ck-font-size-small: 0.75em;
+	--ck-font-size-normal: 1em;
+	--ck-font-size-big: 1.4em;
+	--ck-font-size-large: 1.8em;
+	--ck-ui-component-min-height: 2.3em;
+*/
