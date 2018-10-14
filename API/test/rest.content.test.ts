@@ -121,25 +121,16 @@ describe('REST: Content', () => {
 			const badRoute = Object.assign({}, properContent);
 			delete badRoute.route;
 
-			const badTitle = Object.assign({}, properContent);
-			delete badTitle.title;
+			const badEverything = Object.assign({}, properContent);
+			delete badEverything.route;
+			delete badEverything.title;
+			delete badEverything.content;
+			delete badEverything.description;
+			delete badEverything.published;
 
-			const badContent = Object.assign({}, properContent);
-			delete badContent.content;
-
-			const badDesc = Object.assign({}, properContent);
-			delete badDesc.description;
-
-			const badPublished = Object.assign({}, properContent);
-			delete badPublished.published;
-
-
-			const [badRouteRes, badTitleRes, badContentRes, badDescRes, badPublishedRes] = await Promise.all([
+			const [badRouteRes, badEverythingRes] = await Promise.all([
 				TestBed.http.post('/api/cms').send(badRoute).set('Cookie', TestBed.AdminCookie),
-				TestBed.http.post('/api/cms').send(badTitle).set('Cookie', TestBed.AdminCookie),
-				TestBed.http.post('/api/cms').send(badContent).set('Cookie', TestBed.AdminCookie),
-				TestBed.http.post('/api/cms').send(badDesc).set('Cookie', TestBed.AdminCookie),
-				TestBed.http.post('/api/cms').send(badPublished).set('Cookie', TestBed.AdminCookie)
+				TestBed.http.post('/api/cms').send(badEverything).set('Cookie', TestBed.AdminCookie)
 			]);
 
 			// badRouteRes
@@ -154,14 +145,14 @@ describe('REST: Content', () => {
 			expect(badRouteRes.body.errors[0].params).to.have.property('missingProperty');
 			expect(badRouteRes.body.errors[0].params.missingProperty).to.equal('route');
 
-			// badTitleRes
-			expect(badTitleRes).to.have.status(422);
-			// badContentRes
-			expect(badContentRes).to.have.status(422);
-			// badDescRes
-			expect(badDescRes).to.have.status(422);
-			// badPublished
-			expect(badPublishedRes).to.have.status(422);
+			// badEverythingRes
+			expect(badEverythingRes).to.have.status(422);
+			expect(badEverythingRes.body.errors.length).to.equal(5);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'route')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'title')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'content')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'description')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'published')).to.not.equal(null);
 		});
 
 		it('GET /api/cms/ 200', async () => {
@@ -462,30 +453,21 @@ describe('REST: Content', () => {
 
 			const badRoute = Object.assign({}, properContent);
 			delete badRoute.route;
-
-			const badTitle = Object.assign({}, properContent);
-			delete badTitle.title;
-
-			const badContent = Object.assign({}, properContent);
-			delete badContent.content;
-
-			const badDesc = Object.assign({}, properContent);
-			delete badDesc.description;
-
-			const badPublished = Object.assign({}, properContent);
-			delete badPublished.published;
+			const badEverything = Object.assign({}, properContent);
+			delete badEverything.route;
+			delete badEverything.title;
+			delete badEverything.content;
+			delete badEverything.description;
+			delete badEverything.published;
 
 
 			const postRes = await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(properContent);
 
-			const [badRouteRes, badTitleRes, badContentRes, badDescRes, badPublishedRes] = await Promise.all([
+			const [badRouteRes, badEverythingRes] = await Promise.all([
 				TestBed.http.patch('/api/cms/' + properContent.route).send(badRoute).set('Cookie', TestBed.AdminCookie),
-				TestBed.http.patch('/api/cms/' + properContent.route).send(badTitle).set('Cookie', TestBed.AdminCookie),
-				TestBed.http.patch('/api/cms/' + properContent.route).send(badContent).set('Cookie', TestBed.AdminCookie),
-				TestBed.http.patch('/api/cms/' + properContent.route).send(badDesc).set('Cookie', TestBed.AdminCookie),
-				TestBed.http.patch('/api/cms/' + properContent.route).send(badPublished).set('Cookie', TestBed.AdminCookie)
+				TestBed.http.patch('/api/cms/' + properContent.route).send(badEverything).set('Cookie', TestBed.AdminCookie)
 			]);
 
 			// badRouteRes
@@ -500,14 +482,14 @@ describe('REST: Content', () => {
 			expect(badRouteRes.body.errors[0].params).to.have.property('missingProperty');
 			expect(badRouteRes.body.errors[0].params.missingProperty).to.equal('route');
 
-			// badTitleRes
-			expect(badTitleRes).to.have.status(422);
-			// badContentRes
-			expect(badContentRes).to.have.status(422);
-			// badDescRes
-			expect(badDescRes).to.have.status(422);
-			// badPublished
-			expect(badPublishedRes).to.have.status(422);
+			// badEverythingRes
+			expect(badEverythingRes).to.have.status(422);
+			expect(badEverythingRes.body.errors.length).to.equal(5);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'route')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'title')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'content')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'description')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'published')).to.not.equal(null);
 		});
 
 

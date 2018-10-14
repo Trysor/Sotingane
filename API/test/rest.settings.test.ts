@@ -69,7 +69,6 @@ describe('REST: Settings', () => {
 				.set('Cookie', TestBed.AdminCookie)
 				.send(emptySettings);
 
-			console.log(res.body);
 			expect(res).to.have.status(200);
 			expect(res).to.have.property('body');
 			expect(res.body).to.be.an('object');
