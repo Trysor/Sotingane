@@ -7,8 +7,8 @@ import { format } from 'date-fns';
 export class DateAdapterService extends NativeDateAdapter {
 	format(date: Date, displayFormat: Object): string {
 		if (displayFormat === 'input') {
-			return format(date, 'YYYY-MM-dd');
+			return format(date, 'yyyy-MM-dd');
 		}
-		return format(date, 'YYYY-MM-dd');
+		return format(date, 'yyyy-MM-dd');
 	}
 }
