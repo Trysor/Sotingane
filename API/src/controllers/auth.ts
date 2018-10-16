@@ -3,10 +3,10 @@ import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 import { get as configGet, util as configUtil } from 'config';
 import { sign } from 'jsonwebtoken';
 
-import { status, ajv, JSchema, ROUTE_STATUS, AUTH_STATUS, validateSchema, VALIDATION_FAILED } from '../libs/validate';
+import { status, ajv, JSchema, AUTH_STATUS, validate } from '../libs/validate';
 import { UserModel, User, UserDoc, accessRoles } from '../models';
 
-import { Controller, GET, POST, PATCH, DELETE, isProduction } from '../libs/routing';
+import { Controller, GET, POST, isProduction } from '../libs/routing';
 import { Auth } from '../libs/auth';
 
 
@@ -24,8 +24,8 @@ export class AuthController extends Controller {
 	 * @param  {Next} next next
 	 * @return {Res}          server response: object containing token and user
 	 */
-	@GET({ path: '/token', handlers: [Auth.ByToken] })
-	@POST({ path: '/login', handlers: [validateSchema(JSchema.UserLoginSchema, VALIDATION_FAILED.USER_MODEL), Auth.ByLogin] })
+	@GET({ path: '/token', do: [Auth.ByToken] })
+	@POST({ path: '/login', do: [validate(JSchema.UserLoginSchema), Auth.ByLogin] })
 	public token(req: Req, res: Res): Res {
 		const user: Partial<User> = { _id: req.user._id, username: req.user.username, role: req.user.role };
 
@@ -48,7 +48,7 @@ export class AuthController extends Controller {
 	 * @param  {Next} next next
 	 * @return {Res}          server response: object containing token and user
 	 */
-	@POST({ path: '/logout', handlers: [Auth.ByToken] })
+	@POST({ path: '/logout', do: [Auth.ByToken] })
 	public logout(req: Req, res: Res): Res {
 		return res.cookie('jwt', '', {
 			maxAge: 1000, // one second
@@ -67,12 +67,8 @@ export class AuthController extends Controller {
 	 * @param  {Next} next next
 	 * @return {Res}          server response
 	 */
-	@POST({
-		path: '/register',
-		ignore: isProduction, // Not enabled in production for the time being
-		handlers: [validateSchema(JSchema.UserRegistrationSchema, VALIDATION_FAILED.USER_MODEL)]
-	})
-	public async register(req: Req, res: Res, next: Next) {
+	@POST({ path: '/register', ignore: isProduction, do: [validate(JSchema.UserRegistrationSchema)] })
+	public async register(req: Req, res: Res, next: Next) { // Not enabled in production for the time being
 		const password: string = req.body.password,
 			role: accessRoles = req.body.role,
 			username: string = req.body.username;
@@ -101,10 +97,7 @@ export class AuthController extends Controller {
 	 * @param  {Next} next next
 	 * @return {Res}          server response:
 	 */
-	@POST({
-		path: '/updatepassword',
-		handlers: [Auth.ByToken, validateSchema(JSchema.UserUpdatePasswordSchema, VALIDATION_FAILED.USER_MODEL)]
-	})
+	@POST({ path: '/updatepassword', do: [Auth.ByToken, validate(JSchema.UserUpdatePasswordSchema)] })
 	public async updatePassword(req: Req, res: Res, next: Next) {
 		const currentPassword: string = req.body.currentPassword,
 			password: string = req.body.password,
@@ -131,12 +124,8 @@ export class AuthController extends Controller {
 	 * @param  {Next} next next
 	 * @return {Res}          server response
 	 */
-	@POST({
-		path: '/deleteaccount',
-		ignore: true, // TODO: Implement my security
-		handlers: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)]
-	})
-	public async deleteAccount(req: Req, res: Res, next: Next) {
+	@POST({ path: '/deleteaccount', ignore: true, do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)] })
+	public async deleteAccount(req: Req, res: Res, next: Next) { // TODO: Implement my security
 		const id: string = req.body.id;
 
 		try {
@@ -159,7 +148,7 @@ export class AuthController extends Controller {
 
 // Registration
 const userRegistrationSchema = {
-	'$id': JSchema.UserRegistrationSchema,
+	'$id': JSchema.UserRegistrationSchema.name,
 	'type': 'object',
 	'additionalProperties': false,
 	'properties': {
@@ -178,15 +167,15 @@ const userRegistrationSchema = {
 };
 
 if (ajv.validateSchema(userRegistrationSchema)) {
-	ajv.addSchema(userRegistrationSchema, JSchema.UserRegistrationSchema);
+	ajv.addSchema(userRegistrationSchema, JSchema.UserRegistrationSchema.name);
 } else {
-	console.error(`${JSchema.UserRegistrationSchema} did not validate`);
+	console.error(`${JSchema.UserRegistrationSchema.name} did not validate`);
 }
 
 
 // Login
 const loginSchema = {
-	'$id': JSchema.UserLoginSchema,
+	'$id': JSchema.UserLoginSchema.name,
 	'type': 'object',
 	'additionalProperties': false,
 	'properties': {
@@ -201,16 +190,16 @@ const loginSchema = {
 };
 
 if (ajv.validateSchema(loginSchema)) {
-	ajv.addSchema(loginSchema, JSchema.UserLoginSchema);
+	ajv.addSchema(loginSchema, JSchema.UserLoginSchema.name);
 } else {
-	console.error(`${JSchema.UserLoginSchema} did not validate`);
+	console.error(`${JSchema.UserLoginSchema.name} did not validate`);
 }
 
 
 
 // UpdatePassword
 const userUpdatePasswordSchema = {
-	'$id': JSchema.UserUpdatePasswordSchema,
+	'$id': JSchema.UserUpdatePasswordSchema.name,
 	'type': 'object',
 	'additionalProperties': false,
 	'properties': {
@@ -228,9 +217,9 @@ const userUpdatePasswordSchema = {
 };
 
 if (ajv.validateSchema(userUpdatePasswordSchema)) {
-	ajv.addSchema(userUpdatePasswordSchema, JSchema.UserUpdatePasswordSchema);
+	ajv.addSchema(userUpdatePasswordSchema, JSchema.UserUpdatePasswordSchema.name);
 } else {
-	console.error(`${JSchema.UserUpdatePasswordSchema} did not validate`);
+	console.error(`${JSchema.UserUpdatePasswordSchema.name} did not validate`);
 }
 
 

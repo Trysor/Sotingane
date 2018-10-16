@@ -5,7 +5,7 @@ import { escape } from 'validator';
 
 import { sanitize, stripHTML } from '../libs/sanitizer';
 
-import { status, ajv, JSchema, ROUTE_STATUS, CMS_STATUS, validateSchema, VALIDATION_FAILED } from '../libs/validate';
+import { status, ajv, JSchema, ROUTE_STATUS, CMS_STATUS, validate } from '../libs/validate';
 import { User, accessRoles, Log, LogModel, ContentModel, Content, ContentEntry } from '../models';
 import { Controller, GET, POST, PATCH, DELETE, isProduction } from '../libs/routing';
 import { Auth } from '../libs/auth';
@@ -38,7 +38,7 @@ export class CMSController extends Controller {
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
 	 */
-	@GET({ path: '/', handlers: [Auth.Personalize] })
+	@GET({ path: '/', do: [Auth.Personalize] })
 	public async getContentList(req: Req, res: Res, next: Next) {
 		const user: User = <User>req.user;
 
@@ -69,7 +69,7 @@ export class CMSController extends Controller {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the content object
 	 */
-	@GET({ path: '/:route', handlers: [Auth.Personalize] })
+	@GET({ path: '/:route', do: [Auth.Personalize] })
 	public async getContent(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route,
 			user: User = <User>req.user;
@@ -119,7 +119,7 @@ export class CMSController extends Controller {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the content history array
 	 */
-	@GET({ path: '/history/:route', handlers: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)] })
+	@GET({ path: '/history/:route', do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)] })
 	public async getContentHistory(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route;
 
@@ -142,13 +142,7 @@ export class CMSController extends Controller {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the contentDoc.current object
 	 */
-	@POST({
-		path: '/',
-		handlers: [
-			Auth.ByToken, Auth.RequireRole(accessRoles.admin),
-			validateSchema(JSchema.ContentSchema, VALIDATION_FAILED.CONTENT_MODEL),
-		]
-	})
+	@POST({ path: '/', do: [ Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.ContentSchema) ] })
 	public async createContent(req: Req, res: Res, next: Next) {
 		const data: Content = req.body,
 			user: User = <User>req.user;
@@ -195,13 +189,7 @@ export class CMSController extends Controller {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the updated content object
 	 */
-	@PATCH({
-		path: '/:route',
-		handlers: [
-			Auth.ByToken, Auth.RequireRole(accessRoles.admin),
-			validateSchema(JSchema.ContentSchema, VALIDATION_FAILED.CONTENT_MODEL),
-		]
-	})
+	@PATCH({ path: '/:route', do: [ Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.ContentSchema) ] })
 	public async patchContent(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route,
 			data: Content = req.body,
@@ -250,13 +238,7 @@ export class CMSController extends Controller {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: message declaring success or failure
 	 */
-	@DELETE({
-		path: '/:route',
-		handlers: [
-			Auth.ByToken,
-			Auth.RequireRole(accessRoles.admin),
-		]
-	})
+	@DELETE({ path: '/:route', do: [ Auth.ByToken, Auth.RequireRole(accessRoles.admin) ] })
 	public async deleteContent(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route,
 			user: User = <User>req.user;
@@ -278,7 +260,7 @@ export class CMSController extends Controller {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the search results
 	 */
-	@GET({ path: '/search/:searchTerm', handlers: [Auth.Personalize] })
+	@GET({ path: '/search/:searchTerm', do: [Auth.Personalize] })
 	public async searchContent(req: Req, res: Res, next: Next) {
 		const searchTerm: string = req.params.searchTerm || '',
 			user: User = <User>req.user;
@@ -328,7 +310,7 @@ const maxShortInputLength = 25;
 const maxLongInputLength = 300;
 
 const createPatchContentSchema = {
-	'$id': JSchema.ContentSchema,
+	'$id': JSchema.ContentSchema.name,
 	'type': 'object',
 	'additionalProperties': false,
 	'properties': {
@@ -366,8 +348,8 @@ const createPatchContentSchema = {
 };
 
 if (ajv.validateSchema(createPatchContentSchema)) {
-	ajv.addSchema(createPatchContentSchema, JSchema.ContentSchema);
+	ajv.addSchema(createPatchContentSchema, JSchema.ContentSchema.name);
 } else {
-	console.error(`${JSchema.ContentSchema} did not validate`);
+	console.error(`${JSchema.ContentSchema.name} did not validate`);
 }
 

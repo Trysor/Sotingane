@@ -1,6 +1,6 @@
 ﻿import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
-import { status, ajv, JSchema, ROUTE_STATUS, USERS_STATUS, validateSchema, VALIDATION_FAILED } from '../libs/validate';
+import { status, ajv, JSchema, ROUTE_STATUS, USERS_STATUS, validate } from '../libs/validate';
 import { UserModel, User, accessRoles, UserDoc } from '../models';
 
 import { Controller, GET, PATCH } from '../libs/routing';
@@ -15,7 +15,7 @@ export class UsersController extends Controller {
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
 	 */
-	@GET({ path: '/users/', handlers: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)] })
+	@GET({ path: '/users/', do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)] })
 	public async getAllUsers(req: Req, res: Res, next: Next) {
 		const users = <User[]>await UserModel.find({}, {
 			username: 1, role: 1, createdAt: 1
@@ -30,15 +30,9 @@ export class UsersController extends Controller {
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
 	 */
-	@PATCH({
-		path: '/users/:id', handlers: [
-			Auth.ByToken, Auth.RequireRole(accessRoles.admin),
-			validateSchema(JSchema.UserAdminUpdateUser, VALIDATION_FAILED.USER_MODEL),
-		]
-	})
+	@PATCH({ path: '/users/:id', do: [ Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.UserAdminUpdateUser) ] })
 	public async patchUser(req: Req, res: Res, next: Next) {
 		const user: User = req.body,
-			adminUser: User = <User>req.user,
 			userId: string = req.params.id,
 			username_low = user.username.toLowerCase();
 
@@ -77,7 +71,7 @@ export class UsersController extends Controller {
 }
 
 const userAdminUpdateUser = {
-	'$id': JSchema.UserAdminUpdateUser,
+	'$id': JSchema.UserAdminUpdateUser.name,
 	'type': 'object',
 	'additionalProperties': false,
 	'properties': {
@@ -98,8 +92,8 @@ const userAdminUpdateUser = {
 };
 
 if (ajv.validateSchema(userAdminUpdateUser)) {
-	ajv.addSchema(userAdminUpdateUser, JSchema.UserAdminUpdateUser);
+	ajv.addSchema(userAdminUpdateUser, JSchema.UserAdminUpdateUser.name);
 } else {
-	console.error(`${JSchema.UserAdminUpdateUser} did not validate`);
+	console.error(`${JSchema.UserAdminUpdateUser.name} did not validate`);
 }
 

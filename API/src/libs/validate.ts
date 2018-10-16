@@ -12,6 +12,15 @@ interface ErrorMessage {
 	params: Ajv.ErrorParameters;
 }
 
+interface SchemaValidation {
+	[key: string]: SchemaValidationObject;
+}
+
+interface SchemaValidationObject {
+	name: string;
+	err: VALIDATION_FAILED;
+}
+
 /*
  |--------------------------------------------------------------------------
  | AJV
@@ -20,11 +29,11 @@ interface ErrorMessage {
 
 export const ajv = new Ajv({ allErrors: true });
 
-export const validateSchema = (schema: string, msg: VALIDATION_FAILED) => {
+export const validate = (schema: SchemaValidationObject) => {
 	return (req: Req, res: Res, next: Next): Res => {
-		const valid = ajv.validate(schema, req.body);
+		const valid = ajv.validate(schema.name, req.body);
 		if (!valid) {
-			return res.status(422).send(status(msg, ajv.errors));
+			return res.status(422).send(status(schema.err, ajv.errors));
 		}
 		next();
 	};
@@ -47,22 +56,49 @@ export const status = (value: string, errors?: ErrorObject[]): StatusMessage => 
 	return msg;
 };
 
-export enum JSchema {
+export const JSchema: SchemaValidation = {
 	// User
-	UserLoginSchema = 'UserLoginSchema',
-	UserRegistrationSchema = 'UserRegistrationSchema',
-	UserUpdatePasswordSchema = 'UserUpdatePasswordSchema',
-	UserAdminUpdateUser = 'UserAdminUpdateUser',
+	UserLoginSchema: {
+		name: 'UserLoginSchema',
+		err: VALIDATION_FAILED.USER_MODEL
+	},
+	UserRegistrationSchema: {
+		name: 'UserRegistrationSchema',
+		err: VALIDATION_FAILED.USER_MODEL
+	},
+	UserUpdatePasswordSchema: {
+		name: 'UserUpdatePasswordSchema',
+		err: VALIDATION_FAILED.USER_MODEL
+	},
+	UserAdminUpdateUser: {
+		name: 'UserAdminUpdateUser',
+		err: VALIDATION_FAILED.USER_MODEL
+	},
 
 	// Content
-	ContentSchema = 'ContentSchema',
+	ContentSchema: {
+		name: 'ContentSchema',
+		err: VALIDATION_FAILED.CONTENT_MODEL
+	},
 
 	// Admin
-	AdminAggregationSchema = 'AdminAggregationSchema',
+	AdminAggregationSchema: {
+		name: 'AdminAggregationSchema',
+		err: VALIDATION_FAILED.ADMIN_MODEL
+	},
 
 	// Settings
-	SettingsSchema = 'SettingsSchema'
-}
+	SettingsSchema: {
+		name: 'SettingsSchema',
+		err: VALIDATION_FAILED.SETTING_MODEL
+	},
+
+	// Theme
+	ThemeSchema: {
+		name: 'ThemeSchema',
+		err: VALIDATION_FAILED.THEME_MODEL
+	},
+};
 
 
 /*
@@ -75,8 +111,11 @@ export const enum VALIDATION_FAILED {
 	USER_MODEL = 'User object validation failed',
 	CONTENT_MODEL = 'Content object validation failed',
 	ADMIN_MODEL = 'Query object validation failed',
-	SETTING_MODEL = 'Setting object validation failed'
+	SETTING_MODEL = 'Setting object validation failed',
+	THEME_MODEL = 'Theme object validation failed'
 }
+
+
 
 
 export const enum ROUTE_STATUS {
@@ -125,4 +164,10 @@ export const enum SETTINGS_STATUS {
 	DATA_UNPROCESSABLE = 'The provided data could not be processed',
 	SETTINGS_UPDATED = 'Settings has been updated successfully',
 	SETTINGS_NONE_FOUND = 'Could not find settings',
+}
+
+export const enum THEME_STATUS {
+	DATA_UNPROCESSABLE = 'The provided data could not be processed',
+	THEME_UPDATED = 'Theme has been updated successfully',
+	THEME_NONE_FOUND = 'Could not find theme',
 }

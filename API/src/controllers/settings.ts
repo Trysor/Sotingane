@@ -1,22 +1,16 @@
-﻿import { Request as Req, Response as Res, NextFunction as Next } from 'express';
+import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
 import { SettingsModel, accessRoles, Settings } from '../models';
 
 import { Controller, GET, POST } from '../libs/routing';
-import { SETTINGS_STATUS, status, JSchema, ajv, validateSchema, VALIDATION_FAILED } from '../libs/validate';
+import { SETTINGS_STATUS, status, JSchema, ajv, validate } from '../libs/validate';
 
 import { Auth } from '../libs/auth';
 
 
 export class SettingsController extends Controller {
 
-	@POST({ path: '/',
-		handlers: [
-			Auth.ByToken,
-			Auth.RequireRole(accessRoles.admin),
-			validateSchema(JSchema.SettingsSchema, VALIDATION_FAILED.SETTING_MODEL)
-		]
-	})
+	@POST({ path: '/', do: [ Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.SettingsSchema) ] })
 	public async postSettings(req: Req, res: Res, next: Next) {
 		const settingsDoc: Settings = await SettingsModel.findOneAndUpdate({}, req.body, { upsert: true, new: true }).lean();
 		if (!settingsDoc) {
@@ -25,7 +19,7 @@ export class SettingsController extends Controller {
 		return res.status(200).send(status(SETTINGS_STATUS.SETTINGS_UPDATED));
 	}
 
-	@GET({ path: '/', handlers: [] })
+	@GET({ path: '/', do: [] })
 	public async getSettings(req: Req, res: Res, next: Next) {
 		const settings: Settings = await SettingsModel.findOne({}, { _id: false, __v: false }).lean();
 		if (!settings) {
@@ -38,7 +32,7 @@ export class SettingsController extends Controller {
 
 
 const settingsSchema = {
-	'$id': JSchema.SettingsSchema,
+	'$id': JSchema.SettingsSchema.name,
 	'type': 'object',
 	'additionalProperties': false,
 	'properties': {
@@ -97,11 +91,11 @@ const settingsSchema = {
 			}
 		}
 	},
-	required: ['theme', 'org', 'meta', 'footer']
+	required: ['org', 'meta', 'footer']
 };
 
 if (ajv.validateSchema(settingsSchema)) {
-	ajv.addSchema(settingsSchema, JSchema.SettingsSchema);
+	ajv.addSchema(settingsSchema, JSchema.SettingsSchema.name);
 } else {
-	console.error(`${JSchema.SettingsSchema} did not validate`);
+	console.error(`${JSchema.SettingsSchema.name} did not validate`);
 }

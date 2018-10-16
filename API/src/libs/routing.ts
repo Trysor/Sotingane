@@ -11,7 +11,7 @@ import { util as configUtil } from 'config';
 interface RoutingOptions {
 	path: PathParams;
 	ignore?: boolean;
-	handlers: RequestHandler[];
+	do: RequestHandler[];
 }
 
 
@@ -54,8 +54,8 @@ export const isProduction = configUtil.getEnv('NODE_ENV') === 'production';
 export function GET(opts: RoutingOptions) {
 	return (target: Controller, propertyKey: string, descriptor: PropertyDescriptor) => {
 		if (opts.ignore) { return; }
-		opts.handlers.push(descriptor.value);
-		getRouter(target).get(opts.path, opts.handlers);
+		opts.do.push(descriptor.value);
+		getRouter(target).get(opts.path, opts.do);
 	};
 }
 
@@ -66,8 +66,8 @@ export function GET(opts: RoutingOptions) {
 export function POST(opts: RoutingOptions) {
 	return (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) => {
 		if (opts.ignore) { return; }
-		opts.handlers.push(descriptor.value);
-		getRouter(target).post(opts.path, opts.handlers);
+		opts.do.push(descriptor.value);
+		getRouter(target).post(opts.path, opts.do);
 	};
 }
 
@@ -78,8 +78,8 @@ export function POST(opts: RoutingOptions) {
 export function PATCH(opts: RoutingOptions) {
 	return (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) => {
 		if (opts.ignore) { return; }
-		opts.handlers.push(descriptor.value);
-		getRouter(target).patch(opts.path, opts.handlers);
+		opts.do.push(descriptor.value);
+		getRouter(target).patch(opts.path, opts.do);
 	};
 }
 
@@ -90,7 +90,7 @@ export function PATCH(opts: RoutingOptions) {
 export function DELETE(opts: RoutingOptions) {
 	return (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) => {
 		if (opts.ignore) { return; }
-		opts.handlers.push(descriptor.value);
-		getRouter(target).delete(opts.path, opts.handlers);
+		opts.do.push(descriptor.value);
+		getRouter(target).delete(opts.path, opts.do);
 	};
 }

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
-import { SettingsModel, Settings, accessRoles } from '../src/models';
-import { CMS_STATUS, VALIDATION_FAILED, USERS_STATUS, ADMIN_STATUS, SETTINGS_STATUS } from '../src/libs/validate';
+import { Settings } from '../src/models';
+import { VALIDATION_FAILED, SETTINGS_STATUS } from '../src/libs/validate';
 
 import { TestBed } from './testbed';
 
