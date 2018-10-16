@@ -17,5 +17,6 @@ export const API = {
 		cms: '/api/admin/cms',
 		aggregate: '/api/admin/cms/aggregate'
 	},
-	settings: '/api/settings'
+	settings: '/api/settings',
+	theme: '/api/theme'
 };
