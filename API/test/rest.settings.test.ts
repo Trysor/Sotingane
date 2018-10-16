@@ -10,41 +10,6 @@ import { TestBed } from './testbed';
 // ---------------------------------
 
 const emptySettings: Settings = {
-	'theme': {
-		'--app-prim-1': '',
-		'--app-prim-2': '',
-		'--app-prim-3': '',
-		'--app-prim-c-1': '',
-		'--app-prim-c-2': '',
-		'--app-prim-c-3': '',
-
-		'--app-acc-1': '',
-		'--app-acc-2': '',
-		'--app-acc-3': '',
-		'--app-acc-c-1': '',
-		'--app-acc-c-2': '',
-		'--app-acc-c-3': '',
-
-		'--color-text': '',
-		'--color-background': '',
-		'--color-header': '',
-		'--color-sidepanel': '',
-		'--color-material': '',
-		'--color-content': '',
-		'--color-shade': '',
-		'--color-active': '',
-		'--color-overlay': '',
-		'--color-border': '',
-		'--color-disabled': '',
-
-		'--border': '',
-		'--shadow': '',
-
-		'--width-wrapper': '',
-		'--width-side': '',
-		'--width-max-field': '',
-		'--height-header': ''
-	},
 	'org': '',
 	'meta': {
 		'title': '',
@@ -109,7 +74,6 @@ describe('REST: Settings', () => {
 			expect(res).to.have.status(200);
 			expect(res).to.have.property('body');
 			expect(res.body).to.be.an('object');
-			expect(res.body).have.property('theme');
 			expect(res.body).have.property('org');
 			expect(res.body).have.property('meta');
 			expect(res.body).have.property('footer');
