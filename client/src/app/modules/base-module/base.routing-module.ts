@@ -8,7 +8,7 @@ import { ContentComponent } from '@app/modules/content-module/content-component/
 
 
 // Guards
-import { AuthGuard, AdminGuard, LoginGuard } from '@app/guards';
+import { AuthGuard, AdminGuard, LoginGuard, RedirectGuard } from '@app/guards';
 
 @NgModule({
 	imports: [
@@ -38,7 +38,7 @@ import { AuthGuard, AdminGuard, LoginGuard } from '@app/guards';
 						canActivate: [AuthGuard], canLoad: [AuthGuard]
 					},
 					// CMS routes
-					{ path: '', redirectTo: 'home', pathMatch: 'full' },
+					{ path: '', pathMatch: 'full', children: [], canActivate: [RedirectGuard] },
 					{ path: ':content', component: ContentComponent },
 				]
 			},

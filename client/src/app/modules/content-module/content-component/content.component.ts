@@ -4,12 +4,10 @@ import {
 } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 
-import { HttpErrorResponse } from '@angular/common/http';
-
-import { CMSService, AuthService, ModalService, ContentService } from '@app/services';
+import { CMSService, AuthService, ModalService, ContentService, SettingsService } from '@app/services';
 import { CmsContent, AccessRoles } from '@app/models';
 
-import { Subject, BehaviorSubject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 
 
@@ -38,6 +36,7 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 	// Template Helpers
 	public readonly AccessRoles = AccessRoles;
 	public readonly isPlatformServer: boolean;
+	public get settings() { return this.settingsService.settings; }
 
 	// Code helpers
 	private readonly _ngUnsub = new Subject();
@@ -49,6 +48,7 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 		private route: ActivatedRoute,
 		private router: Router,
 		public authService: AuthService,
+		private settingsService: SettingsService,
 		public cmsService: CMSService) {
 
 		this.router.events.pipe(
@@ -62,11 +62,7 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 	ngAfterViewInit() {
 		this.cmsService.content.pipe(takeUntil(this._ngUnsub)).subscribe(content => {
 			if (!content) { return; }
-
-			// Set metadata
-			this.contentService.setContentMeta(content);
-			// Build content
-			this.contentService.buildContentForElement(this._contentHost, content);
+			this.contentService.buildContentForElement(this._contentHost, content); // Build content
 		});
 	}
 
@@ -76,8 +72,8 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 		this._ngUnsub.complete();
 		// Clean components
 		this.contentService.cleanEmbeddedComponents();
-		// Set meta back to default
-		this.contentService.setDefaultMeta();
+		// We're no longer watching content
+		this.cmsService.content.next(null);
 	}
 
 	ngDoCheck() {

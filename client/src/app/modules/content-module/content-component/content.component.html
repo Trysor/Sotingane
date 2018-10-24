@@ -12,7 +12,7 @@
 				<button mat-menu-item (click)="navigateToEditPage()">
 					<mat-icon>mode_edit</mat-icon> Edit
 				</button>
-				<button mat-menu-item (click)="deletePage()" [disabled]="contentObject.route === 'home'">
+				<button mat-menu-item (click)="deletePage()" [disabled]="contentObject.route === (settings | async).indexRoute">
 					<mat-icon>delete</mat-icon> Delete
 				</button>
 			</ng-template>
@@ -26,7 +26,7 @@
 <!-- Details -->
 <ng-container *ngIf="!previewMode && cmsService.content | async as contentObject">
 	<span class="info" *ngIf="contentObject.access !== AccessRoles.everyone">Access group: {{contentObject.access}}</span>
-	<div class="info right" *ngIf="contentObject.route !== 'home' && !previewMode && contentObject.updatedAt">
+	<div class="info right" *ngIf="contentObject.route !== (settings | async).indexRoute && !previewMode && contentObject.updatedAt">
 		<div>
 			Updated by: {{contentObject.updatedBy.username}}, <span [matTooltip]="contentObject.updatedAt | TimeAgo" matTooltipPosition="above">
 				{{ contentObject.updatedAt | date:'dd. MMM yyyy, HH:mm' }}

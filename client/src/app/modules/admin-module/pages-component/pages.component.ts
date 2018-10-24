@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
 import { CmsContent, TableSettings, ColumnType } from '@app/models';
-import { ModalService, CMSService, AdminService, MobileService } from '@app/services';
+import { ModalService, SettingsService, AdminService } from '@app/services';
 
 import { AccessHandler } from '@app/classes';
 
@@ -84,7 +84,7 @@ export class PagesComponent implements OnDestroy {
 				},
 				noText: true,
 				func: c => this.modalService.openDeleteContentModal(c),
-				disabled: c => c.route === 'home',
+				disabled: c => c.route === this.settingsService.settings.getValue().indexRoute,
 				narrow: true
 			}
 		],
@@ -103,7 +103,7 @@ export class PagesComponent implements OnDestroy {
 	constructor(
 		@Optional() private modalService: ModalService,
 		private router: Router,
-		private cmsService: CMSService,
+		private settingsService: SettingsService,
 		private adminService: AdminService,
 		private datePipe: DatePipe) {
 

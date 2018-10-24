@@ -5,7 +5,6 @@ import { AppSettings, ThemeSettings } from '@app/models';
 import { HttpService } from '@app/services/http/http.service';
 import { PlatformService } from '@app/services/utility/platform.service';
 
-
 import { makeStateKey } from '@angular/platform-browser';
 const SETTINGS_KEY = makeStateKey<AppSettings>('appsettings'),
 	  THEME_KEY = makeStateKey<ThemeSettings>('themesettings');
@@ -16,6 +15,7 @@ import { take } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 
 const emptySettings: AppSettings = {
+	'indexRoute': '',
 	'org': '',
 	'meta': {
 		'title': '',
@@ -103,7 +103,7 @@ export class SettingsService {
 
 	private renderTheme(theme: ThemeSettings) {
 		for (const entry of Object.entries(theme)) {
-			this.platform.document.documentElement.style.setProperty(entry['0'], entry['1']);
+			// this.platform.document.documentElement.style.setProperty(entry['0'], entry['1']);
 			// this._renderer.setStyle(this.platform.document.body.style, entry['0'], entry['1']);
 		}
 	}

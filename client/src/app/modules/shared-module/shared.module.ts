@@ -7,9 +7,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../material.module';
 
-// Guards
-import { AuthGuard, AdminGuard, LoginGuard, DeactivateGuard } from '@app/guards';
-
 // Pipes
 import { TimeAgoPipe, NumberPipe } from '@app/pipes';
 import { DatePipe } from '@angular/common';

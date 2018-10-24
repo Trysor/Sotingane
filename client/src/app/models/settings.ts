@@ -1,5 +1,6 @@
 ﻿
 export interface AppSettings {
+	indexRoute: string;
 	org: string;
 	meta: {
 		title: string;

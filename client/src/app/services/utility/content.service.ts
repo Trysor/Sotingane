@@ -2,6 +2,7 @@
 import { Meta, Title } from '@angular/platform-browser';
 
 import { SettingsService } from '@app/services/controllers/settings.service';
+import { CMSService } from '@app/services/controllers/cms.service';
 
 import { CmsContent, DynamicComponent } from '@app/models';
 
@@ -16,6 +17,7 @@ export class ContentService {
 	private readonly _embeddedComponents: ComponentRef<DynamicComponent>[] = [];
 
 	constructor(
+		private cmsService: CMSService,
 		private settingsService: SettingsService,
 		private resolver: ComponentFactoryResolver,
 		private injector: Injector,
@@ -26,6 +28,23 @@ export class ContentService {
 		this._dynamicContent.set('a', this.resolver.resolveComponentFactory(DynamicLinkComponent));
 		this._dynamicContent.set('figure.media', this.resolver.resolveComponentFactory(DynamicMediaComponent));
 		this._dynamicContent.set('figure.image', this.resolver.resolveComponentFactory(DynamicImageComponent));
+
+		this.cmsService.content.subscribe( content => {
+			if (!!content) {
+				this.setContentMeta(content);
+			} else {
+				this.setDefaultMeta();
+			}
+		});
+
+		this.settingsService.settings.subscribe( settings => {
+			const content = this.cmsService.content.getValue();
+			if (!!content) {
+				this.setContentMeta(content);
+			} else {
+				this.setDefaultMeta();
+			}
+		});
 	}
 
 	// ---------------------------------------
@@ -35,7 +54,7 @@ export class ContentService {
 	/**
 	 * Sets metadata to the default values provided in the environment variables
 	 */
-	public setDefaultMeta() {
+	private setDefaultMeta() {
 		this.title.setTitle(this.settingsService.settings.getValue().meta.title);
 		this.meta.updateTag({ name: 'description', content: this.settingsService.settings.getValue().meta.desc });
 	}
@@ -45,7 +64,7 @@ export class ContentService {
 	 * Sets metadata based on content
 	 * @param cmsContent
 	 */
-	public setContentMeta(cmsContent: CmsContent) {
+	private setContentMeta(cmsContent: CmsContent) {
 		this.meta.updateTag({ name: 'description', content: cmsContent.description });
 		this.title.setTitle(`${this.settingsService.settings.getValue().meta.title} - ${cmsContent.title}`);
 	}

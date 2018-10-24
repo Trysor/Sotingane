@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, Optional, ViewChild, ChangeDetectionStrat
 import { MatDrawer } from '@angular/material';
 import { Router } from '@angular/router';
 
-import { MobileService, AuthService, ContentService, WorkerService, ServerService, SEOService } from '@app/services';
+import { MobileService, AuthService, WorkerService, ServerService, SEOService } from '@app/services';
 
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -21,14 +21,10 @@ export class BaseComponent implements OnInit, OnDestroy {
 	constructor(
 		@Optional() private workerService: WorkerService,
 		@Optional() public serverService: ServerService,
-		private contentService: ContentService,
 		public seoService: SEOService,
 		public mobileService: MobileService,
 		public authService: AuthService,
 		public router: Router) {
-
-		// Sets default metadata
-		contentService.setDefaultMeta();
 	}
 
 	ngOnInit() {
