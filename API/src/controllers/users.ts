@@ -30,7 +30,7 @@ export class UsersController extends Controller {
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
 	 */
-	@PATCH({ path: '/users/:id', do: [ Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.UserAdminUpdateUser) ] })
+	@PATCH({ path: '/users/:id', do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.UserAdminUpdateUser)] })
 	public async patchUser(req: Req, res: Res, next: Next) {
 		const user: User = req.body,
 			userId: string = req.params.id,

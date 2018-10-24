@@ -142,7 +142,7 @@ export class CMSController extends Controller {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the contentDoc.current object
 	 */
-	@POST({ path: '/', do: [ Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.ContentSchema) ] })
+	@POST({ path: '/', do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.ContentSchema)] })
 	public async createContent(req: Req, res: Res, next: Next) {
 		const data: Content = req.body,
 			user: User = <User>req.user;
@@ -189,7 +189,7 @@ export class CMSController extends Controller {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the updated content object
 	 */
-	@PATCH({ path: '/:route', do: [ Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.ContentSchema) ] })
+	@PATCH({ path: '/:route', do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.ContentSchema)] })
 	public async patchContent(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route,
 			data: Content = req.body,
@@ -238,7 +238,7 @@ export class CMSController extends Controller {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: message declaring success or failure
 	 */
-	@DELETE({ path: '/:route', do: [ Auth.ByToken, Auth.RequireRole(accessRoles.admin) ] })
+	@DELETE({ path: '/:route', do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)] })
 	public async deleteContent(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route,
 			user: User = <User>req.user;

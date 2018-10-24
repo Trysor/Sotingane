@@ -1,4 +1,4 @@
-﻿import { Request as Req, Response as Res, NextFunction as Next } from 'express';
+import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
 import { SettingsModel, accessRoles, Settings } from '../models';
 
@@ -10,7 +10,7 @@ import { Auth } from '../libs/auth';
 
 export class SettingsController extends Controller {
 
-	@POST({ path: '/', do: [ Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.SettingsSchema) ] })
+	@POST({ path: '/', do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.SettingsSchema)] })
 	public async postSettings(req: Req, res: Res, next: Next) {
 		const settingsDoc: Settings = await SettingsModel.findOneAndUpdate({}, req.body, { upsert: true, new: true }).lean();
 		if (!settingsDoc) {

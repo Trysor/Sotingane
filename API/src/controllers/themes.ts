@@ -10,8 +10,8 @@ import { Auth } from '../libs/auth';
 
 export class ThemeController extends Controller {
 
-	@PATCH({	path: '/:theme',	do: [ Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.ThemeSchema) ] })
-	@POST({		path: '/',			do: [ Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.ThemeSchema) ] })
+	@PATCH({	path: '/:theme',	do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.ThemeSchema)] })
+	@POST({		path: '/',			do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.ThemeSchema)] })
 	public async postPatchTheme(req: Req, res: Res, next: Next) {
 		const isPatch = (!!req.params && !!req.params.themed);
 		const searchQuery = isPatch ? { name: req.params.theme } : {};
