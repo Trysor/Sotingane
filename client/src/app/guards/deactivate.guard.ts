@@ -15,7 +15,7 @@ export class DeactivateGuard implements CanDeactivate<ComposeComponent> {
 	 * Denies the user from leaving a route until conditions are met
 	 */
 	canDeactivate(comp: ComposeComponent): boolean|Observable<boolean> {
-		if (!!this.authService.user) { return true; }
+		if (!this.authService.user) { return true; }
 		return comp.canDeactivate();
 	}
 }
