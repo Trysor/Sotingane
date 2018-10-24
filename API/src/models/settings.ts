@@ -9,6 +9,7 @@
 
 
 const schema = new Schema({
+	indexRoute: { type: String, required: true },
 	org: { type: String, required: true },
 	meta: {
 		title: { type: String, required: true },
@@ -21,6 +22,7 @@ const schema = new Schema({
 });
 
 export interface Settings {
+	indexRoute: string;
 	org: string;
 	meta: {
 		title: string;

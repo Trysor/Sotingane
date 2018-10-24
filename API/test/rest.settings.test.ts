@@ -10,6 +10,7 @@ import { TestBed } from './testbed';
 // ---------------------------------
 
 const emptySettings: Settings = {
+	'indexRoute': '',
 	'org': '',
 	'meta': {
 		'title': '',
@@ -77,6 +78,7 @@ describe('REST: Settings', () => {
 			expect(res.body).have.property('org');
 			expect(res.body).have.property('meta');
 			expect(res.body).have.property('footer');
+			expect(res.body).have.property('indexRoute');
 		});
 	});
 });

@@ -1,4 +1,4 @@
-import { Request as Req, Response as Res, NextFunction as Next } from 'express';
+﻿import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
 import { SettingsModel, accessRoles, Settings } from '../models';
 
@@ -36,6 +36,7 @@ const settingsSchema = {
 	'type': 'object',
 	'additionalProperties': false,
 	'properties': {
+		indexRoute: { 'type': 'string' },
 		org: { 'type': 'string' },
 		meta: {
 			'type': 'object',
