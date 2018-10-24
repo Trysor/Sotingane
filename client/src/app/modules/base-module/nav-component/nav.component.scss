@@ -4,17 +4,21 @@
 	margin: 10px 0;
 }
 
-a[mat-list-item].active {
-	background: var(--color-active);
-}
+a[mat-list-item] {
+	&.active {
+		background: var(--color-active);
+	}
 
-.subItem {
-	padding-left: 14px;
-
-	::ng-deep .mat-ripple {
-		margin-left: -14px;
+	&.subItem {
+		padding-left: 14px;
+	
+		::ng-deep .mat-ripple {
+			margin-left: -14px;
+		}
 	}
 }
+
+
 
 mat-nav-list h2.mat-subheader {
 	font-weight: bold;
