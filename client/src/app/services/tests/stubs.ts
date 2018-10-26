@@ -1,5 +1,5 @@
 ﻿
-import { User, AccessRoles } from '@app/models';
+import { User } from '@types';
 
 import {
 	AdminService, AuthService, CMSService, HttpService, InterceptorService,

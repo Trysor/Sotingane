@@ -1,8 +1,7 @@
 ﻿import { Injectable } from '@angular/core';
 import { Router, NavigationStart } from '@angular/router';
 
-import { env } from '@env';
-import { CmsContent } from '@app/models';
+import { Content } from '@types';
 
 import { HttpService } from '@app/services/http/http.service';
 import { CMSService } from '@app/services/controllers/cms.service';
@@ -71,7 +70,7 @@ export class SEOService {
 
 
 
-	private seoBreadcrumb(fullUrl: string, content: CmsContent): object {
+	private seoBreadcrumb(fullUrl: string, content: Content): object {
 		const json = {
 			'@context': 'http://schema.org',
 			'@type': 'BreadcrumbList',
@@ -98,7 +97,7 @@ export class SEOService {
 		return json;
 	}
 
-	private seoArticle(fullUrl: string, content: CmsContent): object {
+	private seoArticle(fullUrl: string, content: Content): object {
 		return {
 			'@context': 'http://schema.org',
 			'@type': 'Article',

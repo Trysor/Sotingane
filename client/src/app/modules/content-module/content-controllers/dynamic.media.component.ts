@@ -1,6 +1,6 @@
 ﻿import { Component, Renderer2, ElementRef, ChangeDetectionStrategy, Input, OnInit } from '@angular/core';
 
-import { DynamicComponent } from '@app/models';
+import { DynamicComponent } from '@types';
 
 import { PlatformService } from '@app/services/utility/platform.service';
 import { IntersectionService } from '@app/services/utility/intersection.service';
@@ -143,7 +143,7 @@ export class DynamicMediaComponent extends DynamicLazyLoader implements DynamicC
 	 * @param el
 	 * @param textContent
 	 */
-	public buildJob(el: Element, textContent: string): void {
+	public buildJob(el: Element): void {
 		this.url = el.children[0].getAttribute('url');
 	}
 

@@ -1,6 +1,6 @@
 ﻿import { expect } from 'chai';
 
-import { Content, accessRoles } from '../src/models';
+import { Content, AccessRoles } from '../types';
 
 import { TestBed } from './testbed';
 
@@ -16,7 +16,7 @@ describe('HTTP: Authorization', () => {
 			title: 'httpAuthCookie',
 			route: 'httpAuthCookie',
 			content: 'test',
-			access: accessRoles.everyone,
+			access: AccessRoles.everyone,
 			description: 'test',
 			folder: 'test',
 			published: true,
@@ -36,7 +36,7 @@ describe('HTTP: Authorization', () => {
 			title: 'httpAuthHeader',
 			route: 'httpAuthHeader',
 			content: 'test',
-			access: accessRoles.everyone,
+			access: AccessRoles.everyone,
 			description: 'test',
 			folder: 'test',
 			published: true,

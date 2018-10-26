@@ -1,4 +1,4 @@
-﻿import { BehaviorSubject } from 'rxjs';
+﻿import { BehaviorSubject } from '../../Client/node_modules/rxjs';
 
 export interface TableSettings<T> {
 	columns: ColumnSettings<T>[];

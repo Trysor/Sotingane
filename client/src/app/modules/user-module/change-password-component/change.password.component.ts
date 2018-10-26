@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { ModalService, AuthService } from '@app/services';
-import { User, UpdatePasswordUser, ModalData } from '@app/models';
+import { UpdatePasswordUser, ModalData } from '@types';
 
 
 @Component({

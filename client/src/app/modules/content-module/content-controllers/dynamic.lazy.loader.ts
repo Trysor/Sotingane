@@ -1,4 +1,4 @@
-﻿import { Component, OnDestroy, ChangeDetectionStrategy, ElementRef } from '@angular/core';
+﻿import { OnDestroy, ElementRef } from '@angular/core';
 
 import { IntersectionService } from '@app/services';
 

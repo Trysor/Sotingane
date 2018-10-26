@@ -11,14 +11,14 @@
 							<mat-form-field appearance="outline">
 								<mat-label>Title</mat-label>
 								<input matInput id="title" #title formControlName="title" type="text"
-									   [errorStateMatcher]="formErrorInstant" autocomplete="off" required [maxlength]="maxShortInputLength">
+									   [errorStateMatcher]="formErrorInstant" autocomplete="off" required [maxlength]="CONTENT_MAX_LENGTH.TITLE">
 								<mat-error *ngIf="contentForm.get('title').hasError('required')">
 									Title is <strong>required</strong>
 								</mat-error>
 								<mat-error *ngIf="contentForm.get('title').hasError('alreadyExists')">
 									Title already exists!
 								</mat-error>
-								<mat-hint align="end">{{title.value.length}} / {{maxShortInputLength}}</mat-hint>
+								<mat-hint align="end">{{title.value.length}} / {{CONTENT_MAX_LENGTH.TITLE}}</mat-hint>
 							</mat-form-field>
 						</div>
 
@@ -27,14 +27,14 @@
 							<mat-form-field appearance="outline">
 								<mat-label>Route</mat-label>
 								<input matInput id="route" #route formControlName="route" type="text"
-									   [errorStateMatcher]="formErrorInstant" autocomplete="off" required [maxlength]="maxShortInputLength">
+									   [errorStateMatcher]="formErrorInstant" autocomplete="off" required [maxlength]="CONTENT_MAX_LENGTH.ROUTE">
 								<mat-error *ngIf="contentForm.get('route').hasError('required')">
 									Route is <strong>required</strong>
 								</mat-error>
 								<mat-error *ngIf="contentForm.get('route').hasError('alreadyExists')">
 									Route already exists!
 								</mat-error>
-								<mat-hint align="end">{{route.value.length}} / {{maxShortInputLength}}</mat-hint>
+								<mat-hint align="end">{{route.value.length}} / {{CONTENT_MAX_LENGTH.ROUTE}}</mat-hint>
 							</mat-form-field>
 						</div>
 
@@ -69,8 +69,8 @@
 							<mat-form-field appearance="outline">
 								<mat-label>Folder</mat-label>
 								<input matInput id="folder" #folder formControlName="folder" type="text"
-									   autocomplete="off" [matAutocomplete]="folderAuto" [maxlength]="maxShortInputLength">
-								<mat-hint align="end">{{folder.value.length}} / {{maxShortInputLength}}</mat-hint>
+									   autocomplete="off" [matAutocomplete]="folderAuto" [maxlength]="CONTENT_MAX_LENGTH.FOLDER">
+								<mat-hint align="end">{{folder.value.length}} / {{CONTENT_MAX_LENGTH.FOLDER}}</mat-hint>
 
 								<mat-autocomplete #folderAuto="matAutocomplete">
 									<mat-option *ngFor="let folder of filteredFolders | async" [value]="folder">
@@ -93,11 +93,11 @@
 							<mat-form-field appearance="outline">
 								<mat-label>Description</mat-label>
 								<textarea matInput id="desc" #desc formControlName="description" type="text"
-										  autocomplete="off" required [maxlength]="maxLongInputLength" matTextareaAutosize></textarea>
+										  autocomplete="off" required [maxlength]="CONTENT_MAX_LENGTH.DESC" matTextareaAutosize></textarea>
 								<mat-error *ngIf="contentForm.get('description').hasError('required')">
 									Description is <strong>required</strong>
 								</mat-error>
-								<mat-hint align="end">{{desc.value.length}} / {{maxLongInputLength}}</mat-hint>
+								<mat-hint align="end">{{desc.value.length}} / {{CONTENT_MAX_LENGTH.DESC}}</mat-hint>
 							</mat-form-field>
 						</div>
 					</section-component>

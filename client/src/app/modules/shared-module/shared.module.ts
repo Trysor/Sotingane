@@ -11,6 +11,9 @@ import { MaterialModule } from '../material.module';
 import { TimeAgoPipe, NumberPipe } from '@app/pipes';
 import { DatePipe } from '@angular/common';
 
+// Directives
+import { MobileDirective } from '@app/directives/mobile.directive';
+
 // Components
 import { ModalComponent } from './modals/modal.component';
 import { ImageModalComponent } from './modals/imagemodal.component';
@@ -44,7 +47,8 @@ import { TableComponent } from './table-component/table.component';
 		ImageModalComponent,
 		SectionWrapperComponent,
 		SectionComponent,
-		TableComponent
+		TableComponent,
+		MobileDirective
 	],
 	providers: [
 		DatePipe

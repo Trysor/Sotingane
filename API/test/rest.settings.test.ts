@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { Settings } from '../src/models';
+import { Settings } from '../types';
 import { VALIDATION_FAILED, SETTINGS_STATUS } from '../src/libs/validate';
 
 import { TestBed } from './testbed';

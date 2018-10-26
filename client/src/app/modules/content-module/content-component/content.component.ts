@@ -5,7 +5,7 @@ import {
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 
 import { CMSService, AuthService, ModalService, ContentService, SettingsService } from '@app/services';
-import { CmsContent, AccessRoles } from '@app/models';
+import { Content, AccessRoles } from '@types';
 
 import { Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
@@ -22,7 +22,7 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 	@ViewChild('contentHost') private _contentHost: ElementRef<HTMLDivElement>;
 
 	// Input content. Used in relation to Editing previews
-	@Input() public set contentInput(value: CmsContent) {
+	@Input() public set contentInput(value: Content) {
 		if (!value) { return; }
 		const old = this.cmsService.content.getValue();
 		if (old && old.content === value.content && old.title === value.title) {

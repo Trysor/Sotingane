@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { Theme } from '../src/models';
+import { Theme } from '../types';
 import { VALIDATION_FAILED, THEME_STATUS } from '../src/libs/validate';
 
 import { TestBed } from './testbed';

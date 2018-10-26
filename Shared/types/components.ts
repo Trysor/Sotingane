@@ -1,4 +1,8 @@
 
+export interface DynamicComponent {
+	buildJob(el: Element): void;
+}
+
 export interface ModalData {
 	headerText: string;
 	bodyText: string;

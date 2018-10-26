@@ -3,8 +3,9 @@ import { Component, Optional, OnDestroy, ChangeDetectionStrategy } from '@angula
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
-import { CmsContent, TableSettings, ColumnType } from '@app/models';
 import { ModalService, SettingsService, AdminService } from '@app/services';
+
+import { Content, TableSettings, ColumnType } from '@types';
 
 import { AccessHandler } from '@app/classes';
 
@@ -19,11 +20,11 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class PagesComponent implements OnDestroy {
 	private _ngUnsub = new Subject();
-	public data = new BehaviorSubject<CmsContent[]>(null);
+	public data = new BehaviorSubject<Content[]>(null);
 
 	private readonly _accessHandler = new AccessHandler();
 
-	public readonly settings: TableSettings<CmsContent> = {
+	public readonly settings: TableSettings<Content> = {
 		columns: [
 			{
 				header: '',

@@ -4,16 +4,12 @@ import { get as configGet, util as configUtil } from 'config';
 import { sign } from 'jsonwebtoken';
 
 import { status, ajv, JSchema, AUTH_STATUS, validate } from '../libs/validate';
-import { UserModel, User, UserDoc, accessRoles } from '../models';
+import { UserModel, UserDoc } from '../models';
+import { User, AccessRoles } from '../../types';
 
 import { Controller, GET, POST, isProduction } from '../libs/routing';
 import { Auth } from '../libs/auth';
 
-
-export interface TokenResponse {
-	token: string;
-	user: User;
-}
 
 export class AuthController extends Controller {
 
@@ -70,7 +66,7 @@ export class AuthController extends Controller {
 	@POST({ path: '/register', ignore: isProduction, do: [validate(JSchema.UserRegistrationSchema)] })
 	public async register(req: Req, res: Res, next: Next) { // Not enabled in production for the time being
 		const password: string = req.body.password,
-			role: accessRoles = req.body.role,
+			role: AccessRoles = req.body.role,
 			username: string = req.body.username;
 
 		const userAlreadyExists = await UserModel.findOne({ username_lower: username.toLowerCase() }).lean();
@@ -124,7 +120,7 @@ export class AuthController extends Controller {
 	 * @param  {Next} next next
 	 * @return {Res}          server response
 	 */
-	@POST({ path: '/deleteaccount', ignore: true, do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)] })
+	@POST({ path: '/deleteaccount', ignore: true, do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
 	public async deleteAccount(req: Req, res: Res, next: Next) { // TODO: Implement my security
 		const id: string = req.body.id;
 
@@ -157,7 +153,7 @@ const userRegistrationSchema = {
 		},
 		'role': {
 			'type': 'string',
-			'enum': [accessRoles.admin, accessRoles.user]
+			'enum': [AccessRoles.admin, AccessRoles.user]
 		},
 		'password': {
 			'type': 'string'

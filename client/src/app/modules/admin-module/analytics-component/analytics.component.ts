@@ -7,7 +7,7 @@ import { MatSnackBar } from '@angular/material';
 
 import {
 	AggregationQuery, AggregationResult, AggregationResultSummarized, AggregationResultUnwinded, User, TableSettings
-} from '@app/models';
+} from '@types';
 import { CMSService, AdminService, MobileService } from '@app/services';
 
 import { FormErrorInstant, AccessHandler } from '@app/classes';

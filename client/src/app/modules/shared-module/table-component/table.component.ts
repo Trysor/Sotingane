@@ -1,12 +1,12 @@
 import { Component, ViewChild, Input, OnInit, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 import { MatPaginator, MatSort, MatTable, MatTableDataSource } from '@angular/material';
 
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
-import { ColumnSettings, ColumnType, TableSettings, TableFilterSettings, Column } from '@app/models';
+import { ColumnSettings, ColumnType, TableSettings, TableFilterSettings, Column } from '@types';
 import { MobileService } from '@app/services';
 
-import { Subject, Observable, BehaviorSubject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil, distinctUntilChanged, debounceTime } from 'rxjs/operators';
 
 @Component({

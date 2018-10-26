@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { User } from '@app/models';
+import { User } from '@types';
 import { StorageService, StorageKey } from '@app/services/utility/storage.service';
 
 @Injectable({ providedIn: 'root' })

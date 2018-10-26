@@ -1,10 +1,9 @@
 import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatSelectChange } from '@angular/material';
-import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 
-import { CMSService, AdminService, AuthService } from '@app/services';
-import { User, CmsAccess } from '@app/models';
+import { AdminService, AuthService } from '@app/services';
+import { User } from '@types';
 
 import { AccessHandler } from '@app/classes';
 

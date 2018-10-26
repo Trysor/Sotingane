@@ -5,11 +5,11 @@
 	"main": "dist/api.js",
 	"scripts": {
 		"build": "tsc",
-		"dev": "tsc-watch --onSuccess \"node dist/out-tsc/src/app.js\"",
+		"dev": "tsc-watch --onSuccess \"node dist/out-tsc/api/src/app.js\"",
 		"lint": "tslint -c tslint.json 'src/**/*.ts'",
-		"test:cont": "tsc-watch --onSuccess \"cross-env NODE_ENV=test node dist/out-tsc/test/testbed.js\"",
-		"test": "npm run build && cross-env NODE_ENV=test node dist/out-tsc/test/testbed.js",
-		"test:debug": "npm run build && mocha --inspect-brk --delay --exit ./dist/out-tsc/**/*.test.js",
+		"test:cont": "tsc-watch --onSuccess \"cross-env NODE_ENV=test node dist/out-tsc/api/test/testbed.js\"",
+		"test": "npm run build && cross-env NODE_ENV=test node dist/out-tsc/api/test/testbed.js",
+		"test:debug": "npm run build && mocha --inspect-brk --delay --exit ./dist/out-tsc/api/**/*.test.js",
 		"webpack": "webpack --config webpack.config.js --progress --colors"
 	},
 	"author": "",

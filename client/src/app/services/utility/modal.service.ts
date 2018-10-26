@@ -2,7 +2,7 @@
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 
-import { ModalData, ImageModalData, CmsContent } from '@app/models';
+import { ModalData, ImageModalData, Content } from '@types';
 import { ModalComponent } from '@app/modules/shared-module/modals/modal.component';
 import { ImageModalComponent } from '@app/modules/shared-module/modals/imagemodal.component';
 
@@ -18,7 +18,7 @@ export class ModalService {
 	 * Opens a delete content modal for the given content item
 	 * @param content
 	 */
-	public openDeleteContentModal(content: CmsContent) {
+	public openDeleteContentModal(content: Content) {
 		const data: ModalData = {
 			headerText: `Delete ${content.title}`,
 			bodyText: 'Do you wish to proceed?',

@@ -1,5 +1,5 @@
 ﻿
-import { CmsAccess, AccessRoles } from '@app/models';
+import { CmsAccess, AccessRoles } from '@types';
 
 
 export class AccessHandler {

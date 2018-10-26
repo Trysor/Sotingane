@@ -1,6 +1,6 @@
 ﻿import { Component, Renderer2, ElementRef, Optional, ChangeDetectionStrategy } from '@angular/core';
 
-import { DynamicComponent } from '@app/models';
+import { DynamicComponent } from '@types';
 import { ModalService } from '@app/services/utility/modal.service';
 import { IntersectionService } from '@app/services/utility/intersection.service';
 import { MobileService } from '@app/services/utility/mobile.service';

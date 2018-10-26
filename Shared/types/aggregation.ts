@@ -1,4 +1,4 @@
-﻿import { AccessRoles, User } from '@app/models/user';
+﻿import { AccessRoles, User } from './user';
 
 export interface AggregationQuery {
 	createdBy?: string;

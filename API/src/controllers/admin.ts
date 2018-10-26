@@ -3,7 +3,8 @@
 import * as mongoose from 'mongoose';
 
 import { status, ajv, JSchema, ADMIN_STATUS, CMS_STATUS, validate } from '../libs/validate';
-import { accessRoles, ContentModel, Content, ContentEntry } from '../models';
+import { ContentModel } from '../models';
+import { Content, ContentEntry, AccessRoles, AggregationQuery } from '../../types';
 
 import { MongoStream } from '../libs/MongoStreamer';
 import { Controller, GET, POST } from '../libs/routing';
@@ -18,7 +19,7 @@ export class AdminController extends Controller {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: a list of partial content information
 	 */
-	@GET({ path: '/cms/', do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)] })
+	@GET({ path: '/cms/', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
 	public async getAdminContentList(req: Req, res: Res, next: Next) {
 		const contentList: Content[] = await ContentModel.aggregate([
 			{ $lookup: { from: 'logs', localField: '_id', foreignField: 'content', as: 'logData' } },
@@ -49,7 +50,7 @@ export class AdminController extends Controller {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the content object
 	 */
-	@GET({ path: '/cms/:route', do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)] })
+	@GET({ path: '/cms/:route', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
 	public async getContentFull(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route;
 
@@ -75,7 +76,7 @@ export class AdminController extends Controller {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the aggregated data
 	 */
-	@POST({ path: '/cms/aggregate', do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.AdminAggregationSchema)] })
+	@POST({ path: '/cms/aggregate', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.AdminAggregationSchema)] })
 	public async aggregateContent(req: Req, res: Res, next: Next) {
 		const query: AggregationQuery = req.body;
 		const unwind = query.hasOwnProperty('unwind') && query.unwind;
@@ -182,13 +183,19 @@ export class AdminController extends Controller {
 	}
 }
 
+/*
+ |--------------------------------------------------------------------------
+ | JSON schema
+ |--------------------------------------------------------------------------
+*/
+
 const adminAggregationSchema = {
 	'$id': JSchema.AdminAggregationSchema.name,
 	'type': 'object',
 	'additionalProperties': false,
 	'properties': {
 		'createdBy': { 'type': 'string' },
-		'access': { 'type': 'string', 'enum': [accessRoles.admin, accessRoles.user, accessRoles.everyone, ''] },
+		'access': { 'type': 'string', 'enum': [AccessRoles.admin, AccessRoles.user, AccessRoles.everyone, ''] },
 		'published': { 'type': 'boolean' },
 		'route': { 'type': 'string' },
 		'folder': { 'type': 'string' },
@@ -201,22 +208,6 @@ const adminAggregationSchema = {
 		'unwind': { 'type': 'boolean' }
 	},
 };
-
-export interface AggregationQuery {
-	createdBy?: string;
-	access?: accessRoles;
-	published?: boolean;
-	route?: string;
-	folder?: string;
-	createdAfterDate?: Date;
-	createdBeforeDate?: Date;
-	seenAfterDate?: Date;
-	seenBeforeDate?: Date;
-	readBy?: string[];
-	browsers?: string[];
-	unwind?: boolean;
-}
-
 
 if (ajv.validateSchema(adminAggregationSchema)) {
 	ajv.addSchema(adminAggregationSchema, JSchema.AdminAggregationSchema.name);

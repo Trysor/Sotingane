@@ -1,6 +1,6 @@
-﻿import { Component, OnInit, Input, Renderer2, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+﻿import { Component, OnInit, Input, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 
-import { DynamicComponent } from '@app/models';
+import { DynamicComponent } from '@types';
 
 import { PlatformService } from '@app/services/utility/platform.service';
 import { DynamicLazyLoader } from './dynamic.lazy.loader';
@@ -10,8 +10,8 @@ import { DynamicLazyLoader } from './dynamic.lazy.loader';
 	selector: 'router-link',
 	template: `
 		<ng-container [ngSwitch]="isRemoteUrl">
-			<a *ngSwitchCase="true" [href]="link" [ngStyle]="style">{{text}}</a>
-			<a *ngSwitchCase="false" [routerLink]="link" [ngStyle]="style">{{text}}</a>
+			<a *ngSwitchCase="true" [href]="link">{{text}}</a>
+			<a *ngSwitchCase="false" [routerLink]="link">{{text}}</a>
 		</ng-container>`,
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -48,9 +48,9 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 	 * @param el
 	 * @param textContent
 	 */
-	public buildJob(el: Element, textContent: string): void {
+	public buildJob(el: Element): void {
 		this.link = el.getAttribute('href');
-		this.text = textContent;
+		this.text = el.textContent;
 	}
 
 	load() { }

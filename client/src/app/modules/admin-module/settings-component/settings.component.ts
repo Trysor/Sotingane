@@ -3,7 +3,7 @@ import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 
 import { SettingsService } from '@app/services/controllers/settings.service';
 
-import { AppSettings } from '@app/models';
+import { Settings } from '@types';
 
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
@@ -51,7 +51,7 @@ export class SettingsComponent implements OnDestroy {
 	}
 
 	public submitForm() {
-		const settings: AppSettings = this.settingsForm.getRawValue();
+		const settings: Settings = this.settingsForm.getRawValue();
 		console.log(settings);
 		this.settingsService.postSettings(settings).pipe(take(1)).subscribe(
 			() => this.settingsService.settings.next(settings),

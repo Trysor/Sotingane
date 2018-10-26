@@ -4,7 +4,7 @@ import { Meta, Title } from '@angular/platform-browser';
 import { SettingsService } from '@app/services/controllers/settings.service';
 import { CMSService } from '@app/services/controllers/cms.service';
 
-import { CmsContent, DynamicComponent } from '@app/models';
+import { Content, DynamicComponent } from '@types';
 
 import { DynamicLinkComponent } from '@app/modules/content-module/content-controllers/dynamic.link.component';
 import { DynamicImageComponent } from '@app/modules/content-module/content-controllers/dynamic.image.component';
@@ -62,11 +62,11 @@ export class ContentService {
 
 	/**
 	 * Sets metadata based on content
-	 * @param cmsContent
+	 * @param Content
 	 */
-	private setContentMeta(cmsContent: CmsContent) {
-		this.meta.updateTag({ name: 'description', content: cmsContent.description });
-		this.title.setTitle(`${this.settingsService.settings.getValue().meta.title} - ${cmsContent.title}`);
+	private setContentMeta(content: Content) {
+		this.meta.updateTag({ name: 'description', content: content.description });
+		this.title.setTitle(`${this.settingsService.settings.getValue().meta.title} - ${content.title}`);
 	}
 
 
@@ -77,11 +77,11 @@ export class ContentService {
 	/**
 	 * Builds the content for the given elementRef
 	 * @param element
-	 * @param cmsContent
+	 * @param Content
 	 */
-	public buildContentForElement(element: ElementRef<HTMLDivElement>, cmsContent: CmsContent) {
+	public buildContentForElement(element: ElementRef<HTMLDivElement>, content: Content) {
 		// null ref checks
-		if (!element || !element.nativeElement || !cmsContent || !cmsContent.content) {
+		if (!element || !element.nativeElement || !content || !content.content) {
 			return;
 		}
 
@@ -90,7 +90,7 @@ export class ContentService {
 
 		// Clean components before rebuilding.
 		this.cleanEmbeddedComponents();
-		e.innerHTML = cmsContent.content.replace(/src/g, 'data-src');
+		e.innerHTML = content.content.replace(/src/g, 'data-src');
 
 		// Inject
 		this._dynamicContent.forEach((fac, selector) => {
@@ -99,7 +99,7 @@ export class ContentService {
 
 			for (let i = 0; i < elems.length; i++) {
 				const el = elems.item(i);
-				const origEl = el.cloneNode(true);
+				const origEl = <Element>el.cloneNode(true);
 				const savedTextContent = el.textContent; // save text content before we modify the element
 				// convert NodeList into an array, since Angular dosen't like having a NodeList passed for projectableNodes
 				const comp = fac.create(this.injector, [Array.prototype.slice.call(el.childNodes)], el);
@@ -109,7 +109,7 @@ export class ContentService {
 					const attr = el.attributes.item(j);
 					comp.instance[attr.name] = attr.value;
 				}
-				comp.instance.buildJob(<Element>origEl, savedTextContent);
+				comp.instance.buildJob(origEl);
 
 				// Add to list
 				this._embeddedComponents.push(comp);

@@ -8,7 +8,7 @@ import { env } from '@env';
 import { TokenService } from '@app/services/utility/token.service';
 import { LoadingService } from '@app/services/utility/loading.service';
 
-import { Observable, of, throwError, TimeoutError } from 'rxjs';
+import { Observable, throwError, TimeoutError } from 'rxjs';
 import { timeout, finalize, catchError } from 'rxjs/operators';
 
 

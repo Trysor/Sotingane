@@ -1,6 +1,7 @@
 import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
-import { ThemeModel, accessRoles, Theme } from '../models';
+import { ThemeModel } from '../models';
+import { AccessRoles, Theme } from '../../types';
 
 import { Controller, GET, POST, PATCH } from '../libs/routing';
 import { THEME_STATUS, status, JSchema, ajv, validate } from '../libs/validate';
@@ -10,8 +11,8 @@ import { Auth } from '../libs/auth';
 
 export class ThemeController extends Controller {
 
-	@PATCH({	path: '/:theme',	do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.ThemeSchema)] })
-	@POST({		path: '/',			do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.ThemeSchema)] })
+	@PATCH({	path: '/:theme',	do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.ThemeSchema)] })
+	@POST({		path: '/',			do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.ThemeSchema)] })
 	public async postPatchTheme(req: Req, res: Res, next: Next) {
 		const isPatch = (!!req.params && !!req.params.themed);
 		const searchQuery = isPatch ? { name: req.params.theme } : {};
@@ -34,6 +35,11 @@ export class ThemeController extends Controller {
 
 }
 
+/*
+ |--------------------------------------------------------------------------
+ | JSON schema
+ |--------------------------------------------------------------------------
+*/
 
 const ThemeSchema = {
 	'$id': JSchema.ThemeSchema.name,

@@ -4,10 +4,11 @@ import { MatDialog, MatDialogConfig } from '@angular/material';
 import { DatePipe } from '@angular/common';
 
 import { AdminService, AuthService } from '@app/services';
-import { User, TableSettings, ColumnType } from '@app/models';
 import { AccessHandler } from '@app/classes';
 
+import { User, TableSettings, ColumnType } from '@types';
 import { UserModalComponent, UserModalData } from '../user-modal-component/user.modal.component';
+
 
 import { Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';

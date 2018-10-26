@@ -1,8 +1,7 @@
 import { expect } from 'chai';
 
-import { User, accessRoles } from '../src/models';
+import { User, AccessRoles, UserToken } from '../types';
 import { AUTH_STATUS, VALIDATION_FAILED } from '../src/libs/validate';
-import { TokenResponse } from '../src/controllers';
 
 import { TestBed, AdminUser } from './testbed';
 
@@ -14,7 +13,7 @@ import { TestBed, AdminUser } from './testbed';
 const userToRegister: Partial<User> = {
 	username: 'Bob',
 	password: 'aaaaaaa',
-	role: accessRoles.admin,
+	role: AccessRoles.admin,
 };
 
 // ---------------------------------
@@ -37,7 +36,7 @@ describe('REST: Authorization', () => {
 			expect(res).to.have.status(200);
 			expect(res).to.have.property('body');
 
-			const body: TokenResponse = res.body;
+			const body: UserToken = res.body;
 			expect(res).to.have.cookie('jwt');
 			expect(body.user).to.have.property('username');
 			expect(body.user).property('username').to.equal(AdminUser.username);
@@ -64,7 +63,7 @@ describe('REST: Authorization', () => {
 			expect(res).to.have.status(200);
 			expect(res).to.have.property('body');
 
-			const body: TokenResponse = res.body;
+			const body: UserToken = res.body;
 
 			expect(res).to.have.cookie('jwt');
 			expect(body).to.have.property('token');
@@ -141,7 +140,7 @@ describe('REST: Authorization', () => {
 			const user: Partial<User> = {
 				username: userToRegister.username,
 				password: userToRegister.password,
-				role: accessRoles.admin
+				role: AccessRoles.admin
 			};
 
 			const res = await TestBed.http.post('/api/auth/register').send(user);
@@ -153,8 +152,8 @@ describe('REST: Authorization', () => {
 		});
 
 		it('POST /api/auth/register 422', async () => {
-			const noUsername: Partial<User> = { password: 'aaa', role: accessRoles.user };
-			const noPassword: Partial<User> = { username: userToRegister.username + 'test', role: accessRoles.user };
+			const noUsername: Partial<User> = { password: 'aaa', role: AccessRoles.user };
+			const noPassword: Partial<User> = { username: userToRegister.username + 'test', role: AccessRoles.user };
 			const noRole: Partial<User> = { username: userToRegister.username + 'test', password: 'aaa' };
 			const badRole: Partial<User> = {
 				username: userToRegister.username + 'test',

@@ -1,6 +1,5 @@
-import { Document, model, Model, Schema } from 'mongoose';
-import { NextFunction } from 'express';
-import { accessRoles } from '../models/user';
+import { Document, model, Schema } from 'mongoose';
+import { AccessRoles, ContentEntry } from '../../types';
 
 /*
  |--------------------------------------------------------------------------
@@ -8,11 +7,10 @@ import { accessRoles } from '../models/user';
  |--------------------------------------------------------------------------
 */
 
-
 const schema = new Schema({
 	current: {
 		title: { type: String, unique: true, required: true },
-		access: { type: String, enum: ['admin', 'user', 'everyone'], default: 'everyone', index: true },
+		access: { type: String, enum: [AccessRoles.admin, AccessRoles.user, AccessRoles.everyone], default: AccessRoles.everyone, index: true },
 		route: { type: String, required: true, unique: true, index: { unique: true } },
 		published: { type: Boolean, default: true },
 		version: { type: Number, required: true },
@@ -44,44 +42,6 @@ schema.index(
 	{ 'current.title': 'text', 'current.content_searchable': 'text', 'current.description': 'text' },
 	{ weights: { 'current.title': 3, 'current.content_searchable': 1, 'current.description': 2 } }
 );
-
-
-export interface ContentEntry {
-	current: Content;
-	prev: Content[];
-
-	views: number;
-
-	updatedAt?: Date;
-	createdAt?: Date;
-	_id: any;
-}
-
-
-export interface Content {
-	title: string;
-	access?: accessRoles;
-	route: string;
-	published?: boolean;
-	version?: number;
-
-	views?: number;
-
-	content?: string;
-	content_searchable?: string;
-
-	description?: string;
-	images?: string[]; // url
-
-	folder?: string;
-	nav?: boolean;
-
-	updatedBy?: Schema.Types.ObjectId;
-	createdBy?: Schema.Types.ObjectId;
-
-	updatedAt?: Date;
-	createdAt?: Date;
-}
 
 interface ContentDoc extends ContentEntry, Document { }
 export const ContentModel = model<ContentDoc>('Content', schema);

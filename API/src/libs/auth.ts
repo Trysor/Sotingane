@@ -6,7 +6,8 @@ import { use as passportUse, authenticate } from 'passport';
 import { Handler } from 'express';
 import { Request, Response, NextFunction } from 'express';
 
-import { UserModel, accessRoles, User } from '../models';
+import { AccessRoles, User } from '../../types';
+import { UserModel } from '../models';
 import { status, ROUTE_STATUS } from './validate';
 
 
@@ -66,10 +67,10 @@ const Personalize = (req: Request, res: Response, next: NextFunction) => {
 	});
 };
 
-const RequireRole = (role: accessRoles) => {
+const RequireRole = (role: AccessRoles) => {
 	return (req: Request, res: Response, next: NextFunction) => {
 		const user = <User>req.user;
-		if (user && (user.isOfRole(role) || user.isOfRole(accessRoles.admin))) {
+		if (user && (user.isOfRole(role) || user.isOfRole(AccessRoles.admin))) {
 			return next();
 		}
 		return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED));

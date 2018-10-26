@@ -5,18 +5,17 @@ import { DatePipe } from '@angular/common';
 
 import { MatSelectChange } from '@angular/material';
 
-import { ChangeEvent } from '@ckeditor/ckeditor5-angular/ckeditor.component';
 import ClassicEditor from '@app/ckeditor';
 
 
 import { ModalService, CMSService, MobileService, AdminService, StorageService, StorageKey } from '@app/services';
-import { CmsContent, AccessRoles } from '@app/models';
+import { Content, AccessRoles } from '@types';
+import { CONTENT_MAX_LENGTH } from '@global';
+
 import { FormErrorInstant, AccessHandler } from '@app/classes';
 
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { CKEditor5 } from '@ckeditor/ckeditor5-angular/ckeditor';
-
 
 enum VersionHistory { Draft = -1 }
 
@@ -30,21 +29,20 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 	public readonly contentForm: FormGroup; // Form
 	public readonly formErrorInstant = new FormErrorInstant(); // Form validation errors trigger instantly
 	public readonly ClassicEditor = ClassicEditor; // CKEditor
-	public originalContent: CmsContent; // When editing, the original content is kept here
+	public originalContent: Content; // When editing, the original content is kept here
 	// Access
 	public readonly AccessRoles = AccessRoles;
 	public readonly accessHandler = new AccessHandler();
 
 	// History fields
 	public versionIndex: number = VersionHistory.Draft;
-	public history: CmsContent[] = null;
+	public history: Content[] = null;
 	public readonly VersionHistory = VersionHistory;
 
-	public readonly maxShortInputLength = 25;
-	public readonly maxLongInputLength = 300;
+	public readonly CONTENT_MAX_LENGTH = CONTENT_MAX_LENGTH;
 	public readonly filteredFolders = new BehaviorSubject<string[]>(['']);
 
-	private _currentDraft: CmsContent; // used with the versioning
+	private _currentDraft: Content; // used with the versioning
 	private folders: string[] = []; // Holds a list of used Folders
 
 	private _ngUnsub = new Subject();
@@ -68,21 +66,21 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 		// Form
 		this.contentForm = fb.group({
 			'route': ['', Validators.compose([
-				Validators.maxLength(this.maxShortInputLength),
+				Validators.maxLength(this.CONTENT_MAX_LENGTH.ROUTE),
 				this.disallowed(cmsService.getContentList(), 'route').bind(this)
 			])],
 			'title': ['', Validators.compose([
-				Validators.maxLength(this.maxShortInputLength),
+				Validators.maxLength(this.CONTENT_MAX_LENGTH.TITLE),
 				this.disallowed(cmsService.getContentList(), 'title').bind(this)
 			])],
 			'published': [true],
 			'description': ['', Validators.compose([
 				Validators.required,
-				Validators.maxLength(this.maxLongInputLength)
+				Validators.maxLength(this.CONTENT_MAX_LENGTH.DESC)
 			])],
 			'access': [AccessRoles.everyone, Validators.required],
 			'nav': [true],
-			'folder': ['', Validators.maxLength(this.maxShortInputLength)],
+			'folder': ['', Validators.maxLength(this.CONTENT_MAX_LENGTH.FOLDER)],
 			'content': ['', Validators.required],
 		});
 		this._currentDraft = this.contentForm.getRawValue();
@@ -174,7 +172,7 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 	 * @param contentList
 	 * @param prop
 	 */
-	private disallowed(contentList: BehaviorSubject<CmsContent[]>, prop: string) {
+	private disallowed(contentList: BehaviorSubject<Content[]>, prop: string) {
 		return (control: FormControl): { [key: string]: any } => {
 			const list = contentList.getValue();
 			if (list && list.some((content) => {
@@ -214,11 +212,11 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 	 * Submits the form and hands it over to the cmsService
 	 */
 	public submitForm() {
-		const content: CmsContent = this.contentForm.getRawValue();
+		const content: Content = this.contentForm.getRawValue();
 		content.route = content.route.toLowerCase();
 
 		// Helper
-		const onSubmit = (obs: Observable<CmsContent>) => {
+		const onSubmit = (obs: Observable<Content>) => {
 			const sub = obs.subscribe(
 				newContent => {
 					sub.unsubscribe();

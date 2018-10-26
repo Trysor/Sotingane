@@ -6,7 +6,10 @@ import { escape } from 'validator';
 import { sanitize, stripHTML } from '../libs/sanitizer';
 
 import { status, ajv, JSchema, ROUTE_STATUS, CMS_STATUS, validate } from '../libs/validate';
-import { User, accessRoles, Log, LogModel, ContentModel, Content, ContentEntry } from '../models';
+import { User, AccessRoles, Log, Content, ContentEntry } from '../../types';
+import { CONTENT_MAX_LENGTH } from '../../global';
+import { LogModel, ContentModel } from '../models';
+
 import { Controller, GET, POST, PATCH, DELETE, isProduction } from '../libs/routing';
 import { Auth } from '../libs/auth';
 
@@ -42,10 +45,10 @@ export class CMSController extends Controller {
 	public async getContentList(req: Req, res: Res, next: Next) {
 		const user: User = <User>req.user;
 
-		const accessRights: accessRoles[] = [accessRoles.everyone];
+		const accessRights: AccessRoles[] = [AccessRoles.everyone];
 		if (user) {
-			accessRights.push(accessRoles.user);
-			if (user.role === accessRoles.admin) { accessRights.push(accessRoles.admin); }
+			accessRights.push(AccessRoles.user);
+			if (user.role === AccessRoles.admin) { accessRights.push(AccessRoles.admin); }
 		}
 
 		const contentList: Content[] = await ContentModel.aggregate([
@@ -88,7 +91,7 @@ export class CMSController extends Controller {
 
 		if (!contentDoc) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
 
-		const access = contentDoc.current.access === accessRoles.everyone || (user && user.canAccess(contentDoc.current.access));
+		const access = contentDoc.current.access === AccessRoles.everyone || (user && user.canAccess(contentDoc.current.access));
 		if (!access) { return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED)); }
 
 		res.status(200).send(contentDoc.current);
@@ -119,7 +122,7 @@ export class CMSController extends Controller {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the content history array
 	 */
-	@GET({ path: '/history/:route', do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)] })
+	@GET({ path: '/history/:route', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
 	public async getContentHistory(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route;
 
@@ -142,7 +145,7 @@ export class CMSController extends Controller {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the contentDoc.current object
 	 */
-	@POST({ path: '/', do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.ContentSchema)] })
+	@POST({ path: '/', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.ContentSchema)] })
 	public async createContent(req: Req, res: Res, next: Next) {
 		const data: Content = req.body,
 			user: User = <User>req.user;
@@ -189,7 +192,7 @@ export class CMSController extends Controller {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: the updated content object
 	 */
-	@PATCH({ path: '/:route', do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin), validate(JSchema.ContentSchema)] })
+	@PATCH({ path: '/:route', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.ContentSchema)] })
 	public async patchContent(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route,
 			data: Content = req.body,
@@ -238,12 +241,12 @@ export class CMSController extends Controller {
 	 * @param  {Next}		next next
 	 * @return {Res}		server response: message declaring success or failure
 	 */
-	@DELETE({ path: '/:route', do: [Auth.ByToken, Auth.RequireRole(accessRoles.admin)] })
+	@DELETE({ path: '/:route', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
 	public async deleteContent(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route,
 			user: User = <User>req.user;
 
-		if (!user.isOfRole(accessRoles.admin)) {
+		if (!user.isOfRole(AccessRoles.admin)) {
 			return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED));
 		}
 
@@ -265,10 +268,10 @@ export class CMSController extends Controller {
 		const searchTerm: string = req.params.searchTerm || '',
 			user: User = <User>req.user;
 
-		const accessRights: accessRoles[] = [accessRoles.everyone];
+		const accessRights: AccessRoles[] = [AccessRoles.everyone];
 		if (user) {
-			accessRights.push(accessRoles.user);
-			if (user.role === accessRoles.admin) { accessRights.push(accessRoles.admin); }
+			accessRights.push(AccessRoles.user);
+			if (user.role === AccessRoles.admin) { accessRights.push(AccessRoles.admin); }
 		}
 
 		try {
@@ -306,9 +309,6 @@ export class CMSController extends Controller {
  |--------------------------------------------------------------------------
 */
 
-const maxShortInputLength = 25;
-const maxLongInputLength = 300;
-
 const createPatchContentSchema = {
 	'$id': JSchema.ContentSchema.name,
 	'type': 'object',
@@ -316,29 +316,29 @@ const createPatchContentSchema = {
 	'properties': {
 		'title': {
 			'type': 'string',
-			'maxLength': maxShortInputLength
+			'maxLength': CONTENT_MAX_LENGTH.TITLE
 		},
 		'access': {
 			'type': 'string',
-			'enum': [accessRoles.admin, accessRoles.user, accessRoles.everyone]
+			'enum': [AccessRoles.admin, AccessRoles.user, AccessRoles.everyone]
 		},
 		'published': {
 			'type': 'boolean'
 		},
 		'route': {
 			'type': 'string',
-			'maxLength': maxShortInputLength
+			'maxLength': CONTENT_MAX_LENGTH.ROUTE
 		},
 		'content': {
 			'type': 'string'
 		},
 		'description': {
 			'type': 'string',
-			'maxLength': maxLongInputLength
+			'maxLength': CONTENT_MAX_LENGTH.DESC
 		},
 		'folder': {
 			'type': 'string',
-			'maxLength': maxShortInputLength
+			'maxLength': CONTENT_MAX_LENGTH.FOLDER
 		},
 		'nav': {
 			'type': 'boolean'

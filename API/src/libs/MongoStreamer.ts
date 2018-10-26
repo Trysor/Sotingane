@@ -1,5 +1,5 @@
-﻿import { Request as Req, Response as Res, NextFunction as Next } from 'express';
-import { QueryCursor, Document, Aggregate, Query } from 'mongoose';
+﻿import { Response as Res, NextFunction as Next } from 'express';
+import { QueryCursor, Aggregate, Query } from 'mongoose';
 import { StatusMessage } from './validate';
 
 interface StreamerOptions {

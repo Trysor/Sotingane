@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material';
 
 import { env } from '@env';
-import { User, UpdatePasswordUser, UserToken, AccessRoles } from '@app/models';
+import { User, UpdatePasswordUser, UserToken, AccessRoles } from '@types';
 
 import { HttpService } from '@app/services/http/http.service';
 import { TokenService } from '@app/services/utility/token.service';

@@ -1,9 +1,9 @@
 import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
-import { Router, ActivatedRoute, NavigationEnd, NavigationStart } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
 import { CMSService, MobileService } from '@app/services';
-import { CmsContent, TableSettings, ColumnType, TableFilterSettings } from '@app/models';
+import { SearchResultContent, TableSettings, ColumnType, TableFilterSettings } from '@types';
 
 import { Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil, take } from 'rxjs/operators';
@@ -17,9 +17,9 @@ import { takeUntil, take } from 'rxjs/operators';
 export class SearchResultsComponent implements OnDestroy {
 	private _ngUnsub = new Subject();
 
-	public data = new BehaviorSubject<CmsContent[]>([]);
+	public data = new BehaviorSubject<SearchResultContent[]>([]);
 
-	public readonly settings: TableSettings<CmsContent> = {
+	public readonly settings: TableSettings<SearchResultContent> = {
 		columns: [
 			{
 				header: ' ',

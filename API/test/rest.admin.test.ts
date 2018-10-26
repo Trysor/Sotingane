@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 
-import { ContentModel, Content, accessRoles } from '../src/models';
+import { ContentModel } from '../src/models';
+import { Content, AccessRoles, AggregationQuery } from '../types';
 import { CMS_STATUS, VALIDATION_FAILED, USERS_STATUS, ADMIN_STATUS } from '../src/libs/validate';
-import { AggregationQuery } from '../src/controllers';
 
 import { TestBed } from './testbed';
 
@@ -228,7 +228,7 @@ describe('REST: Admin', () => {
 				title: 'getadmin200',
 				route: 'getadmin200',
 				content: 'test',
-				access: accessRoles.everyone,
+				access: AccessRoles.everyone,
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -253,7 +253,7 @@ describe('REST: Admin', () => {
 				title: 'getadmin401',
 				route: 'getadmin401',
 				content: 'test',
-				access: accessRoles.everyone,
+				access: AccessRoles.everyone,
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -350,7 +350,7 @@ describe('REST: Admin', () => {
 			const afterDate = new Date();
 
 			const content: Content = {
-				title: 'aggregDate', route: 'aggregdate', content: 'test', access: accessRoles.everyone,
+				title: 'aggregDate', route: 'aggregdate', content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test', published: true, nav: true
 			};
 
@@ -385,7 +385,7 @@ describe('REST: Admin', () => {
 			const beforeDate = new Date();
 
 			const content: Content = {
-				title: 'aggregDateBefore', route: 'aggregdatebefore', content: 'test', access: accessRoles.everyone,
+				title: 'aggregDateBefore', route: 'aggregdatebefore', content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test', published: true, nav: true
 			};
 
@@ -422,7 +422,7 @@ describe('REST: Admin', () => {
 		it('POST /api/admin/cms/aggregate 200, written by only', async () => {
 			const content: Content = {
 				title: 'writtenByAdmin2', route: 'writtenbyadmin2',
-				content: 'test', access: accessRoles.everyone,
+				content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test',
 				published: true, nav: true
 			};
@@ -462,21 +462,21 @@ describe('REST: Admin', () => {
 		});
 
 		it('POST /api/admin/cms/aggregate 200, access only', async () => {
-			const queryEveryone: AggregationQuery = { access: accessRoles.everyone };
-			const queryUsers: AggregationQuery = { access: accessRoles.user };
-			const queryAdmins: AggregationQuery = { access: accessRoles.admin };
+			const queryEveryone: AggregationQuery = { access: AccessRoles.everyone };
+			const queryUsers: AggregationQuery = { access: AccessRoles.user };
+			const queryAdmins: AggregationQuery = { access: AccessRoles.admin };
 
 			const content: Partial<Content> = { content: 'test', description: 'test', folder: 'test', published: true, nav: true };
 
 			const [res1, res2, res3] = await Promise.all([
 				TestBed.http.post('/api/cms').set('Cookie', TestBed.AdminCookie).send(Object.assign({
-					route: 'aggregAccess1', title: 'aggregAccess1', access: accessRoles.everyone
+					route: 'aggregAccess1', title: 'aggregAccess1', access: AccessRoles.everyone
 				}, content)),
 				TestBed.http.post('/api/cms').set('Cookie', TestBed.AdminCookie).send(Object.assign({
-					route: 'aggregAccess2', title: 'aggregAccess2', access: accessRoles.user
+					route: 'aggregAccess2', title: 'aggregAccess2', access: AccessRoles.user
 				}, content)),
 				TestBed.http.post('/api/cms').set('Cookie', TestBed.AdminCookie).send(Object.assign({
-					route: 'aggregAccess3', title: 'aggregAccess3', access: accessRoles.admin
+					route: 'aggregAccess3', title: 'aggregAccess3', access: AccessRoles.admin
 				}, content))
 			]);
 
@@ -505,9 +505,9 @@ describe('REST: Admin', () => {
 
 			const allPages = allContentDocs.map(contentDoc => contentDoc.current);
 
-			const everyoneCount = allPages.filter(c => c.access === accessRoles.everyone).length;
-			const usersCount = allPages.filter(c => c.access === accessRoles.user).length;
-			const adminsCount = allPages.filter(c => c.access === accessRoles.admin).length;
+			const everyoneCount = allPages.filter(c => c.access === AccessRoles.everyone).length;
+			const usersCount = allPages.filter(c => c.access === AccessRoles.user).length;
+			const adminsCount = allPages.filter(c => c.access === AccessRoles.admin).length;
 
 			const queryEveryoneCount = (<any[]>resEveryone.body).length;
 			const queryUsersCount = (<any[]>resUsers.body).length;
@@ -524,7 +524,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'unpubAggreg', route: 'unpubaggreg',
-				content: 'test', access: accessRoles.everyone,
+				content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test',
 				published: false, nav: true // published === false
 			};
@@ -564,7 +564,7 @@ describe('REST: Admin', () => {
 			const afterDate = new Date();
 
 			const content: Content = {
-				title: 'aggregSeenAfter', route: 'aggregseenafter', content: 'test', access: accessRoles.everyone,
+				title: 'aggregSeenAfter', route: 'aggregseenafter', content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test', published: true, nav: true
 			};
 
@@ -602,7 +602,7 @@ describe('REST: Admin', () => {
 			const beforeDate = new Date();
 
 			const content: Content = {
-				title: 'aggregSeenBefore', route: 'aggregseenbefore', content: 'test', access: accessRoles.everyone,
+				title: 'aggregSeenBefore', route: 'aggregseenbefore', content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test', published: true, nav: true
 			};
 
@@ -650,7 +650,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'browserAggreg', route: 'browseraggreg',
-				content: 'test', access: accessRoles.everyone,
+				content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test',
 				published: true, nav: true
 			};
@@ -696,7 +696,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'unwindAggreg', route: 'unwindaggreg',
-				content: 'test', access: accessRoles.everyone,
+				content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test',
 				published: true, nav: true
 			};
@@ -735,7 +735,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'propAggreg', route: 'propaggreg',
-				content: 'test', access: accessRoles.everyone,
+				content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test',
 				published: true, nav: true
 			};

@@ -1,18 +1,18 @@
 import { request, use as chaiUse } from 'chai';
 import ChaiHttp = require('chai-http');
 
-import { util as configUtil, get as configGet } from 'config';
+import { util as configUtil } from 'config';
 
 import * as Mocha from 'mocha';
 import { readdirSync } from 'fs';
 import { join as pathjoin } from 'path';
 
-import { ContentModel, LogModel, SettingsModel, UserModel, User, accessRoles, UserDoc } from '../src/models';
-import { TokenResponse } from '../src/controllers';
+import { ContentModel, LogModel, SettingsModel, UserModel, UserDoc } from '../src/models';
+import { User, UserToken, AccessRoles } from '../types';
 
 import app from '../src/app';
 
-export class TestBedSingleton {
+class TestBedSingleton {
 	private _http: ChaiHttp.Agent;
 
 	public get http() { return this._http; }
@@ -32,8 +32,9 @@ export class TestBedSingleton {
 		this._http = request(app).keepOpen();
 
 		const mocha = new Mocha();
-		readdirSync(pathjoin('dist', 'out-tsc', 'test')).filter((file) => file.endsWith('.test.js')).forEach((file) => {
-			mocha.addFile(pathjoin('dist', 'out-tsc', 'test', file));
+		const path = pathjoin('dist', 'out-tsc', 'api', 'test');
+		readdirSync(path).filter((file) => file.endsWith('.test.js')).forEach((file) => {
+			mocha.addFile(pathjoin(path, file));
 		});
 
 		app.on('launched', async () => {
@@ -75,30 +76,30 @@ export class TestBedSingleton {
 
 		return {
 			user: userObj,
-			cookie: 'jwt=' + (<TokenResponse>res.body).token // slightly modified
+			cookie: 'jwt=' + (<UserToken>res.body).token // slightly modified
 		};
 	}
 }
-
-export const TestBed = new TestBedSingleton();
-export default TestBed;
 
 // Used in test scenarios
 export const AdminUser: Partial<User> = {
 	username: 'Admin',
 	username_lower: 'admin',
 	password: 'test',
-	role: accessRoles.admin,
+	role: AccessRoles.admin,
 };
 export const AdminUser2: Partial<User> = {
 	username: 'Admin2',
 	username_lower: 'admin2',
 	password: 'test',
-	role: accessRoles.admin,
+	role: AccessRoles.admin,
 };
 export const TestUser: Partial<User> = {
 	username: 'User',
 	username_lower: 'user',
 	password: 'test',
-	role: accessRoles.user,
+	role: AccessRoles.user,
 };
+
+export const TestBed = new TestBedSingleton();
+export default TestBed;

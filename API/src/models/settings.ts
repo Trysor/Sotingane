@@ -1,12 +1,11 @@
 ﻿import { Document, model, Schema } from 'mongoose';
+import { Settings } from '../../types';
 
 /*
  |--------------------------------------------------------------------------
  | Settings schema
  |--------------------------------------------------------------------------
 */
-
-
 
 const schema = new Schema({
 	indexRoute: { type: String, required: true },
@@ -21,18 +20,6 @@ const schema = new Schema({
 	}
 });
 
-export interface Settings {
-	indexRoute: string;
-	org: string;
-	meta: {
-		title: string;
-		desc: string;
-	};
-	footer: {
-		text: string;
-		copyright: string;
-	};
-}
 
 export interface SettingsDoc extends Settings, Document { }
 export let SettingsModel = model<SettingsDoc>('Setting', schema);
