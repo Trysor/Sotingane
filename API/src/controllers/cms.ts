@@ -1,17 +1,22 @@
 import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
+// Libs
 import { UAParser } from 'ua-parser-js';
 import { escape } from 'validator';
-
 import { sanitize, stripHTML } from '../libs/sanitizer';
-
 import { status, ajv, JSchema, ROUTE_STATUS, CMS_STATUS, validate } from '../libs/validate';
-import { User, AccessRoles, Log, Content, ContentEntry } from '../../types';
-import { CONTENT_MAX_LENGTH } from '../../global';
-import { LogModel, ContentModel } from '../models';
-
 import { Controller, GET, POST, PATCH, DELETE, isProduction } from '../libs/routing';
 import { Auth } from '../libs/auth';
+import { ImageSize } from '../libs/image-size';
+
+// Models
+import { LogModel, ContentModel } from '../models';
+
+// Types and global settings
+import { User, AccessRoles, Log, Content, ContentEntry } from '../../types';
+import { CONTENT_MAX_LENGTH } from '../../global';
+
+
 
 
 
@@ -143,93 +148,57 @@ export class CMSController extends Controller {
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
 	 */
-	@POST({ path: '/', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.ContentSchema)] })
-	public async createContent(req: Req, res: Res, next: Next) {
-		const data: Content = req.body,
-			user: User = <User>req.user;
+	@POST({		path: '/',			do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.ContentSchema)] })
+	@PATCH({	path: '/:route',	do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.ContentSchema)] })
+	public async submitContent(req: Req, res: Res, next: Next) {
+		const isPatch = (!!req.params && !!req.params.route);
+		const data: Content = req.body;
+		const user: User = <User>req.user;
+
+		let existingDoc: ContentEntry;
+		if (isPatch) {
+			existingDoc = <ContentEntry>await ContentModel.findOne({ 'current.route': req.params.route }, { prev: false }).lean();
+			if (!existingDoc) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
+		}
 
 		// insert ONLY sanitized and escaped data!
 		const sanitizedContent = sanitize(data.content);
+		const imageUrls = CMSController.getImageSrcFromContent(sanitizedContent);
+		const searchable = stripHTML(sanitizedContent);
 
-		let searchable = stripHTML(sanitizedContent);
-		if (!searchable || searchable.length === 0) {
-			searchable = ' '; // Cannot be empty.
-		}
-
-		const newCurrent: Content = {
+		const contentToSubmit: Content = {
 			title: escape(data.title),
 			route: escape(data.route.replace(/\//g, '')).toLowerCase(),
 			published: data.published,
 			access: data.access,
-			version: 0,
+			version: isPatch ? existingDoc.current.version + 1 : 0,
 			content: sanitizedContent,
-			content_searchable: searchable,
+			content_searchable: searchable ? searchable + ' ' : ' ',
 			description: sanitize(data.description),
-			images: CMSController.getImageSrcFromContent(sanitizedContent),
-			nav: !!data.nav,
-			createdBy: user._id,
-			updatedBy: user._id,
-			updatedAt: new Date(),
-			createdAt: new Date()
-		};
-		if (data.folder) { newCurrent.folder = stripHTML(data.folder).replace(/\//g, ''); }
-
-		const newContentDoc = await new ContentModel({ current: newCurrent }).save();
-
-		if (!newContentDoc) { return res.status(500).send(status(CMS_STATUS.DATA_UNABLE_TO_SAVE)); }
-		return res.status(200).send(newContentDoc.current);
-	}
-
-
-
-
-	/**
-	 * Updates content
-	 * @param  {Req}		req  request
-	 * @param  {Res}		res  response
-	 * @param  {Next}		next next
-	 * @return {Res}		server response: the updated content object
-	 */
-	@PATCH({ path: '/:route', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.ContentSchema)] })
-	public async patchContent(req: Req, res: Res, next: Next) {
-		const route: string = req.params.route,
-			data: Content = req.body,
-			user: User = <User>req.user;
-
-		// Fetch current version
-		const contentDoc = <ContentEntry>await ContentModel.findOne({ 'current.route': route }, { prev: false }).lean();
-
-		if (!contentDoc) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
-
-		const sanitizedContent = sanitize(data.content);
-		const patched = {
-			title: escape(data.title),
-			route: escape(data.route.replace(/\//g, '')).toLowerCase(),
-			published: data.published,
-			access: data.access,
-			version: contentDoc.current.version + 1,
-			content: sanitizedContent,
-			content_searchable: stripHTML(data.content),
-			description: sanitize(data.description),
-			images: CMSController.getImageSrcFromContent(sanitizedContent),
+			images: await ImageSize.imageDataFromURLs(imageUrls),
 			nav: !!data.nav,
 			folder: data.folder ? stripHTML(data.folder).replace(/\//g, '') : '',
+			createdBy: isPatch ? existingDoc.current.createdBy : user._id,
 			updatedBy: user._id,
 			updatedAt: new Date(),
-			createdBy: contentDoc.current.createdBy,
-			createdAt: contentDoc.current.createdAt
+			createdAt: isPatch ? existingDoc.current.createdAt : new Date()
 		};
 
-		const updated: ContentEntry = await ContentModel.findByIdAndUpdate(contentDoc._id,
-			{
-				$set: { current: patched },
-				$push: { prev: { $each: [contentDoc.current], $position: 0, $slice: 10 } }
-			},
-			{ new: true }
-		).lean();
+		let updatedContent: ContentEntry;
+		if (isPatch) {
+			updatedContent = await ContentModel.findByIdAndUpdate(existingDoc._id,
+				{
+					$set: { current: contentToSubmit },
+					$push: { prev: { $each: [existingDoc.current], $position: 0, $slice: 10 } }
+				},
+				{ new: true }
+			).lean();
+		} else {
+			updatedContent = await new ContentModel({ current: contentToSubmit }).save();
+		}
 
-		if (!updated) { return res.status(500).send(status(CMS_STATUS.DATA_UNABLE_TO_SAVE)); }
-		return res.status(200).send(updated.current);
+		if (!updatedContent) { return res.status(500).send(status(CMS_STATUS.DATA_UNABLE_TO_SAVE)); }
+		return res.status(200).send(updatedContent.current);
 	}
 
 	/**

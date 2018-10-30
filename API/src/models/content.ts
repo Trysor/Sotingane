@@ -19,7 +19,12 @@ const schema = new Schema({
 		content_searchable: { type: String, required: true },
 
 		description: { type: String },
-		images: [{ type: String }],
+		images: [{
+			width: { type: Number },
+			height: { type: Number },
+			type: { type: String },
+			url: { type: String }
+		}],
 
 		folder: { type: String },
 		nav: { type: Boolean, default: false },

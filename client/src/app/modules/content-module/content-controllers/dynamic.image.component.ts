@@ -1,6 +1,6 @@
 ﻿import { Component, Renderer2, ElementRef, Optional, ChangeDetectionStrategy } from '@angular/core';
 
-import { DynamicComponent } from '@types';
+import { DynamicComponent, Content } from '@types';
 import { ModalService } from '@app/services/utility/modal.service';
 import { IntersectionService } from '@app/services/utility/intersection.service';
 import { MobileService } from '@app/services/utility/mobile.service';
@@ -37,10 +37,19 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 		super(elRef, inters);
 	}
 
-	buildJob(): void {
+	buildJob(el, content: Content): void {
 		this._imgEl = this.elRef.nativeElement.querySelector('img');
-		const src = this._imgEl.attributes['data-src'].nodeValue;
+		const src: string = this._imgEl.attributes['data-src'].nodeValue;
 		this.renderer.removeAttribute(this._imgEl, 'data-src');
+
+		// Add size attributes
+		const imageData = content.images.find(imgData => src === imgData.url);
+		if (!!imageData) {
+			const ratio = imageData.height / imageData.width;
+			this.renderer.setStyle(this._imgEl, 'padding-bottom', `${ratio * 100}%`);
+			// this.renderer.setAttribute(this._imgEl, 'width', imageData.width.toString());
+			// this.renderer.setAttribute(this._imgEl, 'height', imageData.height.toString());
+		}
 
 		// Add lazy tag
 		if (this.platform.isBrowser) { this.renderer.addClass(this.elRef.nativeElement, 'lazy'); }
@@ -69,7 +78,10 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 		// Add the srcset
 		this.renderer.setAttribute(this._imgEl, 'srcset', this._srcset);
 		// Remove lazy tag
-		this.renderer.listen(this._imgEl, 'load', () => this.renderer.removeClass(this.elRef.nativeElement, 'lazy'));
+		this.renderer.listen(this._imgEl, 'load', () => {
+			this.renderer.removeStyle(this._imgEl, 'padding-bottom');
+			this.renderer.removeClass(this.elRef.nativeElement, 'lazy');
+		});
 	}
 
 	/**

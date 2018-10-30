@@ -28,7 +28,7 @@ export interface Content {
 	content_searchable?: string;
 
 	description?: string;
-	images?: string[]; // url
+	images?: ImageContentData[];
 
 	folder?: string;
 	nav?: boolean;
@@ -57,6 +57,14 @@ export interface CmsAccess {
 export interface CmsFolder {
 	title: string;
 	content: Content[];
+}
+
+
+export interface ImageContentData {
+	width: number;
+    height: number;
+	type: string;
+	url: string;
 }
 
 

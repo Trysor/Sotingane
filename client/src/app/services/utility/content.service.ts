@@ -109,7 +109,7 @@ export class ContentService {
 					const attr = el.attributes.item(j);
 					comp.instance[attr.name] = attr.value;
 				}
-				comp.instance.buildJob(origEl);
+				comp.instance.buildJob(origEl, content);
 
 				// Add to list
 				this._embeddedComponents.push(comp);

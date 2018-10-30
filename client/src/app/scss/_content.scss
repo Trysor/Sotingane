@@ -60,7 +60,6 @@ $figure-margin: 0.8em;
 
 	figure {
 		margin: 0 0 1em 0;
-		width: calc(50% - #{$figure-margin});
 		box-sizing: border-box;
 		display: block;
 		box-shadow: var(--shadow);
@@ -76,12 +75,9 @@ $figure-margin: 0.8em;
 
 		// Lazy-load pre-sizing to fill space.
 		&.lazy {
-			height: calc(var(--width-wrapper) * 9 / 16);
 			opacity: 0;
-
-			&.image-style-align-left,
-			&.image-style-align-right {
-				height: calc(var(--width-wrapper) / 2 * 9 / 16);
+			img {
+				height: 0;
 			}
 		}
 
@@ -90,7 +86,6 @@ $figure-margin: 0.8em;
 			position: absolute;
 			top: 0;
 			left: 0;
-			height: 100%;
 			width: 100%;
 			z-index: 100;
 			box-shadow: var(--shadow) inset;
@@ -103,9 +98,9 @@ $figure-margin: 0.8em;
 
 		img {
 			display: block;
-			margin: 0 auto;
-			max-width: 100%;
+			margin: 0;
 			width: 100%;
+			max-width: 100%;
 		}
 
 		figcaption {
@@ -118,7 +113,6 @@ $figure-margin: 0.8em;
 
 		&.image-style-align-left,
 		&.image-style-align-right {
-			display: inline-block;
 			max-width: calc(50% - #{$figure-margin}); // negate the padding
 			width: calc(50% - #{$figure-margin});
 			margin-top: 0;
@@ -138,7 +132,7 @@ $figure-margin: 0.8em;
 	}
 
 	figure.media {
-		//display: inline-block;
+		width: calc(50% - #{$figure-margin});
 		margin: 0 $figure-margin 1em 0;
 		position: relative;
 		float: left;
@@ -176,7 +170,6 @@ $figure-margin: 0.8em;
 	}
 
 	figure.table {
-		width: initial;
 		table {
 			border-collapse: collapse;
 			border: none;
