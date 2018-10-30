@@ -1,9 +1,7 @@
-﻿import { Component, OnInit, Input, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+﻿import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
 
 import { DynamicComponent } from '@types';
-
 import { PlatformService } from '@app/services/utility/platform.service';
-import { DynamicLazyLoader } from './dynamic.lazy.loader';
 
 
 @Component({
@@ -15,25 +13,18 @@ import { DynamicLazyLoader } from './dynamic.lazy.loader';
 		</ng-container>`,
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicComponent, OnInit {
+export class DynamicLinkComponent implements DynamicComponent, OnInit {
+	private _isRemoteUrl = true;
+
 	@Input() link: string;
 	@Input() text: string;
 
 	public get isRemoteUrl(): boolean { return this._isRemoteUrl; }
 
-	private _isRemoteUrl = true;
 
-	constructor(
-		private platform: PlatformService,
-		private elRef: ElementRef<HTMLElement>) {
-
-		super(elRef, null);
-	}
+	constructor(private platform: PlatformService) { }
 
 	ngOnInit() {
-		// Protect against template issues
-		if (!this.elRef.nativeElement.parentNode) { return; }
-
 		if (this.platform.document) {
 			const origin = this.platform.document.location.origin;
 			if (this.link.startsWith('/') || this.link.startsWith(origin)) {
@@ -52,6 +43,4 @@ export class DynamicLinkComponent extends DynamicLazyLoader implements DynamicCo
 		this.link = el.getAttribute('href');
 		this.text = el.textContent;
 	}
-
-	load() { }
 }
