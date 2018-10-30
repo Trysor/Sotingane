@@ -31,6 +31,7 @@ export class CMSController extends Controller {
 			images.push(match[1]);
 			match = CMSController.ImageSrcRegex.exec(html);
 		}
+
 		return images;
 	}
 
@@ -70,7 +71,6 @@ export class CMSController extends Controller {
 	 * @param  {Req}		req  request
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
-	 * @return {Res}		server response: the content object
 	 */
 	@GET({ path: '/:route', do: [Auth.Personalize] })
 	public async getContent(req: Req, res: Res, next: Next) {
@@ -120,7 +120,6 @@ export class CMSController extends Controller {
 	 * @param  {Req}		req  request
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
-	 * @return {Res}		server response: the content history array
 	 */
 	@GET({ path: '/history/:route', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
 	public async getContentHistory(req: Req, res: Res, next: Next) {
@@ -143,7 +142,6 @@ export class CMSController extends Controller {
 	 * @param  {Req}		req  request
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
-	 * @return {Res}		server response: the contentDoc.current object
 	 */
 	@POST({ path: '/', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.ContentSchema)] })
 	public async createContent(req: Req, res: Res, next: Next) {
@@ -239,7 +237,6 @@ export class CMSController extends Controller {
 	 * @param  {Req}		req  request
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
-	 * @return {Res}		server response: message declaring success or failure
 	 */
 	@DELETE({ path: '/:route', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
 	public async deleteContent(req: Req, res: Res, next: Next) {
@@ -261,7 +258,6 @@ export class CMSController extends Controller {
 	 * @param  {Req}		req  request
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
-	 * @return {Res}		server response: the search results
 	 */
 	@GET({ path: '/search/:searchTerm', do: [Auth.Personalize] })
 	public async searchContent(req: Req, res: Res, next: Next) {

@@ -2,10 +2,6 @@
 import { AccessRoles } from './user';
 
 
-interface UserObject {
-	username: string;
-}
-
 
 export interface ContentEntry {
 	current: Content;
@@ -63,3 +59,7 @@ export interface CmsFolder {
 	content: Content[];
 }
 
+
+interface UserObject {
+	username: string;
+}

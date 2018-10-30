@@ -13,7 +13,7 @@ export class ThemeController extends Controller {
 
 	@PATCH({	path: '/:theme',	do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.ThemeSchema)] })
 	@POST({		path: '/',			do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.ThemeSchema)] })
-	public async postPatchTheme(req: Req, res: Res, next: Next) {
+	public async submitTheme(req: Req, res: Res, next: Next) {
 		const isPatch = (!!req.params && !!req.params.themed);
 		const searchQuery = isPatch ? { name: req.params.theme } : {};
 		const themeDoc: Theme = await ThemeModel.findOneAndUpdate(searchQuery, req.body, { upsert: !isPatch, new: true }).lean();

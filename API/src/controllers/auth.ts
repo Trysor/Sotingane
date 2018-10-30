@@ -18,7 +18,6 @@ export class AuthController extends Controller {
 	 * @param  {Req}      req  request
 	 * @param  {Res}     res  response
 	 * @param  {Next} next next
-	 * @return {Res}          server response: object containing token and user
 	 */
 	@GET({ path: '/token', do: [Auth.ByToken] })
 	@POST({ path: '/login', do: [validate(JSchema.UserLoginSchema), Auth.ByLogin] })
@@ -42,7 +41,6 @@ export class AuthController extends Controller {
 	 * @param  {Req}      req  request
 	 * @param  {Res}     res  response
 	 * @param  {Next} next next
-	 * @return {Res}          server response: object containing token and user
 	 */
 	@POST({ path: '/logout', do: [Auth.ByToken] })
 	public logout(req: Req, res: Res): Res {
@@ -61,7 +59,6 @@ export class AuthController extends Controller {
 	 * @param  {Req}      req  request
 	 * @param  {Res}     res  response
 	 * @param  {Next} next next
-	 * @return {Res}          server response
 	 */
 	@POST({ path: '/register', ignore: isProduction, do: [validate(JSchema.UserRegistrationSchema)] })
 	public async register(req: Req, res: Res, next: Next) { // Not enabled in production for the time being
@@ -91,7 +88,6 @@ export class AuthController extends Controller {
 	 * @param  {Req}      req  request
 	 * @param  {Res}     res  response
 	 * @param  {Next} next next
-	 * @return {Res}          server response:
 	 */
 	@POST({ path: '/updatepassword', do: [Auth.ByToken, validate(JSchema.UserUpdatePasswordSchema)] })
 	public async updatePassword(req: Req, res: Res, next: Next) {
@@ -118,7 +114,6 @@ export class AuthController extends Controller {
 	 * @param  {Req}      req  request
 	 * @param  {Res}     res  response
 	 * @param  {Next} next next
-	 * @return {Res}          server response
 	 */
 	@POST({ path: '/deleteaccount', ignore: true, do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
 	public async deleteAccount(req: Req, res: Res, next: Next) { // TODO: Implement my security

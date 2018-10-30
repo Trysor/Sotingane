@@ -11,6 +11,10 @@ interface StreamerOptions {
 	batchSize?: number;
 }
 
+/**
+ * Stream data from MongoDB to the client using Mongoose Cursor
+ * @param opts		configuration for the stream and its resulting response
+ */
 export const MongoStream = (opts: StreamerOptions) => {
 	// Init stream variables
 	let hasData = false;

@@ -17,7 +17,6 @@ export class AdminController extends Controller {
 	 * @param  {Req}		req  request
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
-	 * @return {Res}		server response: a list of partial content information
 	 */
 	@GET({ path: '/cms/', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
 	public async getAdminContentList(req: Req, res: Res, next: Next) {
@@ -48,7 +47,6 @@ export class AdminController extends Controller {
 	 * @param  {Req}		req  request
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
-	 * @return {Res}		server response: the content object
 	 */
 	@GET({ path: '/cms/:route', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
 	public async getContentFull(req: Req, res: Res, next: Next) {
@@ -74,7 +72,6 @@ export class AdminController extends Controller {
 	 * @param  {Req}		req  request
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
-	 * @return {Res}		server response: the aggregated data
 	 */
 	@POST({ path: '/cms/aggregate', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.AdminAggregationSchema)] })
 	public async aggregateContent(req: Req, res: Res, next: Next) {
