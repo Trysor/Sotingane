@@ -110,16 +110,7 @@
 					<ckeditor class="editor" id="content" [editor]="ClassicEditor" formControlName="content"></ckeditor>
 				</ng-template>
 			</mat-tab>
-
-
-			<mat-tab label="Preview" #previewTab>
-				<ng-template matTabContent>
-					<content-component previewMode="true" [contentInput]="contentForm.getRawValue()"></content-component>
-				</ng-template>
-			</mat-tab>
-
 		</mat-tab-group>
-
 	</form>
 
 	<div class="actions">

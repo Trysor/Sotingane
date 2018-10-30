@@ -21,18 +21,6 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 	// Content
 	@ViewChild('contentHost') private _contentHost: ElementRef<HTMLDivElement>;
 
-	// Input content. Used in relation to Editing previews
-	@Input() public set contentInput(value: Content) {
-		if (!value) { return; }
-		const old = this.cmsService.content.getValue();
-		if (old && old.content === value.content && old.title === value.title) {
-			return; // Visually the same as what we've got
-		}
-		this.cmsService.content.next(value);
-	}
-	// previewMode controls the visiblity state of details in the template
-	@Input() public previewMode = false;
-
 	// Template Helpers
 	public readonly AccessRoles = AccessRoles;
 	public readonly isPlatformServer: boolean;
@@ -52,16 +40,14 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 		public cmsService: CMSService) {
 
 		this.router.events.pipe(
-			filter(e => e instanceof NavigationEnd),
-			takeUntil(this._ngUnsub)
+			filter(e => e instanceof NavigationEnd), takeUntil(this._ngUnsub)
 		).subscribe(e => {
 			this.cmsService.requestContent(this.route.snapshot.params['content']);
 		});
 	}
 
 	ngAfterViewInit() {
-		this.cmsService.content.pipe(takeUntil(this._ngUnsub)).subscribe(content => {
-			if (!content) { return; }
+		this.cmsService.content.pipe(filter(c => !!c), takeUntil(this._ngUnsub)).subscribe(content => {
 			this.contentService.buildContentForElement(this._contentHost, content); // Build content
 		});
 	}
