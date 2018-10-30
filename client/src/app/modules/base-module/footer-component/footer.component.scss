@@ -4,10 +4,11 @@
 	padding: 40px 20px;
 	text-align: center;
 	font-size: 0.75em;
-	color: rgba(var(--color-text), .6);
 	box-sizing: border-box;
 
 	span {
 		display: block;
+		white-space: pre-line;
+		margin-top: 1em;
 	}
 }

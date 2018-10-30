@@ -1,15 +1,14 @@
-import { Component, Optional, OnDestroy, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 
 import {
-	CmsContent, AccessRoles, User, AggregationQuery, AggregationResult,
-	TableSettings, ColumnType, ColumnDir, ColumnSettings
-} from '@app/models';
-import { ModalService, CMSService, AdminService, MobileService } from '@app/services';
+	AggregationQuery, AggregationResult, AggregationResultSummarized, AggregationResultUnwinded, User, TableSettings
+} from '@types';
+import { CMSService, AdminService, MobileService } from '@app/services';
 
 import { FormErrorInstant, AccessHandler } from '@app/classes';
 
@@ -20,6 +19,7 @@ import { takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
 enum AnalyticsState {
 	QUERY,
+	LOADING,
 	RESULTS
 }
 
@@ -40,10 +40,8 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 	// Form handlers
 	public readonly aggregateForm: FormGroup; // Form
 	public readonly formErrorInstant = new FormErrorInstant(); // Form validation errors trigger instantly
-	public loading = false;
 
 	// Helpers
-	public readonly AccessRoles = AccessRoles;
 	public readonly accessHandler = new AccessHandler();
 	public readonly AnalyticsState = AnalyticsState;
 
@@ -89,17 +87,16 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 
 
 	// Results Settings
-	public readonly unwindSettings: TableSettings<AggregationResult> = {
+	public readonly unwindSettings: TableSettings<AggregationResultUnwinded> = {
 		columns: [
 			{
 				header: 'Timestamp',
 				property: 'logDataTs',
-				val: a => this.datePipe.transform(a.logDataTs, 'yyyy-MM-dd hh:mm:ss')
-				// DatePipe does not follow ISO standard for date formats
+				val: a => this.datePipe.transform(a.logDataTs, 'yyyy-MM-dd HH:mm:ss')
 			},
 			{
-				header: 'Page',
-				property: 'title',
+				header: 'Route',
+				property: 'route',
 			},
 			{
 				header: 'User',
@@ -114,22 +111,18 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 				header: 'Browser',
 				property: 'logDataBrowser',
 				val: a => a.logDataBrowser ? `${a.logDataBrowser} ${a.logDataBrowserVer}` : 'Unknown'
-			},
-			{
-				header: 'Referer',
-				property: 'logDataReferer',
-			},
+			}
 		],
 		mobile: ['logDataTs', 'title', 'logDataUser'],
 
 		active: 'logDataTs',
-		dir: ColumnDir.ASC,
+		dir: 'desc',
 
-		trackBy: (index: number, a) => a.route
+		trackBy: (index: number, a) => a.logDataId
 	};
 
 
-	public readonly settings: TableSettings<AggregationResult> = {
+	public readonly settings: TableSettings<AggregationResultSummarized> = {
 		columns: [
 			{
 				header: 'Title',
@@ -140,15 +133,28 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 				property: 'route',
 			},
 			{
+				header: 'Access',
+				property: 'access',
+				icon: { val: a => this.accessHandler.getAccessChoice(a.access).icon },
+				val: a => this.accessHandler.getAccessChoice(a.access).plural
+			},
+			{
 				header: 'Views',
 				property: 'views',
-				val: (a) => a.views.toString()
+				rightAlign: true,
+				val: (a) => a.views
+			},
+			{
+				header: 'Last visited',
+				property: 'lastVisit',
+				rightAlign: true,
+				val: (a) => this.datePipe.transform(a.lastVisit, 'yyyy-MM-dd HH:mm:ss')
 			}
 		],
 		mobile: ['title', 'route', 'views'],
 
 		active: 'title',
-		dir: ColumnDir.ASC,
+		dir: 'asc',
 
 		trackBy: (index: number, a) => a.route
 	};
@@ -203,16 +209,18 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 	public submitForm() {
 		const query: AggregationQuery = this.aggregateForm.value;
 
-		this.loading = true;
+		this.setState(AnalyticsState.LOADING);
 		this.adminService.getAggregatedData(query).subscribe(data => {
-			this.loading = false;
 			if (Array.isArray(data)) {
 				this.data.next(data);
 				this.setState(AnalyticsState.RESULTS);
 				return;
 			}
+			this.setState(AnalyticsState.QUERY);
 			this.data.next(null);
 			this.openSnackBar((<any>data).message);
+		}, err => {
+			this.setState(AnalyticsState.QUERY);
 		});
 	}
 

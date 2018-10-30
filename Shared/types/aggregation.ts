@@ -1,4 +1,4 @@
-﻿import { AccessRoles, User } from '@app/models/user';
+﻿import { AccessRoles, User } from './user';
 
 export interface AggregationQuery {
 	createdBy?: string;
@@ -15,7 +15,7 @@ export interface AggregationQuery {
 	unwind?: boolean;
 }
 
-export interface AggregationResult {
+interface AggregationResultGeneric {
 	title: string;
 	route: string;
 	access: AccessRoles;
@@ -26,13 +26,23 @@ export interface AggregationResult {
 	createdAt: Date;
 	updatedBy: User;
 	createdBy: User;
+}
 
-	views?: number;
+export interface AggregationResultSummarized extends AggregationResultGeneric {
+	views: number;
+	lastVisit: string; // comes through as string
+}
 
-	logDataUser?: string; // id
-	logDataTs?: Date;
-	logDataReferer?: string;
+export interface AggregationResultUnwinded extends AggregationResultGeneric {
+	logDataId: string;
+	logDataTs: string; // comes through as string
+	logDataUser?: string; // userid
 	logDataBrowser?: string;
 	logDataBrowserVer?: string;
 }
+
+
+export type AggregationResult = AggregationResultSummarized | AggregationResultUnwinded;
+
+
 

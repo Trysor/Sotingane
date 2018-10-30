@@ -4,12 +4,15 @@ import { MatDialog, MatDialogConfig } from '@angular/material';
 import { DatePipe } from '@angular/common';
 
 import { AdminService, AuthService } from '@app/services';
-import { User, AccessRoles, TableSettings, ColumnType, ColumnDir } from '@app/models';
+import { AccessHandler } from '@app/classes';
 
+import { User, TableSettings, ColumnType } from '@types';
 import { UserModalComponent, UserModalData } from '../user-modal-component/user.modal.component';
+
 
 import { Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+
 
 
 @Component({
@@ -22,6 +25,8 @@ export class UsersComponent implements OnDestroy {
 	private _ngUnsub = new Subject();
 	public data = new BehaviorSubject<User[]>(null);
 
+	private readonly _accessHandler = new AccessHandler();
+
 	public readonly settings: TableSettings<User> = {
 		columns: [
 			{
@@ -31,18 +36,8 @@ export class UsersComponent implements OnDestroy {
 			{
 				header: 'Role',
 				property: 'role',
-				icon: user => {
-					switch (user.role) {
-						case AccessRoles.admin: { return 'security'; }
-						case AccessRoles.user: { return 'verified_user'; }
-					}
-				},
-				val: user => {
-					switch (user.role) {
-						case AccessRoles.admin: { return 'Admin'; }
-						case AccessRoles.user: { return 'User'; }
-					}
-				},
+				icon: { val: user => this._accessHandler.getAccessChoice(user.role).icon },
+				val: user => this._accessHandler.getAccessChoice(user.role).single
 			},
 			{
 				header: 'Joined date',
@@ -56,7 +51,7 @@ export class UsersComponent implements OnDestroy {
 				property: '_id',
 				noSort: true,
 				type: ColumnType.Button,
-				icon: () => 'settings',
+				icon: { val: () => 'settings' },
 				noText: true,
 				func: (user, users) => {
 					this.dialog.open(
@@ -72,7 +67,7 @@ export class UsersComponent implements OnDestroy {
 		],
 
 		active: 'username',
-		dir: ColumnDir.ASC,
+		dir: 'asc',
 
 		trackBy: (index: number, user: User) => user._id,
 

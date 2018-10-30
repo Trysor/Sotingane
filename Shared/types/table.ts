@@ -1,14 +1,12 @@
-﻿import { BehaviorSubject } from 'rxjs';
-
-export interface TableSettings<T> {
+﻿export interface TableSettings<T> {
 	columns: ColumnSettings<T>[];
 	mobile: Column<T>[];
 
 	// default sort
 	active: Column<T>;
-	dir: ColumnDir;
+	dir: keyof ColumnDir;
 
-	trackBy: (index: number, item: T) => string;
+	trackBy: (index: number, item: T) => string | number;
 
 	rowClick?: (rowOjb: T) => void;
 }
@@ -16,7 +14,7 @@ export interface TableSettings<T> {
 export interface TableFilterSettings {
 	placeholder?: string;
 	func?: (term: string) => void;
-	hidden?: BehaviorSubject<boolean>;
+	hidden?: any; // BehaviorSubject<boolean>;
 }
 
 export interface ColumnSettings<T> {
@@ -25,19 +23,18 @@ export interface ColumnSettings<T> {
 	property: Column<T>;
 
 	header: string;
-	val?: (obj?: T, all?: T[]) => string;
-	val2?: (obj?: T, all?: T[]) => string;
+	val?: (obj?: T, all?: T[]) => string | number;
+	val2?: (obj?: T, all?: T[]) => string | number;
 
 	tooltip?: (obj?: T, all?: T[]) => string;
-	icon?: (obj?: T) => string;
+
+	icon?: ColIconSettings<T>;
 
 	func?: (obj?: T, all?: T[]) => void;
 	disabled?: (obj?: T, all?: T[]) => boolean;
 	noText?: boolean;
 	narrow?: boolean;
 	noSort?: boolean;
-
-	color?: 'primary' | 'accent' | 'warn';
 
 	rightAlign?: boolean;
 }
@@ -50,15 +47,20 @@ export enum ColumnType {
 	Normal
 }
 
-export enum ColumnDir {
-	ASC = 'asc',
-	DESC = 'desc'
-}
-
 export type Column<T> = keyof T | keyof ExtraColumns;
 
 
 interface ExtraColumns {
 	edit: string;
 	delete: string;
+}
+
+interface ColumnDir {
+	asc: string;
+	desc: string;
+}
+
+interface ColIconSettings<T> {
+	val: (obj?: T) => string;
+	color?: 'primary' | 'accent' | 'warn';
 }

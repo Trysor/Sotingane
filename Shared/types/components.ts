@@ -1,3 +1,7 @@
+import { Content } from './content';
+export interface DynamicComponent {
+	buildJob(el?: Element, content?: Content): void;
+}
 
 export interface ModalData {
 	headerText: string;

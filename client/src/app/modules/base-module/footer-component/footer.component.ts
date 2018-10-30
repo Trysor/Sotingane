@@ -1,7 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 
-import { env } from '@env';
-
+import { SettingsService } from '@app/services/controllers/settings.service';
 
 @Component({
 	selector: 'footer-component',
@@ -10,9 +9,5 @@ import { env } from '@env';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FooterComponent {
-
-	public desc = env.FOOTER.desc;
-	public copyright = env.FOOTER.copyright;
-
-	constructor() { }
+	constructor(public settingsService: SettingsService) { }
 }

@@ -1,10 +1,8 @@
 ﻿import { expect } from 'chai';
 
-import { ContentModel, Content } from '../src/models/content';
-import { status, ROUTE_STATUS, CMS_STATUS, VALIDATION_FAILED, USERS_STATUS } from '../src/libs/validate';
+import { Content, AccessRoles } from '../types';
 
-import { TestBed, AdminUser, TestUser } from './testbed';
-import { accessRoles } from '../src/models/user';
+import { TestBed } from './testbed';
 
 // ---------------------------------
 // ------- Content TestSuite -------
@@ -18,7 +16,7 @@ describe('HTTP: Authorization', () => {
 			title: 'httpAuthCookie',
 			route: 'httpAuthCookie',
 			content: 'test',
-			access: accessRoles.everyone,
+			access: AccessRoles.everyone,
 			description: 'test',
 			folder: 'test',
 			published: true,
@@ -38,7 +36,7 @@ describe('HTTP: Authorization', () => {
 			title: 'httpAuthHeader',
 			route: 'httpAuthHeader',
 			content: 'test',
-			access: accessRoles.everyone,
+			access: AccessRoles.everyone,
 			description: 'test',
 			folder: 'test',
 			published: true,

@@ -1,23 +1,20 @@
 {
 	"compilerOptions": {
+		"outDir": "dist/out-tsc",
+		"sourceMap": true,
 		"module": "commonjs",
+		"moduleResolution": "node",
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
 		"target": "es2015",
 		"noImplicitAny": true,
-		"moduleResolution": "node",
-		"sourceMap": true,
-		"outDir": "dist/out-tsc",
+		"typeRoots": [
+			"node_modules/@types"
+		],
 		"baseUrl": ".",
 		"lib": [
 			"es2017",
 			"dom"
-		],
-		"typeRoots": [
-			"node_modules/@types"
-		]
-	},
-	"paths": {
-		"*": [
-			"src/types/*"
 		]
 	},
 	"include": [

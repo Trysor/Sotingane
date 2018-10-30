@@ -7,12 +7,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../material.module';
 
-// Guards
-import { AuthGuard, AdminGuard, LoginGuard, DeactivateGuard } from '@app/guards';
-
 // Pipes
-import { TimeAgo } from '@app/pipes';
+import { TimeAgoPipe, NumberPipe } from '@app/pipes';
 import { DatePipe } from '@angular/common';
+
+// Directives
+import { MobileDirective } from '@app/directives/mobile.directive';
 
 // Components
 import { ModalComponent } from './modals/modal.component';
@@ -34,18 +34,21 @@ import { TableComponent } from './table-component/table.component';
 		ReactiveFormsModule,
 		RouterModule,
 		HttpClientModule,
-		TimeAgo,
+		TimeAgoPipe,
+		NumberPipe,
 		SectionWrapperComponent,
 		SectionComponent,
 		TableComponent
 	],
 	declarations: [
-		TimeAgo,
+		TimeAgoPipe,
+		NumberPipe,
 		ModalComponent,
 		ImageModalComponent,
 		SectionWrapperComponent,
 		SectionComponent,
-		TableComponent
+		TableComponent,
+		MobileDirective
 	],
 	providers: [
 		DatePipe

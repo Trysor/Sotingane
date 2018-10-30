@@ -4,12 +4,10 @@ import {
 } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 
-import { HttpErrorResponse } from '@angular/common/http';
+import { CMSService, AuthService, ModalService, ContentService, SettingsService } from '@app/services';
+import { Content, AccessRoles } from '@types';
 
-import { CMSService, AuthService, ModalService, ContentService } from '@app/services';
-import { CmsContent, AccessRoles } from '@app/models';
-
-import { Subject, BehaviorSubject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 
 
@@ -23,19 +21,10 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 	// Content
 	@ViewChild('contentHost') private _contentHost: ElementRef<HTMLDivElement>;
 
-	// Input content. Used in relation to Editing previews
-	private _inputSet = false;
-	@Input() public set contentInput(value: CmsContent) {
-		if (this._inputSet) { return; }
-		this.cmsService.content.next(value);
-		this._inputSet = true;
-	}
-	// previewMode controls the visiblity state of details in the template
-	@Input() public previewMode = false;
-
 	// Template Helpers
 	public readonly AccessRoles = AccessRoles;
 	public readonly isPlatformServer: boolean;
+	public get settings() { return this.settingsService.settings; }
 
 	// Code helpers
 	private readonly _ngUnsub = new Subject();
@@ -47,24 +36,19 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 		private route: ActivatedRoute,
 		private router: Router,
 		public authService: AuthService,
+		private settingsService: SettingsService,
 		public cmsService: CMSService) {
 
 		this.router.events.pipe(
-			takeUntil(this._ngUnsub),
-			filter(e => e instanceof NavigationEnd)
+			filter(e => e instanceof NavigationEnd), takeUntil(this._ngUnsub)
 		).subscribe(e => {
 			this.cmsService.requestContent(this.route.snapshot.params['content']);
 		});
 	}
 
 	ngAfterViewInit() {
-		this.cmsService.content.pipe(takeUntil(this._ngUnsub)).subscribe(content => {
-			if (!content) { return; }
-
-			// Set metadata
-			this.contentService.setContentMeta(content);
-			// Build content
-			this.contentService.buildContentForElement(this._contentHost, content);
+		this.cmsService.content.pipe(filter(c => !!c), takeUntil(this._ngUnsub)).subscribe(content => {
+			this.contentService.buildContentForElement(this._contentHost, content); // Build content
 		});
 	}
 
@@ -74,8 +58,8 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 		this._ngUnsub.complete();
 		// Clean components
 		this.contentService.cleanEmbeddedComponents();
-		// Set meta back to default
-		this.contentService.setDefaultMeta();
+		// We're no longer watching content
+		this.cmsService.content.next(null);
 	}
 
 	ngDoCheck() {

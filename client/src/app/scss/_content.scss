@@ -1,12 +1,15 @@
 /// <reference path="_theme_vars.scss" />
 
+$lazy-transition: ease-in-out opacity 0.3s;
+$figure-margin: 0.8em;
+
 #content {
 	a, p {
 		word-wrap: break-word; // legacy name of overflow-wrap
 		overflow-wrap: break-word;
 	}
 
-	& > h1, & > h2, & > h3, & > h4, & > h5, & > h6 {
+	h1, h2, h3, h4, h5, h6 {
 		clear: both;
 	}
 
@@ -47,7 +50,7 @@
 		}
 	}
 
-	& > ul, & > ol {
+	ul, ol {
 		padding-left: 2em;
 
 		li {
@@ -55,39 +58,53 @@
 		}
 	}
 
-	image-container.image,
-	figure.image {
-		text-align: center;
-		margin: 0 0 1em 0; // 1em margin bottom
+	figure {
+		margin: 0 0 1em 0;
 		box-sizing: border-box;
 		display: block;
-		clear: both;
+		box-shadow: var(--shadow);
+	}
+
+	figure.image {
+		text-align: center;
+		position: relative;
+		transition: $lazy-transition;
+
 		border: var(--border);
 		background: var(--color-sidepanel);
-		box-shadow: var(--shadow);
-		position: relative;
+
+		// Lazy-load pre-sizing to fill space.
+		&.lazy {
+			opacity: 0;
+			img {
+				height: 0;
+			}
+		}
 
 		&:after {
 			content: "";
 			position: absolute;
 			top: 0;
 			left: 0;
-			height: 100%;
 			width: 100%;
-			z-index: 1000;
+			z-index: 100;
 			box-shadow: var(--shadow) inset;
 			pointer-events: none;
 		}
 
+		.click {
+			cursor: pointer;
+		}
+
 		img {
 			display: block;
-			margin: 0 auto;
-			max-width: 100%;
+			margin: 0;
 			width: 100%;
+			max-width: 100%;
 		}
 
 		figcaption {
-			padding: .8em;
+			padding: 0.75em;
 			font-size: .75em;
 			background: var(--color-material) !important;
 			box-shadow: var(--shadow) inset;
@@ -96,76 +113,89 @@
 
 		&.image-style-align-left,
 		&.image-style-align-right {
-			clear: none !important;
-			display: inline-block;
-			max-width: calc(50% - .2m); // negate the padding
-			width: calc(50% - .2em);
+			max-width: calc(50% - #{$figure-margin}); // negate the padding
+			width: calc(50% - #{$figure-margin});
 			margin-top: 0;
 		}
 
 		&.image-style-align-left {
+			margin-right: $figure-margin;
 			float: left;
-			margin-right: .2em;
 			clear: left;
 		}
 
 		&.image-style-align-right {
+			margin-left: $figure-margin;
 			float: right;
-			margin-left: .2em;
 			clear: right;
 		}
 	}
-	// Lazy-load pre-sizing to fill space.
-	image-container.image {
-		&.lazy {
-			height: calc(var(--width-wrapper) * 9 / 16);
-			opacity: 0;
 
-			&.image-style-align-left,
-			&.image-style-align-right {
-				height: calc(var(--width-wrapper) / 2 * 9 / 16);
+	figure.media {
+		width: calc(50% - #{$figure-margin});
+		margin: 0 $figure-margin 1em 0;
+		position: relative;
+		float: left;
+		vertical-align: top;
+		transition: $lazy-transition;
+
+		&.lazy {
+			opacity: 0;
+		}
+
+		&.wide {
+			margin: 0;
+			width: 100%;
+			clear: both;
+		}
+
+		iframe {
+			position: absolute;
+			top: 0;
+			right: 0;
+			width: 100%;
+			height: 100%;
+			transition: $lazy-transition;
+
+			&.iframelazy {
+				opacity: 0;
 			}
 		}
 
-		.click {
-			cursor: pointer;
+		img {
+			display: block;
+			width: 100%;
+			height: auto;
+		}
+	}
+
+	figure.table {
+		table {
+			border-collapse: collapse;
+			border: none;
+			background: var(--color-shade);
+			
+			table-layout: fixed;
+			width: 100%;
+			white-space: nowrap;
+			
+			th, td {
+				border: var(--border);
+				background: none;
+				padding: 0.5em;
+
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
 		}
 	}
 }
 
-.video {
-	//display: inline-block;
-	position: relative;
-	margin: 0 .8em .8em 0;
-	width: calc(50% - 0.8em);
-	float: left;
-	clear: right;
-	vertical-align: top;
 
-	&.wide {
-		margin: 0 0 .8em 0;
-		width: 100%;
-		clear: both;
-	}
-
-	iframe {
-		position: absolute;
-		top: 0;
-		right: 0;
-		width: 100%;
-		height: 100%;
-	}
-
-	img {
-		display: block;
-		width: 100%;
-		height: auto;
-	}
-}
 // Mobile styling
 .site.mobile {
 	#content {
-		image-container.image,
 		figure.image {
 			&.image-style-align-right,
 			&.image-style-align-left {
@@ -177,10 +207,10 @@
 				margin-right: 0;
 			}
 		}
-	}
 
-	.video {
-		float: none;
-		width: 100%;
+		figure.media {
+			float: none;
+			width: 100%;
+		}
 	}
 }

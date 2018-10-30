@@ -1,43 +1,40 @@
-import { Express } from 'express';
 import { request, use as chaiUse } from 'chai';
 import ChaiHttp = require('chai-http');
 
-import { util as configUtil, get as configGet } from 'config';
+import { util as configUtil } from 'config';
 
 import * as Mocha from 'mocha';
 import { readdirSync } from 'fs';
 import { join as pathjoin } from 'path';
 
-import { ContentModel } from '../src/models/content';
-import { LogModel } from '../src/models/log';
-import { UserModel, User, accessRoles } from '../src/models/user';
-import { TokenResponse } from '../src/controllers/auth';
+import { ContentModel, LogModel, SettingsModel, UserModel, UserDoc } from '../src/models';
+import { User, UserToken, AccessRoles } from '../types';
 
-import app from '../src/index';
+import app from '../src/app';
 
-export class TestBedSingleton {
+class TestBedSingleton {
 	private _http: ChaiHttp.Agent;
 
 	public get http() { return this._http; }
-	public AdminUser: User;
+	public AdminUser: UserDoc;
 	public AdminCookie: string;
 
-	public AdminUser2: User;
+	public AdminUser2: UserDoc;
 	public Admin2Cookie: string;
 
-	public User: User;
+	public User: UserDoc;
 	public UserCookie: string;
 
 	constructor() {
 		if (configUtil.getEnv('NODE_ENV') !== 'test') { return; }
-		const db = configGet<string>('database');
 
 		chaiUse(ChaiHttp);
-		this._http = (<any>request(app)).keepOpen(); // TODO: Update @types/chai-http
+		this._http = request(app).keepOpen();
 
 		const mocha = new Mocha();
-		readdirSync(pathjoin('dist', 'out-tsc', 'test')).filter((file) => file.endsWith('.test.js')).forEach((file) => {
-			mocha.addFile(pathjoin('dist', 'out-tsc', 'test', file));
+		const path = pathjoin('dist', 'out-tsc', 'api', 'test');
+		readdirSync(path).filter((file) => file.endsWith('.test.js')).forEach((file) => {
+			mocha.addFile(pathjoin(path, file));
 		});
 
 		app.on('launched', async () => {
@@ -46,9 +43,10 @@ export class TestBedSingleton {
 
 			// Drop Test collections
 			await Promise.all([
-				UserModel.remove({}).exec(),
-				ContentModel.remove({}).exec(),
-				LogModel.remove({}).exec()
+				UserModel.deleteMany({}).exec(),
+				ContentModel.deleteMany({}).exec(),
+				LogModel.deleteMany({}).exec(),
+				SettingsModel.deleteMany({}).exec()
 			]);
 
 			// Create new users and log them in
@@ -72,37 +70,36 @@ export class TestBedSingleton {
 	}
 
 
-	private async createUser(user: Partial<User>): Promise<{ user: User, cookie: string }> {
+	private async createUser(user: Partial<User>): Promise<{ user: UserDoc, cookie: string }> {
 		const userObj = await new UserModel(user).save();
 		const res = await TestBed.http.post('/api/auth/login').send({ username: user.username, password: user.password });
 
 		return {
 			user: userObj,
-			cookie: 'jwt=' + (<TokenResponse>res.body).token // slightly modified
+			cookie: 'jwt=' + (<UserToken>res.body).token // slightly modified
 		};
 	}
 }
-
-export const TestBed = new TestBedSingleton();
-export default TestBed;
 
 // Used in test scenarios
 export const AdminUser: Partial<User> = {
 	username: 'Admin',
 	username_lower: 'admin',
 	password: 'test',
-	role: accessRoles.admin,
+	role: AccessRoles.admin,
 };
 export const AdminUser2: Partial<User> = {
 	username: 'Admin2',
 	username_lower: 'admin2',
 	password: 'test',
-	role: accessRoles.admin,
+	role: AccessRoles.admin,
 };
 export const TestUser: Partial<User> = {
 	username: 'User',
 	username_lower: 'user',
 	password: 'test',
-	role: accessRoles.user,
+	role: AccessRoles.user,
 };
 
+export const TestBed = new TestBedSingleton();
+export default TestBed;

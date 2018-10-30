@@ -1,13 +1,10 @@
 import { expect } from 'chai';
 
-import { ContentModel, Content } from '../src/models/content';
-import { status, ROUTE_STATUS, CMS_STATUS, VALIDATION_FAILED, USERS_STATUS, ADMIN_STATUS } from '../src/libs/validate';
+import { ContentModel } from '../src/models';
+import { Content, AccessRoles, AggregationQuery } from '../types';
+import { CMS_STATUS, VALIDATION_FAILED, USERS_STATUS, ADMIN_STATUS } from '../src/libs/validate';
 
-import { TestBed, AdminUser, TestUser } from './testbed';
-import { accessRoles } from '../src/models/user';
-import { AggregationQuery } from '../src/controllers/admin';
-import { fail } from 'assert';
-import { LogModel } from '../src/models/log';
+import { TestBed } from './testbed';
 
 // ---------------------------------
 // ------- Content TestSuite -------
@@ -196,7 +193,6 @@ describe('REST: Admin', () => {
 	describe('/api/admin/cms/', () => {
 
 		it('GET /api/admin/cms/ 200', async () => {
-
 			const res = await TestBed.http.get('/api/admin/cms/').set('Cookie', TestBed.AdminCookie);
 
 			expect(res).to.have.status(200);
@@ -232,7 +228,7 @@ describe('REST: Admin', () => {
 				title: 'getadmin200',
 				route: 'getadmin200',
 				content: 'test',
-				access: accessRoles.everyone,
+				access: AccessRoles.everyone,
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -257,7 +253,7 @@ describe('REST: Admin', () => {
 				title: 'getadmin401',
 				route: 'getadmin401',
 				content: 'test',
-				access: accessRoles.everyone,
+				access: AccessRoles.everyone,
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -354,7 +350,7 @@ describe('REST: Admin', () => {
 			const afterDate = new Date();
 
 			const content: Content = {
-				title: 'aggregDate', route: 'aggregdate', content: 'test', access: accessRoles.everyone,
+				title: 'aggregDate', route: 'aggregdate', content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test', published: true, nav: true
 			};
 
@@ -389,7 +385,7 @@ describe('REST: Admin', () => {
 			const beforeDate = new Date();
 
 			const content: Content = {
-				title: 'aggregDateBefore', route: 'aggregdatebefore', content: 'test', access: accessRoles.everyone,
+				title: 'aggregDateBefore', route: 'aggregdatebefore', content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test', published: true, nav: true
 			};
 
@@ -426,7 +422,7 @@ describe('REST: Admin', () => {
 		it('POST /api/admin/cms/aggregate 200, written by only', async () => {
 			const content: Content = {
 				title: 'writtenByAdmin2', route: 'writtenbyadmin2',
-				content: 'test', access: accessRoles.everyone,
+				content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test',
 				published: true, nav: true
 			};
@@ -439,11 +435,11 @@ describe('REST: Admin', () => {
 			const queryAdmin1: AggregationQuery = { createdBy: TestBed.AdminUser._id };
 			const queryAdmin2: AggregationQuery = { createdBy: TestBed.AdminUser2._id };
 
-			const [resAdmin1, resAdmin2, allContentDocs] = await Promise.all([
+			const [resAdmin1, resAdmin2] = await Promise.all([
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryAdmin1),
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryAdmin2),
-				ContentModel.find({}, { current: 1 })
 			]);
+			const allContentDocs = await ContentModel.find({}, { current: 1 });
 
 			expect(resAdmin1).to.have.status(200);
 			expect(resAdmin1).to.have.property('body');
@@ -466,21 +462,21 @@ describe('REST: Admin', () => {
 		});
 
 		it('POST /api/admin/cms/aggregate 200, access only', async () => {
-			const queryEveryone: AggregationQuery = { access: accessRoles.everyone };
-			const queryUsers: AggregationQuery = { access: accessRoles.user };
-			const queryAdmins: AggregationQuery = { access: accessRoles.admin };
+			const queryEveryone: AggregationQuery = { access: AccessRoles.everyone };
+			const queryUsers: AggregationQuery = { access: AccessRoles.user };
+			const queryAdmins: AggregationQuery = { access: AccessRoles.admin };
 
 			const content: Partial<Content> = { content: 'test', description: 'test', folder: 'test', published: true, nav: true };
 
 			const [res1, res2, res3] = await Promise.all([
 				TestBed.http.post('/api/cms').set('Cookie', TestBed.AdminCookie).send(Object.assign({
-					route: 'aggregAccess1', title: 'aggregAccess1', access: accessRoles.everyone
+					route: 'aggregAccess1', title: 'aggregAccess1', access: AccessRoles.everyone
 				}, content)),
 				TestBed.http.post('/api/cms').set('Cookie', TestBed.AdminCookie).send(Object.assign({
-					route: 'aggregAccess2', title: 'aggregAccess2', access: accessRoles.user
+					route: 'aggregAccess2', title: 'aggregAccess2', access: AccessRoles.user
 				}, content)),
 				TestBed.http.post('/api/cms').set('Cookie', TestBed.AdminCookie).send(Object.assign({
-					route: 'aggregAccess3', title: 'aggregAccess3', access: accessRoles.admin
+					route: 'aggregAccess3', title: 'aggregAccess3', access: AccessRoles.admin
 				}, content))
 			]);
 
@@ -488,12 +484,12 @@ describe('REST: Admin', () => {
 			expect(res2).to.have.status(200);
 			expect(res3).to.have.status(200);
 
-			const [resEveryone, resUsers, resAdmins, allContentDocs] = await Promise.all([
+			const [resEveryone, resUsers, resAdmins] = await Promise.all([
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryEveryone),
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryUsers),
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryAdmins),
-				ContentModel.find({}, { current: 1 })
 			]);
+			const allContentDocs = await ContentModel.find({}, { current: 1 });
 
 			expect(resEveryone).to.have.status(200);
 			expect(resEveryone).to.have.property('body');
@@ -509,9 +505,9 @@ describe('REST: Admin', () => {
 
 			const allPages = allContentDocs.map(contentDoc => contentDoc.current);
 
-			const everyoneCount = allPages.filter(c => c.access === accessRoles.everyone).length;
-			const usersCount = allPages.filter(c => c.access === accessRoles.user).length;
-			const adminsCount = allPages.filter(c => c.access === accessRoles.admin).length;
+			const everyoneCount = allPages.filter(c => c.access === AccessRoles.everyone).length;
+			const usersCount = allPages.filter(c => c.access === AccessRoles.user).length;
+			const adminsCount = allPages.filter(c => c.access === AccessRoles.admin).length;
 
 			const queryEveryoneCount = (<any[]>resEveryone.body).length;
 			const queryUsersCount = (<any[]>resUsers.body).length;
@@ -528,7 +524,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'unpubAggreg', route: 'unpubaggreg',
-				content: 'test', access: accessRoles.everyone,
+				content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test',
 				published: false, nav: true // published === false
 			};
@@ -538,11 +534,11 @@ describe('REST: Admin', () => {
 
 			expect(pushUnpublishedContentRes).to.have.status(200);
 
-			const [resPublished, resUnpublished, allContentDocs] = await Promise.all([
+			const [resPublished, resUnpublished] = await Promise.all([
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryPublished),
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryUnpublished),
-				ContentModel.find({}, { current: 1 })
 			]);
+			const allContentDocs = await ContentModel.find({}, { current: 1 });
 
 			expect(resPublished).to.have.status(200);
 			expect(resPublished).to.have.property('body');
@@ -568,7 +564,7 @@ describe('REST: Admin', () => {
 			const afterDate = new Date();
 
 			const content: Content = {
-				title: 'aggregSeenAfter', route: 'aggregseenafter', content: 'test', access: accessRoles.everyone,
+				title: 'aggregSeenAfter', route: 'aggregseenafter', content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test', published: true, nav: true
 			};
 
@@ -598,17 +594,15 @@ describe('REST: Admin', () => {
 
 			expect(resAfter2).to.have.status(200);
 			expect(resAfter2).to.have.property('body');
-			expect(resAfter2.body).to.be.an('array');
-			const contentFind2 = (<any[]>resAfter2.body).find((c: any) => c.route === content.route);
-			expect(contentFind2).to.not.be.an('undefined'); // to NOT be.
-			expect(contentFind2.views).to.equal(0); // the query after date is set *after* we checked out the page
+			expect(resAfter2.body).to.have.property('message');
+			expect(resAfter2.body.message).to.equal(ADMIN_STATUS.AGGREGATION_RESULT_NONE_FOUND);
 		});
 
 		it('POST /api/admin/cms/aggregate 200, seen before only', async () => {
 			const beforeDate = new Date();
 
 			const content: Content = {
-				title: 'aggregSeenBefore', route: 'aggregseenbefore', content: 'test', access: accessRoles.everyone,
+				title: 'aggregSeenBefore', route: 'aggregseenbefore', content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test', published: true, nav: true
 			};
 
@@ -638,8 +632,7 @@ describe('REST: Admin', () => {
 			expect(resBefore).to.have.property('body');
 			expect(resBefore.body).to.be.an('array');
 			const contentFind = (<any[]>resBefore.body).find((c: any) => c.route === content.route);
-			expect(contentFind).to.not.be.an('undefined'); // to NOT be undefined.
-			expect(contentFind.views).to.be.equal(0);
+			expect(contentFind).to.be.an('undefined'); // to be undefined. It wasn't seen before the date specified
 
 			// the second before was created AFTER the new content, and should thus include the content we POSTed above
 			expect(resBefore2).to.have.status(200);
@@ -657,7 +650,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'browserAggreg', route: 'browseraggreg',
-				content: 'test', access: accessRoles.everyone,
+				content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test',
 				published: true, nav: true
 			};
@@ -678,14 +671,13 @@ describe('REST: Admin', () => {
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(query3),
 			]);
 
-			const resEdgeContent = (<Content[]>resEdge.body).find(c => c.route === content.route);
-			const resChromeContent = (<Content[]>resChrome.body).find(c => c.route === content.route);
-			const resBothContent = (<Content[]>resBoth.body).find(c => c.route === content.route);
-
 			expect(resEdge).to.have.status(200);
 			expect(resEdge).to.have.property('body');
-			expect(resEdge.body).to.be.an('array');
-			expect(resEdgeContent.views).to.be.equal(0);
+			expect(resEdge.body).to.have.property('message');
+			expect(resEdge.body.message).to.equal(ADMIN_STATUS.AGGREGATION_RESULT_NONE_FOUND);
+
+			const resChromeContent = (<Content[]>resChrome.body).find(c => c.route === content.route);
+			const resBothContent = (<Content[]>resBoth.body).find(c => c.route === content.route);
 
 			expect(resChrome).to.have.status(200);
 			expect(resChrome).to.have.property('body');
@@ -704,7 +696,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'unwindAggreg', route: 'unwindaggreg',
-				content: 'test', access: accessRoles.everyone,
+				content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test',
 				published: true, nav: true
 			};
@@ -743,7 +735,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'propAggreg', route: 'propaggreg',
-				content: 'test', access: accessRoles.everyone,
+				content: 'test', access: AccessRoles.everyone,
 				description: 'test', folder: 'test',
 				published: true, nav: true
 			};
@@ -769,6 +761,7 @@ describe('REST: Admin', () => {
 			expect(resContent).to.have.property('title');
 			expect(resContent).to.have.property('route');
 			expect(resContent).to.have.property('views');
+			expect(resContent).to.have.property('lastVisit');
 
 			expect(resContent.title).to.be.equal(content.title);
 			expect(resContent.route).to.be.equal(content.route);

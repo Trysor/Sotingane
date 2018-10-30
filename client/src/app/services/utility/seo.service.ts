@@ -1,14 +1,15 @@
-﻿import { Injectable, Inject } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { Router, NavigationStart } from '@angular/router';
 
-import { env } from '@env';
-import { CmsContent } from '@app/models';
+import { Content } from '@types';
 
 import { HttpService } from '@app/services/http/http.service';
 import { CMSService } from '@app/services/controllers/cms.service';
+import { SettingsService } from '@app/services/controllers/settings.service';
+
 
 import { BehaviorSubject } from 'rxjs';
-import { filter, take } from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
 
 
 @Injectable({ providedIn: 'root' })
@@ -17,22 +18,27 @@ export class SEOService {
 	private readonly _bread = new BehaviorSubject<object>(null);
 	private readonly _article = new BehaviorSubject<object>(null);
 
-
 	public get logo() { return this._logo; }
 	public get bread() { return this._bread; }
 	public get article() { return this._article; }
 
+	private readonly _orgLogoURL: string;
+
 	constructor(
 		private router: Router,
+		private settingsService: SettingsService,
 		private cmsService: CMSService,
 		private httpService: HttpService) {
+
+		// Org Logo can't be svg.
+		this._orgLogoURL = this.httpService.urlBase + '/assets/logo192themed.png';
 
 		// Set logo. This one is static
 		this._logo.next({
 			'@context': 'http://schema.org',
 			'@type': 'Organization',
 			'url': this.httpService.urlBase,
-			'logo': this.httpService.urlBase + '/assets/logo192themed.png' // can't be svg.
+			'logo': this._orgLogoURL
 		});
 
 		// Handle Breadcrumb
@@ -64,7 +70,7 @@ export class SEOService {
 
 
 
-	private seoBreadcrumb(fullUrl: string, content: CmsContent): object {
+	private seoBreadcrumb(fullUrl: string, content: Content): object {
 		const json = {
 			'@context': 'http://schema.org',
 			'@type': 'BreadcrumbList',
@@ -73,7 +79,7 @@ export class SEOService {
 				'position': 1,
 				'item': {
 					'@id': this.httpService.urlBase,
-					'name': env.META.title,
+					'name': this.settingsService.settings.getValue().meta.title,
 				}
 			}]
 		};
@@ -91,7 +97,7 @@ export class SEOService {
 		return json;
 	}
 
-	private seoArticle(fullUrl: string, content: CmsContent): object {
+	private seoArticle(fullUrl: string, content: Content): object {
 		return {
 			'@context': 'http://schema.org',
 			'@type': 'Article',
@@ -101,7 +107,17 @@ export class SEOService {
 			'datePublished': content.createdAt,
 			'dateModified': content.updatedAt,
 			'author': {
+				'@type': 'Person',
 				'name': content.createdBy.username
+			},
+			'mainEntityOfPage': fullUrl,
+			'publisher': {
+				'@type': 'Organization',
+				'name': this.settingsService.settings.getValue().org,
+				'logo': {
+					'@type': 'ImageObject',
+					'url': this._orgLogoURL
+				}
 			}
 		};
 	}

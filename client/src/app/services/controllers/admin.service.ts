@@ -3,9 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpService } from '@app/services/http/http.service';
 
 import { env } from '@env';
-import { User, CmsContent, AggregationResult, AggregationQuery } from '@app/models';
-
-import { Observable } from 'rxjs';
+import { User, Content, AggregationResult, AggregationQuery } from '@types';
 
 
 @Injectable({ providedIn: 'root' })
@@ -28,11 +26,11 @@ export class AdminService {
 
 
 	public getAllContent() {
-		return this.http.client.get<CmsContent[]>(this.http.apiUrl(env.API.admin.cms));
+		return this.http.client.get<Content[]>(this.http.apiUrl(env.API.admin.cms));
 	}
 
 	public getContentPage(route: string) {
-		return this.http.client.get<CmsContent>(this.http.apiUrl(env.API.admin.cms + '/' + route));
+		return this.http.client.get<Content>(this.http.apiUrl(env.API.admin.cms + '/' + route));
 	}
 
 	public getAggregatedData(query: AggregationQuery) {

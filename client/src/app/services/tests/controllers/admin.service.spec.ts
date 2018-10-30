@@ -1,13 +1,12 @@
 ﻿import { TestBed } from '@angular/core/testing';
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 import { AdminService, HttpService } from '@app/services';
-import { User, CmsContent, AccessRoles } from '@app/models';
+import { User, Content, AccessRoles } from '@types';
 
 import { env } from '@env';
-import { of } from 'rxjs';
 
 
 describe('AdminService', () => {
@@ -41,7 +40,7 @@ describe('AdminService', () => {
 
 
 	it('getAllusers()', () => {
-		const testUsers: User[] = [{ username: 'Bob' }, { username: 'Alice' }];
+		const testUsers: User[] = [{ username: 'Bob', _id: null }, { username: 'Alice', _id: null }];
 
 		// Subscribe to request
 		service.getAllusers().subscribe(users => {
@@ -77,7 +76,7 @@ describe('AdminService', () => {
 
 
 	it('getAllContent()', () => {
-		const testContent: CmsContent[] = [
+		const testContent: Content[] = [
 			{ title: 'test', route: 'test', access: AccessRoles.everyone },
 			{ title: 'test2', route: 'test2', access: AccessRoles.everyone },
 		];
@@ -97,7 +96,7 @@ describe('AdminService', () => {
 	});
 
 	it('getContentPage()', () => {
-		const testContent: CmsContent = { title: 'test', route: 'test', access: AccessRoles.everyone };
+		const testContent: Content = { title: 'test', route: 'test', access: AccessRoles.everyone };
 
 		// Subscribe to request
 		service.getContentPage(testContent.route).subscribe(content => {

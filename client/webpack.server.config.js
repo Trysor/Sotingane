@@ -3,14 +3,11 @@ const webpack = require('webpack');
 
 module.exports = {
 	mode: 'none',
+	devtool: 'source-map',
 	entry: { server: './server.ts' },
 	resolve: { extensions: ['.js', '.ts'] },
 	target: 'node',
-	// Make sure we don't include all node_modules
-	externals: [/node_modules/],
-	optimization: {
-		minimize: false,
-	},
+	optimization: { minimize: false, },
 	output: {
 		path: path.join(__dirname, 'dist'),
 		filename: '[name].js'

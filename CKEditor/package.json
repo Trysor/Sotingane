@@ -2,41 +2,42 @@
 	"name": "ckeditor",
 	"version": "0.0.0",
 	"description": "CKEditor",
-	"main": "app.js",
 	"author": {
 		"name": ""
 	},
 	"scripts": {
 		"webpack": "webpack --config webpack.ckeditor.config.js --progress --colors",
-		"build": "npm run webpack"
+		"build": "npm run webpack",
+		"buildtsc": "tsc"
 	},
+	"main": "dist/ckeditor.js",
+	"types": "ckeditor.ts",
 	"dependencies": {
-		"@ckeditor/ckeditor5-alignment": "^10.0.1",
-		"@ckeditor/ckeditor5-basic-styles": "^10.0.1",
-		"@ckeditor/ckeditor5-block-quote": "^10.0.1",
-		"@ckeditor/ckeditor5-editor-classic": "^10.0.1",
-		"@ckeditor/ckeditor5-essentials": "^10.1.0",
-		"@ckeditor/ckeditor5-heading": "^10.0.1",
-		"@ckeditor/ckeditor5-image": "^10.1.0",
-		"@ckeditor/ckeditor5-link": "^10.0.2",
-		"@ckeditor/ckeditor5-list": "^11.0.0",
-		"@ckeditor/ckeditor5-paragraph": "^10.0.1",
-		"@ckeditor/ckeditor5-upload": "^10.0.1",
-		"@ckeditor/ckeditor5-theme-lark": "^10.1.0"
+		"@ckeditor/ckeditor5-alignment": "10.0.3",
+		"@ckeditor/ckeditor5-basic-styles": "10.0.3",
+		"@ckeditor/ckeditor5-block-quote": "10.1.0",
+		"@ckeditor/ckeditor5-editor-classic": "11.0.1",
+		"@ckeditor/ckeditor5-table": "11.0.0",
+		"@ckeditor/ckeditor5-essentials": "10.1.2",
+		"@ckeditor/ckeditor5-heading": "10.1.0",
+		"@ckeditor/ckeditor5-image": "11.0.0",
+		"@ckeditor/ckeditor5-link": "10.0.4",
+		"@ckeditor/ckeditor5-list": "11.0.2",
+		"@ckeditor/ckeditor5-media-embed": "10.0.0",
+		"@ckeditor/ckeditor5-paragraph": "10.0.3",
+		"@ckeditor/ckeditor5-theme-lark": "11.1.0"
 	},
 	"devDependencies": {
-		"@ckeditor/ckeditor5-dev-utils": "^10.0.1",
-		"@ckeditor/ckeditor5-dev-webpack-plugin": "^6.0.1",
-		"@types/node": "^10.5.2",
-		"babel-minify-webpack-plugin": "^0.3.1",
-		"postcss-loader": "^2.1.6",
+		"@ckeditor/ckeditor5-dev-utils": "11.0.1",
+		"@ckeditor/ckeditor5-dev-webpack-plugin": "7.0.1",
+		"@types/node": "10.11.7",
+		"postcss-loader": "^3.0.0",
 		"raw-loader": "^0.5.1",
-		"style-loader": "^0.21.0",
-		"ts-loader": "4.4.2",
-		"typescript": "^2.9.2",
-		"webpack": "^4.16.1",
-		"webpack-cli": "3.0.8",
-		"webpack-sources": "1.1.0",
+		"style-loader": "0.23.1",
+		"ts-loader": "5.2.1",
+		"typescript": "3.1.3",
+		"webpack": "4.20.2",
+		"webpack-cli": "3.1.2",
 		"wrapper-webpack-plugin": "2.0.0"
 	}
 }

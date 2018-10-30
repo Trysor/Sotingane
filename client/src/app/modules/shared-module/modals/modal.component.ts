@@ -1,8 +1,7 @@
 import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { Router } from '@angular/router';
 
-import { ModalData } from '@app/models';
+import { ModalData } from '@types';
 
 @Component({
 	selector: 'delete-modal',

@@ -1,11 +1,9 @@
 import { expect } from 'chai';
 
-import { ContentModel, Content } from '../src/models/content';
-import { accessRoles } from '../src/models/user';
+import { Content, AccessRoles } from '../types';
+import { CMS_STATUS, VALIDATION_FAILED } from '../src/libs/validate';
 
-import { status, ROUTE_STATUS, CMS_STATUS, VALIDATION_FAILED } from '../src/libs/validate';
-
-import { TestBed, AdminUser } from './testbed';
+import { TestBed } from './testbed';
 
 
 // ---------------------------------
@@ -27,7 +25,7 @@ describe('REST: Content', () => {
 				title: 'test',
 				route: 'test',
 				content: 'test',
-				access: accessRoles.everyone,
+				access: AccessRoles.everyone,
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -70,7 +68,7 @@ describe('REST: Content', () => {
           <script src="/evil.js"></script>
           <a href="/acceptable">good</a>
           <img src="/acceptable.jpg" />`,
-				access: accessRoles.everyone,
+				access: AccessRoles.everyone,
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -113,7 +111,7 @@ describe('REST: Content', () => {
 				title: 'test3',
 				route: 'test3',
 				content: 'test',
-				access: accessRoles.everyone,
+				access: AccessRoles.everyone,
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -123,25 +121,16 @@ describe('REST: Content', () => {
 			const badRoute = Object.assign({}, properContent);
 			delete badRoute.route;
 
-			const badTitle = Object.assign({}, properContent);
-			delete badTitle.title;
+			const badEverything = Object.assign({}, properContent);
+			delete badEverything.route;
+			delete badEverything.title;
+			delete badEverything.content;
+			delete badEverything.description;
+			delete badEverything.published;
 
-			const badContent = Object.assign({}, properContent);
-			delete badContent.content;
-
-			const badDesc = Object.assign({}, properContent);
-			delete badDesc.description;
-
-			const badPublished = Object.assign({}, properContent);
-			delete badPublished.published;
-
-
-			const [badRouteRes, badTitleRes, badContentRes, badDescRes, badPublishedRes] = await Promise.all([
+			const [badRouteRes, badEverythingRes] = await Promise.all([
 				TestBed.http.post('/api/cms').send(badRoute).set('Cookie', TestBed.AdminCookie),
-				TestBed.http.post('/api/cms').send(badTitle).set('Cookie', TestBed.AdminCookie),
-				TestBed.http.post('/api/cms').send(badContent).set('Cookie', TestBed.AdminCookie),
-				TestBed.http.post('/api/cms').send(badDesc).set('Cookie', TestBed.AdminCookie),
-				TestBed.http.post('/api/cms').send(badPublished).set('Cookie', TestBed.AdminCookie)
+				TestBed.http.post('/api/cms').send(badEverything).set('Cookie', TestBed.AdminCookie)
 			]);
 
 			// badRouteRes
@@ -156,14 +145,14 @@ describe('REST: Content', () => {
 			expect(badRouteRes.body.errors[0].params).to.have.property('missingProperty');
 			expect(badRouteRes.body.errors[0].params.missingProperty).to.equal('route');
 
-			// badTitleRes
-			expect(badTitleRes).to.have.status(422);
-			// badContentRes
-			expect(badContentRes).to.have.status(422);
-			// badDescRes
-			expect(badDescRes).to.have.status(422);
-			// badPublished
-			expect(badPublishedRes).to.have.status(422);
+			// badEverythingRes
+			expect(badEverythingRes).to.have.status(422);
+			expect(badEverythingRes.body.errors.length).to.equal(5);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'route')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'title')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'content')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'description')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'published')).to.not.equal(null);
 		});
 
 		it('GET /api/cms/ 200', async () => {
@@ -181,7 +170,7 @@ describe('REST: Content', () => {
 				title: 'list200user',
 				route: 'list200user',
 				content: 'test',
-				access: accessRoles.user, // USER RIGHTS REQUIRED
+				access: AccessRoles.user, // USER RIGHTS REQUIRED
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -223,7 +212,7 @@ describe('REST: Content', () => {
 				title: 'list200admin',
 				route: 'list200admin',
 				content: 'test',
-				access: accessRoles.admin, // ADMIN RIGHTS REQUIRED
+				access: AccessRoles.admin, // ADMIN RIGHTS REQUIRED
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -286,7 +275,7 @@ describe('REST: Content', () => {
 				title: 'get200user',
 				route: 'get200user',
 				content: 'test',
-				access: accessRoles.user, // user role
+				access: AccessRoles.user, // user role
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -329,7 +318,7 @@ describe('REST: Content', () => {
 				title: 'get200admin',
 				route: 'get200admin',
 				content: 'test',
-				access: accessRoles.admin, // admin role
+				access: AccessRoles.admin, // admin role
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -378,7 +367,7 @@ describe('REST: Content', () => {
 				title: 'patch200',
 				route: 'patch200',
 				content: 'test',
-				access: accessRoles.everyone,
+				access: AccessRoles.everyone,
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -406,7 +395,7 @@ describe('REST: Content', () => {
 				title: 'patch401',
 				route: 'patch401',
 				content: 'test',
-				access: accessRoles.everyone,
+				access: AccessRoles.everyone,
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -433,7 +422,7 @@ describe('REST: Content', () => {
 				title: 'some404route',
 				route: route,
 				content: 'test',
-				access: accessRoles.everyone,
+				access: AccessRoles.everyone,
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -455,7 +444,7 @@ describe('REST: Content', () => {
 				title: 'patch422',
 				route: 'patch422',
 				content: 'test',
-				access: accessRoles.everyone,
+				access: AccessRoles.everyone,
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -464,30 +453,21 @@ describe('REST: Content', () => {
 
 			const badRoute = Object.assign({}, properContent);
 			delete badRoute.route;
-
-			const badTitle = Object.assign({}, properContent);
-			delete badTitle.title;
-
-			const badContent = Object.assign({}, properContent);
-			delete badContent.content;
-
-			const badDesc = Object.assign({}, properContent);
-			delete badDesc.description;
-
-			const badPublished = Object.assign({}, properContent);
-			delete badPublished.published;
+			const badEverything = Object.assign({}, properContent);
+			delete badEverything.route;
+			delete badEverything.title;
+			delete badEverything.content;
+			delete badEverything.description;
+			delete badEverything.published;
 
 
 			const postRes = await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(properContent);
 
-			const [badRouteRes, badTitleRes, badContentRes, badDescRes, badPublishedRes] = await Promise.all([
+			const [badRouteRes, badEverythingRes] = await Promise.all([
 				TestBed.http.patch('/api/cms/' + properContent.route).send(badRoute).set('Cookie', TestBed.AdminCookie),
-				TestBed.http.patch('/api/cms/' + properContent.route).send(badTitle).set('Cookie', TestBed.AdminCookie),
-				TestBed.http.patch('/api/cms/' + properContent.route).send(badContent).set('Cookie', TestBed.AdminCookie),
-				TestBed.http.patch('/api/cms/' + properContent.route).send(badDesc).set('Cookie', TestBed.AdminCookie),
-				TestBed.http.patch('/api/cms/' + properContent.route).send(badPublished).set('Cookie', TestBed.AdminCookie)
+				TestBed.http.patch('/api/cms/' + properContent.route).send(badEverything).set('Cookie', TestBed.AdminCookie)
 			]);
 
 			// badRouteRes
@@ -502,14 +482,14 @@ describe('REST: Content', () => {
 			expect(badRouteRes.body.errors[0].params).to.have.property('missingProperty');
 			expect(badRouteRes.body.errors[0].params.missingProperty).to.equal('route');
 
-			// badTitleRes
-			expect(badTitleRes).to.have.status(422);
-			// badContentRes
-			expect(badContentRes).to.have.status(422);
-			// badDescRes
-			expect(badDescRes).to.have.status(422);
-			// badPublished
-			expect(badPublishedRes).to.have.status(422);
+			// badEverythingRes
+			expect(badEverythingRes).to.have.status(422);
+			expect(badEverythingRes.body.errors.length).to.equal(5);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'route')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'title')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'content')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'description')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'published')).to.not.equal(null);
 		});
 
 
@@ -518,7 +498,7 @@ describe('REST: Content', () => {
 				title: 'delete200',
 				route: 'delete200',
 				content: 'test',
-				access: accessRoles.everyone,
+				access: AccessRoles.everyone,
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -542,7 +522,7 @@ describe('REST: Content', () => {
 				title: 'delete401',
 				route: 'delete401',
 				content: 'test',
-				access: accessRoles.everyone,
+				access: AccessRoles.everyone,
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -584,7 +564,7 @@ describe('REST: Content', () => {
 				title: 'history',
 				route: 'history',
 				content: 'test',
-				access: accessRoles.everyone,
+				access: AccessRoles.everyone,
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -595,7 +575,7 @@ describe('REST: Content', () => {
 				title: 'history',
 				route: 'history',
 				content: 'new patched content',
-				access: accessRoles.everyone,
+				access: AccessRoles.everyone,
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -650,7 +630,7 @@ describe('REST: Content', () => {
 					title: 'search' + i,
 					route: 'search' + i,
 					content: 'search',
-					access: accessRoles.everyone, // FOR EVERYONE
+					access: AccessRoles.everyone, // FOR EVERYONE
 					description: 'search',
 					folder: 'test',
 					published: true,
@@ -661,7 +641,7 @@ describe('REST: Content', () => {
 					title: 'searchUser' + i,
 					route: 'searchUser' + i,
 					content: 'search',
-					access: accessRoles.user, // USER RIGHTS REQUIRED
+					access: AccessRoles.user, // USER RIGHTS REQUIRED
 					description: 'search',
 					folder: 'test',
 					published: true,
@@ -672,7 +652,7 @@ describe('REST: Content', () => {
 					title: 'searchAdmin' + i,
 					route: 'searchAdmin' + i,
 					content: 'search',
-					access: accessRoles.admin, // ADMIN RIGHTS REQUIRED
+					access: AccessRoles.admin, // ADMIN RIGHTS REQUIRED
 					description: 'search',
 					folder: 'test',
 					published: true,

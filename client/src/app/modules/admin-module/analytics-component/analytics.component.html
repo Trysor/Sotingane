@@ -1,8 +1,6 @@
-
-
 <mat-accordion [ngClass]="{ analyze: true, mobile: (mobileService.isMobile() | async) }">
 
-	<mat-expansion-panel [expanded]="(state | async) == AnalyticsState.QUERY" (opened)="setState(AnalyticsState.QUERY)">
+	<mat-expansion-panel [expanded]="(state | async) !== AnalyticsState.RESULTS" (opened)="setState(AnalyticsState.QUERY)">
 		<mat-expansion-panel-header>Query</mat-expansion-panel-header>
 
 		<form [formGroup]="aggregateForm" id="aggregateForm" autocomplete="off" (ngSubmit)="submitForm()">
@@ -75,11 +73,11 @@
 							<mat-select id="access" #access="matSelect" formControlName="access">
 								<mat-select-trigger *ngIf="aggregateForm.get('access').value">
 									<mat-icon>{{accessHandler.getAccessChoice(aggregateForm.get('access').value).icon}}</mat-icon>
-									{{ accessHandler.getAccessChoice(aggregateForm.get('access').value).verbose }}
+									{{ accessHandler.getAccessChoice(aggregateForm.get('access').value).plural }}
 								</mat-select-trigger>
 								<mat-option [disabled]="!aggregateForm.get('access').value">-- Clear Selection --</mat-option>
 								<mat-option *ngFor="let option of accessHandler.accessChoices" [value]="option.value">
-									<mat-icon matPrefix>{{ option.icon }}</mat-icon>{{ option.verbose }}
+									<mat-icon matPrefix>{{ option.icon }}</mat-icon>{{ option.plural }}
 								</mat-option>
 							</mat-select>
 						</mat-form-field>
@@ -164,7 +162,7 @@
 
 
 			<mat-action-row>
-				<button mat-raised-button class="submit" type="submit" [disabled]="!aggregateForm.valid || loading" color="primary">
+				<button mat-raised-button class="submit" type="submit" [disabled]="!aggregateForm.valid || (state | async) == AnalyticsState.LOADING" color="primary">
 					Analyze
 				</button>
 			</mat-action-row>

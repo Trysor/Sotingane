@@ -1,26 +1,26 @@
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { env } from '@env';
-import { CmsContent, AccessRoles } from '@app/models';
+import { Content, AccessRoles, SearchResultContent } from '@types';
 
 import { makeStateKey } from '@angular/platform-browser';
-const LIST_KEY = makeStateKey<CmsContent[]>('cmslist'),
-	PAGE_KEY = makeStateKey<CmsContent>('cmspage'),
-	SEARCH_KEY = makeStateKey<CmsContent[]>('cmssearch');
+const LIST_KEY = makeStateKey<Content[]>('cmslist'),
+	PAGE_KEY = makeStateKey<Content>('cmspage'),
+	SEARCH_KEY = makeStateKey<SearchResultContent[]>('cmssearch');
 
 import { AuthService } from '@app/services/controllers/auth.service';
 import { HttpService } from '@app/services/http/http.service';
 
-import { Observable, BehaviorSubject, of } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, BehaviorSubject } from 'rxjs';
+
 
 @Injectable({ providedIn: 'root' })
 export class CMSService {
-	private _listSubject: BehaviorSubject<CmsContent[]> = new BehaviorSubject(null);
-	private _pageSubject: BehaviorSubject<CmsContent> = new BehaviorSubject(null);
+	private _listSubject: BehaviorSubject<Content[]> = new BehaviorSubject(null);
+	private _pageSubject: BehaviorSubject<Content> = new BehaviorSubject(null);
 
-	private readonly _failedToLoad: CmsContent = {
+	private readonly _failedToLoad: Content = {
 		access: AccessRoles.everyone,
 		title: 'Page not available',
 		content: 'Uhm. There appears to be nothing here. Sorry.',
@@ -30,7 +30,6 @@ export class CMSService {
 	};
 
 	constructor(
-		@Inject(PLATFORM_ID) private platformId: Object,
 		private authService: AuthService,
 		private http: HttpService,
 		private router: Router) {
@@ -47,9 +46,9 @@ export class CMSService {
 	/**
 	 * Gets the cmsRoutes as a BehaviorSubject
 	 * @param  {[boolean]}                        forceUpdate, whether to force update. Defaults to false.
-	 * @return {BehaviorSubject<CmsContent[]>}    the BehaviorSubject
+	 * @return {BehaviorSubject<Content[]>}    the BehaviorSubject
 	 */
-	public getContentList(forceUpdate = false): BehaviorSubject<CmsContent[]> {
+	public getContentList(forceUpdate = false): BehaviorSubject<Content[]> {
 		if (!forceUpdate) { return this._listSubject; }
 
 		this.requestContentList().subscribe(contentList => {
@@ -64,32 +63,34 @@ export class CMSService {
 
 	/**
 	 * Requests the content list
-	 * @return {Observable<CmsContent[]>}       Server's response, as an Observable
+	 * @return {Observable<Content[]>}       Server's response, as an Observable
 	 */
-	private requestContentList(): Observable<CmsContent[]> {
-		return this.http.client.get<CmsContent[]>(this.http.apiUrl(env.API.cms.content));
-		// return this.http.transferStateForRequest(LIST_KEY, this.http.get<CmsContent[]>(environment.URL.cms.content));
-	}
-
-	/**
-	 * Requests the content from the given url
-	 * @return {Observable<CmsContent>}         Server's response, as an Observable
-	 */
-	public searchContent(searchTerm: string): Observable<CmsContent[]> {
+	private requestContentList(): Observable<Content[]> {
 		return this.http.fromState(
-			SEARCH_KEY,
-			this.http.client.get<CmsContent[]>(this.http.apiUrl(env.API.cms.search + '/' + searchTerm))
+			LIST_KEY,
+			this.http.client.get<Content[]>(this.http.apiUrl(env.API.cms.content))
 		);
 	}
 
 	/**
 	 * Requests the content from the given url
-	 * @return {Observable<CmsContent>}         Server's response, as an Observable
+	 * @return {Observable<Content>}         Server's response, as an Observable
+	 */
+	public searchContent(searchTerm: string): Observable<SearchResultContent[]> {
+		return this.http.fromState(
+			SEARCH_KEY,
+			this.http.client.get<SearchResultContent[]>(this.http.apiUrl(env.API.cms.search + '/' + searchTerm))
+		);
+	}
+
+	/**
+	 * Requests the content from the given url
+	 * @return {Observable<Content>}         Server's response, as an Observable
 	 */
 	public requestContent(contentUrl: string) {
 		this.http.fromState(
 			PAGE_KEY,
-			this.http.client.get<CmsContent>(this.http.apiUrl(env.API.cms.content + '/' + contentUrl))
+			this.http.client.get<Content>(this.http.apiUrl(env.API.cms.content + '/' + contentUrl))
 		).subscribe(
 			content => this._pageSubject.next(content),
 			error => this._pageSubject.next(this._failedToLoad)
@@ -98,18 +99,18 @@ export class CMSService {
 
 	/**
 	 * Requests the content History array from the given url
-	 * @return {Observable<CmsContent>}         Server's response, as an Observable
+	 * @return {Observable<Content>}         Server's response, as an Observable
 	 */
-	public requestContentHistory(contentUrl: string): Observable<CmsContent[]> {
-		return this.http.client.get<CmsContent[]>(this.http.apiUrl(env.API.cms.history + '/' + contentUrl));
+	public requestContentHistory(contentUrl: string): Observable<Content[]> {
+		return this.http.client.get<Content[]>(this.http.apiUrl(env.API.cms.history + '/' + contentUrl));
 	}
 
 	/**
 	 * Requests to update the content for a given url
-	 * @return {Observable<CmsContent>}         Server's response, as an Observable
+	 * @return {Observable<Content>}         Server's response, as an Observable
 	 */
-	public updateContent(contentUrl: string, updatedContent: CmsContent): Observable<CmsContent> {
-		return this.http.client.patch<CmsContent>(this.http.apiUrl(env.API.cms.content + '/' + contentUrl), updatedContent);
+	public updateContent(contentUrl: string, updatedContent: Content): Observable<Content> {
+		return this.http.client.patch<Content>(this.http.apiUrl(env.API.cms.content + '/' + contentUrl), updatedContent);
 	}
 
 	/**
@@ -122,9 +123,9 @@ export class CMSService {
 
 	/**
 	 * Requests to create the content for a given url
-	 * @return {Observable<CmsContent>}         Server's response, as an Observable
+	 * @return {Observable<Content>}         Server's response, as an Observable
 	 */
-	public createContent(newContent: CmsContent): Observable<CmsContent> {
-		return this.http.client.post<CmsContent>(this.http.apiUrl(env.API.cms.content), newContent);
+	public createContent(newContent: Content): Observable<Content> {
+		return this.http.client.post<Content>(this.http.apiUrl(env.API.cms.content), newContent);
 	}
 }

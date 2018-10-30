@@ -10,17 +10,13 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '@app/modules';
 
 // Routing
-import { RouterTestingModule } from '@angular/router/testing';
 const routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
 import { Router } from '@angular/router';
 
 import { AuthService, HttpService } from '@app/services';
-import { User, CmsContent, AccessRoles } from '@app/models';
-
-import { UserToken } from '@app/models';
+import { User, UserToken } from '@types';
 
 import { env } from '@env';
-import { of } from 'rxjs';
 
 describe('AuthService', () => {
 	let service: AuthService;
@@ -60,7 +56,7 @@ describe('AuthService', () => {
 	});
 
 	it('login()', () => {
-		const testUser: User = { username: 'test', password: 'pass' };
+		const testUser: User = { username: 'test', password: 'pass', _id: null };
 		 /* { "iss": "", "iat": 946684800, "exp": 32503680000, "aud": "", "sub": "test",
 			"_id": "123456", "username": "test", "role": "admin" }  */
 
@@ -83,7 +79,7 @@ describe('AuthService', () => {
 	});
 
 	it('login() fail', () => {
-		const testUser: User = { username: 'test', password: 'pass' };
+		const testUser: User = { username: 'test', password: 'pass', _id: null };
 
 		// Subscribe to request
 		service.login(testUser).subscribe(

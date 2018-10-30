@@ -1,8 +1,8 @@
 ﻿
-import { User, AccessRoles } from '@app/models';
+import { User } from '@types';
 
 import {
-	AdminService, AuthService, CMSService, ContentService, HttpService, InterceptorService,
+	AdminService, AuthService, CMSService, HttpService, InterceptorService,
 	IntersectionService, LoadingService, MobileService
 } from '@app/services';
 

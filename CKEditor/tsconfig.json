@@ -3,7 +3,10 @@
 		"outDir": "./dist/out-tsc",
 		"declaration": false,
 		"target": "es6",
-		"lib": [ "es2017" ],
+		"lib": [
+			"es2017",
+			"dom"
+		],
 		"moduleResolution": "node",
 		"module": "es2015",
 		"sourceMap": true,

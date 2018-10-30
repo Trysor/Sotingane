@@ -1,46 +1,27 @@
 import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
-import { ajv, JSchema } from '../libs/validate';
-
-import { UserModel, User, accessRoles } from '../models/user';
-
 import { get as configGet, util as configUtil } from 'config';
 import { sign } from 'jsonwebtoken';
 
-import { status, ROUTE_STATUS, AUTH_STATUS } from '../libs/validate';
+import { status, ajv, JSchema, AUTH_STATUS, validate } from '../libs/validate';
+import { UserModel, UserDoc } from '../models';
+import { User, AccessRoles } from '../../types';
 
-const userTypes: accessRoles[] = [accessRoles.admin, accessRoles.user];
+import { Controller, GET, POST, isProduction } from '../libs/routing';
+import { Auth } from '../libs/auth';
 
-export interface TokenResponse {
-	token: string;
-	user: User;
-}
 
-export class AuthController {
-
-	/**
-	 * Require the user to be at least of the provided role
-	 * @param role
-	 */
-	public static requireRole(role: accessRoles) {
-		return (req: Req, res: Res, next: Next) => {
-			const user = <User>req.user;
-			if (user && (user.isOfRole(role) || user.isOfRole(accessRoles.admin))) {
-				return next();
-			}
-			return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED));
-		};
-	}
-
+export class AuthController extends Controller {
 
 	/**
 	 * Returns a new token for a user in a session which is about to expire, if authorized to do so
 	 * @param  {Req}      req  request
 	 * @param  {Res}     res  response
 	 * @param  {Next} next next
-	 * @return {Res}          server response: object containing token and user
 	 */
-	public static token(req: Req, res: Res): Res {
+	@GET({ path: '/token', do: [Auth.ByToken] })
+	@POST({ path: '/login', do: [validate(JSchema.UserLoginSchema), Auth.ByLogin] })
+	public token(req: Req, res: Res): Res {
 		const user: Partial<User> = { _id: req.user._id, username: req.user.username, role: req.user.role };
 
 		const expires = 10800; // expiresIn in seconds ( = 3hours)
@@ -49,7 +30,6 @@ export class AuthController {
 		return res.cookie('jwt', token, {
 			maxAge: expires * 1000,
 			secure: configUtil.getEnv('NODE_ENV') === 'production',
-			domain: req.hostname,
 			httpOnly: true,
 			sameSite: true
 		}).status(200).send({ token: token, user: user });
@@ -61,12 +41,12 @@ export class AuthController {
 	 * @param  {Req}      req  request
 	 * @param  {Res}     res  response
 	 * @param  {Next} next next
-	 * @return {Res}          server response: object containing token and user
 	 */
-	public static logout(req: Req, res: Res): Res {
+	@POST({ path: '/logout', do: [Auth.ByToken] })
+	public logout(req: Req, res: Res): Res {
 		return res.cookie('jwt', '', {
 			maxAge: 1000, // one second
-			secure: configUtil.getEnv('NODE_ENV') === 'production',
+			secure: isProduction,
 			domain: req.hostname,
 			httpOnly: true,
 			sameSite: true
@@ -79,16 +59,16 @@ export class AuthController {
 	 * @param  {Req}      req  request
 	 * @param  {Res}     res  response
 	 * @param  {Next} next next
-	 * @return {Res}          server response
 	 */
-	public static async register(req: Req, res: Res, next: Next) {
+	@POST({ path: '/register', ignore: isProduction, do: [validate(JSchema.UserRegistrationSchema)] })
+	public async register(req: Req, res: Res, next: Next) { // Not enabled in production for the time being
 		const password: string = req.body.password,
-			role: accessRoles = req.body.role,
+			role: AccessRoles = req.body.role,
 			username: string = req.body.username;
 
 		const userAlreadyExists = await UserModel.findOne({ username_lower: username.toLowerCase() }).lean();
 
-		// check if the email is already in use first
+		// check if the username is already in use first
 		if (userAlreadyExists) { return res.status(409).send(status(AUTH_STATUS.USERNAME_NOT_AVILIABLE)); }
 
 		const user = await new UserModel({
@@ -108,13 +88,17 @@ export class AuthController {
 	 * @param  {Req}      req  request
 	 * @param  {Res}     res  response
 	 * @param  {Next} next next
-	 * @return {Res}          server response:
 	 */
-	public static async updatePassword(req: Req, res: Res, next: Next) {
+	@POST({ path: '/updatepassword', do: [Auth.ByToken, validate(JSchema.UserUpdatePasswordSchema)] })
+	public async updatePassword(req: Req, res: Res, next: Next) {
 		const currentPassword: string = req.body.currentPassword,
 			password: string = req.body.password,
 			confirm: string = req.body.confirm,
-			user: User = <User>req.user;
+			user: UserDoc = <UserDoc>req.user;
+
+		if (password !== confirm) {
+			return res.status(401).send(status(AUTH_STATUS.PASSWORD_DID_NOT_MATCH));
+		}
 
 		const isMatch = await user.comparePassword(currentPassword);
 		if (!isMatch) { return res.status(401).send(status(AUTH_STATUS.PASSWORD_DID_NOT_MATCH)); }
@@ -130,18 +114,16 @@ export class AuthController {
 	 * @param  {Req}      req  request
 	 * @param  {Res}     res  response
 	 * @param  {Next} next next
-	 * @return {Res}          server response
 	 */
-	public static async deleteAccount(req: Req, res: Res, next: Next) {
-		const id: string = req.body.id,
-			user: User = <User>req.user;
+	@POST({ path: '/deleteaccount', ignore: true, do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
+	public async deleteAccount(req: Req, res: Res, next: Next) { // TODO: Implement my security
+		const id: string = req.body.id;
 
-		if (!user.isOfRole(accessRoles.admin)) {
-			return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED));
+		try {
+			await UserModel.findByIdAndRemove(id).lean();
+		} catch (e) {
+			return res.status(400).send(status(AUTH_STATUS.USER_ID_NOT_FOUND));
 		}
-		await UserModel.findByIdAndRemove(id).lean();
-
-		// if (err) { return res.status(400).send(status(AUTH_STATUS.USER_ID_NOT_FOUND)); }
 		return res.status(200).send(status(AUTH_STATUS.ACCOUNT_DELETED));
 	}
 }
@@ -157,7 +139,7 @@ export class AuthController {
 
 // Registration
 const userRegistrationSchema = {
-	'$id': JSchema.UserRegistrationSchema,
+	'$id': JSchema.UserRegistrationSchema.name,
 	'type': 'object',
 	'additionalProperties': false,
 	'properties': {
@@ -166,7 +148,7 @@ const userRegistrationSchema = {
 		},
 		'role': {
 			'type': 'string',
-			'enum': [accessRoles.admin, accessRoles.user]
+			'enum': [AccessRoles.admin, AccessRoles.user]
 		},
 		'password': {
 			'type': 'string'
@@ -176,15 +158,15 @@ const userRegistrationSchema = {
 };
 
 if (ajv.validateSchema(userRegistrationSchema)) {
-	ajv.addSchema(userRegistrationSchema, JSchema.UserRegistrationSchema);
+	ajv.addSchema(userRegistrationSchema, JSchema.UserRegistrationSchema.name);
 } else {
-	console.error(`${JSchema.UserRegistrationSchema} did not validate`);
+	console.error(`${JSchema.UserRegistrationSchema.name} did not validate`);
 }
 
 
 // Login
 const loginSchema = {
-	'$id': JSchema.UserLoginSchema,
+	'$id': JSchema.UserLoginSchema.name,
 	'type': 'object',
 	'additionalProperties': false,
 	'properties': {
@@ -199,16 +181,16 @@ const loginSchema = {
 };
 
 if (ajv.validateSchema(loginSchema)) {
-	ajv.addSchema(loginSchema, JSchema.UserLoginSchema);
+	ajv.addSchema(loginSchema, JSchema.UserLoginSchema.name);
 } else {
-	console.error(`${JSchema.UserLoginSchema} did not validate`);
+	console.error(`${JSchema.UserLoginSchema.name} did not validate`);
 }
 
 
 
 // UpdatePassword
 const userUpdatePasswordSchema = {
-	'$id': JSchema.UserUpdatePasswordSchema,
+	'$id': JSchema.UserUpdatePasswordSchema.name,
 	'type': 'object',
 	'additionalProperties': false,
 	'properties': {
@@ -226,9 +208,9 @@ const userUpdatePasswordSchema = {
 };
 
 if (ajv.validateSchema(userUpdatePasswordSchema)) {
-	ajv.addSchema(userUpdatePasswordSchema, JSchema.UserUpdatePasswordSchema);
+	ajv.addSchema(userUpdatePasswordSchema, JSchema.UserUpdatePasswordSchema.name);
 } else {
-	console.error(`${JSchema.UserUpdatePasswordSchema} did not validate`);
+	console.error(`${JSchema.UserUpdatePasswordSchema.name} did not validate`);
 }
 
 

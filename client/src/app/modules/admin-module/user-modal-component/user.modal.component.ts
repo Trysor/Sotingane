@@ -1,12 +1,14 @@
 import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatSelectChange } from '@angular/material';
-import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 
-import { CMSService, AdminService, AuthService } from '@app/services';
-import { User, AccessRoles, CmsAccess } from '@app/models';
+import { AdminService, AuthService } from '@app/services';
+import { User } from '@types';
+
+import { AccessHandler } from '@app/classes';
 
 import { Subject } from 'rxjs';
+
 
 @Component({
 	selector: 'user-modal',
@@ -19,10 +21,7 @@ export class UserModalComponent {
 	public otherUsernames: string[];
 	public issue = new Subject<string>();
 
-	public accessChoices: CmsAccess[] = [
-		{ value: AccessRoles.user, verbose: 'User', icon: 'verified_user' },
-		{ value: AccessRoles.admin, verbose: 'Admin', icon: 'security' }
-	];
+	public readonly accessHandler = new AccessHandler();
 
 	constructor(
 		public dialogRef: MatDialogRef<UserModalComponent>,

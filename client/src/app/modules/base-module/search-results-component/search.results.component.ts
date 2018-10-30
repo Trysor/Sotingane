@@ -1,9 +1,9 @@
 import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
-import { Router, ActivatedRoute, NavigationEnd, NavigationStart } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
 import { CMSService, MobileService } from '@app/services';
-import { CmsContent, TableSettings, ColumnType, ColumnDir, TableFilterSettings } from '@app/models';
+import { SearchResultContent, TableSettings, ColumnType, TableFilterSettings } from '@types';
 
 import { Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil, take } from 'rxjs/operators';
@@ -17,9 +17,9 @@ import { takeUntil, take } from 'rxjs/operators';
 export class SearchResultsComponent implements OnDestroy {
 	private _ngUnsub = new Subject();
 
-	public data = new BehaviorSubject<CmsContent[]>([]);
+	public data = new BehaviorSubject<SearchResultContent[]>([]);
 
-	public readonly settings: TableSettings<CmsContent> = {
+	public readonly settings: TableSettings<SearchResultContent> = {
 		columns: [
 			{
 				header: ' ',
@@ -27,8 +27,8 @@ export class SearchResultsComponent implements OnDestroy {
 				narrow: true,
 				noSort: true,
 				type: ColumnType.Image,
-				val: c => c.images[0],
-				val2: c => c.images[0]
+				val: c => (c.images && c.images.length > 0) ? c.images[0].url : null,
+				val2: c => (c.images && c.images.length > 0) ? c.images[0].url : null,
 			},
 			{
 				header: 'Title',
@@ -58,7 +58,7 @@ export class SearchResultsComponent implements OnDestroy {
 		mobile: ['title', 'relevance'],
 
 		active: 'relevance',
-		dir: ColumnDir.DESC,
+		dir: 'desc',
 
 		trackBy: (index, c) => c.title,
 		rowClick: c => this.router.navigateByUrl('/' + c.route)
@@ -91,7 +91,7 @@ export class SearchResultsComponent implements OnDestroy {
 	 * Set searchResults helper
 	 */
 	private setResults(term: string) {
-		this.cmsService.searchContent(term).pipe(takeUntil(this._ngUnsub), take(1)).subscribe(
+		this.cmsService.searchContent(term).pipe(take(1), takeUntil(this._ngUnsub)).subscribe(
 			list => this.data.next(Array.isArray(list) ? list : null),
 			err => this.data.next(null)
 		);

@@ -1,4 +1,4 @@
-﻿import { Component, OnDestroy, ChangeDetectionStrategy, ElementRef } from '@angular/core';
+﻿import { OnDestroy, ElementRef } from '@angular/core';
 
 import { IntersectionService } from '@app/services';
 
@@ -19,7 +19,7 @@ export abstract class DynamicLazyLoader implements OnDestroy {
 		this._ngUnsub.next();
 		this._ngUnsub.complete();
 
-		if (this.el && !this._unobserved) {
+		if (this.el && this.inter && !this._unobserved) {
 			this.inter.unobserve(this.el.nativeElement);
 		}
 	}

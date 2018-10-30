@@ -7,9 +7,6 @@ export const API = {
 		token: '/api/auth/token',
 		updatepass: '/api/auth/updatepassword',
 	},
-	steam: {
-		servers: '/api/steam',
-	},
 	cms: {
 		content: '/api/cms',
 		history: '/api/cms/history',
@@ -19,5 +16,7 @@ export const API = {
 		users: '/api/admin/users',
 		cms: '/api/admin/cms',
 		aggregate: '/api/admin/cms/aggregate'
-	}
+	},
+	settings: '/api/settings',
+	theme: '/api/theme'
 };

@@ -1,17 +1,14 @@
 ﻿import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
-import { ajv, JSchema } from '../libs/validate';
+import { status, ajv, JSchema, USERS_STATUS, validate } from '../libs/validate';
+import { User, AccessRoles } from '../../types';
+import { UserModel, UserDoc } from '../models';
 
-import { UserModel, User, accessRoles } from '../models/user';
-
-import { get as configGet } from 'config';
-import { status, ROUTE_STATUS, USERS_STATUS } from '../libs/validate';
-
-const userTypes: accessRoles[] = [accessRoles.admin, accessRoles.user];
+import { Controller, GET, PATCH } from '../libs/routing';
+import { Auth } from '../libs/auth';
 
 
-
-export class UsersController {
+export class UsersController extends Controller {
 
 	/**
 	 * Gets All registered users
@@ -19,7 +16,8 @@ export class UsersController {
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
 	 */
-	public static async getAllUsers(req: Req, res: Res, next: Next) {
+	@GET({ path: '/users/', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
+	public async getAllUsers(req: Req, res: Res, next: Next) {
 		const users = <User[]>await UserModel.find({}, {
 			username: 1, role: 1, createdAt: 1
 		}).lean().sort('username_lower');
@@ -33,9 +31,9 @@ export class UsersController {
 	 * @param  {Res}		res  response
 	 * @param  {Next}		next next
 	 */
-	public static async patchUser(req: Req, res: Res, next: Next) {
+	@PATCH({ path: '/users/:id', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.UserAdminUpdateUser)] })
+	public async patchUser(req: Req, res: Res, next: Next) {
 		const user: User = req.body,
-			adminUser: User = <User>req.user,
 			userId: string = req.params.id,
 			username_low = user.username.toLowerCase();
 
@@ -43,7 +41,7 @@ export class UsersController {
 			return res.status(400).send(status(USERS_STATUS.DATA_UNPROCESSABLE));
 		}
 
-		const patchUser = (err: any, patchingUser: User) => {
+		const patchUser = (err: any, patchingUser: UserDoc) => {
 			if (err) { return res.status(400).send(status(USERS_STATUS.DATA_UNPROCESSABLE)); }
 
 			patchingUser.username = user.username;
@@ -73,8 +71,14 @@ export class UsersController {
 	}
 }
 
+/*
+ |--------------------------------------------------------------------------
+ | JSON schema
+ |--------------------------------------------------------------------------
+*/
+
 const userAdminUpdateUser = {
-	'$id': JSchema.UserAdminUpdateUser,
+	'$id': JSchema.UserAdminUpdateUser.name,
 	'type': 'object',
 	'additionalProperties': false,
 	'properties': {
@@ -88,15 +92,15 @@ const userAdminUpdateUser = {
 		},
 		'role': {
 			'type': 'string',
-			'enum': [accessRoles.admin, accessRoles.user]
+			'enum': [AccessRoles.admin, AccessRoles.user]
 		}
 	},
 	'required': ['_id', 'username', 'role']
 };
 
 if (ajv.validateSchema(userAdminUpdateUser)) {
-	ajv.addSchema(userAdminUpdateUser, JSchema.UserAdminUpdateUser);
+	ajv.addSchema(userAdminUpdateUser, JSchema.UserAdminUpdateUser.name);
 } else {
-	console.error(`${JSchema.UserAdminUpdateUser} did not validate`);
+	console.error(`${JSchema.UserAdminUpdateUser.name} did not validate`);
 }
 

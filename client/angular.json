@@ -28,7 +28,11 @@
 							"src/robots.txt"
 						],
 						"styles": [
-							"src/app/app.scss"
+							"src/app/app.scss",
+							{
+								"input": "src/app/scss/lazy.scss",
+								"lazy": true
+							}
 						],
 						"scripts": []
 					},

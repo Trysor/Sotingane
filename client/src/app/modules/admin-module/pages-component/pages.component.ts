@@ -3,8 +3,9 @@ import { Component, Optional, OnDestroy, ChangeDetectionStrategy } from '@angula
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
-import { CmsContent, AccessRoles, TableSettings, ColumnType, ColumnDir } from '@app/models';
-import { ModalService, CMSService, AdminService, MobileService } from '@app/services';
+import { ModalService, SettingsService, AdminService } from '@app/services';
+
+import { Content, TableSettings, ColumnType } from '@types';
 
 import { AccessHandler } from '@app/classes';
 
@@ -19,18 +20,18 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class PagesComponent implements OnDestroy {
 	private _ngUnsub = new Subject();
-	public data = new BehaviorSubject<CmsContent[]>(null);
+	public data = new BehaviorSubject<Content[]>(null);
 
 	private readonly _accessHandler = new AccessHandler();
 
-	public readonly settings: TableSettings<CmsContent> = {
+	public readonly settings: TableSettings<Content> = {
 		columns: [
 			{
 				header: '',
 				property: 'edit',
 				noSort: true,
 				type: ColumnType.InternalLink,
-				icon: () => 'mode_edit',
+				icon: { val: () => 'mode_edit' },
 				noText: true,
 				func: c => `/compose/${c.route}`,
 				narrow: true,
@@ -51,8 +52,8 @@ export class PagesComponent implements OnDestroy {
 			{
 				header: 'Access',
 				property: 'access',
-				icon: c => this._accessHandler.getAccessChoice(c.access).icon,
-				val: c => this._accessHandler.getAccessChoice(c.access).verbose
+				icon: { val: c => this._accessHandler.getAccessChoice(c.access).icon },
+				val: c => this._accessHandler.getAccessChoice(c.access).single
 			},
 			{
 				header: 'Published',
@@ -78,18 +79,20 @@ export class PagesComponent implements OnDestroy {
 				property: 'delete',
 				noSort: true,
 				type: ColumnType.Button,
-				icon: () => 'delete',
-				color: 'warn',
+				icon: {
+					val: () => 'delete',
+					color: 'warn'
+				},
 				noText: true,
 				func: c => this.modalService.openDeleteContentModal(c),
-				disabled: c => c.route === 'home',
+				disabled: c => c.route === this.settingsService.settings.getValue().indexRoute,
 				narrow: true
 			}
 		],
 		mobile: ['title', 'views', 'edit'],
 
 		active: 'title',
-		dir: ColumnDir.ASC,
+		dir: 'asc',
 
 		trackBy: (index, item) => item.route,
 		rowClick: c => this.router.navigateByUrl('/' + c.route)
@@ -101,7 +104,7 @@ export class PagesComponent implements OnDestroy {
 	constructor(
 		@Optional() private modalService: ModalService,
 		private router: Router,
-		private cmsService: CMSService,
+		private settingsService: SettingsService,
 		private adminService: AdminService,
 		private datePipe: DatePipe) {
 

@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { CanActivate, CanLoad, Router } from '@angular/router';
 
 import { AuthService } from '@app/services';
-import { AccessRoles } from '@app/models';
+import { AccessRoles } from '@types';
 
 @Injectable({ providedIn: 'root' })
-export class AdminGuard implements CanActivate {
+export class AdminGuard implements CanActivate, CanLoad {
 
 	constructor(
 		private authService: AuthService,
@@ -23,6 +23,10 @@ export class AdminGuard implements CanActivate {
 			this.router.navigateByUrl('/');
 		}
 		return accessGranted;
+	}
+
+	canLoad() {
+		return this.canActivate();
 	}
 
 }

@@ -13,11 +13,14 @@ const sanitizeOptions: sanitizeHtml.IOptions = {
 		'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',
 		'table', 'thead', 'tbody', 'tr', 'th', 'td', 'pre',
 		'figure', 'caption', 'figcaption', 'img',
+		'oembed'
 	],
 	allowedAttributes: {
-		'a': ['href'],
 		'*': ['class', 'style'],
+		'a': ['href'],
 		'img': ['src', 'alt'],
+		'div': ['data-oembed-url'],
+		'oembed': ['url']
 	},
 	allowedSchemesByTag: {
 		'a': ['http', 'https', 'steam']
@@ -50,4 +53,4 @@ const stripOptions = {
  * @param  {string} htmlInput       the HTML to sanitize
  * @return {string}                 plain text output
  */
-export const stripHTML = (htmlInput: string) => sanitizeHtml(htmlInput, stripOptions).trim().replace(/ {1,}/g, ' ');
+export const stripHTML = (htmlInput: string): string => sanitizeHtml(htmlInput, stripOptions).trim().replace(/ {1,}/g, ' ');

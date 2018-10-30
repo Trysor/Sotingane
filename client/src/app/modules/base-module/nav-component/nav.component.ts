@@ -1,10 +1,9 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 
-import { CmsContent, CmsFolder } from '@app/models';
+import { Content, CmsFolder } from '@types';
 import { CMSService, MobileService } from '@app/services';
 
-import { Subject, BehaviorSubject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
 	selector: 'nav-component',
@@ -13,19 +12,17 @@ import { takeUntil } from 'rxjs/operators';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NavComponent {
-	private _ngUnsub = new Subject();
-
 	private _contentSubject = new BehaviorSubject(null);
 
 	public get contentSubject() { return this._contentSubject; }
 
 	/**
-	 * Sort arrangement function for CmsContent, CmsFolders and SteamServer, based on either's title.
-	 * @param  {CmsContent | CmsFolder}   a object to be sorted
-	 * @param  {CmsContent | CmsFolder}   b object to be sorted
+	 * Sort arrangement function for Content, CmsFolders and SteamServer, based on either's title.
+	 * @param  {Content | CmsFolder}   a object to be sorted
+	 * @param  {Content | CmsFolder}   b object to be sorted
 	 * @return {number}                                 a's relative position to b.
 	 */
-	private static sortMethod(a: CmsContent | CmsFolder, b: CmsContent | CmsFolder): number {
+	private static sortMethod(a: Content | CmsFolder, b: Content | CmsFolder): number {
 		return a.title.localeCompare(b.title);
 	}
 
@@ -39,13 +36,13 @@ export class NavComponent {
 	}
 
 	/**
-	 * Creates and organizes the navigation tree from the CmsContent list provided
-	 * @param  {CmsContent[]} contentList the CmsContent list to create the nav tree from
+	 * Creates and organizes the navigation tree from the Content list provided
+	 * @param  {Content[]} contentList the Content list to create the nav tree from
 	 */
-	private updateContentList(contentList: CmsContent[]) {
+	private updateContentList(contentList: Content[]) {
 		if (!contentList) { return; }
 
-		const rootContent: CmsContent[] = [];
+		const rootContent: Content[] = [];
 		const folders: CmsFolder[] = [];
 		for (const content of contentList) { // (nav is filtered server-side)
 			if (!content.folder) {
@@ -76,10 +73,10 @@ export class NavComponent {
 	/**
 	 * Helper function for angular's *ngFor
 	 * @param  {number}                   index the index of the item to track
-	 * @param  {CmsContent | CmsFolder}   item the item tracked
+	 * @param  {Content | CmsFolder}   item the item tracked
 	 * @return {string}                   the item's title; used for tracking
 	 */
-	trackBy(index: number, item: CmsContent | CmsFolder): string {
+	trackBy(index: number, item: Content | CmsFolder): string {
 		return item.title;
 	}
 }

@@ -9,46 +9,68 @@
 	*
 -->
 
-<form [formGroup]="settingsForm" id="settingsForm" class="settingsForm" autocomplete="off"
-	  [ngClass]="{ mobile: (mobileService.isMobile() | async) }" (ngSubmit)="submitForm()">
-
-
+<form [formGroup]="settingsForm" id="settingsForm" class="settingsForm" autocomplete="off" (ngSubmit)="submitForm()">
 	<sectionwrapper-component>
-		<!-- Content Management SECTION -->
-		<section-component header="Content Management">
-			<!-- showAuthorDetails -->
+
+		<section-component header="Organization">
 			<div class="field">
-				<mat-checkbox formControlName="showAuthorDetails" class="full" labelPosition="before">
-					<span class="checkLabel">Show content author details</span>
-				</mat-checkbox>
+				<mat-form-field appearance="outline">
+					<mat-label>Organization name</mat-label>
+					<input matInput id="org" formControlName="org" type="text" autocomplete="off" required>
+				</mat-form-field>
+			</div>
+		</section-component>
+
+		<section-component header="Meta" formGroupName="meta">
+			<div class="field">
+				<mat-form-field appearance="outline">
+					<mat-label>Title</mat-label>
+					<input matInput id="metaTitle" formControlName="title" type="text" autocomplete="off" required>
+				</mat-form-field>
 			</div>
 
 			<div class="field">
-				<label for="something">test</label>
-				<mat-form-field>
-					<input matInput id="something" type="text"> <!--  formControlName="something" -->
+				<mat-form-field appearance="outline">
+					<mat-label>Description</mat-label>
+					<input matInput id="metaDesc" formControlName="desc" type="text" autocomplete="off" required>
 				</mat-form-field>
 			</div>
 		</section-component>
 
 
-		<section-component header="Some Other Section">
-			<p>Test</p>
+		<section-component header="Footer" formGroupName="footer">
+			<div class="field">
+				<mat-form-field appearance="outline">
+					<mat-label>Footer text</mat-label>
+					<textarea matInput id="footerText" formControlName="text" type="text" autocomplete="off" required
+							  mat-autosize matAutosizeMaxRows="10">
+					</textarea>
+				</mat-form-field>
+			</div>
+
+			<div class="field">
+				<mat-form-field appearance="outline">
+					<mat-label>Copyright notice</mat-label>
+					<input matInput id="footerCopyright" formControlName="copyright" type="text" autocomplete="off" required>
+				</mat-form-field>
+			</div>
 		</section-component>
 
-		<section-component header="Some third">
-			<div style="height: 200px;"></div>
+		<!-- Content Management SECTION -->
+		<section-component header="Content Management">
+			<!-- Index Route -->
+			<div class="field">
+				<mat-form-field appearance="outline">
+					<mat-label>Index Route</mat-label>
+					<input matInput id="indexRoute" formControlName="indexRoute" type="text" autocomplete="off" required>
+				</mat-form-field>
+			</div>
 		</section-component>
-
-		<section-component header="etc">
-			<p>mad man maximus</p>
-		</section-component>
-
 	</sectionwrapper-component>
 </form>
 
 <div class="submitbox">
-	<button mat-raised-button type="submit" form="settingsForm" [disabled]="(!settingsForm.valid || !settingsForm.dirty)">
+	<button mat-raised-button type="submit" color="primary" form="settingsForm" [disabled]="(!settingsForm.valid || !settingsForm.dirty)">
 		Save
 	</button>
 </div>

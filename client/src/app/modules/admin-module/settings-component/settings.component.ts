@@ -1,7 +1,12 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 
-import { MobileService } from '@app/services';
+import { SettingsService } from '@app/services/controllers/settings.service';
+
+import { Settings } from '@types';
+
+import { Subject } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
 
 
 @Component({
@@ -10,20 +15,47 @@ import { MobileService } from '@app/services';
 	styleUrls: ['./settings.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SettingsComponent {
+export class SettingsComponent implements OnDestroy {
+
 	public settingsForm: FormGroup;
 
+	private _ngUnsub = new Subject();
+
 	constructor(
-		public mobileService: MobileService,
+		private settingsService: SettingsService,
 		private fb: FormBuilder) {
 
 		this.settingsForm = fb.group({
-			'showAuthorDetails': [true, Validators.required],
+			'indexRoute': ['', Validators.required],
+			'org': ['', Validators.required],
+			'meta': fb.group({
+				'title': ['', Validators.required],
+				'desc': ['', Validators.required]
+			}),
+			'footer': fb.group({
+				'text': ['', Validators.required],
+				'copyright': ['', Validators.required]
+			})
+		});
+
+		this.settingsService.updateSettings();
+
+		this.settingsService.settings.pipe(takeUntil(this._ngUnsub)).subscribe( newSettings => {
+			this.settingsForm.setValue(newSettings);
 		});
 	}
 
+	ngOnDestroy() {
+		this._ngUnsub.next();
+		this._ngUnsub.complete();
+	}
 
 	public submitForm() {
-
+		const settings: Settings = this.settingsForm.getRawValue();
+		console.log(settings);
+		this.settingsService.postSettings(settings).pipe(take(1)).subscribe(
+			() => this.settingsService.settings.next(settings),
+			err => { console.log('err', err); }
+		);
 	}
 }
