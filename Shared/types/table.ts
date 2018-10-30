@@ -1,6 +1,4 @@
-﻿import { BehaviorSubject } from '../../Client/node_modules/rxjs';
-
-export interface TableSettings<T> {
+﻿export interface TableSettings<T> {
 	columns: ColumnSettings<T>[];
 	mobile: Column<T>[];
 
@@ -16,7 +14,7 @@ export interface TableSettings<T> {
 export interface TableFilterSettings {
 	placeholder?: string;
 	func?: (term: string) => void;
-	hidden?: BehaviorSubject<boolean>;
+	hidden?: any; // BehaviorSubject<boolean>;
 }
 
 export interface ColumnSettings<T> {
