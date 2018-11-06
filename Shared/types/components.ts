@@ -1,4 +1,4 @@
-import { Content } from './content';
+import { Content, ImageContentData } from './content';
 export interface DynamicComponent {
 	buildJob(el?: Element, content?: Content): void;
 }
@@ -15,8 +15,6 @@ export interface ModalData {
 }
 
 export interface ImageModalData {
-	src: string;
-	alt: string;
-	images?: string[];
-	index?: number;
+	images: ImageContentData[];
+	startIndex: number;
 }

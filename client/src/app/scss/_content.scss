@@ -68,15 +68,14 @@ $figure-margin: 0.8em;
 	figure.image {
 		text-align: center;
 		position: relative;
-		transition: $lazy-transition;
 
 		border: var(--border);
 		background: var(--color-sidepanel);
 
 		// Lazy-load pre-sizing to fill space.
 		&.lazy {
-			opacity: 0;
 			img {
+				opacity: 0;
 				height: 0;
 			}
 		}
@@ -97,6 +96,7 @@ $figure-margin: 0.8em;
 		}
 
 		img {
+			transition: $lazy-transition;
 			display: block;
 			margin: 0;
 			width: 100%;
@@ -117,7 +117,7 @@ $figure-margin: 0.8em;
 			width: calc(50% - #{$figure-margin});
 			margin-top: 0;
 		}
-
+		
 		&.image-style-align-left {
 			margin-right: $figure-margin;
 			float: left;

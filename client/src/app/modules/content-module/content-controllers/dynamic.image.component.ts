@@ -26,6 +26,8 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 	private _imgEl: HTMLImageElement;
 	private readonly _sources: PictureSource[] = [];
 
+	private _content: Content;
+
 	constructor(
 		private elRef: ElementRef<HTMLElement>,
 		private inters: IntersectionService,
@@ -38,6 +40,8 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 	}
 
 	buildJob(el, content: Content): void {
+		this._content = content;
+
 		this._imgEl = this.elRef.nativeElement.querySelector('img');
 		const src: string = this._imgEl.attributes['data-src'].nodeValue;
 		this.renderer.removeAttribute(this._imgEl, 'data-src');
@@ -52,7 +56,7 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 		}
 
 		// Add lazy tag
-		if (this.platform.isBrowser) { this.renderer.addClass(this.elRef.nativeElement, 'lazy'); }
+		this.renderer.addClass(this.elRef.nativeElement, 'lazy');
 
 		this._sources.push({ media: null, src: src });
 
@@ -67,9 +71,7 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 			}
 		});
 
-		if (this.platform.isServer) {
-			this.load();
-		} else {
+		if (!this.platform.isServer) {
 			this.hookLazyLoader(this.elRef.nativeElement);
 		}
 	}
@@ -93,6 +95,9 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 
 		// this.sources[0] is auto-format original-sized image
 		const altAttr = this._imgEl.attributes['alt'];
-		this.modalService.openImageModal({ src: this._sources[0].src, alt: altAttr ? altAttr.nodeValue : '' });
+		this.modalService.openImageModal({
+			startIndex: this._content.images.map(i => i.url).indexOf(this._sources[0].src),
+			images: this._content.images
+		});
 	}
 }

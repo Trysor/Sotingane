@@ -77,6 +77,6 @@ export class ModalService {
 	 * @param data
 	 */
 	public openImageModal(data: ImageModalData) {
-		this.dialog.open(ImageModalComponent, <MatDialogConfig>{ data: data, panelClass: 'imagemodal' });
+		this.dialog.open(ImageModalComponent, <MatDialogConfig>{ data: data, panelClass: 'imagemodal', autoFocus: false });
 	}
 }
