@@ -1,8 +1,4 @@
 ﻿import { Injectable, ElementRef, Injector, ComponentRef, ComponentFactory, ComponentFactoryResolver } from '@angular/core';
-import { Meta, Title } from '@angular/platform-browser';
-
-import { SettingsService } from '@app/services/controllers/settings.service';
-import { CMSService } from '@app/services/controllers/cms.service';
 
 import { Content, DynamicComponent } from '@types';
 
@@ -17,58 +13,14 @@ export class ContentService {
 	private readonly _embeddedComponents: ComponentRef<DynamicComponent>[] = [];
 
 	constructor(
-		private cmsService: CMSService,
-		private settingsService: SettingsService,
 		private resolver: ComponentFactoryResolver,
-		private injector: Injector,
-		private title: Title,
-		private meta: Meta) {
+		private injector: Injector) {
 
 		// Map the tag to replace with the corresponding factory
 		this._dynamicContent.set('a', this.resolver.resolveComponentFactory(DynamicLinkComponent));
 		this._dynamicContent.set('figure.media', this.resolver.resolveComponentFactory(DynamicMediaComponent));
 		this._dynamicContent.set('figure.image', this.resolver.resolveComponentFactory(DynamicImageComponent));
-
-		this.cmsService.content.subscribe( content => {
-			if (!!content) {
-				this.setContentMeta(content);
-			} else {
-				this.setDefaultMeta();
-			}
-		});
-
-		this.settingsService.settings.subscribe( settings => {
-			const content = this.cmsService.content.getValue();
-			if (!!content) {
-				this.setContentMeta(content);
-			} else {
-				this.setDefaultMeta();
-			}
-		});
 	}
-
-	// ---------------------------------------
-	// ---------- META DATA METHODS ----------
-	// ---------------------------------------
-
-	/**
-	 * Sets metadata to the default values provided in the environment variables
-	 */
-	private setDefaultMeta() {
-		this.title.setTitle(this.settingsService.settings.getValue().meta.title);
-		this.meta.updateTag({ name: 'description', content: this.settingsService.settings.getValue().meta.desc });
-	}
-
-
-	/**
-	 * Sets metadata based on content
-	 * @param Content
-	 */
-	private setContentMeta(content: Content) {
-		this.meta.updateTag({ name: 'description', content: content.description });
-		this.title.setTitle(`${this.settingsService.settings.getValue().meta.title} - ${content.title}`);
-	}
-
 
 	// ---------------------------------------
 	// ----------- CONTENT METHODS -----------
@@ -100,7 +52,7 @@ export class ContentService {
 			for (let i = 0; i < elems.length; i++) {
 				const el = elems.item(i);
 				const origEl = <Element>el.cloneNode(true);
-				const savedTextContent = el.textContent; // save text content before we modify the element
+
 				// convert NodeList into an array, since Angular dosen't like having a NodeList passed for projectableNodes
 				const comp = fac.create(this.injector, [Array.prototype.slice.call(el.childNodes)], el);
 				// only static ones work here since this is the only time they're set
