@@ -40,6 +40,7 @@ import { AuthGuard, AdminGuard, LoginGuard, RedirectGuard } from '@app/guards';
 					// CMS routes
 					{ path: '', pathMatch: 'full', children: [], canActivate: [RedirectGuard] },
 					{ path: ':content', component: ContentComponent },
+					{ path: '**', children: [], canActivate: [RedirectGuard] }
 				]
 			},
 		])

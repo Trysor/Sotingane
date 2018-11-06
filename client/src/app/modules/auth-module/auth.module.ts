@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 
 // Router
-import { AuthRoutingModule } from './auth.routing-module';
+import { RouterModule } from '@angular/router';
 
 // Modules
 import { SharedModule } from '@app/modules/shared-module/shared.module';
@@ -18,7 +18,7 @@ import { AuthComponent } from './auth-component/auth.component';
 		AuthComponent
 	],
 	imports: [
-		AuthRoutingModule,
+		RouterModule.forChild([ { path: '', component: AuthComponent, pathMatch: 'full' } ]),
 		SharedModule,
 		CommonModule
 	]
