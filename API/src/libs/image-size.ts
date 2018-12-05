@@ -12,9 +12,8 @@ export class ImageSize {
 	 */
 	public static async sizeOf(url: string) {
 		try {
-			const imageInfo = await new Promise<ImageContentData>((resolve, reject) => {
+			return await new Promise<ImageContentData>((resolve, reject) => {
 				let req: ClientRequest;
-
 				const responseHandler = (res: IncomingMessage) => {
 					const chunks: any[] = [];
 					res.on('data', chunk => {
@@ -23,9 +22,13 @@ export class ImageSize {
 							req.abort();
 						}
 					}).on('end', () => {
-						const data = <ImageContentData>sizeOf(Buffer.concat(chunks));
-						data.url = url;
-						resolve(data);
+						try {
+							const data = <ImageContentData>sizeOf(Buffer.concat(chunks));
+							data.url = url;
+							resolve(data);
+						} catch (e) {
+							reject(e);
+						}
 					}).on('error', (err) => reject(err));
 				};
 
@@ -37,7 +40,6 @@ export class ImageSize {
 
 				req.on('error', (err) => reject(err));
 			});
-			return imageInfo;
 		} catch (err) {
 			return null;
 		}
