@@ -19,7 +19,8 @@
 			"@env": [ "environments/environment" ],
 			"@app/ckeditor": [ "../../CKEditor" ],
 			"@types": [ "../../Shared/types" ],
-			"@global": [ "../../Shared/global.settings" ]
+			"@global": [ "../../Shared/global.settings" ],
+			"tslib": [ "../node_modules/tslib"]
 		},
 		"lib": [
 			"es2017",
