@@ -32,7 +32,7 @@ class TestBedSingleton {
 		this._http = request(app).keepOpen();
 
 		const mocha = new Mocha();
-		const path = pathjoin('dist', 'out-tsc', 'api', 'test');
+		const path = pathjoin('dist', 'out-tsc', 'API', 'test');
 		readdirSync(path).filter((file) => file.endsWith('.test.js')).forEach((file) => {
 			mocha.addFile(pathjoin(path, file));
 		});
