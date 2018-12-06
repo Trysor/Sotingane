@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import {
 	MatListModule,
 	MatIconModule,
+	MatProgressSpinnerModule,
 	MatProgressBarModule,
 	MatSidenavModule,
 	MatPaginatorModule,
@@ -21,6 +22,7 @@ import {
 	exports: [
 		MatListModule,
 		MatIconModule,
+		MatProgressSpinnerModule,
 		MatProgressBarModule,
 		MatSidenavModule,
 		MatPaginatorModule,

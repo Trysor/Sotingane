@@ -4,6 +4,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { ModalService, AuthService } from '@app/services';
 import { UpdatePasswordUser, ModalData } from '@types';
+import { take } from 'rxjs/operators';
 
 
 @Component({
@@ -32,7 +33,7 @@ export class ChangePasswordComponent {
 	 */
 	public submitForm() {
 		const user: UpdatePasswordUser = this.changePasswordForm.value;
-		const sub = this.authService.updatePassword(user).subscribe(
+		this.authService.updatePassword(user).pipe(take(1)).subscribe(
 			result => {
 				if (result) {
 					this.changePasswordForm.reset();
@@ -40,10 +41,9 @@ export class ChangePasswordComponent {
 					this.router.navigateByUrl('/');
 				}
 				this.modalService.openPasswordChangeModal(result);
-				sub.unsubscribe();
 			},
 			error => {
-				sub.unsubscribe();
+				// TODO: inform user
 			}
 		);
 	}

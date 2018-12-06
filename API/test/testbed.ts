@@ -7,7 +7,7 @@ import * as Mocha from 'mocha';
 import { readdirSync } from 'fs';
 import { join as pathjoin } from 'path';
 
-import { ContentModel, LogModel, SettingsModel, UserModel, UserDoc } from '../src/models';
+import { ContentModel, LogModel, SettingsModel, UserModel, ThemeModel, UserDoc } from '../src/models';
 import { User, UserToken, AccessRoles } from '../types';
 
 import app from '../src/app';
@@ -32,7 +32,7 @@ class TestBedSingleton {
 		this._http = request(app).keepOpen();
 
 		const mocha = new Mocha();
-		const path = pathjoin('dist', 'out-tsc', 'api', 'test');
+		const path = pathjoin('dist', 'out-tsc', 'API', 'test');
 		readdirSync(path).filter((file) => file.endsWith('.test.js')).forEach((file) => {
 			mocha.addFile(pathjoin(path, file));
 		});
@@ -46,7 +46,8 @@ class TestBedSingleton {
 				UserModel.deleteMany({}).exec(),
 				ContentModel.deleteMany({}).exec(),
 				LogModel.deleteMany({}).exec(),
-				SettingsModel.deleteMany({}).exec()
+				SettingsModel.deleteMany({}).exec(),
+				ThemeModel.deleteMany({}).exec()
 			]);
 
 			// Create new users and log them in

@@ -13,7 +13,7 @@ $app-accent-map: ( 1: #{var(--app-acc-1)}, 2: #{var(--app-acc-2)}, 3: #{var(--ap
 $app-primary: ($app-primary-map, 1, 2, 3);
 $app-accent: ($app-accent-map, 1, 2, 3);
 
-
+$cdk-overlay-dark-backdrop-background: rgba(0, 0, 0, 0.5);
 
 // ---------------------------------------
 // ---------------- THEME ----------------

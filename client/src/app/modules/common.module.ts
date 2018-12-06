@@ -5,7 +5,6 @@ import {
 	MatSelectModule,
 	MatCheckboxModule,
 	MatExpansionModule,
-	MatProgressSpinnerModule,
 	MatTabsModule,
 	MatDatepickerModule
 } from '@angular/material';
@@ -16,7 +15,6 @@ import {
 		MatSelectModule,
 		MatCheckboxModule,
 		MatExpansionModule,
-		MatProgressSpinnerModule,
 		MatTabsModule,
 		MatDatepickerModule
 	]

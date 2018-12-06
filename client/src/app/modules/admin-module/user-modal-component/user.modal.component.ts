@@ -8,6 +8,7 @@ import { User } from '@types';
 import { AccessHandler } from '@app/classes';
 
 import { Subject } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 
 @Component({
@@ -49,16 +50,14 @@ export class UserModalComponent {
 		const user: User = this.patchUserForm.value;
 		user._id = this.data.user._id;
 
-		const sub = this.adminService.patchUser(user).subscribe(
+		this.adminService.patchUser(user).pipe(take(1)).subscribe(
 			() => {
 				this.issue.next(null);
 				this.dialogRef.close(true);
-				sub.unsubscribe();
 			},
 			() => {
 				this.issue.next('Could not save the user.');
 				this.patchUserForm.enable();
-				sub.unsubscribe();
 			}
 		);
 	}

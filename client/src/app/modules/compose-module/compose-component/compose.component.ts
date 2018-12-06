@@ -15,7 +15,7 @@ import { CONTENT_MAX_LENGTH } from '@global';
 import { FormErrorInstant, AccessHandler } from '@app/classes';
 
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, take } from 'rxjs/operators';
 
 enum VersionHistory { Draft = -1 }
 
@@ -217,9 +217,8 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 
 		// Helper
 		const onSubmit = (obs: Observable<Content>) => {
-			const sub = obs.subscribe(
+			obs.pipe(take(1)).subscribe(
 				newContent => {
-					sub.unsubscribe();
 					if (newContent) {
 						this.cmsService.getContentList(true);
 						this._hasSaved = true;
@@ -233,7 +232,6 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 				},
 				error => {
 					// TODO: Tell the user why it failed
-					sub.unsubscribe();
 				},
 			);
 		};

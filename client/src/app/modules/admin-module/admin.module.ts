@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 
 // Router
-import { AdminRoutingModule } from './admin.routing-module';
+import { RouterModule } from '@angular/router';
 
 // Modules
 import { SharedModule } from '@app/modules/shared-module/shared.module';
@@ -28,7 +28,7 @@ import { UserModalComponent } from './user-modal-component/user.modal.component'
 	imports: [
 		SharedModule,
 		CommonModule,
-		AdminRoutingModule
+		RouterModule.forChild([ { path: '', component: AdminComponent }	])
 	],
 	entryComponents: [
 		UserModalComponent

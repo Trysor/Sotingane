@@ -35,15 +35,16 @@
 
 .editor {
 	box-sizing: border-box;
-	margin: 0;
 	overflow: hidden;
 	display: block;
 
 	::ng-deep .ck-content.ck-editor__editable {
+		padding: 10px 0;
 		min-height: 245px;
-		background: var(--color-shade);
-		border-color: var(--color-border);
-	}
+		background: none;
+		border: var(--border);
+		border-style: none none solid none;
+	} 
 }
 
 ::ng-deep :root {

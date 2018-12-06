@@ -1,4 +1,6 @@
-﻿import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
+﻿import { Component, OnInit, Input, ChangeDetectionStrategy, HostBinding, HostListener } from '@angular/core';
+
+import { Router, ActivatedRoute, RouterLinkWithHref } from '@angular/router';
 
 import { DynamicComponent } from '@types';
 import { PlatformService } from '@app/services/utility/platform.service';
@@ -6,32 +8,36 @@ import { PlatformService } from '@app/services/utility/platform.service';
 
 @Component({
 	selector: 'router-link',
-	template: `
-		<ng-container [ngSwitch]="isRemoteUrl">
-			<a *ngSwitchCase="true" [href]="link">{{text}}</a>
-			<a *ngSwitchCase="false" [routerLink]="link">{{text}}</a>
-		</ng-container>`,
+	template: `{{text}}`,
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DynamicLinkComponent implements DynamicComponent, OnInit {
 	private _isRemoteUrl = true;
-
-	@Input() link: string;
+	@Input() @HostBinding('attr.href') link: string;
 	@Input() text: string;
+
+	@HostListener('click', ['$event']) onclick(e: MouseEvent) {
+		if (this._isRemoteUrl) { return; }
+
+		e.stopPropagation();
+		e.preventDefault();
+		this.router.navigateByUrl(this.link);
+	}
 
 	public get isRemoteUrl(): boolean { return this._isRemoteUrl; }
 
 
-	constructor(private platform: PlatformService) { }
+	constructor(private router: Router, private platform: PlatformService) {}
 
 	ngOnInit() {
+		if (!this.link || this.link.length === 0) { return; }
+
 		if (this.platform.document) {
 			const origin = this.platform.document.location.origin;
-			if (this.link.startsWith('/') || this.link.startsWith(origin)) {
-				this.link = this.link.replace(origin, '');
-				this._isRemoteUrl = false;
-			}
+			this.link = this.link.replace(origin, '');
 		}
+
+		this._isRemoteUrl = !this.link.startsWith('/');
 	}
 
 	/**

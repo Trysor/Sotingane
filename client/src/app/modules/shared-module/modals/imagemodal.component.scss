@@ -7,6 +7,8 @@
 		background: none;
 		box-shadow: none;
 
+		overflow: visible !important;
+
 		img {
 			pointer-events: initial !important;
 		}
@@ -26,7 +28,65 @@
 		min-width: 80vw;
 		width: calc(100% + 48px);
 		margin: -24px;
-		-o-object-fit: contain;
 		object-fit: contain;
+	}
+}
+
+.load {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+
+.panel {
+	position: absolute;
+	top: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	&.index {
+		display: none;
+		right: 0; left: 0;
+		margin-top: -8vh;
+
+		span {
+			font-size: 1.5em;
+			text-shadow: 0 0 0.2em #000;
+		}
+	}
+	&.prev { left: 0; margin-left: -16vh; }
+	&.next { right: 0; margin-right: -16vh; }
+	&.prev, &.next {
+		width: 10vw;
+		bottom: 0;
+	}
+
+	button,
+	mat-icon {
+		height: 5vw;
+		width: 5vw;
+	}
+	mat-icon {
+		font-size: 5vw;
+		line-height: 5vw;
+		text-shadow: 0 0 0.2em #000;
+	}
+
+	button {
+		opacity: 0.15;
+		transition: opacity 0.15s ease-in-out;
+		pointer-events: initial !important;
+		&:not([disabled]):hover,
+		&.cdk-focused {
+			opacity: 1;
+		}
 	}
 }

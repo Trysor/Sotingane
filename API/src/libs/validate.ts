@@ -2,25 +2,6 @@ import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 import * as Ajv from 'ajv';
 import { ErrorObject } from 'ajv';
 
-export interface StatusMessage {
-	message: string;
-	errors?: ErrorMessage[];
-}
-interface ErrorMessage {
-	property?: string;
-	error: string;
-	params: Ajv.ErrorParameters;
-}
-
-interface SchemaValidation {
-	[key: string]: SchemaValidationObject;
-}
-
-interface SchemaValidationObject {
-	name: string;
-	err: VALIDATION_FAILED;
-}
-
 /*
  |--------------------------------------------------------------------------
  | AJV
@@ -170,4 +151,24 @@ export const enum THEME_STATUS {
 	DATA_UNPROCESSABLE = 'The provided data could not be processed',
 	THEME_UPDATED = 'Theme has been updated successfully',
 	THEME_NONE_FOUND = 'Could not find theme',
+}
+
+
+export interface StatusMessage {
+	message: string;
+	errors?: ErrorMessage[];
+}
+interface ErrorMessage {
+	property?: string;
+	error: string;
+	params: Ajv.ErrorParameters;
+}
+
+interface SchemaValidation {
+	[key: string]: SchemaValidationObject;
+}
+
+interface SchemaValidationObject {
+	name: string;
+	err: VALIDATION_FAILED;
 }

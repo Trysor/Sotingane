@@ -3,7 +3,7 @@
 import { IntersectionService } from '@app/services';
 
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, take, filter } from 'rxjs/operators';
 
 
 export abstract class DynamicLazyLoader implements OnDestroy {
@@ -30,15 +30,17 @@ export abstract class DynamicLazyLoader implements OnDestroy {
 	 */
 	public hookLazyLoader(elem: HTMLElement) {
 		// Hook
-		const sub = this.inter.targets.pipe(takeUntil(this._ngUnsub)).subscribe(entries => {
-			const index = entries.map(entry => entry.target).indexOf(elem);
-			if (index === -1 || !entries[index].isIntersecting) { return; }
-
+		this.inter.targets.pipe(
+			filter(entries => {
+				const index = entries.map(entry => entry.target).indexOf(elem);
+				return !(index === -1 || !entries[index].isIntersecting);
+			}),
+			take(1), takeUntil(this._ngUnsub)
+		).subscribe(() => {
 			// Load our lazy target
 			this._unobserved = true;
 			this.inter.unobserve(elem);
 			this.load();
-			sub.unsubscribe();
 		});
 
 		// Start observing

@@ -4,11 +4,6 @@ node_js:
 
 sudo: required
 
-cache: 
-  directories: 
-    - "CKEditor/node_modules" 
-    - "client/node_modules" 
-
 install:
   - cd $PROJECT
   - npm install 
@@ -28,6 +23,10 @@ matrix:
       install:
         - cd CKEditor && npm install && cd ../client
         - npm install
+      cache:
+        directories: 
+          - "CKEditor/node_modules" 
+          - "client/node_modules"
       script:
         - cd ../CKEditor && npm run build && cd ../client
         - npm run test
