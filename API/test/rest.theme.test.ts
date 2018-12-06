@@ -164,11 +164,12 @@ describe('REST: Theme', () => {
 			expect(res).to.have.status(200);
 			expect(res).to.have.property('body');
 			expect(res.body).to.be.an('object');
-			expect(res.body).have.property('--app-prim-1');
-			expect(res.body).have.property('--app-prim-2');
-			expect(res.body).have.property('--app-prim-3');
-			expect(res.body).have.property('--color-text');
-			expect(res.body).have.property('--width-wrapper');
+			expect(res.body).to.have.property('vars');
+			expect(res.body.vars).have.property('--app-prim-1');
+			expect(res.body.vars).have.property('--app-prim-2');
+			expect(res.body.vars).have.property('--app-prim-3');
+			expect(res.body.vars).have.property('--color-text');
+			expect(res.body.vars).have.property('--width-wrapper');
 		});
 	});
 });
