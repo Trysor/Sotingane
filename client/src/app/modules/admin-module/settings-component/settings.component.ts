@@ -2,11 +2,12 @@ import { Component, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 
 import { SettingsService } from '@app/services/controllers/settings.service';
+import { SnackBarService } from '@app/services/utility/snackbar.service';
 
 import { Settings } from '@types';
 
-import { Subject } from 'rxjs';
-import { take, takeUntil } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
+import { take, takeUntil, catchError } from 'rxjs/operators';
 
 
 @Component({
@@ -23,16 +24,17 @@ export class SettingsComponent implements OnDestroy {
 
 	constructor(
 		private settingsService: SettingsService,
+		private snackBar: SnackBarService,
 		private fb: FormBuilder) {
 
-		this.settingsForm = fb.group({
+		this.settingsForm = this.fb.group({
 			'indexRoute': ['', Validators.required],
 			'org': ['', Validators.required],
-			'meta': fb.group({
+			'meta': this.fb.group({
 				'title': ['', Validators.required],
 				'desc': ['', Validators.required]
 			}),
-			'footer': fb.group({
+			'footer': this.fb.group({
 				'text': ['', Validators.required],
 				'copyright': ['', Validators.required]
 			})
@@ -52,10 +54,15 @@ export class SettingsComponent implements OnDestroy {
 
 	public submitForm() {
 		const settings: Settings = this.settingsForm.getRawValue();
-		console.log(settings);
-		this.settingsService.postSettings(settings).pipe(take(1)).subscribe(
-			() => this.settingsService.settings.next(settings),
-			err => { console.log('err', err); }
+		this.settingsService.postSettings(settings).pipe(take(1), catchError(() => of(false))).subscribe(
+			val => {
+				if (val) {
+					this.settingsService.settings.next(settings);
+					this.snackBar.open('Settings have been updated');
+					return;
+				}
+				this.snackBar.open('Could not update settings');
+			},
 		);
 	}
 }

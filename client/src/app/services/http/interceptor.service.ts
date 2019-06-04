@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 
-import { MatSnackBar } from '@angular/material';
-
 import { env } from '@env';
 
 import { TokenService } from '@app/services/utility/token.service';
 import { LoadingService } from '@app/services/utility/loading.service';
+import { SnackBarService } from '@app/services/utility/snackbar.service';
 
 import { Observable, throwError, TimeoutError } from 'rxjs';
 import { timeout, finalize, catchError } from 'rxjs/operators';
@@ -18,7 +17,7 @@ export class InterceptorService implements HttpInterceptor {
 	constructor(
 		private tokenService: TokenService,
 		private loadingService: LoadingService,
-		private snackBar: MatSnackBar) {
+		private snackBar: SnackBarService) {
 	}
 
 	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -38,24 +37,12 @@ export class InterceptorService implements HttpInterceptor {
 			finalize(() => this.loadingService.removeRequest()),
 			catchError((err: HttpErrorResponse | TimeoutError, caught) => {
 				if (err instanceof TimeoutError) {
-					this.openSnackBar('Request timed out');
+					this.snackBar.open('Request timed out');
 					return throwError('Request timed out');
 				}
 				// Any non-timed-out request has to be handled from where it originated
 				return throwError(err.message);
 			})
 		);
-	}
-
-
-	/**
-	 * Opens a snackbar with the given message and action message
-	 * @param  {string} message The message that is to be displayed
-	 * @param  {string} action  the action message that is to be displayed
-	 */
-	private openSnackBar(message: string, action?: string) {
-		this.snackBar.open(message, action, {
-			duration: 5000,
-		});
 	}
 }

@@ -1,11 +1,9 @@
 import { Injectable, NgZone } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
 
-import { MatSnackBar } from '@angular/material';
-
 import { env } from '@env';
 import { PlatformService } from '@app/services/utility/platform.service';
-
+import { SnackBarService } from '@app/services/utility/snackbar.service';
 
 import { interval } from 'rxjs';
 
@@ -17,10 +15,10 @@ export class WorkerService {
 		private platform: PlatformService,
 		private ngZone: NgZone,
 		private updates: SwUpdate,
-		private snackBar: MatSnackBar) {
+		private snackBar: SnackBarService) {
 
 		if (!env.production) { return; }
-		if (platform.isServer) { return; }
+		if (this.platform.isServer) { return; }
 
 		// TODO: revert this back when it has been fixed
 		// interval(6 * 60 * 60).subscribe(() => updates.checkForUpdate());
@@ -35,19 +33,18 @@ export class WorkerService {
 		updates.available.subscribe(event => {
 			console.log('current version is', event.current);
 			console.log('available version is', event.available);
-			this.openSnackBar();
+
+			this.snackBar.open(
+				'An update is available!',
+				'Update',
+				1000 * 60 * 2 // 2 mins
+			).onAction().subscribe(() => {
+				this.updates.activateUpdate().then(() => document.location.reload());
+			});
 		});
 		updates.activated.subscribe(event => {
 			console.log('old version was', event.previous);
 			console.log('new version is', event.current);
-		});
-	}
-
-	private openSnackBar() {
-		this.snackBar.open('An update is available!', 'Update', {
-			duration: 1000 * 60 * 2, // 2 mins
-		}).onAction().subscribe(event => {
-			this.updates.activateUpdate().then(() => document.location.reload());
 		});
 	}
 }

@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { MatSnackBar } from '@angular/material';
-
 import { env } from '@env';
 import { User, UpdatePasswordUser, UserToken, AccessRoles } from '@types';
 
 import { HttpService } from '@app/services/http/http.service';
 import { TokenService } from '@app/services/utility/token.service';
 import { PlatformService } from '@app/services/utility/platform.service';
+import { SnackBarService } from '@app/services/utility/snackbar.service';
 
 
 import { Observable, Subscription, BehaviorSubject, timer, of } from 'rxjs';
@@ -27,8 +26,7 @@ export class AuthService {
 
 	constructor(
 		private platform: PlatformService,
-		private tokenService: TokenService,
-		private snackBar: MatSnackBar,
+		private snackBar: SnackBarService,
 		private http: HttpService,
 		private router: Router) {
 
@@ -86,14 +84,7 @@ export class AuthService {
 
 
 
-	/**
-	 * Opens a snackbar with the given message and action message
-	 * @param  {string} message The message that is to be displayed
-	 * @param  {string} action  the action message that is to be displayed
-	 */
-	private openSnackBar(message: string, action?: string) {
-		this.snackBar.open(message, action, {
-			duration: 5000,
+			this._userSubject.next(res.user);
 		});
 	}
 
@@ -157,7 +148,7 @@ export class AuthService {
 	 * Log out current user
 	 */
 	public logOut(opts?: { expired: boolean }) {
-		if (opts && opts.expired) { this.openSnackBar('Session expired'); }
+
 		if (this._userSubject.getValue() === null) { return; }
 
 		// If this post errors out (401), then the API already deems you as an unauthorized user

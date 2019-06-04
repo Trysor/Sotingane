@@ -3,12 +3,11 @@ import { Component, OnDestroy, AfterViewInit, ChangeDetectionStrategy } from '@a
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { MatSnackBar } from '@angular/material';
 
 import {
 	AggregationQuery, AggregationResult, AggregationResultSummarized, AggregationResultUnwinded, User, TableSettings
 } from '@types';
-import { CMSService, AdminService, MobileService } from '@app/services';
+import { CMSService, AdminService, MobileService, SnackBarService } from '@app/services';
 
 import { FormErrorInstant, AccessHandler } from '@app/classes';
 
@@ -166,7 +165,7 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 		private fb: FormBuilder,
 		private cmsService: CMSService,
 		private adminService: AdminService,
-		private snackBar: MatSnackBar,
+		private snackBar: SnackBarService,
 		private datePipe: DatePipe) {
 
 		// Form
@@ -218,7 +217,7 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 			}
 			this.setState(AnalyticsState.QUERY);
 			this.data.next(null);
-			this.openSnackBar((<any>data).message);
+			this.snackBar.open((<any>data).message);
 		}, err => {
 			this.setState(AnalyticsState.QUERY);
 		});
@@ -227,18 +226,6 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 	public newQuery() {
 		this.data.next(null);
 	}
-
-	/**
-	 * Opens a snackbar with the given message and action message
-	 * @param  {string} message The message that is to be displayed
-	 * @param  {string} action  the action message that is to be displayed
-	 */
-	private openSnackBar(message: string, action?: string) {
-		this.snackBar.open(message, action, {
-			duration: 5000,
-		});
-	}
-
 
 	setState(newState: AnalyticsState) {
 		this.state.next(newState);
