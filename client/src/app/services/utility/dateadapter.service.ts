@@ -1,5 +1,5 @@
 ﻿import { Injectable } from '@angular/core';
-import { NativeDateAdapter } from '@angular/material';
+import { NativeDateAdapter } from '@app/modules/material.types';
 
 import { format } from 'date-fns';
 

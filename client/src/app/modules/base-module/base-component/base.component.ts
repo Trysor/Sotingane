@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, Optional, ViewChild, ChangeDetectionStrategy } from '@angular/core';
-import { MatDrawer } from '@angular/material';
 import { Router } from '@angular/router';
 
+import { MatDrawer } from '@app/modules/material.types';
 import { MobileService, AuthService, WorkerService, ServerService, SEOService } from '@app/services';
 
 import { Subject } from 'rxjs';

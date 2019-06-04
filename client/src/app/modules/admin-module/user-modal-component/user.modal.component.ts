@@ -1,5 +1,5 @@
 import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatSelectChange } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@app/modules/material.types';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 
 import { AdminService, AuthService } from '@app/services';

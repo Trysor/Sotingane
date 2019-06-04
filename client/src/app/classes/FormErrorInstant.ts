@@ -1,4 +1,4 @@
-﻿import { ErrorStateMatcher } from '@angular/material';
+﻿import { ErrorStateMatcher } from '@app/modules/material.types';
 import { NgForm, FormGroupDirective, FormControl } from '@angular/forms';
 
 export class FormErrorInstant implements ErrorStateMatcher {

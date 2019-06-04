@@ -1,6 +1,6 @@
 import { Component, ViewChild, Input, OnInit, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
-import { MatPaginator, MatSort, MatTable, MatTableDataSource } from '@angular/material';
 
+import { MatTable, MatTableDataSource, MatSort, MatPaginator } from '@app/modules/material.types';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
 import { ColumnSettings, ColumnType, TableSettings, TableFilterSettings, Column } from '@types';

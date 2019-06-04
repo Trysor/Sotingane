@@ -1,6 +1,7 @@
 ﻿import { NgModule } from '@angular/core';
 
-import { MAT_DATE_LOCALE, DateAdapter, MatNativeDateModule } from '@angular/material';
+import { MAT_DATE_LOCALE, DateAdapter } from '@app/modules/material.types';
+import { MatNativeDateModule } from '@angular/material/core';
 
 import { DateAdapterService } from '@app/services';
 

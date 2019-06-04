@@ -1,7 +1,5 @@
 ﻿import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { MatDialog, MatDialogConfig } from '@angular/material';
-
+import { MatDialog, MatDialogConfig } from '@app/modules/material.types';
 import { ModalData, ImageModalData, Content } from '@types';
 import { ModalComponent } from '@app/modules/shared-module/modals/modal.component';
 import { ImageModalComponent } from '@app/modules/shared-module/modals/imagemodal.component';
@@ -9,9 +7,7 @@ import { ImageModalComponent } from '@app/modules/shared-module/modals/imagemoda
 @Injectable({ providedIn: 'root' })
 export class ModalService {
 
-	constructor(
-		private dialog: MatDialog,
-		private router: Router) { }
+	constructor(private dialog: MatDialog) { }
 
 
 	/**

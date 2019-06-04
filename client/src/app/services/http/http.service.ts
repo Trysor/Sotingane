@@ -1,7 +1,8 @@
 ﻿import { Injectable, Optional } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TransferState, StateKey, DomSanitizer } from '@angular/platform-browser';
-import { MatIconRegistry } from '@angular/material';
+
+import { MatIconRegistry } from '@app/modules/material.types';
 
 import { env } from '@env';
 import { ServerService } from '@app/services/http/server.service';
@@ -53,6 +54,7 @@ export class HttpService {
 	public fromState<T>(key: StateKey<T>, request: Observable<T>): Observable<T> {
 		// Get state
 		const state = this.state.get<T>(key, null);
+
 		// If state exists, remove it and deliver its content
 		if (this.state.hasKey(key) && state) {
 			this.state.remove(key);

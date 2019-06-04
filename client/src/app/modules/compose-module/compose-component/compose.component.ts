@@ -3,7 +3,7 @@ import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms'
 import { Router, ActivatedRoute, CanDeactivate } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
-import { MatSelectChange } from '@angular/material';
+import { MatSelectChange } from '@app/modules/material.types';
 
 import ClassicEditor from '@app/ckeditor';
 

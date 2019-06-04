@@ -1,5 +1,5 @@
 import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
-import { MatDialog, MatDialogConfig } from '@angular/material';
+import { MatDialog, MatDialogConfig } from '@app/modules/material.types';
 
 import { DatePipe } from '@angular/common';
 
