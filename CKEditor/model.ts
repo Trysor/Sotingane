@@ -28,6 +28,6 @@ type CKETablePluginToolbar = 'tableColumn' | 'tableRow' | 'mergeTableCells';
 
 
 type CKEToolbarItems =
-	'heading' | 'bold' | 'italic' | 'link' | 'bulletedList' | 'numberedList' |
+	'heading' | 'bold' | 'italic' | 'link' | 'bulletedList' | 'numberedList' | 'removeFormat' | 'fontSize' | 'fontFamily' | 'fontSize' | 'fontColor' |
 	'alignment' | 'blockQuote' | 'code' | 'mediaEmbed' | 'insertTable' | 'undo' | 'redo';
 type CKEToolbarItemSpacer = '|';
