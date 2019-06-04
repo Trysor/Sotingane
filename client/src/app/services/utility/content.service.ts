@@ -70,13 +70,6 @@ export class ContentService {
 	}
 
 	/**
-	 * Detects changes and refreshes the components that have been injected
-	 */
-	public detectChanges() {
-		this._embeddedComponents.forEach(comp => comp.changeDetectorRef.detectChanges());
-	}
-
-	/**
 	 * Destroys all embedded components
 	 */
 	public cleanEmbeddedComponents() {

@@ -3,8 +3,10 @@ import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { ModalService, AuthService } from '@app/services';
-import { UpdatePasswordUser, ModalData } from '@types';
-import { take } from 'rxjs/operators';
+import { UpdatePasswordUser } from '@types';
+
+import { of } from 'rxjs';
+import { take, catchError } from 'rxjs/operators';
 
 
 @Component({
@@ -33,19 +35,17 @@ export class ChangePasswordComponent {
 	 */
 	public submitForm() {
 		const user: UpdatePasswordUser = this.changePasswordForm.value;
-		this.authService.updatePassword(user).pipe(take(1)).subscribe(
-			result => {
-				if (result) {
-					this.changePasswordForm.reset();
-					this.changePasswordForm.markAsUntouched();
-					this.router.navigateByUrl('/');
-				}
-				this.modalService.openPasswordChangeModal(result);
-			},
-			error => {
-				// TODO: inform user
+		this.authService.updatePassword(user).pipe(
+			take(1),
+			catchError(() => of(null))
+		).subscribe(result => {
+			if (result) {
+				this.changePasswordForm.reset();
+				this.changePasswordForm.markAsUntouched();
+				this.router.navigateByUrl('/');
 			}
-		);
+			this.modalService.openPasswordChangeModal(result);
+		});
 	}
 
 

@@ -19,7 +19,7 @@ export class UsersController extends Controller {
 	@GET({ path: '/users/', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
 	public async getAllUsers(req: Req, res: Res, next: Next) {
 		const users = <User[]>await UserModel.find({}, {
-			username: 1, role: 1, createdAt: 1
+			username: 1, roles: 1, createdAt: 1
 		}).lean().sort('username_lower');
 		if (!users) { return res.status(404); } // TODO: Fix me
 		return res.status(200).send(users);
@@ -46,7 +46,7 @@ export class UsersController extends Controller {
 
 			patchingUser.username = user.username;
 			patchingUser.username_lower = username_low;
-			patchingUser.role = user.role;
+			patchingUser.roles = user.roles;
 			patchingUser.save((err2, updated) => {
 				if (err2) { return next(err2); }
 				if (updated) {
@@ -90,12 +90,16 @@ const userAdminUpdateUser = {
 		'username': {
 			'type': 'string',
 		},
-		'role': {
-			'type': 'string',
-			'enum': [AccessRoles.admin, AccessRoles.user]
+		'roles': {
+			'type': 'array',
+			'items': {
+				'type': 'string',
+				'enum': Object.values(AccessRoles)
+			},
+			'uniqueItems': true
 		}
 	},
-	'required': ['_id', 'username', 'role']
+	'required': ['_id', 'username', 'roles']
 };
 
 if (ajv.validateSchema(userAdminUpdateUser)) {

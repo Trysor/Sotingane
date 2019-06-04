@@ -1,7 +1,8 @@
-import { Component, OnInit, OnDestroy, Optional, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, Optional, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { MatDrawer } from '@app/modules/material.types';
+
 import { MobileService, AuthService, WorkerService, ServerService, SEOService } from '@app/services';
 
 import { Subject } from 'rxjs';
@@ -13,10 +14,10 @@ import { takeUntil } from 'rxjs/operators';
 	styleUrls: ['./base.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BaseComponent implements OnInit, OnDestroy {
+export class BaseComponent implements AfterViewInit, OnDestroy {
 	private _ngUnsub = new Subject();
-	@ViewChild('sidenavLeft') private sidenavLeft: MatDrawer;
-	@ViewChild('sidenavRight') private sidenavRight: MatDrawer;
+	@ViewChild('sidenavLeft', { static: false }) private sidenavLeft: MatDrawer;
+	@ViewChild('sidenavRight', { static: false }) private sidenavRight: MatDrawer;
 
 	constructor(
 		@Optional() private workerService: WorkerService,
@@ -27,11 +28,11 @@ export class BaseComponent implements OnInit, OnDestroy {
 		public router: Router) {
 	}
 
-	ngOnInit() {
+	ngAfterViewInit() {
 		this.mobileService.isMobile().pipe(takeUntil(this._ngUnsub)).subscribe(isMobile => {
 			if (!isMobile) { this.closeSideNavs(); }
 		});
-		this.router.events.pipe(takeUntil(this._ngUnsub)).subscribe(e => { this.closeSideNavs(); });
+		this.router.events.pipe(takeUntil(this._ngUnsub)).subscribe(() => { this.closeSideNavs(); });
 	}
 
 	ngOnDestroy() {

@@ -6,16 +6,15 @@ import { PlatformService } from '@app/services/utility/platform.service';
 export enum StorageKey {
 	AdminTabIndex = 'adminTabIndex',
 	ComposeTabIndex = 'composeTabIndex',
-	JWT = 'token'
+	JWT = 'token',
+	RefreshJWT = 'refreshToken'
 }
 
 @Injectable({ providedIn: 'root' })
 export class StorageService {
-	private readonly _serverMap: Map<string, string>;
+	private readonly _serverMap: Map<string, string> = new Map();
 
-	constructor(private platform: PlatformService) {
-		this._serverMap = new Map();
-	}
+	constructor(private platform: PlatformService) { }
 
 	// ---------------------------------------
 	// --------------- SESSION ---------------

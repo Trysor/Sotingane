@@ -73,7 +73,7 @@ describe('REST: Theme', () => {
 		it('POST /api/theme/ 401', async () => {
 			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.post('/api/theme').send(emptyTheme),
-				TestBed.http.post('/api/theme').send(emptyTheme).set('Cookie', TestBed.UserCookie),
+				TestBed.http.post('/api/theme').send(emptyTheme).set('Cookie', TestBed.MemberCookie),
 				TestBed.http.post('/api/theme').send(emptyTheme).set('Cookie', TestBed.AdminCookie)
 			]);
 
@@ -123,7 +123,7 @@ describe('REST: Theme', () => {
 		it('PATCH /api/theme/ 401', async () => {
 			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.patch('/api/theme/' + themeName).send(emptyTheme),
-				TestBed.http.patch('/api/theme/' + themeName).send(emptyTheme).set('Cookie', TestBed.UserCookie),
+				TestBed.http.patch('/api/theme/' + themeName).send(emptyTheme).set('Cookie', TestBed.MemberCookie),
 				TestBed.http.patch('/api/theme/' + themeName).send(emptyTheme).set('Cookie', TestBed.AdminCookie)
 			]);
 

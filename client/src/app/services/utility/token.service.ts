@@ -1,85 +1,18 @@
 import { Injectable } from '@angular/core';
 
-import { User } from '@types';
 import { StorageService, StorageKey } from '@app/services/utility/storage.service';
 
 @Injectable({ providedIn: 'root' })
 export class TokenService {
 
+	// Auth Token
 	public get token() { return this.storage.getLocal(StorageKey.JWT); }
-	public set token(newToken: string) {
-		this.storage.setLocal(StorageKey.JWT, this.jwtIsExpired(newToken) ? null : newToken);
-	}
+	public set token(newToken: string) { this.storage.setLocal(StorageKey.JWT, newToken); }
 
+	// Refresh Token
+	public get refreshToken() { return this.storage.getLocal(StorageKey.RefreshJWT); }
+	public set refreshToken(newToken: string) { this.storage.setLocal(StorageKey.RefreshJWT, newToken); }
+
+	// Constructor
 	constructor(private storage: StorageService) { }
-
-
-	/**
-	 * Decodes the provided JWT
-	 * @param  {string} token the JWT to decode
-	 * @return {User}         The decoded token user
-	 */
-	public jwtDecode(token: string): User {
-		return token ? JSON.parse(this.b64decode(token.split('.')[1])) : null;
-	}
-
-	/**
-	 * Returns the expiration date of a token
-	 * @param  {string} token the token to get the expiration date of
-	 * @return {Date}         the date the token expires
-	 */
-	public jwtExpirationDate(token: string): Date {
-		const user = this.jwtDecode(token);
-		if (!user || !user.hasOwnProperty('exp')) { return null; }
-
-		const date = new Date(0);
-		date.setUTCSeconds(user.exp);
-		return date;
-	}
-
-	/**
-	 * Returns true if the token has expired
-	 * @param  {string}  token  the token to check the expiration date of
-	 * @param  {number}  offset number of seconds offset from now
-	 * @return {boolean}        whether the token has expired
-	 */
-	public jwtIsExpired(token: string, offset: number = 0): boolean {
-		const date = this.jwtExpirationDate(token);
-		// if we can't get a date, we assume its best to say that it has expired.
-		if (null === date) { return true; }
-		return ((new Date().valueOf() + offset * 1000) > date.valueOf());
-	}
-
-
-	/**
-	 * Simulates the atob operator
-	 * Credited: https://github.com/atk
-	 * @param str
-	 */
-	private b64decode(str: string): string {
-		/* tslint:disable:no-bitwise */
-		const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-		let output = '';
-
-		str = String(str).replace(/=+$/, '');
-
-		if (str.length % 4 === 1) { return null; }
-
-		for (
-			// initialize result and counters
-			let bc = 0, bs: any, buffer: any, idx = 0;
-			// get next character
-			buffer = str.charAt(idx++);
-			// character found in table? initialize bit storage and add its ascii value;
-			~buffer && (bs = bc % 4 ? bs * 64 + buffer : buffer,
-				// and if not first of each 4 characters,
-				// convert the first 8 bits to one ascii character
-				bc++ % 4) ? output += String.fromCharCode(255 & bs >> (-2 * bc & 6)) : 0
-		) {
-			// try to find character in table (0-63, not found => -1)
-			buffer = chars.indexOf(buffer);
-		}
-		/* tslint:enable:no-bitwise */
-		return output;
-	}
 }

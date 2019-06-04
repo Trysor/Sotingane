@@ -1,15 +1,20 @@
 import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
-import { get as configGet, util as configUtil } from 'config';
+import { get as configGet } from 'config';
 import { sign } from 'jsonwebtoken';
 
 import { status, ajv, JSchema, AUTH_STATUS, validate } from '../libs/validate';
-import { UserModel, UserDoc } from '../models';
-import { User, AccessRoles } from '../../types';
+import { UserModel } from '../models';
+import { JWTUser, AccessRoles, TokenResponse } from '../../types';
+import { JWT } from '../../global';
 
 import { Controller, GET, POST, isProduction } from '../libs/routing';
 import { Auth } from '../libs/auth';
 
+enum JWT_Type {
+	AUTH = 0,
+	REFRESH = 1
+}
 
 export class AuthController extends Controller {
 
@@ -19,46 +24,101 @@ export class AuthController extends Controller {
 	 * @param  {Res}     res  response
 	 * @param  {Next} next next
 	 */
-	@GET({ path: '/token', do: [Auth.ByToken] })
+	@POST({ path: '/token', do: [Auth.ByRefresh] })
 	@POST({ path: '/login', do: [validate(JSchema.UserLoginSchema), Auth.ByLogin] })
-	public token(req: Req, res: Res): Res {
-		const user: Partial<User> = { _id: req.user._id, username: req.user.username, role: req.user.role };
+	public async token(req: Req, res: Res) {
+		// TODO: Think of a way of changing @POST({ path: '/token' away from POST, to make Angular Universal happy
 
-		const expires = 10800; // expiresIn in seconds ( = 3hours)
-		const token = sign(user, configGet<string>('secret'), { expiresIn: expires });
+		// we have through Auth validated the user exists in DB.
+		const user: JWTUser = req.user;
 
-		return res.cookie('jwt', token, {
-			maxAge: expires * 1000,
-			secure: configUtil.getEnv('NODE_ENV') === 'production',
+		// Generate JWT Object to be sent
+		const jwtObject: JWTUser = { _id: user._id, username: user.username, roles: user.roles };
+
+		// Generate API JWT
+		const now = Date.now(); // right before signing, so we're never ahead with nextExpiry
+		const token = await AuthController.createSignedJWT(jwtObject, JWT_Type.AUTH);
+
+		// Figure out if a refreshToken needs to be generated as well
+		const expiryDate = !!user.exp && user.exp * 1000;
+		const checkAgainst = now + (JWT.EXPIRES_REFRESH * 1000 * JWT.THRESHOLD_EXPIRY); // if we are within the last 10% of the JWT expiriy
+
+		// Send refresh Token if we send a POST (logging in manually with username and password)
+		// or if the refresh token is about to expire
+		const doSendRefreshToken =  req.route.path === '/login' || (expiryDate < checkAgainst);
+
+		// Initiate the response object
+		let response = AuthController.AddCookie(res, JWT_Type.AUTH, token);
+
+		// Create Refresh Token and cookie if necessary
+		let refreshToken;
+		if (doSendRefreshToken) {
+			refreshToken = await AuthController.createSignedJWT(jwtObject, JWT_Type.REFRESH);
+			response = AuthController.AddCookie(res, JWT_Type.REFRESH, refreshToken);
+		}
+
+		jwtObject.exp = (now / 1000) + (JWT.EXPIRES_AUTH * (1 - JWT.THRESHOLD_EXPIRY)); // Add in the expiry info
+
+		const responseBody: TokenResponse = {
+			token: token,
+			refreshToken: refreshToken,
+			user: jwtObject,
+		};
+		return response.status(200).send(responseBody);
+	}
+
+	private static createSignedJWT(jwtObject: JWTUser, type: JWT_Type) {
+		return new Promise<string>((resolve) => {
+			sign(jwtObject, type === JWT_Type.REFRESH ? configGet<string>('refreshSecret') : configGet<string>('secret'), {
+				expiresIn: type === JWT_Type.REFRESH ? JWT.EXPIRES_REFRESH : JWT.EXPIRES_AUTH,
+				audience: type === JWT_Type.REFRESH ? configGet<string>('refreshTokenAudience') : configGet<string>('tokenAudience')
+			}, (err, token) => {
+				resolve(err ? null : token);
+			});
+		});
+	}
+
+	private static AddCookie(res: Res, type: JWT_Type, token: string) {
+		const isDelete = (!token || token.length === 0);
+
+		const cookieKey = type === JWT_Type.REFRESH
+			? JWT.COOKIE_REFRESH
+			: JWT.COOKIE_AUTH;
+
+		let maxAge = type === JWT_Type.REFRESH
+			? JWT.EXPIRES_REFRESH * 1000
+			: JWT.EXPIRES_AUTH * 1000;
+
+		if (isDelete) { maxAge = 1000; }
+
+		return res.cookie(cookieKey, isDelete ? '' : token, {
+			maxAge: maxAge,
+			secure: isProduction,
 			httpOnly: true,
 			sameSite: true
-		}).status(200).send({ token: token, user: user });
+		});
 	}
 
 
 	/**
 	 * Logs out a user by deleting their session cookie
-	 * @param  {Req}      req  request
-	 * @param  {Res}     res  response
-	 * @param  {Next} next next
+	 * @param  {Req}	req  request
+	 * @param  {Res}	res  response
+	 * @param  {Next}	next next
 	 */
-	@POST({ path: '/logout', do: [Auth.ByToken] })
+	@POST({ path: '/logout', do: [] })
 	public logout(req: Req, res: Res): Res {
-		return res.cookie('jwt', '', {
-			maxAge: 1000, // one second
-			secure: isProduction,
-			domain: req.hostname,
-			httpOnly: true,
-			sameSite: true
-		}).status(200).send(status(AUTH_STATUS.USER_LOGGED_OUT));
+		const response = AuthController.AddCookie(res, JWT_Type.AUTH, null);
+		return AuthController.AddCookie(response, JWT_Type.REFRESH, null)
+			.status(200).send(status(AUTH_STATUS.USER_LOGGED_OUT));
 	}
 
 
 	/**
 	 * Registers a user
-	 * @param  {Req}      req  request
-	 * @param  {Res}     res  response
-	 * @param  {Next} next next
+	 * @param  {Req}	req  request
+	 * @param  {Res}	res  response
+	 * @param  {Next}	next next
 	 */
 	@POST({ path: '/register', ignore: isProduction, do: [validate(JSchema.UserRegistrationSchema)] })
 	public async register(req: Req, res: Res, next: Next) { // Not enabled in production for the time being
@@ -94,11 +154,13 @@ export class AuthController extends Controller {
 		const currentPassword: string = req.body.currentPassword,
 			password: string = req.body.password,
 			confirm: string = req.body.confirm,
-			user: UserDoc = <UserDoc>req.user;
+			jwtUser: JWTUser = <JWTUser>req.user;
 
 		if (password !== confirm) {
 			return res.status(401).send(status(AUTH_STATUS.PASSWORD_DID_NOT_MATCH));
 		}
+
+		const user = await UserModel.findById(jwtUser._id);
 
 		const isMatch = await user.comparePassword(currentPassword);
 		if (!isMatch) { return res.status(401).send(status(AUTH_STATUS.PASSWORD_DID_NOT_MATCH)); }
@@ -146,15 +208,19 @@ const userRegistrationSchema = {
 		'username': {
 			'type': 'string'
 		},
-		'role': {
-			'type': 'string',
-			'enum': [AccessRoles.admin, AccessRoles.user]
+		'roles': {
+			'type': 'array',
+			'items': {
+				'type': 'string',
+				'enum': Object.values(AccessRoles)
+			},
+			'uniqueItems': true
 		},
 		'password': {
 			'type': 'string'
 		}
 	},
-	'required': ['username', 'role', 'password']
+	'required': ['username', 'roles', 'password']
 };
 
 if (ajv.validateSchema(userRegistrationSchema)) {

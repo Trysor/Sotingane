@@ -12,9 +12,7 @@ import { BehaviorSubject } from 'rxjs';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NavComponent {
-	private _contentSubject = new BehaviorSubject(null);
-
-	public get contentSubject() { return this._contentSubject; }
+	public readonly contentSubject = new BehaviorSubject(null);
 
 	/**
 	 * Sort arrangement function for Content, CmsFolders and SteamServer, based on either's title.
@@ -64,7 +62,7 @@ export class NavComponent {
 		folders.sort(NavComponent.sortMethod);
 		for (const folder of folders) { folder.content.sort(NavComponent.sortMethod); }
 		// Push
-		this._contentSubject.next({
+		this.contentSubject.next({
 			rootContent: rootContent,
 			folders: folders
 		});

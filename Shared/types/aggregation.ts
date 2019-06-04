@@ -2,7 +2,7 @@
 
 export interface AggregationQuery {
 	createdBy?: string;
-	access?: AccessRoles;
+	access?: AccessRoles[];
 	published?: boolean;
 	route?: string;
 	folder?: string;
@@ -18,7 +18,7 @@ export interface AggregationQuery {
 interface AggregationResultGeneric {
 	title: string;
 	route: string;
-	access: AccessRoles;
+	access: AccessRoles[];
 	folder: string;
 	description: string;
 	images: string[];

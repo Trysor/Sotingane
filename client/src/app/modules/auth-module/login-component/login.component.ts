@@ -6,8 +6,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { User } from '@types';
 import { AuthService } from '@app/services';
 
-import { Subject, BehaviorSubject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject, BehaviorSubject, of } from 'rxjs';
+import { takeUntil, catchError } from 'rxjs/operators';
 
 
 enum STATES {
@@ -65,21 +65,22 @@ export class LoginComponent implements OnDestroy {
 	public logIn() {
 		this.state.next(STATES.LOADING);
 		const user: User = this.loginForm.getRawValue();
-		this.authService.login(user).subscribe(
-			(loggedIn) => {
-				if (loggedIn) {
-					this.router.navigateByUrl('/');
-					return;
-				}
-				this.state.next(STATES.TRY_AGAIN);
-			},
-			(error: HttpErrorResponse) => {
+		this.authService.login(user).pipe(
+			catchError((error: HttpErrorResponse) => {
 				if (error && error.status >= 400 && error.status < 500) {
 					this.state.next(STATES.TRY_AGAIN);
 					return;
 				}
 				this.state.next(STATES.TIMED_OUT);
-			},
-		);
+
+				return of(null);
+			})
+		).subscribe((loggedIn) => {
+			if (!!loggedIn) {
+				this.router.navigateByUrl('/');
+				return;
+			}
+			this.state.next(STATES.TRY_AGAIN);
+		});
 	}
 }

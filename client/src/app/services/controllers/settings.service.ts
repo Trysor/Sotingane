@@ -96,12 +96,10 @@ export class SettingsService {
 	}
 
 	public updateTheme() {
-		this.getTheme().pipe(take(1)).subscribe(
-			(theme) => {
-				this._themeSubject.next(theme);
-				this.renderTheme(theme);
-			}
-		);
+		this.getTheme().pipe(take(1)).subscribe((theme) => {
+			this._themeSubject.next(theme);
+			this.renderTheme(theme);
+		});
 	}
 
 	private renderTheme(theme: Theme) {

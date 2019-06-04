@@ -1,8 +1,18 @@
 
+
+#patchUserForm {
+	min-width: 400px;
+}
+
+
 .row {
 	display: flex;
 	flex-flow: row nowrap;
 	align-items: baseline;
 	justify-content: space-between;
 	margin-bottom: 10px;
+	
+	mat-form-field {
+		flex: 1 1;
+	}
 }

@@ -7,8 +7,8 @@ import { User } from '@types';
 
 import { AccessHandler } from '@app/classes';
 
-import { Subject } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
+import { take, catchError } from 'rxjs/operators';
 
 
 @Component({
@@ -36,7 +36,7 @@ export class UserModalComponent {
 
 		this.patchUserForm = fb.group({
 			'username': [data.user.username, Validators.compose([Validators.required, this.usernameTaken.bind(this)])],
-			'role': [data.user.role, Validators.required]
+			'roles': [data.user.roles, Validators.required]
 		});
 	}
 
@@ -50,16 +50,19 @@ export class UserModalComponent {
 		const user: User = this.patchUserForm.value;
 		user._id = this.data.user._id;
 
-		this.adminService.patchUser(user).pipe(take(1)).subscribe(
-			() => {
+		this.adminService.patchUser(user).pipe(
+			take(1),
+			catchError(() => of(null))
+		).subscribe(result => {
+			if (!!result) {
 				this.issue.next(null);
 				this.dialogRef.close(true);
-			},
-			() => {
-				this.issue.next('Could not save the user.');
-				this.patchUserForm.enable();
+				return;
 			}
-		);
+			this.issue.next('Could not save the user.');
+			this.patchUserForm.enable();
+
+		});
 	}
 
 	/**

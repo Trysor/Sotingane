@@ -4,8 +4,9 @@ import { CmsAccess, AccessRoles } from '@types';
 
 export class AccessHandler {
 	public readonly accessChoices: CmsAccess[] = [
-		{ value: AccessRoles.everyone,	icon: 'group',			single: 'Everyone',		plural: 'Everyone'	},
-		{ value: AccessRoles.user,		icon: 'verified_user',	single: 'User',			plural: 'Users'		},
+		{ value: null,					icon: 'group',			single: 'Everyone',		plural: 'Everyone'	},
+		{ value: AccessRoles.member,	icon: 'verified_user',	single: 'Member',		plural: 'Members'	},
+		{ value: AccessRoles.writer, 	icon: 'text_fields',	single: 'Writer',		plural: 'Writers'	},
 		{ value: AccessRoles.admin,		icon: 'security',		single: 'Admin',		plural: 'Admins'	}
 	];
 
@@ -15,5 +16,13 @@ export class AccessHandler {
 	 */
 	public getAccessChoice(role: AccessRoles): CmsAccess {
 		return this.accessChoices.find(choice => role === choice.value);
+	}
+
+	public getRolesFromAccessList(roles: AccessRoles[]): string {
+		if (roles && roles.length > 0) {
+			return roles.map(role => this.getAccessChoice(role).single).join(', ');
+		} else {
+			return this.getAccessChoice(null).single;
+		}
 	}
 }

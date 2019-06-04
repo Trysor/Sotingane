@@ -13,6 +13,8 @@ export class LoadingService {
 	private _isLoading = new Subject<boolean>();
 	private _loadingBarValue = new Subject<number>();
 
+	private static readonly TICK_RATE = 150;
+
 	public get isLoading() { return this._isLoading; }
 	public get valueSubject() { return this._loadingBarValue; }
 
@@ -31,9 +33,9 @@ export class LoadingService {
 		this._isLoading.subscribe(newVal => {
 			if (!newVal) { return; }
 
-			// Start timer, ticks every 100ms
-			interval(100).pipe(
-				takeWhile(num => (num * 100) < env.TIMEOUT),
+			// Start timer, ticks every TICK_RATE ms.
+			interval(LoadingService.TICK_RATE).pipe(
+				takeWhile(num => (num * LoadingService.TICK_RATE) < env.TIMEOUT),
 				takeUntil(this._isLoading)
 			).subscribe(num => {
 				this._loadingBarValue.next((num * 10000) / env.TIMEOUT);

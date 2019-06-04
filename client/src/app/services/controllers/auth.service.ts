@@ -2,25 +2,27 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { env } from '@env';
-import { User, UpdatePasswordUser, UserToken, AccessRoles } from '@types';
+import { User, UpdatePasswordUser, TokenResponse, AccessRoles, JWTUser } from '@types';
 
 import { HttpService } from '@app/services/http/http.service';
 import { TokenService } from '@app/services/utility/token.service';
 import { PlatformService } from '@app/services/utility/platform.service';
 import { SnackBarService } from '@app/services/utility/snackbar.service';
 
+import { makeStateKey } from '@angular/platform-browser';
+const USERTOKEN_KEY = makeStateKey<TokenResponse>('userToken');
 
-import { Observable, Subscription, BehaviorSubject, timer, of } from 'rxjs';
-import { map, catchError, takeUntil, finalize } from 'rxjs/operators';
+import { Subscription, BehaviorSubject, timer, of } from 'rxjs';
+import { map, catchError, finalize, take, tap } from 'rxjs/operators';
 
 
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-	private _userSubject = new BehaviorSubject(null);
+	private readonly _userSubject = new BehaviorSubject<JWTUser>(null);
 	private _renewalSub: Subscription;
 
-	public get user(): BehaviorSubject<User> {
+	public get user() {
 		return this._userSubject;
 	}
 
@@ -30,9 +32,11 @@ export class AuthService {
 		private http: HttpService,
 		private router: Router) {
 
-		const token = tokenService.token;
-		this.updateCurrentUserData(token);
-		if (platform.isBrowser) { this.engageRenewTokenTimer(token); }
+		if (this.platform.isBrowser) {
+			this._userSubject.subscribe(user => this.engageRenewTokenTimer(user));
+		}
+
+		this.updateTokenInfo();
 	}
 
 
@@ -41,40 +45,19 @@ export class AuthService {
 	// ---------------------------------------
 
 	/**
-	 * Updates the user data field by decoding the JWT token
-	 * @param  {string} token the JWT token to decode
-	 */
-	private updateCurrentUserData(token: string) {
-		if (!token) { return; }
-		const u = this.tokenService.jwtDecode(token);
-		if (!u) { return; }
-		this._userSubject.next(u);
-	}
-
-	/**
 	 * Starts a timer to renew the jwt before it exires
 	 * @param  {string}       token token to base the renewal timer on
 	 */
-	private engageRenewTokenTimer(token: string) {
+	private engageRenewTokenTimer(user: JWTUser) {
 		// cancel any ongoing timers
 		if (this._renewalSub) { this._renewalSub.unsubscribe(); }
-		// Log out the user if it is too late to renew.
-		if (this.tokenService.jwtIsExpired(token)) { this.logOut(); return; }
-		// Engage a new timer to go off 20 minutes before expiration token
-		const renewalDate = new Date(this.tokenService.jwtExpirationDate(token).getTime() - 1000 * 60 * 20);
-		this._renewalSub = timer(renewalDate).subscribe(time => {
-			this.renewToken().subscribe(
-				userToken => {
-					if (userToken.token) {
-						this.tokenService.token = userToken.token;
-						this.engageRenewTokenTimer(userToken.token);
-						return;
-					}
-					this.logOut({ expired: true });
-				},
-				err => this.logOut({ expired: true })
-			);
-		});
+		if (!user) { return; }
+
+		// Start new timer
+		const newTime = Math.max(user.exp * 1000 - Date.now(), 0);
+
+		// Update the token(s) and re-engage timer on complete
+		this._renewalSub = timer(newTime).pipe(take(1)).subscribe(() => this.updateTokenInfo());
 	}
 
 
@@ -82,18 +65,23 @@ export class AuthService {
 	// ----------- HELPER METHODS ------------
 	// ---------------------------------------
 
+	private updateTokenInfo() {
+		return this.renewToken().pipe(
+			take(1),
+			catchError(() => of(<TokenResponse>null)),
+		).subscribe(res => {
 
+			if (!res) {
+				this.logOut({ expired: true, popup: true });
+				return;
+			}
 
 			this._userSubject.next(res.user);
 		});
 	}
 
-	/**
-	 * Returns the expiration state of the currently loggged in user
-	 */
-	public getUserSessionExpired(): boolean {
-		return this.tokenService.jwtIsExpired(this.tokenService.token);
-	}
+
+
 
 	/**
 	 * Returns true if the user is of the given role
@@ -102,7 +90,7 @@ export class AuthService {
 	 */
 	public isUserOfRole(role: AccessRoles): boolean {
 		const user = this.user.getValue();
-		return user && user.role === role;
+		return user && user.roles.includes(role);
 	}
 
 
@@ -125,61 +113,59 @@ export class AuthService {
 	/**
 	 * Requests to log the user in
 	 * @param  {User} user                   The user to log in
-	 * @return {Observable<boolean>}         Server's response, as an Observable
 	 */
-	public login(user: User): Observable<boolean> {
-		return this.http.client.post<UserToken>(this.http.apiUrl(env.API.auth.login), user).pipe(map(
-			(userToken) => {
-				if (!userToken) { return false; }
-
-				// Set token
-				this.tokenService.token = userToken.token;
-				// Engage token renewal timer
-				this.engageRenewTokenTimer(userToken.token);
-				// Set user data & Notify subscribers
-				this.updateCurrentUserData(userToken.token);
+	public login(user: User) {
+		return this.http.client.post<TokenResponse>(this.http.apiUrl(env.API.auth.login), user).pipe(map(
+			(res) => {
+				if (!res) { return false; }
+				this._userSubject.next(res.user);
 				return true;
-			},
-			(err) => false
+			}
 		));
 	}
 
 	/**
 	 * Log out current user
 	 */
-	public logOut(opts?: { expired: boolean }) {
+	public logOut(opts?: { expired: boolean, popup: boolean }) {
+
+		// TODO: redo this
+		if (opts && opts.popup) { this.snackBar.open('Session expired'); }
 
 		if (this._userSubject.getValue() === null) { return; }
 
-		// If this post errors out (401), then the API already deems you as an unauthorized user
-		return this.http.client.post(this.http.apiUrl(env.API.auth.logout), null).pipe(
-			finalize(() => {
-				this.tokenService.token = null;
-				if (this._renewalSub) { this._renewalSub.unsubscribe(); }
-				this._userSubject.next(null);
+		const _finalize = () => {
+			this._userSubject.next(null);
+			this.router.navigateByUrl('/');
+		};
 
-				this.router.navigateByUrl('/');
-			})
-		).subscribe();
+		if (opts && opts.expired) {
+			_finalize();
+			return;
+		}
+
+		// If this post errors out (401), then the API already deems you as an unauthorized user
+		return this.http.client.post(this.http.apiUrl(env.API.auth.logout), null).pipe(finalize(_finalize)).subscribe();
 	}
 
 	/**
 	 * Attempt to renew JWT token
-	 * @return {Observable<boolean>} whether the JWT was successfully renewed
 	 */
-	private renewToken(): Observable<UserToken> {
-		return this.http.client.get<UserToken>(this.http.apiUrl(env.API.auth.token));
+	private renewToken() {
+		return this.http.fromState(
+			USERTOKEN_KEY,
+			this.http.client.post<TokenResponse>(this.http.apiUrl(env.API.auth.token), null)
+		);
 	}
 
 	/**
 	 * Attempt to update the logged in user's password
 	 * @param  {UpdatePasswordUser}  user the object containing the user data
-	 * @return {Observable<boolean>}      wether the password was successfully updated
 	 */
-	public updatePassword(user: UpdatePasswordUser): Observable<boolean> {
+	public updatePassword(user: UpdatePasswordUser) {
 		return this.http.client.post<boolean>(this.http.apiUrl(env.API.auth.updatepass), user).pipe(
 			map(() => true),
-			catchError(err => of(false))
+			catchError(() => of(false))
 		); // returns message objects
 	}
 }

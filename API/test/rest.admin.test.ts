@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import { ContentModel } from '../src/models';
-import { Content, AccessRoles, AggregationQuery } from '../types';
+import { Content, AccessRoles, AggregationQuery, JWTUser } from '../types';
 import { CMS_STATUS, VALIDATION_FAILED, USERS_STATUS, ADMIN_STATUS } from '../src/libs/validate';
 
 import { TestBed } from './testbed';
@@ -27,13 +27,13 @@ describe('REST: Admin', () => {
 			expect(res.body[0]).to.have.property('_id'); // important to keep id here.
 			expect(res.body[0]).to.have.property('username');
 			expect(res.body[0]).to.have.property('createdAt');
-			expect(res.body[0]).to.have.property('role');
+			expect(res.body[0]).to.have.property('roles');
 		});
 
 		it('GET /api/admin/users/ 401', async () => {
 			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/admin/users/'),
-				TestBed.http.get('/api/admin/users/').set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/admin/users/').set('Cookie', TestBed.MemberCookie),
 				TestBed.http.get('/api/admin/users/').set('Cookie', TestBed.AdminCookie)
 			]);
 
@@ -52,13 +52,13 @@ describe('REST: Admin', () => {
 	describe('/api/admin/users/:id', () => {
 
 		it('PATCH /api/admin/users/:id 200', async () => {
-			const patchUser = {
-				_id: TestBed.User.id,
-				username: TestBed.User.username,
-				role: TestBed.User.role,
+			const patchUser: JWTUser = {
+				_id: TestBed.Member.id,
+				username: TestBed.Member.username,
+				roles: TestBed.Member.roles,
 			};
 
-			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 				.set('Cookie', TestBed.AdminCookie)
 				.send(patchUser);
 
@@ -68,13 +68,13 @@ describe('REST: Admin', () => {
 		});
 
 		it('PATCH /api/admin/users/:id 400', async () => {
-			const patchUser = {
+			const patchUser: JWTUser = {
 				_id: TestBed.AdminUser.id, // Using AdminUser's ID instead
-				username: TestBed.User.username,
-				role: TestBed.User.role,
+				username: TestBed.Member.username,
+				roles: TestBed.Member.roles,
 			};
 
-			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 				.set('Cookie', TestBed.AdminCookie)
 				.send(patchUser);
 
@@ -85,19 +85,19 @@ describe('REST: Admin', () => {
 
 		it('PATCH /api/admin/users/:id 401', async () => {
 
-			const patchUser = {
-				_id: TestBed.User.id,
-				username: TestBed.User.username,
-				role: TestBed.User.role,
+			const patchUser: JWTUser = {
+				_id: TestBed.Member.id,
+				username: TestBed.Member.username,
+				roles: TestBed.Member.roles,
 			};
 
 			const [noAuthRes, userRes, adminRes] = await Promise.all([
-				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+				TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 					.send(patchUser),
-				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
-					.set('Cookie', TestBed.UserCookie)
+				TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
+					.set('Cookie', TestBed.MemberCookie)
 					.send(patchUser),
-				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+				TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 					.set('Cookie', TestBed.AdminCookie)
 					.send(patchUser)
 			]);
@@ -108,13 +108,13 @@ describe('REST: Admin', () => {
 		});
 
 		it('PATCH /api/admin/users/:id 409', async () => {
-			const patchUser = {
-				_id: TestBed.User.id,
+			const patchUser: JWTUser = {
+				_id: TestBed.Member.id,
 				username: TestBed.AdminUser.username, // Trying to use the admin user's username.
-				role: TestBed.User.role,
+				roles: TestBed.Member.roles,
 			};
 
-			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 				.set('Cookie', TestBed.AdminCookie)
 				.send(patchUser);
 
@@ -125,36 +125,36 @@ describe('REST: Admin', () => {
 
 		it('PATCH /api/admin/users/:id 422', async () => {
 
-			const idMissing = {
-				username: TestBed.User.username,
-				role: TestBed.User.role
+			const idMissing: Partial<JWTUser> = {
+				username: TestBed.Member.username,
+				roles: TestBed.Member.roles
 			};
-			const usernameMissing = {
-				_id: TestBed.User.id,
-				role: TestBed.User.role
+			const usernameMissing: Partial<JWTUser> = {
+				_id: TestBed.Member.id,
+				roles: TestBed.Member.roles
 			};
-			const roleMissing = {
-				_id: TestBed.User.id,
-				username: TestBed.User.username
+			const roleMissing: Partial<JWTUser> = {
+				_id: TestBed.Member.id,
+				username: TestBed.Member.username
 			};
-			const tooManyProperties = {
-				_id: TestBed.User.id,
-				username: TestBed.User.username,
-				role: TestBed.User.role,
+			const tooManyProperties: { test: string } & JWTUser = {
+				_id: TestBed.Member.id,
+				username: TestBed.Member.username,
+				roles: TestBed.Member.roles,
 				test: 'extra property'
 			};
 
 			const [idRes, userRes, roleRes, tooManyRes] = await Promise.all([
-				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+				TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 					.set('Cookie', TestBed.AdminCookie)
 					.send(idMissing),
-				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+				TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 					.set('Cookie', TestBed.AdminCookie)
 					.send(usernameMissing),
-				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+				TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 					.set('Cookie', TestBed.AdminCookie)
 					.send(roleMissing),
-				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+				TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 					.set('Cookie', TestBed.AdminCookie)
 					.send(tooManyProperties)
 			]);
@@ -176,7 +176,7 @@ describe('REST: Admin', () => {
 
 			expect(roleRes).to.have.status(422);
 			expect(roleRes.body.errors[0].params).to.have.property('missingProperty');
-			expect(roleRes.body.errors[0].params.missingProperty).to.equal('role');
+			expect(roleRes.body.errors[0].params.missingProperty).to.equal('roles');
 
 			expect(tooManyRes.body.errors).to.be.an('array');
 			expect(tooManyRes.body.errors[0].params).to.have.property('additionalProperty');
@@ -207,7 +207,7 @@ describe('REST: Admin', () => {
 		it('GET /api/admin/cms/ 401', async () => {
 			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/admin/cms/'),
-				TestBed.http.get('/api/admin/cms/').set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/admin/cms/').set('Cookie', TestBed.MemberCookie),
 				TestBed.http.get('/api/admin/cms/').set('Cookie', TestBed.AdminCookie)
 			]);
 
@@ -228,7 +228,7 @@ describe('REST: Admin', () => {
 				title: 'getadmin200',
 				route: 'getadmin200',
 				content: 'test',
-				access: AccessRoles.everyone,
+				access: [],
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -253,7 +253,7 @@ describe('REST: Admin', () => {
 				title: 'getadmin401',
 				route: 'getadmin401',
 				content: 'test',
-				access: AccessRoles.everyone,
+				access: [],
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -266,7 +266,7 @@ describe('REST: Admin', () => {
 
 			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/admin/cms/' + content.route),
-				TestBed.http.get('/api/admin/cms/' + content.route).set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/admin/cms/' + content.route).set('Cookie', TestBed.MemberCookie),
 				TestBed.http.get('/api/admin/cms/' + content.route).set('Cookie', TestBed.AdminCookie)
 			]);
 
@@ -350,7 +350,7 @@ describe('REST: Admin', () => {
 			const afterDate = new Date();
 
 			const content: Content = {
-				title: 'aggregDate', route: 'aggregdate', content: 'test', access: AccessRoles.everyone,
+				title: 'aggregDate', route: 'aggregdate', content: 'test', access: [],
 				description: 'test', folder: 'test', published: true, nav: true
 			};
 
@@ -385,7 +385,7 @@ describe('REST: Admin', () => {
 			const beforeDate = new Date();
 
 			const content: Content = {
-				title: 'aggregDateBefore', route: 'aggregdatebefore', content: 'test', access: AccessRoles.everyone,
+				title: 'aggregDateBefore', route: 'aggregdatebefore', content: 'test', access: [],
 				description: 'test', folder: 'test', published: true, nav: true
 			};
 
@@ -422,7 +422,7 @@ describe('REST: Admin', () => {
 		it('POST /api/admin/cms/aggregate 200, written by only', async () => {
 			const content: Content = {
 				title: 'writtenByAdmin2', route: 'writtenbyadmin2',
-				content: 'test', access: AccessRoles.everyone,
+				content: 'test', access: [],
 				description: 'test', folder: 'test',
 				published: true, nav: true
 			};
@@ -462,21 +462,22 @@ describe('REST: Admin', () => {
 		});
 
 		it('POST /api/admin/cms/aggregate 200, access only', async () => {
-			const queryEveryone: AggregationQuery = { access: AccessRoles.everyone };
-			const queryUsers: AggregationQuery = { access: AccessRoles.user };
-			const queryAdmins: AggregationQuery = { access: AccessRoles.admin };
+			const queryAll: AggregationQuery = { };
+			const queryEveryone: AggregationQuery = { access: [] };
+			const queryMembers: AggregationQuery = { access: [AccessRoles.member] };
+			const queryAdmins: AggregationQuery = { access: [AccessRoles.admin] };
 
 			const content: Partial<Content> = { content: 'test', description: 'test', folder: 'test', published: true, nav: true };
 
 			const [res1, res2, res3] = await Promise.all([
 				TestBed.http.post('/api/cms').set('Cookie', TestBed.AdminCookie).send(Object.assign({
-					route: 'aggregAccess1', title: 'aggregAccess1', access: AccessRoles.everyone
+					route: 'aggregAccess1', title: 'aggregAccess1', access: []
 				}, content)),
 				TestBed.http.post('/api/cms').set('Cookie', TestBed.AdminCookie).send(Object.assign({
-					route: 'aggregAccess2', title: 'aggregAccess2', access: AccessRoles.user
+					route: 'aggregAccess2', title: 'aggregAccess2', access: [AccessRoles.member]
 				}, content)),
 				TestBed.http.post('/api/cms').set('Cookie', TestBed.AdminCookie).send(Object.assign({
-					route: 'aggregAccess3', title: 'aggregAccess3', access: AccessRoles.admin
+					route: 'aggregAccess3', title: 'aggregAccess3', access: [AccessRoles.admin]
 				}, content))
 			]);
 
@@ -484,37 +485,34 @@ describe('REST: Admin', () => {
 			expect(res2).to.have.status(200);
 			expect(res3).to.have.status(200);
 
-			const [resEveryone, resUsers, resAdmins] = await Promise.all([
+			const [resAll, resEveryone, resMembers, resAdmins] = await Promise.all([
+				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryAll),
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryEveryone),
-				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryUsers),
+				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryMembers),
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryAdmins),
 			]);
 			const allContentDocs = await ContentModel.find({}, { current: 1 });
-
-			expect(resEveryone).to.have.status(200);
-			expect(resEveryone).to.have.property('body');
-			expect(resEveryone.body).to.be.an('array');
-
-			expect(resUsers).to.have.status(200);
-			expect(resUsers).to.have.property('body');
-			expect(resUsers.body).to.be.an('array');
-
-			expect(resAdmins).to.have.status(200);
-			expect(resAdmins).to.have.property('body');
-			expect(resAdmins.body).to.be.an('array');
-
 			const allPages = allContentDocs.map(contentDoc => contentDoc.current);
 
-			const everyoneCount = allPages.filter(c => c.access === AccessRoles.everyone).length;
-			const usersCount = allPages.filter(c => c.access === AccessRoles.user).length;
-			const adminsCount = allPages.filter(c => c.access === AccessRoles.admin).length;
+			for (const res of [resAll, resEveryone, resMembers, resAdmins]) {
+				expect(res).to.have.status(200);
+				expect(res).to.have.property('body');
+				expect(res.body).to.be.an('array');
+			}
 
+			const allCount = allPages.length;
+			const everyoneCount = allPages.filter(c => c.access.length === 0).length;
+			const membersCount = allPages.filter(c => c.access.includes(AccessRoles.member)).length;
+			const adminsCount = allPages.filter(c => c.access.includes(AccessRoles.admin)).length;
+
+			const queryAllCount = (<any[]>resAll.body).length;
 			const queryEveryoneCount = (<any[]>resEveryone.body).length;
-			const queryUsersCount = (<any[]>resUsers.body).length;
+			const queryMembersCount = (<any[]>resMembers.body).length;
 			const queryAdminsCount = (<any[]>resAdmins.body).length;
 
+			expect(allCount).to.equal(queryAllCount, 'should have filtered based on access (all)');
 			expect(everyoneCount).to.equal(queryEveryoneCount, 'should have filtered based on access (everyone)');
-			expect(usersCount).to.equal(queryUsersCount, 'should have filtered based on access (users)');
+			expect(membersCount).to.equal(queryMembersCount, 'should have filtered based on access (members)');
 			expect(adminsCount).to.equal(queryAdminsCount, 'should have filtered based on access (admins)');
 		});
 
@@ -524,7 +522,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'unpubAggreg', route: 'unpubaggreg',
-				content: 'test', access: AccessRoles.everyone,
+				content: 'test', access: [],
 				description: 'test', folder: 'test',
 				published: false, nav: true // published === false
 			};
@@ -564,7 +562,7 @@ describe('REST: Admin', () => {
 			const afterDate = new Date();
 
 			const content: Content = {
-				title: 'aggregSeenAfter', route: 'aggregseenafter', content: 'test', access: AccessRoles.everyone,
+				title: 'aggregSeenAfter', route: 'aggregseenafter', content: 'test', access: [],
 				description: 'test', folder: 'test', published: true, nav: true
 			};
 
@@ -602,7 +600,7 @@ describe('REST: Admin', () => {
 			const beforeDate = new Date();
 
 			const content: Content = {
-				title: 'aggregSeenBefore', route: 'aggregseenbefore', content: 'test', access: AccessRoles.everyone,
+				title: 'aggregSeenBefore', route: 'aggregseenbefore', content: 'test', access: [],
 				description: 'test', folder: 'test', published: true, nav: true
 			};
 
@@ -639,8 +637,11 @@ describe('REST: Admin', () => {
 			expect(resBefore2).to.have.property('body');
 			expect(resBefore2.body).to.be.an('array');
 			const contentFind2 = (<any[]>resBefore2.body).find((c: any) => c.route === content.route);
+			if (!contentFind2) {
+				console.log(resBefore2.body);
+			}
 			expect(contentFind2).to.not.be.an('undefined'); // to NOT be undefined.
-			expect(contentFind2.views).to.be.equal(1); // Views count should have increased.
+			expect(contentFind2.views).to.equal(1); // Views count should have increased.
 		});
 
 		it('POST /api/admin/cms/aggregate 200, browser only', async () => {
@@ -650,7 +651,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'browserAggreg', route: 'browseraggreg',
-				content: 'test', access: AccessRoles.everyone,
+				content: 'test', access: [],
 				description: 'test', folder: 'test',
 				published: true, nav: true
 			};
@@ -696,7 +697,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'unwindAggreg', route: 'unwindaggreg',
-				content: 'test', access: AccessRoles.everyone,
+				content: 'test', access: [],
 				description: 'test', folder: 'test',
 				published: true, nav: true
 			};
@@ -735,7 +736,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'propAggreg', route: 'propaggreg',
-				content: 'test', access: AccessRoles.everyone,
+				content: 'test', access: [],
 				description: 'test', folder: 'test',
 				published: true, nav: true
 			};
@@ -773,7 +774,7 @@ describe('REST: Admin', () => {
 
 			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.post('/api/admin/cms/aggregate').send(query),
-				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.UserCookie).send(query),
+				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.MemberCookie).send(query),
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(query)
 			]);
 

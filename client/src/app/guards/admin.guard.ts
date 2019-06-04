@@ -14,11 +14,9 @@ export class AdminGuard implements CanActivate, CanLoad {
 
 	/**
 	 * Dictates the access rights to a given route
-	 * @return {boolean} whether access is granted
 	 */
 	canActivate() {
-		const isExpired = this.authService.getUserSessionExpired();
-		const accessGranted = !isExpired && this.authService.isUserOfRole(AccessRoles.admin);
+		const accessGranted = this.authService.isUserOfRole(AccessRoles.admin);
 		if (!accessGranted) {
 			this.router.navigateByUrl('/');
 		}

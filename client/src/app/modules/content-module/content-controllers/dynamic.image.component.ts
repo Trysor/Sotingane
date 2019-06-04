@@ -39,7 +39,7 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 		super(elRef, inters);
 	}
 
-	buildJob(el, content: Content): void {
+	buildJob(_el: Element, content: Content): void {
 		this._content = content;
 
 		this._imgEl = this.elRef.nativeElement.querySelector('img');
@@ -47,7 +47,7 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 		this.renderer.removeAttribute(this._imgEl, 'data-src');
 
 		// Add size attributes
-		const imageData = content.images.find(imgData => src === imgData.url);
+		const imageData = content.images && content.images.find(imgData => src === imgData.url);
 		if (!!imageData) {
 			const ratio = imageData.height / imageData.width;
 			this.renderer.setStyle(this._imgEl, 'padding-bottom', `${ratio * 100}%`);

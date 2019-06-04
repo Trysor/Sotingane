@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 
 import { env } from '@env';
-import { Content, AccessRoles, SearchResultContent } from '@types';
+import { Content, SearchResultContent } from '@types';
 
 import { makeStateKey } from '@angular/platform-browser';
 const LIST_KEY = makeStateKey<Content[]>('cmslist'),
@@ -12,16 +11,17 @@ const LIST_KEY = makeStateKey<Content[]>('cmslist'),
 import { AuthService } from '@app/services/controllers/auth.service';
 import { HttpService } from '@app/services/http/http.service';
 
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 
 @Injectable({ providedIn: 'root' })
 export class CMSService {
-	private _listSubject: BehaviorSubject<Content[]> = new BehaviorSubject(null);
+	private readonly _listSubject: BehaviorSubject<Content[]> = new BehaviorSubject(null);
 	private _pageSubject: BehaviorSubject<Content> = new BehaviorSubject(null);
 
-	private readonly _failedToLoad: Content = {
-		access: AccessRoles.everyone,
+	private readonly _failedToLoad: Content = <Content>{
+		access: [],
 		title: 'Page not available',
 		content: 'Uhm. There appears to be nothing here. Sorry.',
 		description: '404 - Not found',
@@ -31,11 +31,12 @@ export class CMSService {
 
 	constructor(
 		private authService: AuthService,
-		private http: HttpService,
-		private router: Router) {
+		private http: HttpService) {
 
 		// Whenever a user logs in or out we should force-update.
-		authService.user.subscribe(user => this.getContentList(true));
+		this.authService.user.subscribe(() => {
+			this.getContentList(true);
+		});
 	}
 
 	public get content() {
@@ -85,16 +86,14 @@ export class CMSService {
 
 	/**
 	 * Requests the content from the given url
-	 * @return {Observable<Content>}         Server's response, as an Observable
 	 */
 	public requestContent(contentUrl: string) {
 		this.http.fromState(
 			PAGE_KEY,
 			this.http.client.get<Content>(this.http.apiUrl(env.API.cms.content + '/' + contentUrl))
-		).subscribe(
-			content => this._pageSubject.next(content),
-			error => this._pageSubject.next(this._failedToLoad)
-		);
+		).pipe(
+			catchError(() => of(this._failedToLoad))
+		).subscribe(content => this._pageSubject.next(content));
 	}
 
 	/**

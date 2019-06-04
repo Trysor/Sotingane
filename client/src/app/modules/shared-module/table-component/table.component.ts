@@ -1,6 +1,7 @@
 import { Component, ViewChild, Input, OnInit, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { MatTable, MatTableDataSource, MatSort, MatPaginator } from '@app/modules/material.types';
+
 import { FormBuilder, FormGroup } from '@angular/forms';
 
 import { ColumnSettings, ColumnType, TableSettings, TableFilterSettings, Column } from '@types';
@@ -16,14 +17,15 @@ import { takeUntil, distinctUntilChanged, debounceTime } from 'rxjs/operators';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TableComponent implements OnInit, AfterViewInit {
-	@ViewChild(MatTable) table: MatTable<object>;
-	@ViewChild(MatPaginator) paginator: MatPaginator;
-	@ViewChild(MatSort) sort: MatSort;
+	@ViewChild(MatTable, { static: false }) table: MatTable<object>;
+	@ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+	@ViewChild(MatSort, { static: false }) sort: MatSort;
 	@Input() settings: TableSettings<any>;
 	@Input() filterSettings: TableFilterSettings = {}; // default empty object
 	@Input() set data(value: object[]) { this.Source.data = value || []; }
 
 	public readonly ColumnType = ColumnType;
+	public readonly isNaN = isNaN;
 
 	public readonly pageSizes = [10, 25, 50, 100];
 	public readonly Source = new MatTableDataSource<object>([]);
@@ -70,8 +72,6 @@ export class TableComponent implements OnInit, AfterViewInit {
 	ngOnInit() {
 		if (!this.settings) { throw Error('No settings'); }
 
-		this.table.trackBy = this.settings.trackBy;
-
 		this.mobileService.isMobile().subscribe(isMobile => {
 			this.displayedColumns = isMobile ? this.settings.mobile : this.settings.columns.map(col => col.property);
 		});
@@ -79,6 +79,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 
 	ngAfterViewInit() {
 		// These must be placed here; the view must've been initialized.
+		this.table.trackBy = this.settings.trackBy;
 		this.Source.paginator = this.paginator;
 		this.Source.sort = this.sort;
 	}

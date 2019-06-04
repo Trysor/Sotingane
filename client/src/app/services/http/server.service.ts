@@ -1,6 +1,7 @@
 ﻿import { Injectable, Inject } from '@angular/core';
 
 import { env } from '@env';
+import { JWT } from '@global';
 
 import { Request } from 'express';
 import { REQUEST } from '@nguniversal/express-engine/tokens';
@@ -23,9 +24,12 @@ export class ServerService {
 		// Override the environment API routes to include the base
 		if (env.API_BASE === '') { env.API_BASE = this._urlBase; }
 
-		// Set token if one exists
-		if (req.cookies && req.cookies.jwt) {
-			this.tokenService.token = req.cookies.jwt;
+		// Set tokens if one exists
+		if (req.cookies && req.cookies[JWT.COOKIE_AUTH]) {
+			this.tokenService.token = req.cookies[JWT.COOKIE_AUTH];
+		}
+		if (req.cookies && req.cookies[JWT.COOKIE_REFRESH]) {
+			this.tokenService.refreshToken = req.cookies[JWT.COOKIE_REFRESH];
 		}
 
 		const userAgent = (<string>req.headers['user-agent']).toLowerCase();

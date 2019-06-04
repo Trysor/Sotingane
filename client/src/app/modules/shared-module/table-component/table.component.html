@@ -26,8 +26,11 @@
 				<mat-icon *ngIf="col.icon" [color]="!!col.disabled && col.disabled(obj, Source.data) ? '' : (col.icon.color || 'primary')">
 					{{col.icon.val(obj)}}
 				</mat-icon>
-				<span *ngIf="!col.noText" [ngClass]="{ 'hasIcon': col.icon }">
-					{{ (col.val ? col.val(obj, Source.data) : obj[col.property]) | number }}
+				<span *ngIf="!col.removeText" [ngClass]="{ 'hasIcon': col.icon }">
+					{{ isNaN( (col.val ? col.val(obj, Source.data) : obj[col.property]) )
+						? (col.val ? col.val(obj, Source.data) : obj[col.property])
+						: (col.val ? col.val(obj, Source.data) : obj[col.property]) | number
+					}}
 				</span>
 			</ng-template>
 

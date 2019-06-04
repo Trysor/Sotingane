@@ -27,11 +27,10 @@ const schema = new Schema({
 		type: String, // Not in clear text
 		required: true
 	},
-	role: {
+	roles: [{
 		type: String,
-		enum: [AccessRoles.admin, AccessRoles.user],
-		default: AccessRoles.user
-	},
+		enum: Object.values(AccessRoles),
+	}],
 },
 {
 	timestamps: { createdAt: true, updatedAt: false }
@@ -67,14 +66,8 @@ schema.methods.comparePassword = async function (candidatePassword: string): Pro
 	return compare(candidatePassword, u.password);
 };
 
-schema.methods.isOfRole = function (role: AccessRoles): boolean {
-	const u: User = this;
-	return u.role === role;
-};
-
 schema.methods.canAccess = function (level: AccessRoles): boolean {
-	const u: User = this;
-	return level === AccessRoles.everyone || u.role === AccessRoles.admin || u.isOfRole(level);
+	return (<User>this).roles.includes(level);
 };
 
 export interface UserDoc extends User, Document { }

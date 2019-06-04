@@ -1,4 +1,4 @@
-﻿import { TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
 // Http
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
@@ -14,9 +14,11 @@ const routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
 import { Router } from '@angular/router';
 
 import { AuthService, HttpService } from '@app/services';
-import { User, UserToken } from '@types';
+import { User, TokenResponse } from '@types';
 
 import { env } from '@env';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 describe('AuthService', () => {
 	let service: AuthService;
@@ -72,7 +74,7 @@ describe('AuthService', () => {
 		expect(req.request.method).toEqual('POST');
 
 		// Reply with test data
-		req.flush(<UserToken>{ // tslint:disable:max-line-length
+		req.flush(<TokenResponse>{ // tslint:disable:max-line-length
 			token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjk0NjY4NDgwMCwiZXhwIjozMjUwMzY4MDAwMCwiYXVkIjoiIiwic3ViIjoidGVzdCIsIl9pZCI6IjEyMzQ1NiIsInVzZXJuYW1lIjoidGVzdCIsInJvbGUiOiJhZG1pbiJ9.uI0Z1CmNRGBxG5HxC_UHZCbsx_kJ0CvRqRuy2YG-Zu0',
 			user: testUser
 		}); // tslint:enable:max-line-length
@@ -82,14 +84,17 @@ describe('AuthService', () => {
 		const testUser: User = { username: 'test', password: 'pass', _id: null };
 
 		// Subscribe to request
-		service.login(testUser).subscribe(
-			success => { fail('a status 401 should never enter the success handler'); },
-			(error: HttpErrorResponse) => {
+		service.login(testUser).pipe(
+			catchError((error: HttpErrorResponse) => {
 				// Once a reply is given, test that it is correct
 				expect(error.status).toBe(401, 'Should not have logged in');
 				expect(service.user.getValue()).toBe(null, 'should NOT have set user');
-			}
-		);
+
+				return of(false);
+			})
+		).subscribe(success => {
+			if (success) { fail('a status 401 should never enter the success handler'); }
+		});
 
 		// Expect a request to be made
 		const req = httpTestingController.expectOne(env.API.auth.login);

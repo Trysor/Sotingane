@@ -1,10 +1,10 @@
 ﻿import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
-import * as mongoose from 'mongoose';
+import { Types as MongoTypes } from 'mongoose';
 
 import { status, ajv, JSchema, ADMIN_STATUS, CMS_STATUS, validate } from '../libs/validate';
 import { ContentModel } from '../models';
-import { Content, ContentEntry, AccessRoles, AggregationQuery } from '../../types';
+import { Content, ContentEntry, AccessRoles, AggregationQuery, AggregationResult } from '../../types';
 
 import { MongoStream } from '../libs/MongoStreamer';
 import { Controller, GET, POST } from '../libs/routing';
@@ -79,19 +79,22 @@ export class AdminController extends Controller {
 		const unwind = query.hasOwnProperty('unwind') && query.unwind;
 
 		// Content filtering
-		const match: any = {};
-		if (query.createdBy) { match['current.createdBy'] = mongoose.Types.ObjectId(query.createdBy); }		// CreatedBy
-		if (query.access) { match['current.access'] = query.access; }										// Access
-		if (query.hasOwnProperty('published')) { match['current.published'] = query.published; }			// Published
-		if (query.route) { match['current.route'] = query.route.toLowerCase(); }							// Route
-		if (query.folder) { match['current.folder'] = query.folder; }										// Folder
-
-		if (!!query.createdAfterDate && !!query.createdBeforeDate) {										// CreatedAt
-			match['current.createdAt'] = { '$gte': new Date(query.createdAfterDate), '$lt': new Date(query.createdBeforeDate) };
+		const match: any[] = [];
+		if (query.createdBy) { match.push({'current.createdBy': MongoTypes.ObjectId(query.createdBy) }); }		// CreatedBy
+		if (query.hasOwnProperty('published')) { match.push({'current.published': query.published}); }				// Published
+		if (query.route) { match.push({'current.route': query.route.toLowerCase()}); }								// Route
+		if (query.folder) { match.push({'current.folder': query.folder}); }											// Folder
+		if (query.access && query.access.length > 0) {																// Access
+			match.push({ 'current.access': { $elemMatch: { $in: query.access } } });
+		} else if (query.access && query.access.length === 0) {
+			match.push({ 'current.access': { $eq: [] } });
+		}
+		if (!!query.createdAfterDate && !!query.createdBeforeDate) {												// CreatedAt
+			match.push({'current.createdAt': { '$gte': new Date(query.createdAfterDate), '$lt': new Date(query.createdBeforeDate) }});
 		} else if (query.createdAfterDate) {
-			match['current.createdAt'] = { '$gte': new Date(query.createdAfterDate) };
+			match.push({'current.createdAt': { '$gte': new Date(query.createdAfterDate) }});
 		} else if (query.createdBeforeDate) {
-			match['current.createdAt'] = { '$lt': new Date(query.createdBeforeDate) };
+			match.push({'current.createdAt': { '$lt': new Date(query.createdBeforeDate) }});
 		}
 
 		// Early project
@@ -115,7 +118,7 @@ export class AdminController extends Controller {
 			userFilter['logData.ts'] = { '$lt': new Date(query.seenBeforeDate) };
 		}
 		if (!!query.readBy && query.readBy.length > 0) { // Read by check (must compare against ObjectId)
-			userFilter['logData.user'] = { $in: query.readBy.map(id => mongoose.Types.ObjectId(id)) };
+			userFilter['logData.user'] = { $in: query.readBy.map(id => MongoTypes.ObjectId(id)) };
 		}
 		if (!!query.browsers && query.browsers.length > 0) { // equality match. 100% equal.
 			userFilter['logData.browser'] = { $in: query.browsers };
@@ -146,7 +149,7 @@ export class AdminController extends Controller {
 
 		// Pipeline
 		const pipeline: object[] = [];
-		pipeline.push({ $match: match });								// Match against document
+		pipeline.push({ $match: match.length > 0 ? { $and: match } : {} });						// Match against document
 		pipeline.push({ $project: earlyProject });						// Exclude uneeded data early
 		pipeline.push({ $lookup: lookup });								// Lookup logData
 		pipeline.push({ $unwind: unwindPipeline });						// Always unwind
@@ -167,13 +170,10 @@ export class AdminController extends Controller {
 					noneFoundStatus: status(ADMIN_STATUS.AGGREGATION_RESULT_NONE_FOUND)
 				});
 			} else {
-				const results: any[] = await ContentModel.aggregate(pipeline).allowDiskUse(true);
+				const results: AggregationResult[] = await ContentModel.aggregate(pipeline).allowDiskUse(true);
 				if (!results || results.length === 0) { return res.status(200).send(status(ADMIN_STATUS.AGGREGATION_RESULT_NONE_FOUND)); }
 				return res.status(200).send(results);
 			}
-
-
-
 		} catch (e) {
 			return res.status(200).send(status(ADMIN_STATUS.AGGREGATION_MONGOOSE_ERROR));
 		}
@@ -192,7 +192,7 @@ const adminAggregationSchema = {
 	'additionalProperties': false,
 	'properties': {
 		'createdBy': { 'type': 'string' },
-		'access': { 'type': 'string', 'enum': [AccessRoles.admin, AccessRoles.user, AccessRoles.everyone, ''] },
+		'access': { 'type': 'array', 'items': { 'type': 'string', 'enum': Object.values(AccessRoles) }, 'uniqueItems': true },
 		'published': { 'type': 'boolean' },
 		'route': { 'type': 'string' },
 		'folder': { 'type': 'string' },

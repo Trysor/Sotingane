@@ -14,11 +14,9 @@ export class AuthGuard implements CanActivate, CanLoad {
 
 	/**
 	 * Dictates the access rights to a given route
-	 * @return {boolean} whether access is granted
 	 */
 	canActivate() {
-		const isExpired = this.authService.getUserSessionExpired();
-		const accessGranted = this.authService.user.getValue() && !isExpired;
+		const accessGranted = !!this.authService.user.getValue();
 		if (!accessGranted) {
 			this.router.navigateByUrl('/');
 		}

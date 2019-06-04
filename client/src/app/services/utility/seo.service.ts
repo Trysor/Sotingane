@@ -7,7 +7,7 @@ import { Content, SEO_Article, SEO_BreadcrumbList, SEO_Organization } from '@typ
 import { HttpService } from '@app/services/http/http.service';
 import { CMSService } from '@app/services/controllers/cms.service';
 import { SettingsService } from '@app/services/controllers/settings.service';
-
+import { PlatformService } from '@app/services/utility/platform.service';
 
 import { BehaviorSubject } from 'rxjs';
 import { filter, combineLatest } from 'rxjs/operators';
@@ -30,6 +30,7 @@ export class SEOService {
 		private settingsService: SettingsService,
 		private cmsService: CMSService,
 		private httpService: HttpService,
+		private platformService: PlatformService,
 		private title: Title,
 		private meta: Meta) {
 
@@ -79,7 +80,7 @@ export class SEOService {
 	private setDefaultMeta() {
 		this.title.setTitle(this.settingsService.settings.getValue().meta.title);
 		this.meta.updateTag({ name: 'description', content: this.settingsService.settings.getValue().meta.desc });
-		this.meta.updateTag({ name: 'canonical', content: this.httpService.urlBase + this.router.routerState.snapshot.url });
+		this.updateCanonical();
 	}
 
 
@@ -90,6 +91,18 @@ export class SEOService {
 	private setContentMeta(content: Content) {
 		this.meta.updateTag({ name: 'description', content: content.description });
 		this.title.setTitle(`${this.settingsService.settings.getValue().meta.title} - ${content.title}`);
+		this.updateCanonical();
+	}
+
+
+	private updateCanonical() {
+		const doc = this.platformService.document;
+		let linkElem = doc.head.querySelector('link[rel=canonical]');
+		if (!linkElem) {
+			linkElem = doc.createElement('link');
+			linkElem.setAttribute('rel', 'canonical');
+			doc.head.appendChild(linkElem);
+		}
 
 		const routerUrl = this.router.routerState.snapshot.url;
 		let canonical = this.httpService.urlBase;
@@ -99,8 +112,9 @@ export class SEOService {
 		} else {
 			canonical = canonical + routerUrl;
 		}
-		this.meta.updateTag({ name: 'canonical', content: canonical });
+		linkElem.setAttribute('href', canonical);
 	}
+
 
 	// ---------------------------------------
 	// ------------- SEO METHODS -------------

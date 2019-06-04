@@ -5,8 +5,8 @@ import { DatePipe } from '@angular/common';
 import { CMSService, MobileService } from '@app/services';
 import { SearchResultContent, TableSettings, ColumnType, TableFilterSettings } from '@types';
 
-import { Subject, BehaviorSubject } from 'rxjs';
-import { takeUntil, take } from 'rxjs/operators';
+import { Subject, BehaviorSubject, of } from 'rxjs';
+import { takeUntil, take, catchError } from 'rxjs/operators';
 
 @Component({
 	selector: 'search-results-component',
@@ -91,9 +91,12 @@ export class SearchResultsComponent implements OnDestroy {
 	 * Set searchResults helper
 	 */
 	private setResults(term: string) {
-		this.cmsService.searchContent(term).pipe(take(1), takeUntil(this._ngUnsub)).subscribe(
-			list => this.data.next(Array.isArray(list) ? list : null),
-			err => this.data.next(null)
+		this.cmsService.searchContent(term).pipe(
+			take(1),
+			catchError(() => of(null)),
+			takeUntil(this._ngUnsub)
+		).subscribe(
+			list => this.data.next(!!list && Array.isArray(list) ? list : null)
 		);
 	}
 

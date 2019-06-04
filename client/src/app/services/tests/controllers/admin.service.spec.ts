@@ -77,8 +77,8 @@ describe('AdminService', () => {
 
 	it('getAllContent()', () => {
 		const testContent: Content[] = [
-			{ title: 'test', route: 'test', access: AccessRoles.everyone },
-			{ title: 'test2', route: 'test2', access: AccessRoles.everyone },
+			{ title: 'test', route: 'test' },
+			{ title: 'test2', route: 'test2' },
 		];
 
 		// Subscribe to request
@@ -96,7 +96,7 @@ describe('AdminService', () => {
 	});
 
 	it('getContentPage()', () => {
-		const testContent: Content = { title: 'test', route: 'test', access: AccessRoles.everyone };
+		const testContent: Content = { title: 'test', route: 'test' };
 
 		// Subscribe to request
 		service.getContentPage(testContent.route).subscribe(content => {

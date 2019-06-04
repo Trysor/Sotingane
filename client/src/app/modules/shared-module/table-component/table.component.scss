@@ -124,10 +124,12 @@ mat-paginator {
 	box-shadow: var(--shadow), var(--shadow) inset;
 	border: var(--shadow);
 
+	::ng-deep .mat-form-field,
 	::ng-deep .mat-paginator-container {
 		min-height: 42px;
 		max-height: 42px;
 		overflow: hidden;
+		align-items: baseline;
 	}
 }
 

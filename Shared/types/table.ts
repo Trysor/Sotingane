@@ -32,7 +32,7 @@ export interface ColumnSettings<T> {
 
 	func?: (obj?: T, all?: T[]) => void;
 	disabled?: (obj?: T, all?: T[]) => boolean;
-	noText?: boolean;
+	removeText?: boolean;
 	narrow?: boolean;
 	noSort?: boolean;
 

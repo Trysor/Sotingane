@@ -23,9 +23,15 @@ export class InterceptorService implements HttpInterceptor {
 	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 		// Only intercept if the request is going to our server.
 		if (!req.url.startsWith(env.API_BASE + env.API.api)) { return next.handle(req); }
+
 		// Add Headers
 		let headers = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
-		const token = this.tokenService.token;
+		let token: string;
+		if (req.url.startsWith(env.API_BASE + env.API.auth.token)) {
+			token = this.tokenService.refreshToken;
+		} else {
+			token = this.tokenService.token;
+		}
 		if (token) { headers = headers.set('Authorization', token); }
 
 		// Add request
@@ -41,7 +47,7 @@ export class InterceptorService implements HttpInterceptor {
 					return throwError('Request timed out');
 				}
 				// Any non-timed-out request has to be handled from where it originated
-				return throwError(err.message);
+				return throwError(err);
 			})
 		);
 	}

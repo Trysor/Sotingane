@@ -2,7 +2,7 @@ import { Component, OnDestroy, AfterViewInit, ChangeDetectionStrategy } from '@a
 
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 
 import {
 	AggregationQuery, AggregationResult, AggregationResultSummarized, AggregationResultUnwinded, User, TableSettings
@@ -13,8 +13,8 @@ import { FormErrorInstant, AccessHandler } from '@app/classes';
 
 import { min as DateMin } from 'date-fns';
 
-import { Subject, BehaviorSubject } from 'rxjs';
-import { takeUntil, distinctUntilChanged } from 'rxjs/operators';
+import { Subject, BehaviorSubject, of } from 'rxjs';
+import { takeUntil, distinctUntilChanged, catchError } from 'rxjs/operators';
 
 enum AnalyticsState {
 	QUERY,
@@ -134,8 +134,13 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 			{
 				header: 'Access',
 				property: 'access',
-				icon: { val: a => this.accessHandler.getAccessChoice(a.access).icon },
-				val: a => this.accessHandler.getAccessChoice(a.access).plural
+				// icon: { val: a => this.accessHandler.getAccessChoice(a.access).icon },
+				val: c => {
+					if (c.access.length === 0) {
+						return this.accessHandler.getAccessChoice(null).single;
+					}
+					return c.access.map(role => this.accessHandler.getAccessChoice(role).single).join(', ');
+				}
 			},
 			{
 				header: 'Views',
@@ -169,10 +174,12 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 		private datePipe: DatePipe) {
 
 		// Form
+		const _disableAccessOnInit = true;
 		this.aggregateForm = fb.group({
 			// Content Filters
 			'createdBy': [''],
-			'access': [''],
+			'access': new FormControl({ value: [], disabled: _disableAccessOnInit }),
+			'accessFilter': [!_disableAccessOnInit],
 			'published': [true],
 			'route': [''],
 			'folder': [''],
@@ -189,6 +196,14 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 		// Get users
 		this.adminService.getAllusers().pipe(takeUntil(this._ngUnsub)).subscribe(users => {
 			this.users.next(users);
+		});
+
+		this.aggregateForm.get('accessFilter').valueChanges.pipe(takeUntil(this._ngUnsub)).subscribe(val => {
+			if (val) {
+				this.aggregateForm.get('access').enable();
+			} else {
+				this.aggregateForm.get('access').disable();
+			}
 		});
 	}
 
@@ -207,9 +222,20 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 
 	public submitForm() {
 		const query: AggregationQuery = this.aggregateForm.value;
+		if (!(<any>query).accessFilter) {
+			delete query.access;
+		}
+		delete (<any>query).accessFilter; // noAccessFilter isn't part of the request to the API
 
 		this.setState(AnalyticsState.LOADING);
-		this.adminService.getAggregatedData(query).subscribe(data => {
+		this.adminService.getAggregatedData(query).pipe(
+			catchError(() => of(null))
+		).subscribe(data => {
+			if (!data) {
+				this.setState(AnalyticsState.QUERY);
+				return;
+			}
+
 			if (Array.isArray(data)) {
 				this.data.next(data);
 				this.setState(AnalyticsState.RESULTS);
@@ -218,8 +244,6 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 			this.setState(AnalyticsState.QUERY);
 			this.data.next(null);
 			this.snackBar.open((<any>data).message);
-		}, err => {
-			this.setState(AnalyticsState.QUERY);
 		});
 	}
 

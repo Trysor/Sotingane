@@ -46,7 +46,7 @@ describe('REST: Settings', () => {
 		it('POST /api/settings/ 401', async () => {
 			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.post('/api/settings').send(emptySettings),
-				TestBed.http.post('/api/settings').send(emptySettings).set('Cookie', TestBed.UserCookie),
+				TestBed.http.post('/api/settings').send(emptySettings).set('Cookie', TestBed.MemberCookie),
 				TestBed.http.post('/api/settings').send(emptySettings).set('Cookie', TestBed.AdminCookie)
 			]);
 

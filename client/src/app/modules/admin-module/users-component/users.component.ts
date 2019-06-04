@@ -34,10 +34,9 @@ export class UsersComponent implements OnDestroy {
 				property: 'username',
 			},
 			{
-				header: 'Role',
-				property: 'role',
-				icon: { val: user => this._accessHandler.getAccessChoice(user.role).icon },
-				val: user => this._accessHandler.getAccessChoice(user.role).single
+				header: 'Roles',
+				property: 'roles',
+				val: user => user.roles.map(role => this._accessHandler.getAccessChoice(role).single).join(', ')
 			},
 			{
 				header: 'Joined date',
@@ -52,7 +51,7 @@ export class UsersComponent implements OnDestroy {
 				noSort: true,
 				type: ColumnType.Button,
 				icon: { val: () => 'settings' },
-				noText: true,
+				removeText: true,
 				func: (user, users) => {
 					this.dialog.open(
 						UserModalComponent,
@@ -71,7 +70,7 @@ export class UsersComponent implements OnDestroy {
 
 		trackBy: (index: number, user: User) => user._id,
 
-		mobile: ['username', 'role', '_id'], // _id = edit
+		mobile: ['username', 'roles', '_id'], // _id = edit
 
 	};
 

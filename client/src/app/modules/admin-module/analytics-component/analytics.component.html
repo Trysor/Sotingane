@@ -68,17 +68,23 @@
 
 					<!-- ACCESS -->
 					<div class="field">
+						<mat-checkbox formControlName="accessFilter" class="half" labelPosition="after">
+							Filter by Access
+						</mat-checkbox>
+
 						<mat-form-field appearance="outline">
-							<mat-label>Access</mat-label>
-							<mat-select id="access" #access="matSelect" formControlName="access">
-								<mat-select-trigger *ngIf="aggregateForm.get('access').value">
-									<mat-icon>{{accessHandler.getAccessChoice(aggregateForm.get('access').value).icon}}</mat-icon>
-									{{ accessHandler.getAccessChoice(aggregateForm.get('access').value).plural }}
+							<mat-label>Access Limitation</mat-label>
+							<mat-select id="access" #access="matSelect" formControlName="access" multiple>
+								<mat-select-trigger>
+									<ng-container *ngFor="let selected of aggregateForm.get('access').value; last as last">
+										<mat-icon>{{accessHandler.getAccessChoice(selected).icon}}</mat-icon> {{ accessHandler.getAccessChoice(selected).plural }}<span *ngIf="!last">, </span>
+									</ng-container>
 								</mat-select-trigger>
-								<mat-option [disabled]="!aggregateForm.get('access').value">-- Clear Selection --</mat-option>
-								<mat-option *ngFor="let option of accessHandler.accessChoices" [value]="option.value">
-									<mat-icon matPrefix>{{ option.icon }}</mat-icon>{{ option.plural }}
-								</mat-option>
+								<ng-container *ngFor="let option of accessHandler.accessChoices">
+									<mat-option *ngIf="option.value" [value]="option.value">
+										<mat-icon matPrefix>{{ option.icon }}</mat-icon>{{ option.plural }}
+									</mat-option>
+								</ng-container>
 							</mat-select>
 						</mat-form-field>
 					</div>
