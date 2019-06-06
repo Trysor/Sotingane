@@ -1,12 +1,12 @@
-import { TestBed } from '@angular/core/testing';
+﻿import { TestBed } from '@angular/core/testing';
 
 // Http
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-const httpServiceSpy = jasmine.createSpyObj<HttpService>('HttpService', ['client', 'apiUrl']);
+import { StateKey } from '@angular/platform-browser';
 
 // Material
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+// import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '@app/modules';
 
 // Routing
@@ -25,7 +25,14 @@ describe('AuthService', () => {
 	let httpTestingController: HttpTestingController;
 
 	beforeEach(() => {
+		const httpServiceSpy = jasmine.createSpyObj<HttpService>('HttpService', ['apiUrl', 'fromState']);
 
+		// change the calls to fromState and apiUrl and return modified values
+		// the only fromState-call there is in auth.service returns TokenResponse
+		httpServiceSpy.fromState.and.callFake( <any>((_key: any, req: any) => of<TokenResponse>(<any>{})) );
+		httpServiceSpy.apiUrl.and.callFake((api: string) => api);
+
+		// Use our spies in the module
 		TestBed.configureTestingModule({
 			providers: [
 				{ provide: HttpService, useValue: httpServiceSpy },
@@ -33,19 +40,18 @@ describe('AuthService', () => {
 				AuthService
 			],
 			imports: [
-				NoopAnimationsModule,
 				MaterialModule,
 				HttpClientTestingModule
 			]
 		});
-		service = TestBed.get(AuthService);
-		httpTestingController = TestBed.get(HttpTestingController);
 
 		// Override the client property to use the test client
-		(<any>service).http.client = TestBed.get(HttpClient);
+		// This needs to happen before we do TestBed.get(AuthService);
+		TestBed.get(HttpService).client = TestBed.get(HttpClient);
 
-		// skip api base etc
-		TestBed.get(HttpService).apiUrl.and.callFake((api: string) => api);
+		// Get the service, and the httpTestingController, so we can use these in our tests
+		service = TestBed.get(AuthService);
+		httpTestingController = TestBed.get(HttpTestingController);
 	});
 
 

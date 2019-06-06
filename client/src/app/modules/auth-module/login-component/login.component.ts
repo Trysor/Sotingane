@@ -67,20 +67,19 @@ export class LoginComponent implements OnDestroy {
 		const user: User = this.loginForm.getRawValue();
 		this.authService.login(user).pipe(
 			catchError((error: HttpErrorResponse) => {
-				if (error && error.status >= 400 && error.status < 500) {
-					this.state.next(STATES.TRY_AGAIN);
-					return;
-				}
-				this.state.next(STATES.TIMED_OUT);
-
-				return of(null);
+				this.state.next((error && error.status >= 400 && error.status < 500)
+					? STATES.TRY_AGAIN
+					: STATES.TIMED_OUT
+				);
+				return of(false);
 			})
 		).subscribe((loggedIn) => {
-			if (!!loggedIn) {
-				this.router.navigateByUrl('/');
+			// Check if we're NOT logged in, and in loading state (which means we didn't error out)
+			if (!loggedIn && this.state.getValue() === STATES.LOADING) {
+				this.state.next(STATES.TRY_AGAIN);
 				return;
 			}
-			this.state.next(STATES.TRY_AGAIN);
+			this.router.navigateByUrl('/');
 		});
 	}
 }

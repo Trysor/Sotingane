@@ -4,7 +4,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { HttpClient } from '@angular/common/http';
 
 import { AdminService, HttpService } from '@app/services';
-import { User, Content, AccessRoles } from '@types';
+import { User, Content } from '@types';
 
 import { env } from '@env';
 
@@ -14,7 +14,7 @@ describe('AdminService', () => {
 	let httpTestingController: HttpTestingController;
 
 	beforeEach(() => {
-		const spy = jasmine.createSpyObj<HttpService>('HttpService', ['client', 'apiUrl']);
+		const spy = jasmine.createSpyObj<HttpService>('HttpService', ['client', 'apiUrl',]);
 
 		TestBed.configureTestingModule({
 			providers: [
