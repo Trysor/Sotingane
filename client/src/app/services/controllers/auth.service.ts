@@ -7,6 +7,7 @@ import { User, UpdatePasswordUser, TokenResponse, AccessRoles, JWTUser } from '@
 import { HttpService } from '@app/services/http/http.service';
 import { PlatformService } from '@app/services/utility/platform.service';
 import { SnackBarService } from '@app/services/utility/snackbar.service';
+import { TokenService } from '@app/services/utility/token.service';
 
 import { makeStateKey } from '@angular/platform-browser';
 const USERTOKEN_KEY = makeStateKey<TokenResponse>('userToken');
@@ -25,10 +26,15 @@ export class AuthService {
 		return this._userSubject;
 	}
 
+	public get hasToken() {
+		return !!this.tokens.token;
+	}
+
 	constructor(
 		private platform: PlatformService,
 		private snackBar: SnackBarService,
 		private http: HttpService,
+		private tokens: TokenService,
 		private router: Router) {
 
 		if (this.platform.isBrowser) {
@@ -68,14 +74,20 @@ export class AuthService {
 			take(1),
 			catchError(() => of(null as TokenResponse)),
 		).subscribe(res => {
-
 			if (!res) {
 				this.logOut({ expired: true, popup: true });
 				return;
 			}
 
-			this._userSubject.next(res.user);
+			this.setTokensAndUserObject(res);
 		});
+	}
+
+	private setTokensAndUserObject(res: TokenResponse) {
+		this.tokens.token = res && res.token || null;
+		this.tokens.refreshToken = res && res.refreshToken || null;
+
+		this._userSubject.next(res && res.user || null);
 	}
 
 
@@ -130,7 +142,7 @@ export class AuthService {
 		if (this._userSubject.getValue() === null) { return; }
 
 		const _finalize = () => {
-			this._userSubject.next(null);
+			this.setTokensAndUserObject(null);
 			this.router.navigateByUrl('/');
 		};
 
