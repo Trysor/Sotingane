@@ -58,7 +58,7 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 		// Add lazy tag
 		this.renderer.addClass(this.elRef.nativeElement, 'lazy');
 
-		this._sources.push({ media: null, src: src });
+		this._sources.push({ media: null, src });
 
 		this._srcset = this._sources.map((s) => `${s.src} ${(s.media ? s.media : '')}`).join(', ');
 		this.renderer.listen(this._imgEl, 'click', this.onclick.bind(this));
@@ -94,7 +94,7 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 		if (this.mobileService.isMobile().getValue()) { return; }
 
 		// this.sources[0] is auto-format original-sized image
-		const altAttr = this._imgEl.attributes['alt'];
+		const altAttr = this._imgEl.attributes.getNamedItem('alt');
 		this.modalService.openImageModal({
 			startIndex: this._content.images.map(i => i.url).indexOf(this._sources[0].src),
 			images: this._content.images

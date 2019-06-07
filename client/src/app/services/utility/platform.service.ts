@@ -9,11 +9,11 @@ export class PlatformService {
 	private readonly _document: Document;
 
 	constructor(
-		@Inject(PLATFORM_ID) private platformId: Object,
+		@Inject(PLATFORM_ID) private platformId: object,
 		@Inject(DOCUMENT) private doc: Document) {
-		this._isBrowser = isPlatformBrowser(platformId);
-		this._isServer = isPlatformServer(platformId);
-		this._document = doc;
+		this._isBrowser = isPlatformBrowser(this.platformId);
+		this._isServer = isPlatformServer(this.platformId);
+		this._document = this.doc;
 	}
 
 	public get isBrowser() { return this._isBrowser; }

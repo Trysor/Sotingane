@@ -8,12 +8,8 @@ export class SnackBarService {
 
 	/**
 	 * Opens a snackbar with the given message and action message
-	 * @param  {string} message The message that is to be displayed
-	 * @param  {string} action  the action message that is to be displayed
 	 */
 	public open(message: string, action?: string, duration: number = 5000) {
-		return this.snackBar.open(message, action, {
-			duration: duration,
-		});
+		return this.snackBar.open(message, action, { duration });
 	}
 }

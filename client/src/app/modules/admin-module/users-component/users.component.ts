@@ -55,7 +55,7 @@ export class UsersComponent implements OnDestroy {
 				func: (user, users) => {
 					this.dialog.open(
 						UserModalComponent,
-						<MatDialogConfig>{ data: <UserModalData>{ user: user, userList: users } }
+						{ data: { user, userList: users } as UserModalData } as MatDialogConfig
 					).afterClosed().subscribe((closedResult: boolean) => {
 						if (closedResult) { this.updateList(); }
 					});

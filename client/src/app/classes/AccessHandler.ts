@@ -12,7 +12,6 @@ export class AccessHandler {
 
 	/**
 	 * returns the CmsAccess value of the selected access privileges
-	 * @return {CmsAccess} the selected value
 	 */
 	public getAccessChoice(role: AccessRoles): CmsAccess {
 		return this.accessChoices.find(choice => role === choice.value);

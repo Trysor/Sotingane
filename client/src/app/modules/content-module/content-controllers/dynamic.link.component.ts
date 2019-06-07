@@ -42,8 +42,6 @@ export class DynamicLinkComponent implements DynamicComponent, OnInit {
 
 	/**
 	 * DynamicComponent interface method. Triggered as the component is injected
-	 * @param el
-	 * @param textContent
 	 */
 	public buildJob(el: Element): void {
 		this.link = el.getAttribute('href');

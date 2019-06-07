@@ -35,8 +35,8 @@ export class LoginComponent implements OnDestroy {
 		private fb: FormBuilder,
 		public authService: AuthService) {
 		this.loginForm = fb.group({
-			'username': ['', Validators.required],
-			'password': ['', Validators.required]
+			username: ['', Validators.required],
+			password: ['', Validators.required]
 		});
 		authService.user.pipe(takeUntil(this._ngUnsub)).subscribe(user => {
 			if (!user) { this.state.next(STATES.READY); }

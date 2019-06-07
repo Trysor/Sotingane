@@ -24,9 +24,9 @@ export class ChangePasswordComponent {
 		private fb: FormBuilder,
 		public authService: AuthService) {
 		this.changePasswordForm = fb.group({
-			'currentPassword': ['', Validators.required],
-			'password': ['', Validators.required],
-			'confirm': ['', Validators.required]
+			currentPassword: ['', Validators.required],
+			password: ['', Validators.required],
+			confirm: ['', Validators.required]
 		}, { validator: this.matchingPasswords.bind(this) });
 	}
 
@@ -51,8 +51,6 @@ export class ChangePasswordComponent {
 
 	/**
 	 * Compares the password and confirm fields and returns true if they match
-	 * @param  {FormGroup} group the form group upon which the check is done
-	 * @return {boolean}         if the fields match
 	 */
 	private matchingPasswords(group: FormGroup) {
 		// if they do not match, then we return that matchingPasswords is true (in that it is an error)

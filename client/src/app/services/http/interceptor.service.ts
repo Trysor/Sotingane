@@ -38,7 +38,7 @@ export class InterceptorService implements HttpInterceptor {
 		this.loadingService.addRequest();
 
 		// Send it off to the next handle
-		return next.handle(req.clone({ headers: headers, withCredentials: true })).pipe(
+		return next.handle(req.clone({ headers, withCredentials: true })).pipe(
 			timeout(env.TIMEOUT), // Set global TIMEOUT for all API calls
 			finalize(() => this.loadingService.removeRequest()),
 			catchError((err: HttpErrorResponse | TimeoutError, caught) => {

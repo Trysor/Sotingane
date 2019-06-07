@@ -28,15 +28,15 @@ export class SettingsComponent implements OnDestroy {
 		private fb: FormBuilder) {
 
 		this.settingsForm = this.fb.group({
-			'indexRoute': ['', Validators.required],
-			'org': ['', Validators.required],
-			'meta': this.fb.group({
-				'title': ['', Validators.required],
-				'desc': ['', Validators.required]
+			indexRoute: ['', Validators.required],
+			org: ['', Validators.required],
+			meta: this.fb.group({
+				title: ['', Validators.required],
+				desc: ['', Validators.required]
 			}),
-			'footer': this.fb.group({
-				'text': ['', Validators.required],
-				'copyright': ['', Validators.required]
+			footer: this.fb.group({
+				text: ['', Validators.required],
+				copyright: ['', Validators.required]
 			})
 		});
 

@@ -35,14 +35,14 @@ export class ContentComponent implements AfterViewInit, OnDestroy {
 		private contentService: ContentService,
 		private route: ActivatedRoute,
 		private router: Router,
-		public authService: AuthService,
 		private settingsService: SettingsService,
+		public authService: AuthService,
 		public cmsService: CMSService) {
 
 		this.router.events.pipe(
 			filter(e => e instanceof NavigationEnd), takeUntil(this._ngUnsub)
-		).subscribe(e => {
-			this.cmsService.requestContent(this.route.snapshot.params['content']);
+		).subscribe(() => {
+			this.cmsService.requestContent(this.route.snapshot.params.content);
 		});
 	}
 

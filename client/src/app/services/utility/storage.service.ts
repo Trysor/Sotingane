@@ -22,8 +22,6 @@ export class StorageService {
 
 	/**
 	 * Sets a session storage item
-	 * @param key
-	 * @param value
 	 */
 	public setSession(key: StorageKey, value: string) {
 		if (this.platform.isBrowser) {
@@ -39,7 +37,6 @@ export class StorageService {
 
 	/**
 	 * Gets a session storage item
-	 * @param key
 	 */
 	public getSession(key: StorageKey) {
 		return this.platform.isBrowser ? sessionStorage.getItem(key) : this._serverMap.get(key);
@@ -51,8 +48,6 @@ export class StorageService {
 
 	/**
 	 * Sets a local storage item
-	 * @param key
-	 * @param value
 	 */
 	public setLocal(key: StorageKey, value: string) {
 		if (this.platform.isBrowser) {
@@ -68,7 +63,6 @@ export class StorageService {
 
 	/**
 	 * Gets a local storage item
-	 * @param key
 	 */
 	public getLocal(key: StorageKey) {
 		return this.platform.isBrowser ? localStorage.getItem(key) : this._serverMap.get(key);

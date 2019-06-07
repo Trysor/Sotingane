@@ -45,7 +45,6 @@ export class AuthService {
 
 	/**
 	 * Starts a timer to renew the jwt before it exires
-	 * @param  {string}       token token to base the renewal timer on
 	 */
 	private engageRenewTokenTimer(user: JWTUser) {
 		// cancel any ongoing timers
@@ -67,7 +66,7 @@ export class AuthService {
 	private updateTokenInfo() {
 		return this.renewToken().pipe(
 			take(1),
-			catchError(() => of(<TokenResponse>null)),
+			catchError(() => of(null as TokenResponse)),
 		).subscribe(res => {
 
 			if (!res) {
@@ -84,8 +83,6 @@ export class AuthService {
 
 	/**
 	 * Returns true if the user is of the given role
-	 * @param  {AccessRoles}      role The role to compare against
-	 * @return {boolean}          whether the user is of the given role
 	 */
 	public isUserOfRole(role: AccessRoles): boolean {
 		const user = this.user.getValue();
@@ -111,7 +108,6 @@ export class AuthService {
 
 	/**
 	 * Requests to log the user in
-	 * @param  {User} user                   The user to log in
 	 */
 	public login(user: User) {
 		return this.http.client.post<TokenResponse>(this.http.apiUrl(env.API.auth.login), user).pipe(map(
@@ -159,7 +155,6 @@ export class AuthService {
 
 	/**
 	 * Attempt to update the logged in user's password
-	 * @param  {UpdatePasswordUser}  user the object containing the user data
 	 */
 	public updatePassword(user: UpdatePasswordUser) {
 		return this.http.client.post<boolean>(this.http.apiUrl(env.API.auth.updatepass), user).pipe(

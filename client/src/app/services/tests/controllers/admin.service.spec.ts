@@ -7,6 +7,7 @@ import { AdminService, HttpService } from '@app/services';
 import { User, Content } from '@types';
 
 import { env } from '@env';
+import { Type } from '@angular/core';
 
 
 describe('AdminService', () => {
@@ -14,7 +15,7 @@ describe('AdminService', () => {
 	let httpTestingController: HttpTestingController;
 
 	beforeEach(() => {
-		const spy = jasmine.createSpyObj<HttpService>('HttpService', ['client', 'apiUrl',]);
+		const spy = jasmine.createSpyObj<HttpService>('HttpService', ['client', 'apiUrl']);
 
 		TestBed.configureTestingModule({
 			providers: [
@@ -24,10 +25,10 @@ describe('AdminService', () => {
 			imports: [HttpClientTestingModule]
 		});
 		service = TestBed.get(AdminService);
-		httpTestingController = TestBed.get(HttpTestingController);
+		httpTestingController = TestBed.get(HttpTestingController as Type<HttpTestingController>);
 
 		// Override the client property to use the test client
-		(<any>service).http.client = TestBed.get(HttpClient);
+		( service as any).http.client = TestBed.get(HttpClient);
 
 		// skip api base etc
 		TestBed.get(HttpService).apiUrl.and.callFake((api: string) => api);

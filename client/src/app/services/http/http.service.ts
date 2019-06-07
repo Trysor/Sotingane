@@ -34,7 +34,7 @@ export class HttpService {
 
 		// Registers the logo
 		const logoPath = (platform.isServer ? this._urlBase : '') + '/assets/logo192themed.svg';
-		iconRegistry.addSvgIcon('logo', san.bypassSecurityTrustResourceUrl(logoPath));
+		this.iconRegistry.addSvgIcon('logo', this.san.bypassSecurityTrustResourceUrl(logoPath));
 	}
 
 
@@ -48,8 +48,6 @@ export class HttpService {
 
 	/**
 	 * Handle request on server and transfer state to client
-	 * @param key
-	 * @param request
 	 */
 	public fromState<T>(key: StateKey<T>, request: Observable<T>): Observable<T> {
 		// Get state

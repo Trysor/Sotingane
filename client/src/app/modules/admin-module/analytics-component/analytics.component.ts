@@ -50,25 +50,25 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 	public get maxSeenAfterDate() {
 		return !this.aggregateForm.get('seenBeforeDate').value
 			? this.today
-			: DateMin([this.today, <Date>this.aggregateForm.get('seenBeforeDate').value]);
+			: DateMin([this.today, this.aggregateForm.get('seenBeforeDate').value as Date]);
 	}
 
 	public get minSeenBeforeDate() {
 		return !this.aggregateForm.get('seenAfterDate').value
 			? null
-			: DateMin([this.today, <Date>this.aggregateForm.get('seenAfterDate').value]);
+			: DateMin([this.today, this.aggregateForm.get('seenAfterDate').value as Date]);
 	}
 
 	public get maxCreatedAfterDate() {
 		return !this.aggregateForm.get('createdBeforeDate').value
 			? this.today
-			: DateMin([this.today, <Date>this.aggregateForm.get('createdBeforeDate').value]);
+			: DateMin([this.today, this.aggregateForm.get('createdBeforeDate').value as Date]);
 	}
 
 	public get minCreatedBeforeDate() {
 		return !this.aggregateForm.get('createdAfterDate').value
 			? null
-			: DateMin([this.today, <Date>this.aggregateForm.get('createdAfterDate').value]);
+			: DateMin([this.today, this.aggregateForm.get('createdAfterDate').value as Date]);
 	}
 
 	// Browsers
@@ -177,20 +177,20 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 		const _disableAccessOnInit = true;
 		this.aggregateForm = fb.group({
 			// Content Filters
-			'createdBy': [''],
-			'access': new FormControl({ value: [], disabled: _disableAccessOnInit }),
-			'accessFilter': [!_disableAccessOnInit],
-			'published': [true],
-			'route': [''],
-			'folder': [''],
-			'createdAfterDate': [''],
-			'createdBeforeDate': [''],
+			createdBy: [''],
+			access: new FormControl({ value: [], disabled: _disableAccessOnInit }),
+			accessFilter: [!_disableAccessOnInit],
+			published: [true],
+			route: [''],
+			folder: [''],
+			createdAfterDate: [''],
+			createdBeforeDate: [''],
 			// User Filters
-			'seenAfterDate': [''],
-			'seenBeforeDate': [''],
-			'readBy': [[]],
-			'browsers': [[]],
-			'unwind': [false],
+			seenAfterDate: [''],
+			seenBeforeDate: [''],
+			readBy: [[]],
+			browsers: [[]],
+			unwind: [false],
 		});
 
 		// Get users
@@ -222,10 +222,10 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 
 	public submitForm() {
 		const query: AggregationQuery = this.aggregateForm.value;
-		if (!(<any>query).accessFilter) {
+		if (!(query as any).accessFilter) {
 			delete query.access;
 		}
-		delete (<any>query).accessFilter; // noAccessFilter isn't part of the request to the API
+		delete (query as any).accessFilter; // noAccessFilter isn't part of the request to the API
 
 		this.setState(AnalyticsState.LOADING);
 		this.adminService.getAggregatedData(query).pipe(
@@ -243,7 +243,7 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 			}
 			this.setState(AnalyticsState.QUERY);
 			this.data.next(null);
-			this.snackBar.open((<any>data).message);
+			this.snackBar.open((data as any).message);
 		});
 	}
 

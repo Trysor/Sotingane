@@ -9,11 +9,12 @@ import { filter, distinctUntilChanged, debounceTime, takeUntil, takeWhile } from
 
 @Injectable({ providedIn: 'root' })
 export class LoadingService {
+	private static readonly TICK_RATE = 150;
+
 	private _requests = new BehaviorSubject<number>(0);
 	private _isLoading = new Subject<boolean>();
 	private _loadingBarValue = new Subject<number>();
 
-	private static readonly TICK_RATE = 150;
 
 	public get isLoading() { return this._isLoading; }
 	public get valueSubject() { return this._loadingBarValue; }

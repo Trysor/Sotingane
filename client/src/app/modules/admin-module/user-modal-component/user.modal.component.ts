@@ -35,8 +35,8 @@ export class UserModalComponent {
 		this.otherUsernames = this.data.userList.filter(user => user !== data.user).map(user => user.username.toLowerCase());
 
 		this.patchUserForm = fb.group({
-			'username': [data.user.username, Validators.compose([Validators.required, this.usernameTaken.bind(this)])],
-			'roles': [data.user.roles, Validators.required]
+			username: [data.user.username, Validators.compose([Validators.required, this.usernameTaken.bind(this)])],
+			roles: [data.user.roles, Validators.required]
 		});
 	}
 
@@ -74,7 +74,6 @@ export class UserModalComponent {
 
 	/**
 	 * Form Validation that disallows values that are considered unique for the username property.
-	 * @param control
 	 */
 	private usernameTaken(control: FormControl) {
 		return this.otherUsernames.includes(control.value.toLowerCase()) ? { usernameTaken: true } : null;

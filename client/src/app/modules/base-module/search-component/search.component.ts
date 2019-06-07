@@ -3,7 +3,7 @@ import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core
 import { Router } from '@angular/router';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
-import { CMSService, MobileService } from '@app/services';
+import { MobileService } from '@app/services';
 
 @Component({
 	selector: 'search-component',
@@ -17,10 +17,9 @@ export class SearchComponent implements OnInit {
 
 	constructor(
 		public mobileService: MobileService,
-		private cmsService: CMSService,
 		private fb: FormBuilder,
 		private router: Router) {
-		this.form = this.fb.group({ 'search': [''] });
+		this.form = this.fb.group({ search: [''] });
 	}
 
 	ngOnInit() {

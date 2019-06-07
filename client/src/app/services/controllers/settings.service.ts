@@ -6,8 +6,8 @@ import { HttpService } from '@app/services/http/http.service';
 import { PlatformService } from '@app/services/utility/platform.service';
 
 import { makeStateKey } from '@angular/platform-browser';
-const SETTINGS_KEY = makeStateKey<Settings>('settings'),
-	  THEME_KEY = makeStateKey<Theme>('theme');
+const SETTINGS_KEY = makeStateKey<Settings>('settings');
+const THEME_KEY = makeStateKey<Theme>('theme');
 
 
 import { env } from '@env';
@@ -15,15 +15,15 @@ import { take } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 
 const emptySettings: Settings = {
-	'indexRoute': '',
-	'org': '',
-	'meta': {
-		'title': '',
-		'desc': ''
+	indexRoute: '',
+	org: '',
+	meta: {
+		title: '',
+		desc: ''
 	},
-	'footer': {
-		'text': '',
-		'copyright': ''
+	footer: {
+		text: '',
+		copyright: ''
 	}
 };
 

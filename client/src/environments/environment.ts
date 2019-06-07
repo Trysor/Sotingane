@@ -5,7 +5,7 @@ export const env = {
 
 	TIMEOUT: 5000,
 
-	API: API,
+	API,
 	API_BASE: 'http://localhost:2000'
 };
 

@@ -32,30 +32,30 @@ enum VideoSite {
 export class DynamicMediaComponent extends DynamicLazyLoader implements DynamicComponent {
 	private static readonly VideoFilters: VideoFilter[] = [
 		{
-			'site': VideoSite.youtube,
-			'match': 'youtu.be',
-			'idFrom': /be\/([a-zA-Z0-9_-]+)/,
-			'start': /[\&\?]t=([0-9]+)/
+			site: VideoSite.youtube,
+			match: 'youtu.be',
+			idFrom: /be\/([a-zA-Z0-9_-]+)/,
+			start: /[\&\?]t=([0-9]+)/
 		},
 		{
-			'site': VideoSite.youtube,
-			'match': 'youtube',
-			'idFrom': /\?v=([a-zA-Z0-9_-]+)/,
-			'start': /[&?]t=([0-9]+)/
+			site: VideoSite.youtube,
+			match: 'youtube',
+			idFrom: /\?v=([a-zA-Z0-9_-]+)/,
+			start: /[&?]t=([0-9]+)/
 		},
 		{
-			'site': VideoSite.twitch,
-			'match': 'twitch.tv/videos/',
-			'idFrom': /videos\/([a-zA-Z0-9_-]+)/,
-			'start': /[&?]t=([0-9]+)/, // t=04h30m37s. TODO: fix me.
-			'prefix': 'video=v'
+			site: VideoSite.twitch,
+			match: 'twitch.tv/videos/',
+			idFrom: /videos\/([a-zA-Z0-9_-]+)/,
+			start: /[&?]t=([0-9]+)/, // t=04h30m37s. TODO: fix me.
+			prefix: 'video=v'
 		},
 		{
-			'site': VideoSite.twitch,
-			'match': 'twitch.tv/',
-			'idFrom': /tv\/([a-zA-Z0-9_-]+)/,
-			'start': /[&?]t=([0-9]+)/,  // t=04h30m37s. TODO: fix me.
-			'prefix': 'channel='
+			site: VideoSite.twitch,
+			match: 'twitch.tv/',
+			idFrom: /tv\/([a-zA-Z0-9_-]+)/,
+			start: /[&?]t=([0-9]+)/,  // t=04h30m37s. TODO: fix me.
+			prefix: 'channel='
 		}
 	];
 
@@ -76,8 +76,6 @@ export class DynamicMediaComponent extends DynamicLazyLoader implements DynamicC
 
 	/**
 	 * DynamicComponent interface method. Triggered as the component is injected
-	 * @param el
-	 * @param textContent
 	 */
 	public buildJob(el: Element): void {
 		this.url = el.children[0].getAttribute('url');
@@ -97,7 +95,7 @@ export class DynamicMediaComponent extends DynamicLazyLoader implements DynamicC
 			const ID = match ? match[1] : undefined;
 			if (!ID) { break; }
 
-			const params: VideoParams = { 'ID': ID };
+			const params: VideoParams = { ID };
 			const startMatch = filter.start.exec(this.url);
 			if (startMatch) { params.start = startMatch[1]; }
 			if (filter.prefix) { params.prefix = filter.prefix; }

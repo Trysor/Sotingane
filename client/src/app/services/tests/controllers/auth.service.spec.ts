@@ -19,6 +19,7 @@ import { User, TokenResponse } from '@types';
 import { env } from '@env';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { Type } from '@angular/core';
 
 describe('AuthService', () => {
 	let service: AuthService;
@@ -29,7 +30,7 @@ describe('AuthService', () => {
 
 		// change the calls to fromState and apiUrl and return modified values
 		// the only fromState-call there is in auth.service returns TokenResponse
-		httpServiceSpy.fromState.and.callFake( <any>((_key: any, req: any) => of<TokenResponse>(<any>{})) );
+		httpServiceSpy.fromState.and.callFake(  ((_key: any, req: any) => of<TokenResponse>( {} as any)) as any );
 		httpServiceSpy.apiUrl.and.callFake((api: string) => api);
 
 		// Use our spies in the module
@@ -51,7 +52,7 @@ describe('AuthService', () => {
 
 		// Get the service, and the httpTestingController, so we can use these in our tests
 		service = TestBed.get(AuthService);
-		httpTestingController = TestBed.get(HttpTestingController);
+		httpTestingController = TestBed.get(HttpTestingController as Type<HttpTestingController>);
 	});
 
 
@@ -80,10 +81,10 @@ describe('AuthService', () => {
 		expect(req.request.method).toEqual('POST');
 
 		// Reply with test data
-		req.flush(<TokenResponse>{ // tslint:disable:max-line-length
+		req.flush( { // tslint:disable:max-line-length
 			token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjk0NjY4NDgwMCwiZXhwIjozMjUwMzY4MDAwMCwiYXVkIjoiIiwic3ViIjoidGVzdCIsIl9pZCI6IjEyMzQ1NiIsInVzZXJuYW1lIjoidGVzdCIsInJvbGUiOiJhZG1pbiJ9.uI0Z1CmNRGBxG5HxC_UHZCbsx_kJ0CvRqRuy2YG-Zu0',
 			user: testUser
-		}); // tslint:enable:max-line-length
+		} as TokenResponse); // tslint:enable:max-line-length
 	});
 
 	it('login() fail', () => {

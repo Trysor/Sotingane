@@ -66,28 +66,29 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 
 		// Form
 		this.contentForm = this.fb.group({
-			'route': ['', Validators.compose([
+			route: ['', Validators.compose([
 				Validators.maxLength(this.CONTENT_MAX_LENGTH.ROUTE),
 				this.disallowed(this.cmsService.getContentList(), 'route').bind(this)
 			])],
-			'title': ['', Validators.compose([
+			title: ['', Validators.compose([
 				Validators.maxLength(this.CONTENT_MAX_LENGTH.TITLE),
 				this.disallowed(this.cmsService.getContentList(), 'title').bind(this)
 			])],
-			'published': [true],
-			'description': ['', Validators.compose([
+			published: [true],
+			description: ['', Validators.compose([
 				Validators.required,
 				Validators.maxLength(this.CONTENT_MAX_LENGTH.DESC)
 			])],
-			'access': [[]],
-			'nav': [true],
-			'folder': ['', Validators.maxLength(this.CONTENT_MAX_LENGTH.FOLDER)],
-			'content': ['', Validators.required],
+			access: [[]],
+			nav: [true],
+			folder: ['', Validators.maxLength(this.CONTENT_MAX_LENGTH.FOLDER)],
+			content: ['', Validators.required],
 		});
 		this._currentDraft = this.contentForm.getRawValue();
 
 		// Hook (non-dirty) route to title.
-		const routeEdit = this.contentForm.get('route'), titleEdit = this.contentForm.get('title');
+		const routeEdit = this.contentForm.get('route');
+		const titleEdit = this.contentForm.get('title');
 		let oldTitleValue = titleEdit.value;
 		this.contentForm.get('title').valueChanges.pipe(takeUntil(this._ngUnsub)).subscribe(newVal => {
 			// Update routeEdit IFF the user specifically edits title without having touched route, and the values are equal
@@ -116,7 +117,7 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 		));
 
 		// Router: Check if we are editing or creating content. Load from API
-		const editingContentRoute = this.route.snapshot.params['route'];
+		const editingContentRoute = this.route.snapshot.params.route;
 		if (editingContentRoute) {
 			this.adminService.getContentPage(editingContentRoute).pipe(
 				catchError(() => {
@@ -141,7 +142,6 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 
 	/**
 	 * Event handler for when the currently viewed version changes
-	 * @param event
 	 */
 	public versionChange(event: MatSelectChange) {
 		const c = this.history ? this.history[event.value] : null;
@@ -175,8 +175,6 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 
 	/**
 	 * Form Validation that disallows values that are considered unique for the given property.
-	 * @param contentList
-	 * @param prop
 	 */
 	private disallowed(contentList: BehaviorSubject<Content[]>, prop: string) {
 		return (control: FormControl): { [key: string]: any } => {
@@ -225,7 +223,7 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 		const onSubmit = (obs: Observable<Content>) => {
 			obs.pipe(
 				take(1),
-				catchError(() => of(<Content>null))
+				catchError(() => of( null as Content))
 			).subscribe(newContent => {
 				if (!newContent) {
 					// TODO: Tell the user why it failed
@@ -254,10 +252,8 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 
 	/**
 	 * Returns the display format of history items
-	 * @param ver
-	 * @param text
 	 */
-	public getHistoryItemFormatted(ver: number, text: string): string {
+	public getHistoryItemFormatted(ver: number, text: string) {
 		return `${ver}. ${text}`;
 	}
 

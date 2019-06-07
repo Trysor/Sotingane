@@ -86,7 +86,6 @@ export class TableComponent implements OnInit, AfterViewInit {
 
 	/**
 	 * method to perform the click function on a row
-	 * @param row
 	 */
 	public rowClick(row: object) {
 		if (this.settings.rowClick) {
@@ -96,9 +95,6 @@ export class TableComponent implements OnInit, AfterViewInit {
 
 	/**
 	 * Handler for column func button clicks
-	 * @param col
-	 * @param obj
-	 * @param e
 	 */
 	public buttonClick(col: ColumnSettings<any>, obj: object, e: MouseEvent) {
 		col.func(obj, this.Source.data);
@@ -107,7 +103,6 @@ export class TableComponent implements OnInit, AfterViewInit {
 
 	/**
 	 * Click override for hyperlinks and buttons - disable propagation so that row clicks do not trigger
-	 * @param e
 	 */
 	public overrideClick(e: MouseEvent) {
 		e.stopPropagation();

@@ -29,7 +29,6 @@ export class IntersectionService {
 
 	/**
 	 * Observe the on-screen visiblity of a given element
-	 * @param el
 	 */
 	public observe(el: Element) {
 		if (this.platform.isBrowser) {
@@ -52,7 +51,6 @@ export class IntersectionService {
 
 	/**
 	 * Unobserves an element
-	 * @param el
 	 */
 	public unobserve(el: Element) {
 		if (this.platform.isServer) { return; }
