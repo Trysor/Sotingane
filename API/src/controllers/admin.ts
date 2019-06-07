@@ -14,16 +14,13 @@ export class AdminController extends Controller {
 
 	/**
 	 * Gets all content
-	 * @param  {Req}		req  request
-	 * @param  {Res}		res  response
-	 * @param  {Next}		next next
 	 */
 	@GET({ path: '/cms/', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
 	public async getAdminContentList(req: Req, res: Res, next: Next) {
 		const contentList: Content[] = await ContentModel.aggregate([
 			{ $lookup: { from: 'logs', localField: '_id', foreignField: 'content', as: 'logData' } },
 			{ $unwind: { path: '$logData', preserveNullAndEmptyArrays: true } },
-			{ $group: { _id: '$_id', 'current': { $first: '$current' }, 'views': { $sum: 1 } } },
+			{ $group: { _id: '$_id', current: { $first: '$current' }, views: { $sum: 1 } } },
 			{
 				$project: {
 					current: {
@@ -44,21 +41,18 @@ export class AdminController extends Controller {
 
 	/**
 	 * Gets all content of a given route, declared by the param
-	 * @param  {Req}		req  request
-	 * @param  {Res}		res  response
-	 * @param  {Next}		next next
 	 */
 	@GET({ path: '/cms/:route', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
 	public async getContentFull(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route;
 
-		const contentDoc = <ContentEntry>await ContentModel.findOne(
+		const contentDoc =  await ContentModel.findOne(
 			{ 'current.route': route },
-			{ 'current': 1 }
+			{ current: 1 }
 		).populate([
 			{ path: 'current.updatedBy', select: 'username -_id' }, // exclude _id
 			{ path: 'current.createdBy', select: 'username -_id' }  // exclude _id
-		]).lean();
+		]).lean() as ContentEntry;
 
 		if (!contentDoc) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
 		res.status(200).send(contentDoc.current);
@@ -69,9 +63,6 @@ export class AdminController extends Controller {
 
 	/**
 	 * Aggregates Content and Log data
-	 * @param  {Req}		req  request
-	 * @param  {Res}		res  response
-	 * @param  {Next}		next next
 	 */
 	@POST({ path: '/cms/aggregate', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.AdminAggregationSchema)] })
 	public async aggregateContent(req: Req, res: Res, next: Next) {
@@ -90,11 +81,11 @@ export class AdminController extends Controller {
 			match.push({ 'current.access': { $eq: [] } });
 		}
 		if (!!query.createdAfterDate && !!query.createdBeforeDate) {												// CreatedAt
-			match.push({'current.createdAt': { '$gte': new Date(query.createdAfterDate), '$lt': new Date(query.createdBeforeDate) }});
+			match.push({'current.createdAt': { $gte: new Date(query.createdAfterDate), $lt: new Date(query.createdBeforeDate) }});
 		} else if (query.createdAfterDate) {
-			match.push({'current.createdAt': { '$gte': new Date(query.createdAfterDate) }});
+			match.push({'current.createdAt': { $gte: new Date(query.createdAfterDate) }});
 		} else if (query.createdBeforeDate) {
-			match.push({'current.createdAt': { '$lt': new Date(query.createdBeforeDate) }});
+			match.push({'current.createdAt': { $lt: new Date(query.createdBeforeDate) }});
 		}
 
 		// Early project
@@ -111,11 +102,11 @@ export class AdminController extends Controller {
 		// LogData filtering
 		const userFilter: any = {};
 		if (!!query.seenAfterDate && !!query.seenBeforeDate) {
-			userFilter['logData.ts'] = { '$gte': new Date(query.seenAfterDate), '$lt': new Date(query.seenBeforeDate) };
+			userFilter['logData.ts'] = { $gte: new Date(query.seenAfterDate), $lt: new Date(query.seenBeforeDate) };
 		} else if (!!query.seenAfterDate) {
-			userFilter['logData.ts'] = { '$gte': new Date(query.seenAfterDate) };
+			userFilter['logData.ts'] = { $gte: new Date(query.seenAfterDate) };
 		} else if (!!query.seenBeforeDate) {
-			userFilter['logData.ts'] = { '$lt': new Date(query.seenBeforeDate) };
+			userFilter['logData.ts'] = { $lt: new Date(query.seenBeforeDate) };
 		}
 		if (!!query.readBy && query.readBy.length > 0) { // Read by check (must compare against ObjectId)
 			userFilter['logData.user'] = { $in: query.readBy.map(id => MongoTypes.ObjectId(id)) };
@@ -127,9 +118,9 @@ export class AdminController extends Controller {
 		// Content-LogData grouping
 		const group = {
 			_id: '$_id',
-			'current': { $first: '$current' },
-			'views': { $sum: 1 },
-			'lastVisit': { $last: '$logData.ts' }
+			current: { $first: '$current' },
+			views: { $sum: 1 },
+			lastVisit: { $last: '$logData.ts' }
 		};
 
 		// Projecting
@@ -137,14 +128,14 @@ export class AdminController extends Controller {
 			current: { title: 1, route: 1, access: 1 }
 		};
 		if (unwind) { // Add log data since we're unwinding
-			project['current']['logDataId'] = '$logData._id';
-			project['current']['logDataUser'] = '$logData.user';
-			project['current']['logDataTs'] = '$logData.ts';
-			project['current']['logDataBrowser'] = '$logData.browser';
-			project['current']['logDataBrowserVer'] = '$logData.browser_ver';
+			project.current.logDataId = '$logData._id';
+			project.current.logDataUser = '$logData.user';
+			project.current.logDataTs = '$logData.ts';
+			project.current.logDataBrowser = '$logData.browser';
+			project.current.logDataBrowserVer = '$logData.browser_ver';
 		} else { // Else we summarize
-			project['current']['views'] = '$views';
-			project['current']['lastVisit'] = '$lastVisit';
+			project.current.views = '$views';
+			project.current.lastVisit = '$lastVisit';
 		}
 
 		// Pipeline
@@ -164,7 +155,7 @@ export class AdminController extends Controller {
 			if (stream) {
 				return MongoStream({
 					type: 'aggregation',
-					res: res,
+					res,
 					query: () => ContentModel.aggregate(pipeline),
 					errStatus: status(ADMIN_STATUS.AGGREGATION_MONGOOSE_ERROR),
 					noneFoundStatus: status(ADMIN_STATUS.AGGREGATION_RESULT_NONE_FOUND)
@@ -187,22 +178,22 @@ export class AdminController extends Controller {
 */
 
 const adminAggregationSchema = {
-	'$id': JSchema.AdminAggregationSchema.name,
-	'type': 'object',
-	'additionalProperties': false,
-	'properties': {
-		'createdBy': { 'type': 'string' },
-		'access': { 'type': 'array', 'items': { 'type': 'string', 'enum': Object.values(AccessRoles) }, 'uniqueItems': true },
-		'published': { 'type': 'boolean' },
-		'route': { 'type': 'string' },
-		'folder': { 'type': 'string' },
-		'createdAfterDate': { 'oneOf': [{ 'type': 'string', 'format': 'date-time' }, { 'type': 'string', 'maxLength': 0 }] },
-		'createdBeforeDate': { 'oneOf': [{ 'type': 'string', 'format': 'date-time' }, { 'type': 'string', 'maxLength': 0 }] },
-		'seenAfterDate': { 'oneOf': [{ 'type': 'string', 'format': 'date-time' }, { 'type': 'string', 'maxLength': 0 }] },
-		'seenBeforeDate': { 'oneOf': [{ 'type': 'string', 'format': 'date-time' }, { 'type': 'string', 'maxLength': 0 }] },
-		'readBy': { 'type': 'array', 'items': { 'type': 'string' }, 'uniqueItems': true },
-		'browsers': { 'type': 'array', 'items': { 'type': 'string' }, 'uniqueItems': true },
-		'unwind': { 'type': 'boolean' }
+	$id: JSchema.AdminAggregationSchema.name,
+	type: 'object',
+	additionalProperties: false,
+	properties: {
+		createdBy: { type: 'string' },
+		access: { type: 'array', items: { type: 'string', enum: Object.values(AccessRoles) }, uniqueItems: true },
+		published: { type: 'boolean' },
+		route: { type: 'string' },
+		folder: { type: 'string' },
+		createdAfterDate: { oneOf: [{ type: 'string', format: 'date-time' }, { type: 'string', maxLength: 0 }] },
+		createdBeforeDate: { oneOf: [{ type: 'string', format: 'date-time' }, { type: 'string', maxLength: 0 }] },
+		seenAfterDate: { oneOf: [{ type: 'string', format: 'date-time' }, { type: 'string', maxLength: 0 }] },
+		seenBeforeDate: { oneOf: [{ type: 'string', format: 'date-time' }, { type: 'string', maxLength: 0 }] },
+		readBy: { type: 'array', items: { type: 'string' }, uniqueItems: true },
+		browsers: { type: 'array', items: { type: 'string' }, uniqueItems: true },
+		unwind: { type: 'boolean' }
 	},
 };
 

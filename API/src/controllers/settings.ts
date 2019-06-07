@@ -38,24 +38,24 @@ export class SettingsController extends Controller {
 */
 
 const settingsSchema = {
-	'$id': JSchema.SettingsSchema.name,
-	'type': 'object',
-	'additionalProperties': false,
-	'properties': {
-		indexRoute: { 'type': 'string' },
-		org: { 'type': 'string' },
+	$id: JSchema.SettingsSchema.name,
+	type: 'object',
+	additionalProperties: false,
+	properties: {
+		indexRoute: { type: 'string' },
+		org: { type: 'string' },
 		meta: {
-			'type': 'object',
-			'properties': {
-				title: { 'type': 'string' },
-				desc: { 'type': 'string' },
+			type: 'object',
+			properties: {
+				title: { type: 'string' },
+				desc: { type: 'string' },
 			}
 		},
 		footer: {
-			'type': 'object',
-			'properties': {
-				text: { 'type': 'string' },
-				copyright: { 'type': 'string' },
+			type: 'object',
+			properties: {
+				text: { type: 'string' },
+				copyright: { type: 'string' },
 			}
 		}
 	},

@@ -21,7 +21,7 @@ export const validate = (schema: SchemaValidationObject) => {
 };
 
 export const status = (value: string, errors?: ErrorObject[]): StatusMessage => {
-	const msg: StatusMessage = { 'message': value };
+	const msg: StatusMessage = { message: value };
 	if (errors) {
 		msg.errors = errors.map(error => {
 			const obj: ErrorMessage = {

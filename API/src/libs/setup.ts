@@ -9,7 +9,6 @@ import * as cookieParser from 'cookie-parser';
 export class Setup {
 	/**
 	 * Initiates setup
-	 * @param  {Express} app express
 	 */
 	public static initiate(app: Express) {
 		// Secure app with helmet

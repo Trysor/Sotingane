@@ -60,7 +60,7 @@ passportUse(new LocalStrategy(localOptions, async (username, password, done) => 
 	const user = await UserModel.findOne({ username_lower: username.toLowerCase() });
 	if (!user) { return done(null, null); }
 	const isMatch = await user.comparePassword(password);
-	done(null, isMatch ? <JWTUser>{ _id: user._id, username: user.username, roles: user.roles } : null);
+	done(null, isMatch ? { _id: user._id, username: user.username, roles: user.roles } as JWTUser : null);
 }));
 
 // Setting up JWT login strategies
@@ -93,7 +93,7 @@ const Personalize = (req: Request, res: Response, next: NextFunction) => {
 
 const RequireRole = (role: AccessRoles) => {
 	return (req: Request, res: Response, next: NextFunction) => {
-		return Auth.CanUserAccess(<JWTUser>req.user, role)
+		return Auth.CanUserAccess(req.user as JWTUser, role)
 			? next()
 			: res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED));
 	};
@@ -138,21 +138,19 @@ export class Auth {
 
 	/**
 	 * Creates the match object with prefilled access user rights data to be used with Mongoose aggregation queries
-	 * @param user User object containing the roles to match against. Null if no user is present
-	 * @param match Optional object containing other match objects
 	 */
 	public static getUserAccessMatchObject(user: JWTUser, match: any = {}) {
 		if (user) {
-			const matchOrSelect = <any>[
+			const matchOrSelect = [
 				{ 'current.access': { $elemMatch: { $in: user.roles } } },
-				{ 'current.access': { $eq: <AccessRoles[]>[] } }
-			];
+				{ 'current.access': { $eq: [] as AccessRoles[] } }
+			] as any;
 			if (!!user.roles && user.roles.includes(AccessRoles.writer)) {
 				matchOrSelect.push({ 'current.createdBy': { $eq: MongoTypes.ObjectId(user._id) }});
 			}
 			match = Object.assign({ $or: matchOrSelect }, match);
 		} else {
-			match = Object.assign({ 'current.access': { $eq: <AccessRoles[]>[] } }, match);
+			match = Object.assign({ 'current.access': { $eq: [] as AccessRoles[] } }, match);
 		}
 		return match;
 	}

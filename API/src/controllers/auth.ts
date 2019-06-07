@@ -5,7 +5,7 @@ import { sign } from 'jsonwebtoken';
 
 import { status, ajv, JSchema, AUTH_STATUS, validate } from '../libs/validate';
 import { UserModel } from '../models';
-import { JWTUser, AccessRoles, TokenResponse } from '../../types';
+import { JWTUser, AccessRoles, TokenResponse, User } from '../../types';
 import { JWT } from '../../global';
 
 import { Controller, GET, POST, isProduction } from '../libs/routing';
@@ -17,12 +17,40 @@ enum JWT_Type {
 }
 
 export class AuthController extends Controller {
+	private static createSignedJWT(jwtObject: JWTUser, type: JWT_Type) {
+		return new Promise<string>((resolve) => {
+			sign(jwtObject, type === JWT_Type.REFRESH ? configGet<string>('refreshSecret') : configGet<string>('secret'), {
+				expiresIn: type === JWT_Type.REFRESH ? JWT.EXPIRES_REFRESH : JWT.EXPIRES_AUTH,
+				audience: type === JWT_Type.REFRESH ? configGet<string>('refreshTokenAudience') : configGet<string>('tokenAudience')
+			}, (err, token) => {
+				resolve(err ? null : token);
+			});
+		});
+	}
+
+	private static AddCookie(res: Res, type: JWT_Type, token: string) {
+		const isDelete = (!token || token.length === 0);
+
+		const cookieKey = type === JWT_Type.REFRESH
+			? JWT.COOKIE_REFRESH
+			: JWT.COOKIE_AUTH;
+
+		let maxAge = type === JWT_Type.REFRESH
+			? JWT.EXPIRES_REFRESH * 1000
+			: JWT.EXPIRES_AUTH * 1000;
+
+		if (isDelete) { maxAge = 1000; }
+
+		return res.cookie(cookieKey, isDelete ? '' : token, {
+			maxAge,
+			secure: isProduction,
+			httpOnly: true,
+			sameSite: true
+		});
+	}
 
 	/**
 	 * Returns a new token for a user in a session which is about to expire, if authorized to do so
-	 * @param  {Req}      req  request
-	 * @param  {Res}     res  response
-	 * @param  {Next} next next
 	 */
 	@POST({ path: '/token', do: [Auth.ByRefresh] })
 	@POST({ path: '/login', do: [validate(JSchema.UserLoginSchema), Auth.ByLogin] })
@@ -60,51 +88,15 @@ export class AuthController extends Controller {
 		jwtObject.exp = (now / 1000) + (JWT.EXPIRES_AUTH * (1 - JWT.THRESHOLD_EXPIRY)); // Add in the expiry info
 
 		const responseBody: TokenResponse = {
-			token: token,
-			refreshToken: refreshToken,
+			token,
+			refreshToken,
 			user: jwtObject,
 		};
 		return response.status(200).send(responseBody);
 	}
 
-	private static createSignedJWT(jwtObject: JWTUser, type: JWT_Type) {
-		return new Promise<string>((resolve) => {
-			sign(jwtObject, type === JWT_Type.REFRESH ? configGet<string>('refreshSecret') : configGet<string>('secret'), {
-				expiresIn: type === JWT_Type.REFRESH ? JWT.EXPIRES_REFRESH : JWT.EXPIRES_AUTH,
-				audience: type === JWT_Type.REFRESH ? configGet<string>('refreshTokenAudience') : configGet<string>('tokenAudience')
-			}, (err, token) => {
-				resolve(err ? null : token);
-			});
-		});
-	}
-
-	private static AddCookie(res: Res, type: JWT_Type, token: string) {
-		const isDelete = (!token || token.length === 0);
-
-		const cookieKey = type === JWT_Type.REFRESH
-			? JWT.COOKIE_REFRESH
-			: JWT.COOKIE_AUTH;
-
-		let maxAge = type === JWT_Type.REFRESH
-			? JWT.EXPIRES_REFRESH * 1000
-			: JWT.EXPIRES_AUTH * 1000;
-
-		if (isDelete) { maxAge = 1000; }
-
-		return res.cookie(cookieKey, isDelete ? '' : token, {
-			maxAge: maxAge,
-			secure: isProduction,
-			httpOnly: true,
-			sameSite: true
-		});
-	}
-
-
 	/**
 	 * Logs out a user by deleting their session cookie
-	 * @param  {Req}	req  request
-	 * @param  {Res}	res  response
-	 * @param  {Next}	next next
 	 */
 	@POST({ path: '/logout', do: [] })
 	public logout(req: Req, res: Res): Res {
@@ -116,15 +108,13 @@ export class AuthController extends Controller {
 
 	/**
 	 * Registers a user
-	 * @param  {Req}	req  request
-	 * @param  {Res}	res  response
-	 * @param  {Next}	next next
 	 */
 	@POST({ path: '/register', ignore: isProduction, do: [validate(JSchema.UserRegistrationSchema)] })
 	public async register(req: Req, res: Res, next: Next) { // Not enabled in production for the time being
-		const password: string = req.body.password,
-			role: AccessRoles = req.body.role,
-			username: string = req.body.username;
+		const password: string = req.body.password;
+		const roles: AccessRoles[] = req.body.roles;
+		const username: string = req.body.username;
+
 
 		const userAlreadyExists = await UserModel.findOne({ username_lower: username.toLowerCase() }).lean();
 
@@ -132,11 +122,11 @@ export class AuthController extends Controller {
 		if (userAlreadyExists) { return res.status(409).send(status(AUTH_STATUS.USERNAME_NOT_AVILIABLE)); }
 
 		const user = await new UserModel({
-			username: username,
+			username,
 			username_lower: username.toLowerCase(),
-			password: password,
-			role: role,
-		}).save();
+			password,
+			roles,
+		} as Partial<User>).save();
 
 		if (!user) { return res.status(409).send(status(AUTH_STATUS.USERNAME_NOT_AVILIABLE)); }
 		return res.status(200).send(status(AUTH_STATUS.ACCOUNT_CREATED));
@@ -145,16 +135,13 @@ export class AuthController extends Controller {
 
 	/**
 	 * Updates a user's password based ont he body contents.
-	 * @param  {Req}      req  request
-	 * @param  {Res}     res  response
-	 * @param  {Next} next next
 	 */
 	@POST({ path: '/updatepassword', do: [Auth.ByToken, validate(JSchema.UserUpdatePasswordSchema)] })
 	public async updatePassword(req: Req, res: Res, next: Next) {
-		const currentPassword: string = req.body.currentPassword,
-			password: string = req.body.password,
-			confirm: string = req.body.confirm,
-			jwtUser: JWTUser = <JWTUser>req.user;
+		const currentPassword: string = req.body.currentPassword;
+		const password: string = req.body.password;
+		const confirm: string = req.body.confirm;
+		const jwtUser: JWTUser = req.user as JWTUser;
 
 		if (password !== confirm) {
 			return res.status(401).send(status(AUTH_STATUS.PASSWORD_DID_NOT_MATCH));
@@ -173,12 +160,9 @@ export class AuthController extends Controller {
 
 	/**
 	 * Deletes a user-account of a given id from req.body.id
-	 * @param  {Req}      req  request
-	 * @param  {Res}     res  response
-	 * @param  {Next} next next
 	 */
 	@POST({ path: '/deleteaccount', ignore: true, do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
-	public async deleteAccount(req: Req, res: Res, next: Next) { // TODO: Implement my security
+	public async deleteAccount(req: Req, res: Res, next: Next) { // TODO: Implement security
 		const id: string = req.body.id;
 
 		try {
@@ -201,26 +185,26 @@ export class AuthController extends Controller {
 
 // Registration
 const userRegistrationSchema = {
-	'$id': JSchema.UserRegistrationSchema.name,
-	'type': 'object',
-	'additionalProperties': false,
-	'properties': {
-		'username': {
-			'type': 'string'
+	$id: JSchema.UserRegistrationSchema.name,
+	type: 'object',
+	additionalProperties: false,
+	properties: {
+		username: {
+			type: 'string'
 		},
-		'roles': {
-			'type': 'array',
-			'items': {
-				'type': 'string',
-				'enum': Object.values(AccessRoles)
+		roles: {
+			type: 'array',
+			items: {
+				type: 'string',
+				enum: Object.values(AccessRoles)
 			},
-			'uniqueItems': true
+			uniqueItems: true
 		},
-		'password': {
-			'type': 'string'
+		password: {
+			type: 'string'
 		}
 	},
-	'required': ['username', 'roles', 'password']
+	required: ['username', 'roles', 'password']
 };
 
 if (ajv.validateSchema(userRegistrationSchema)) {
@@ -232,18 +216,18 @@ if (ajv.validateSchema(userRegistrationSchema)) {
 
 // Login
 const loginSchema = {
-	'$id': JSchema.UserLoginSchema.name,
-	'type': 'object',
-	'additionalProperties': false,
-	'properties': {
-		'username': {
-			'type': 'string'
+	$id: JSchema.UserLoginSchema.name,
+	type: 'object',
+	additionalProperties: false,
+	properties: {
+		username: {
+			type: 'string'
 		},
-		'password': {
-			'type': 'string',
+		password: {
+			type: 'string',
 		},
 	},
-	'required': ['username', 'password']
+	required: ['username', 'password']
 };
 
 if (ajv.validateSchema(loginSchema)) {
@@ -256,21 +240,21 @@ if (ajv.validateSchema(loginSchema)) {
 
 // UpdatePassword
 const userUpdatePasswordSchema = {
-	'$id': JSchema.UserUpdatePasswordSchema.name,
-	'type': 'object',
-	'additionalProperties': false,
-	'properties': {
-		'currentPassword': {
-			'type': 'string'
+	$id: JSchema.UserUpdatePasswordSchema.name,
+	type: 'object',
+	additionalProperties: false,
+	properties: {
+		currentPassword: {
+			type: 'string'
 		},
-		'password': {
-			'type': 'string',
+		password: {
+			type: 'string',
 		},
-		'confirm': {
-			'constant': { '$data': '1/password' } // equal to password
+		confirm: {
+			constant: { $data: '1/password' } // equal to password
 		}
 	},
-	'required': ['currentPassword', 'password', 'confirm']
+	required: ['currentPassword', 'password', 'confirm']
 };
 
 if (ajv.validateSchema(userUpdatePasswordSchema)) {

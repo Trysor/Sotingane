@@ -8,7 +8,6 @@ export class ImageSize {
 
 	/**
 	 * Request Image Size data for a given image
-	 * @param url		An URL pointing to the image of which the size is wanted
 	 */
 	public static async sizeOf(url: string) {
 		try {
@@ -23,7 +22,7 @@ export class ImageSize {
 						}
 					}).on('end', () => {
 						try {
-							const data = <ImageContentData>sizeOf(Buffer.concat(chunks));
+							const data = sizeOf(Buffer.concat(chunks)) as ImageContentData;
 							data.url = url;
 							resolve(data);
 						} catch (e) {

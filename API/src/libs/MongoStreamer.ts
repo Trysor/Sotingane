@@ -28,9 +28,9 @@ export const MongoStream = (opts: StreamerOptions) => {
 	// Create cursor
 	let cursor: QueryCursor<any>;
 	if (opts.type === 'query') {
-		cursor = <QueryCursor<any>>opts.query().cursor(cursorOpts);
+		cursor = opts.query().cursor(cursorOpts) as QueryCursor<any>;
 	} else {
-		cursor = (<Aggregate<any>>opts.query()).cursor(cursorOpts).exec();
+		cursor = (opts.query() as Aggregate<any>).cursor(cursorOpts).exec();
 	}
 
 	// On Error

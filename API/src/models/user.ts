@@ -45,8 +45,8 @@ const schema = new Schema({
 
 
 // Before saving do the following
-schema.pre('save', function (next: NextFunction) {
-	const u = <UserDoc>this; // hard-casting
+schema.pre('save', function(next: NextFunction) {
+	const u = this as UserDoc; // hard-casting
 	if (!u.isModified('password')) { return next(); }
 	hash(u.password, BCRYPT_SALT_FACTOR, (err, hashed) => {
 		if (err) { return next(err); }
@@ -61,13 +61,13 @@ schema.pre('save', function (next: NextFunction) {
  |--------------------------------------------------------------------------
 */
 
-schema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
+schema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
 	const u: User = this;
 	return compare(candidatePassword, u.password);
 };
 
-schema.methods.canAccess = function (level: AccessRoles): boolean {
-	return (<User>this).roles.includes(level);
+schema.methods.canAccess = function(level: AccessRoles): boolean {
+	return (this as User).roles.includes(level);
 };
 
 export interface UserDoc extends User, Document { }
