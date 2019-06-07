@@ -32,7 +32,7 @@ import { CKEditorDefaultConfig } from './model';
 export default class ClassicEditor extends ClassicEditorBase {
 	static defaultConfig: CKEditorDefaultConfig;
 	static builtinPlugins: any[];
-	static create: (e?: HTMLElement) => Promise<any>
+	static create: (e?: HTMLElement) => Promise<any>;
 }
 
 ClassicEditor.builtinPlugins = [
