@@ -5,7 +5,6 @@ import { env } from '@env';
 import { User, UpdatePasswordUser, TokenResponse, AccessRoles, JWTUser } from '@types';
 
 import { HttpService } from '@app/services/http/http.service';
-import { TokenService } from '@app/services/utility/token.service';
 import { PlatformService } from '@app/services/utility/platform.service';
 import { SnackBarService } from '@app/services/utility/snackbar.service';
 
@@ -13,7 +12,7 @@ import { makeStateKey } from '@angular/platform-browser';
 const USERTOKEN_KEY = makeStateKey<TokenResponse>('userToken');
 
 import { Subscription, BehaviorSubject, timer, of } from 'rxjs';
-import { map, catchError, finalize, take, tap } from 'rxjs/operators';
+import { map, catchError, finalize, take } from 'rxjs/operators';
 
 
 
