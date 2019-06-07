@@ -129,6 +129,7 @@
 					},
 					"configurations": {
 						"production": {
+							"optimization": true,
 							"sourceMap": true,
 							"fileReplacements": [
 								{

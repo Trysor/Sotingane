@@ -49,7 +49,7 @@ export class HttpService {
 	/**
 	 * Handle request on server and transfer state to client
 	 */
-	public fromState<T>(key: StateKey<T>, request: Observable<T>): Observable<T> {
+	public fromState<T>(key: StateKey<T>, request: Observable<T>) {
 		// Get state
 		const state = this.state.get<T>(key, null);
 
