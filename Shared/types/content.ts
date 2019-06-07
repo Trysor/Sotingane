@@ -62,7 +62,7 @@ export interface CmsFolder {
 
 export interface ImageContentData {
 	width: number;
-    height: number;
+	height: number;
 	type: string;
 	url: string;
 }

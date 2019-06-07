@@ -1,4 +1,4 @@
-export interface SEO_Article {
+export interface SeoArticle {
 	'@context': 'http://schema.org/';
 	'@type': 'Article';
 	headline: string;
@@ -6,19 +6,19 @@ export interface SEO_Article {
 	image: string[];
 	datePublished: Date;
 	dateModified: Date;
-	author: SEO_Person | SEO_Organization;
+	author: SeoPerson | SeoOrganization;
 	mainEntityOfPage: string;
-	publisher: SEO_Person | SEO_Organization;
+	publisher: SeoPerson | SeoOrganization;
 }
 
-export interface SEO_BreadcrumbList {
+export interface SeoBreadCrumbList {
 	'@context': 'http://schema.org/';
 	'@type': 'BreadcrumbList';
-	itemListElement: SEO_ListItem[];
+	itemListElement: SeoListItem[];
 
 }
 
-export interface SEO_ListItem {
+export interface SeoListItem {
 	'@type': 'ListItem';
 	position: number;
 	name: string;
@@ -26,21 +26,21 @@ export interface SEO_ListItem {
 }
 
 
-export interface SEO_Person {
+export interface SeoPerson {
 	'@type': 'Person';
 	name: string;
 }
 
-export interface SEO_Organization {
+export interface SeoOrganization {
 	'@context'?: 'https://schema.org/';
 	'@type': 'Organization';
 	name: string;
-	logo: SEO_Logo | string;
+	logo: SeoLogo | string;
 	url: string;
 }
 
 
-export interface SEO_Logo {
+export interface SeoLogo {
 	'@type': 'ImageObject';
 	url: string;
 }
