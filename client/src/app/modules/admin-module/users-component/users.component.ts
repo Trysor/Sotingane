@@ -51,6 +51,7 @@ export class UsersComponent implements OnDestroy {
 				noSort: true,
 				type: ColumnType.Button,
 				icon: { val: () => 'settings' },
+				ariaLabel: u => `Edit user: ${u.username}`,
 				removeText: true,
 				func: (user, users) => {
 					this.dialog.open(

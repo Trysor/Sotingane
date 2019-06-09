@@ -34,7 +34,7 @@
 							<mat-datepicker-toggle matPrefix [for]="createdAfterPicker"></mat-datepicker-toggle>
 							<mat-datepicker #createdAfterPicker [touchUi]="mobileService.isMobile() | async"></mat-datepicker>
 							<button *ngIf="aggregateForm.get('createdAfterDate').value" matSuffix mat-icon-button
-									(click)="aggregateForm.get('createdAfterDate').reset('')">
+									(click)="aggregateForm.get('createdAfterDate').reset('')" aria-label="Reset created after date">
 								<mat-icon>clear</mat-icon>
 							</button>
 						</mat-form-field>
@@ -45,11 +45,11 @@
 								   [max]="today" [min]="minCreatedBeforeDate"
 								   formControlName="createdBeforeDate" type="text" autocomplete="off">
 							<mat-datepicker-toggle matPrefix [for]="createdBeforePicker"></mat-datepicker-toggle>
+							<mat-datepicker #createdBeforePicker [touchUi]="mobileService.isMobile() | async"></mat-datepicker>
 							<button *ngIf="aggregateForm.get('createdBeforeDate').value" matSuffix mat-icon-button
-									(click)="aggregateForm.get('createdBeforeDate').reset('')">
+									(click)="aggregateForm.get('createdBeforeDate').reset('')" aria-label="Reset created before date">
 								<mat-icon>clear</mat-icon>
 							</button>
-							<mat-datepicker #createdBeforePicker [touchUi]="mobileService.isMobile() | async"></mat-datepicker>
 						</mat-form-field>
 					</div>
 

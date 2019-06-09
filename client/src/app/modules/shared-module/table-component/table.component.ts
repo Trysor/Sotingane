@@ -28,6 +28,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 	public readonly isNaN = isNaN;
 
 	public readonly pageSizes = [10, 25, 50, 100];
+	public readonly defaultPageSize = 25;
 	public readonly Source = new MatTableDataSource<object>([]);
 	public displayedColumns: Column<any>[];
 
@@ -43,7 +44,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 		this.Source.data = [];
 
 		// Filter form
-		this.filterForm = fb.group({ filterControl: [''] });
+		this.filterForm = this.fb.group({ filterControl: [''] });
 		this.filterForm.get('filterControl').valueChanges.pipe(
 			distinctUntilChanged(), debounceTime(300), takeUntil(this._ngUnsub)
 		).subscribe(value => {

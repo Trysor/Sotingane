@@ -21,12 +21,12 @@ export interface ColumnSettings<T> {
 	type?: ColumnType; // Defaults to Normal
 
 	property: Column<T>;
-
 	header: string;
 	val?: (obj?: T, all?: T[]) => string | number;
 	val2?: (obj?: T, all?: T[]) => string | number;
 
 	tooltip?: (obj?: T, all?: T[]) => string;
+	ariaLabel?: (obj?: T, all?: T[]) => string;
 
 	icon?: ColIconSettings<T>;
 

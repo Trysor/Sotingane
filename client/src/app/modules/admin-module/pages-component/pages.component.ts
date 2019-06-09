@@ -32,6 +32,7 @@ export class PagesComponent implements OnDestroy {
 				noSort: true,
 				type: ColumnType.InternalLink,
 				icon: { val: () => 'mode_edit' },
+				ariaLabel: c => `Edit content: ${c.title}`,
 				removeText: true,
 				func: c => `/compose/${c.route}`,
 				narrow: true,
