@@ -10,15 +10,15 @@ import { TestBed } from './testbed';
 // ---------------------------------
 
 const emptySettings: Settings = {
-	'indexRoute': '',
-	'org': '',
-	'meta': {
-		'title': '',
-		'desc': ''
+	indexRoute: '',
+	org: '',
+	meta: {
+		title: '',
+		desc: ''
 	},
-	'footer': {
-		'text': '',
-		'copyright': ''
+	footer: {
+		text: '',
+		copyright: ''
 	}
 };
 
@@ -65,8 +65,6 @@ describe('REST: Settings', () => {
 			expect(res.body).have.property('message');
 			expect(res.body).property('message').to.equal(VALIDATION_FAILED.SETTING_MODEL);
 		});
-
-
 
 
 		it('GET /api/settings/ 200', async () => {

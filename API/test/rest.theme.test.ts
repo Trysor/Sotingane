@@ -143,6 +143,7 @@ describe('REST: Theme', () => {
 			expect(res.body).property('message').to.equal(VALIDATION_FAILED.THEME_MODEL);
 		});
 
+
 		it('PATCH /api/theme/ 422, missing properties', async () => {
 
 			const missingProp = JSON.parse(JSON.stringify(emptyTheme));

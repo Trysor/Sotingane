@@ -302,15 +302,15 @@ describe('REST: Admin', () => {
 			expect(res).to.have.property('body');
 			expect(res.body).to.be.an('array');
 
-			const allPagesCount = (<Content[]>allPagesRes.body).length;
-			const resCount = (<any[]>res.body).length;
+			const allPagesCount = ( allPagesRes.body as Content[]).length;
+			const resCount = ( res.body as any[]).length;
 
 			expect(resCount).to.equal(allPagesCount, 'should not have filtered anything');
 		});
 
 		it('POST /api/admin/cms/aggregate 200, route only', async () => {
 			const route = 'getadmin200';
-			const query: AggregationQuery = { route: route };
+			const query: AggregationQuery = { route };
 
 			const [res, allPagesRes] = await Promise.all([
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(query),
@@ -321,15 +321,15 @@ describe('REST: Admin', () => {
 			expect(res).to.have.property('body');
 			expect(res.body).to.be.an('array');
 
-			const filteredAllPagesCount = (<Content[]>allPagesRes.body).filter(c => c.route === route).length;
-			const resCount = (<any[]>res.body).length;
+			const filteredAllPagesCount = ( allPagesRes.body as Content[]).filter(c => c.route === route).length;
+			const resCount = ( res.body as any[]).length;
 
 			expect(resCount).to.equal(filteredAllPagesCount, 'should have filtered based on route');
 		});
 
 		it('POST /api/admin/cms/aggregate 200, folder only', async () => {
 			const folder = 'test';
-			const query: AggregationQuery = { folder: folder };
+			const query: AggregationQuery = { folder };
 
 			const [res, allPagesRes] = await Promise.all([
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(query),
@@ -340,8 +340,8 @@ describe('REST: Admin', () => {
 			expect(res).to.have.property('body');
 			expect(res.body).to.be.an('array');
 
-			const filteredAllPagesCount = (<Content[]>allPagesRes.body).filter(c => c.folder === folder).length;
-			const resCount = (<any[]>res.body).length;
+			const filteredAllPagesCount = ( allPagesRes.body as Content[]).filter(c => c.folder === folder).length;
+			const resCount = ( res.body as any[]).length;
 
 			expect(resCount).to.equal(filteredAllPagesCount, 'should have filtered based on folder');
 		});
@@ -370,7 +370,7 @@ describe('REST: Admin', () => {
 			expect(resAfter).to.have.status(200);
 			expect(resAfter).to.have.property('body');
 			expect(resAfter.body).to.be.an('array');
-			const contentFind = (<any[]>resAfter.body).find((c: any) => c.route === content.route);
+			const contentFind = ( resAfter.body as any[]).find((c: any) => c.route === content.route);
 			expect(contentFind).to.not.be.an('undefined'); // to NOT be.
 			expect(contentFind.title).to.equal(content.title);
 
@@ -405,14 +405,14 @@ describe('REST: Admin', () => {
 			expect(resBefore).to.have.status(200);
 			expect(resBefore).to.have.property('body');
 			expect(resBefore.body).to.be.an('array');
-			const contentFind = (<any[]>resBefore.body).find((c: any) => c.route === content.route);
+			const contentFind = ( resBefore.body as any[]).find((c: any) => c.route === content.route);
 			expect(contentFind).to.be.an('undefined'); // to ACTUALLY be undefined.
 
 			// the second before was created AFTER the new content, and should thus include the content we POSTed above
 			expect(resBefore2).to.have.status(200);
 			expect(resBefore2).to.have.property('body');
 			expect(resBefore2.body).to.be.an('array');
-			const contentFind2 = (<any[]>resBefore2.body).find((c: any) => c.route === content.route);
+			const contentFind2 = ( resBefore2.body as any[]).find((c: any) => c.route === content.route);
 			expect(contentFind2).to.not.be.an('undefined'); // to NOT be undefined.
 			expect(contentFind2.title).to.equal(content.title);
 
@@ -454,8 +454,8 @@ describe('REST: Admin', () => {
 			const filteredAdmin1Count = allPages.filter(c => TestBed.AdminUser._id.equals(c.createdBy)).length;
 			const filteredAdmin2Count = allPages.filter(c => TestBed.AdminUser2._id.equals(c.createdBy)).length;
 
-			const admin1Count = (<any[]>resAdmin1.body).length;
-			const admin2Count = (<any[]>resAdmin2.body).length;
+			const admin1Count = ( resAdmin1.body as any[]).length;
+			const admin2Count = ( resAdmin2.body as any[]).length;
 
 			expect(admin1Count).to.equal(filteredAdmin1Count, 'should have filtered based on creator (admin1)');
 			expect(admin2Count).to.equal(filteredAdmin2Count, 'should have filtered based on creator (admin2)');
@@ -505,10 +505,10 @@ describe('REST: Admin', () => {
 			const membersCount = allPages.filter(c => c.access.includes(AccessRoles.member)).length;
 			const adminsCount = allPages.filter(c => c.access.includes(AccessRoles.admin)).length;
 
-			const queryAllCount = (<any[]>resAll.body).length;
-			const queryEveryoneCount = (<any[]>resEveryone.body).length;
-			const queryMembersCount = (<any[]>resMembers.body).length;
-			const queryAdminsCount = (<any[]>resAdmins.body).length;
+			const queryAllCount = ( resAll.body as any[]).length;
+			const queryEveryoneCount = ( resEveryone.body as any[]).length;
+			const queryMembersCount = ( resMembers.body as any[]).length;
+			const queryAdminsCount = ( resAdmins.body as any[]).length;
 
 			expect(allCount).to.equal(queryAllCount, 'should have filtered based on access (all)');
 			expect(everyoneCount).to.equal(queryEveryoneCount, 'should have filtered based on access (everyone)');
@@ -551,8 +551,8 @@ describe('REST: Admin', () => {
 			const publishedCount = allPages.filter(c => c.published === true).length;
 			const unpublishedCount = allPages.filter(c => c.published === false).length;
 
-			const queryPublishedCount = (<any[]>resPublished.body).length;
-			const queryUnpublishedCount = (<any[]>resUnpublished.body).length;
+			const queryPublishedCount = ( resPublished.body as any[]).length;
+			const queryUnpublishedCount = ( resUnpublished.body as any[]).length;
 
 			expect(publishedCount).to.equal(queryPublishedCount, 'should have filtered based on published (true)');
 			expect(unpublishedCount).to.equal(queryUnpublishedCount, 'should have filtered based on published (false)');
@@ -586,7 +586,7 @@ describe('REST: Admin', () => {
 			expect(resAfter).to.have.status(200);
 			expect(resAfter).to.have.property('body');
 			expect(resAfter.body).to.be.an('array');
-			const contentFind = (<any[]>resAfter.body).find((c: any) => c.route === content.route);
+			const contentFind = ( resAfter.body as any[]).find((c: any) => c.route === content.route);
 			expect(contentFind).to.not.be.an('undefined'); // to NOT be.
 			expect(contentFind.views).to.equal(1);
 
@@ -611,15 +611,12 @@ describe('REST: Admin', () => {
 			const viewRes = await TestBed.http.get('/api/cms/' + content.route);
 			expect(viewRes).to.have.status(200);
 
-			// Date2
-			const beforeDate2 = new Date();
+			const queryBefore: AggregationQuery = { seenBeforeDate: beforeDate };
+			const queryBefore2: AggregationQuery = { seenBeforeDate: new Date() };
 
 			// viewBefore2
 			const viewRes2 = await TestBed.http.get('/api/cms/' + content.route);
 			expect(viewRes2).to.have.status(200);
-
-			const queryBefore: AggregationQuery = { seenBeforeDate: beforeDate };
-			const queryBefore2: AggregationQuery = { seenBeforeDate: beforeDate2 };
 
 			const [resBefore, resBefore2] = await Promise.all([
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryBefore),
@@ -629,15 +626,16 @@ describe('REST: Admin', () => {
 			expect(resBefore).to.have.status(200);
 			expect(resBefore).to.have.property('body');
 			expect(resBefore.body).to.be.an('array');
-			const contentFind = (<any[]>resBefore.body).find((c: any) => c.route === content.route);
+			const contentFind = (resBefore.body as any[]).find((c: any) => c.route === content.route);
 			expect(contentFind).to.be.an('undefined'); // to be undefined. It wasn't seen before the date specified
 
 			// the second before was created AFTER the new content, and should thus include the content we POSTed above
 			expect(resBefore2).to.have.status(200);
 			expect(resBefore2).to.have.property('body');
 			expect(resBefore2.body).to.be.an('array');
-			const contentFind2 = (<any[]>resBefore2.body).find((c: any) => c.route === content.route);
+			const contentFind2 = (resBefore2.body as any[]).find((c: any) => c.route === content.route);
 			if (!contentFind2) {
+				console.log('queryBefore2 seenBeforeDate:', queryBefore2.seenBeforeDate);
 				console.log(resBefore2.body);
 			}
 			expect(contentFind2).to.not.be.an('undefined'); // to NOT be undefined.
@@ -677,8 +675,8 @@ describe('REST: Admin', () => {
 			expect(resEdge.body).to.have.property('message');
 			expect(resEdge.body.message).to.equal(ADMIN_STATUS.AGGREGATION_RESULT_NONE_FOUND);
 
-			const resChromeContent = (<Content[]>resChrome.body).find(c => c.route === content.route);
-			const resBothContent = (<Content[]>resBoth.body).find(c => c.route === content.route);
+			const resChromeContent = ( resChrome.body as Content[]).find(c => c.route === content.route);
+			const resBothContent = ( resBoth.body as Content[]).find(c => c.route === content.route);
 
 			expect(resChrome).to.have.status(200);
 			expect(resChrome).to.have.property('body');
@@ -719,7 +717,7 @@ describe('REST: Admin', () => {
 			expect(res.body).to.be.an('array');
 
 			// Expect all properties we expect to find
-			const resContent = (<any[]>res.body).find(c => c.route === content.route);
+			const resContent = ( res.body as any[]).find(c => c.route === content.route);
 			expect(resContent).to.have.property('title');
 			expect(resContent).to.have.property('route');
 			expect(resContent).to.have.property('logDataTs');
@@ -758,7 +756,7 @@ describe('REST: Admin', () => {
 			expect(res.body).to.be.an('array');
 
 			// Expect all properties we expect to find
-			const resContent = (<any[]>res.body).find(c => c.route === content.route);
+			const resContent = ( res.body as any[]).find(c => c.route === content.route);
 			expect(resContent).to.have.property('title');
 			expect(resContent).to.have.property('route');
 			expect(resContent).to.have.property('views');

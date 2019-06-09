@@ -34,7 +34,7 @@ describe('REST: Authorization', () => {
 
 	describe('/api/auth/token', () => {
 		it('GET /api/auth/token 200', async () => {
-			const res = await TestBed.http.post('/api/auth/token').set('Cookie', TestBed.AdminRefreshCookie);
+			const res = await TestBed.http.get('/api/auth/token').set('Cookie', TestBed.AdminRefreshCookie);
 			expect(res).to.have.status(200);
 			expect(res).to.have.property('body');
 
@@ -46,8 +46,8 @@ describe('REST: Authorization', () => {
 
 		it('GET /api/auth/token 401', async () => {
 			const [res, res2] = await Promise.all([
-				TestBed.http.post('/api/auth/token'),
-				TestBed.http.post('/api/auth/token').set('Cookie', TestBed.AdminCookie)
+				TestBed.http.get('/api/auth/token'),
+				TestBed.http.get('/api/auth/token').set('Cookie', TestBed.AdminCookie)
 			]);
 			expect(res).to.have.status(401);
 			expect(res2).to.have.status(401);
@@ -155,7 +155,7 @@ describe('REST: Authorization', () => {
 			const noRole: Partial<User> = { username: userToRegister.username + 'test', password: 'aaa' };
 			const badRole: Partial<User> = {
 				username: userToRegister.username + 'test',
-				password: userToRegister.password + 'test', roles: [<any>'bad']
+				password: userToRegister.password + 'test', roles: [ 'bad' as any]
 			};
 			const badEverything = {};
 
@@ -165,7 +165,6 @@ describe('REST: Authorization', () => {
 				TestBed.http.post('/api/auth/register').send(noRole),
 				TestBed.http.post('/api/auth/register').send(badRole),
 				TestBed.http.post('/api/auth/register').send(badEverything)
-
 			]);
 
 			// noUsernameRes

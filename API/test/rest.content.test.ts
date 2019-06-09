@@ -48,7 +48,7 @@ describe('REST: Content', () => {
 			expect(res2).to.have.property('body');
 			expect(res2.body).to.be.an('array');
 
-			const resContent = (<Content[]>res2.body).find(c => c.route === content.route);
+			const resContent = (res2.body as Content[]).find(c => c.route === content.route);
 			expect(resContent).to.have.property('route');
 			expect(resContent).property('route').to.equal(content.route);
 		});
@@ -216,7 +216,7 @@ describe('REST: Content', () => {
 				nav: true,
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie)
 				.send(content);
 
@@ -230,20 +230,20 @@ describe('REST: Content', () => {
 			expect(noAuthRes).to.have.property('body');
 			expect(noAuthRes.body).to.be.an('array');
 			// Should not show up for unauthed.
-			expect((<Content[]>noAuthRes.body).filter(list => list.route === content.route)).to.be.of.length(0);
+			expect((noAuthRes.body as Content[]).filter(list => list.route === content.route)).to.be.of.length(0);
 
 
 			expect(memberRes).to.have.status(200);
 			expect(memberRes).to.have.property('body');
 			expect(memberRes.body).to.be.an('array');
 			// should show up for members
-			expect((<Content[]>memberRes.body).filter(list => list.route === content.route)).to.be.of.length(1);
+			expect((memberRes.body as Content[]).filter(list => list.route === content.route)).to.be.of.length(1);
 
 			expect(adminRes).to.have.status(200);
 			expect(adminRes).to.have.property('body');
 			expect(adminRes.body).to.be.an('array');
 			// should also show up for admins
-			expect((<Content[]>adminRes.body).filter(list => list.route === content.route)).to.be.of.length(1);
+			expect((adminRes.body as Content[]).filter(list => list.route === content.route)).to.be.of.length(1);
 		});
 
 		it('GET /api/cms/ 200, admin', async () => {
@@ -258,7 +258,7 @@ describe('REST: Content', () => {
 				nav: true,
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie)
 				.send(content);
 
@@ -272,20 +272,20 @@ describe('REST: Content', () => {
 			expect(noAuthRes).to.have.property('body');
 			expect(noAuthRes.body).to.be.an('array');
 			// Should not show up for unauthed.
-			expect((<Content[]>noAuthRes.body).filter(list => list.route === content.route)).to.be.of.length(0);
+			expect((noAuthRes.body as Content[]).filter(list => list.route === content.route)).to.be.of.length(0);
 
 
 			expect(userRes).to.have.status(200);
 			expect(userRes).to.have.property('body');
 			expect(userRes.body).to.be.an('array');
 			// nor for users
-			expect((<Content[]>userRes.body).filter(list => list.route === content.route)).to.be.of.length(0);
+			expect((userRes.body as Content[]).filter(list => list.route === content.route)).to.be.of.length(0);
 
 			expect(adminRes).to.have.status(200);
 			expect(adminRes).to.have.property('body');
 			expect(adminRes.body).to.be.an('array');
 			// but should show up for admins
-			expect((<Content[]>adminRes.body).filter(list => list.route === content.route)).to.be.of.length(1);
+			expect((adminRes.body as Content[]).filter(list => list.route === content.route)).to.be.of.length(1);
 		});
 
 	});
@@ -321,7 +321,7 @@ describe('REST: Content', () => {
 				nav: true
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.Admin2Cookie) // admin 2 creates
 				.send(content);
 
@@ -364,7 +364,7 @@ describe('REST: Content', () => {
 				nav: true
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.Admin2Cookie) // admin 2 creates
 				.send(content);
 
@@ -401,7 +401,7 @@ describe('REST: Content', () => {
 				nav: true
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.WriterCookie) // Writer (without member role)
 				.send(content);
 
@@ -442,7 +442,7 @@ describe('REST: Content', () => {
 				nav: true
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(content);
 
@@ -470,7 +470,7 @@ describe('REST: Content', () => {
 				nav: true
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(content);
 
@@ -488,7 +488,7 @@ describe('REST: Content', () => {
 
 			const content: Content = {
 				title: 'some404route',
-				route: route,
+				route,
 				content: 'test',
 				access: [],
 				description: 'test',
@@ -529,7 +529,7 @@ describe('REST: Content', () => {
 			delete badEverything.published;
 
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(properContent);
 
@@ -573,7 +573,7 @@ describe('REST: Content', () => {
 				nav: true
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(content);
 
@@ -597,7 +597,7 @@ describe('REST: Content', () => {
 				nav: true
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(content);
 
@@ -650,12 +650,12 @@ describe('REST: Content', () => {
 				nav: true
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(content);
 
 
-			const patchRes = await TestBed.http.patch('/api/cms/' + content.route)
+			await TestBed.http.patch('/api/cms/' + content.route)
 				.set('Cookie', TestBed.AdminCookie) // admin patches
 				.send(patched);
 
