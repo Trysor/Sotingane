@@ -107,5 +107,5 @@ const ThemeSchema = {
 if (ajv.validateSchema(ThemeSchema)) {
 	ajv.addSchema(ThemeSchema, JSchema.ThemeSchema.name);
 } else {
-	console.error(`${JSchema.ThemeSchema.name} did not validate`);
+	throw Error(`${JSchema.ThemeSchema.name} did not validate`);
 }

@@ -210,7 +210,7 @@ const userRegistrationSchema = {
 if (ajv.validateSchema(userRegistrationSchema)) {
 	ajv.addSchema(userRegistrationSchema, JSchema.UserRegistrationSchema.name);
 } else {
-	console.error(`${JSchema.UserRegistrationSchema.name} did not validate`);
+	throw Error(`${JSchema.UserRegistrationSchema.name} did not validate`);
 }
 
 
@@ -233,7 +233,7 @@ const loginSchema = {
 if (ajv.validateSchema(loginSchema)) {
 	ajv.addSchema(loginSchema, JSchema.UserLoginSchema.name);
 } else {
-	console.error(`${JSchema.UserLoginSchema.name} did not validate`);
+	throw Error(`${JSchema.UserLoginSchema.name} did not validate`);
 }
 
 
@@ -260,7 +260,7 @@ const userUpdatePasswordSchema = {
 if (ajv.validateSchema(userUpdatePasswordSchema)) {
 	ajv.addSchema(userUpdatePasswordSchema, JSchema.UserUpdatePasswordSchema.name);
 } else {
-	console.error(`${JSchema.UserUpdatePasswordSchema.name} did not validate`);
+	throw Error(`${JSchema.UserUpdatePasswordSchema.name} did not validate`);
 }
 
 

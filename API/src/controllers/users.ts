@@ -105,6 +105,6 @@ const userAdminUpdateUser = {
 if (ajv.validateSchema(userAdminUpdateUser)) {
 	ajv.addSchema(userAdminUpdateUser, JSchema.UserAdminUpdateUser.name);
 } else {
-	console.error(`${JSchema.UserAdminUpdateUser.name} did not validate`);
+	throw Error(`${JSchema.UserAdminUpdateUser.name} did not validate`);
 }
 

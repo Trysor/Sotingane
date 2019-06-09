@@ -293,6 +293,6 @@ const createPatchContentSchema = {
 if (ajv.validateSchema(createPatchContentSchema)) {
 	ajv.addSchema(createPatchContentSchema, JSchema.ContentSchema.name);
 } else {
-	console.error(`${JSchema.ContentSchema.name} did not validate`);
+	throw Error(`${JSchema.ContentSchema.name} did not validate`);
 }
 

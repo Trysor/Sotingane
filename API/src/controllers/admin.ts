@@ -200,6 +200,6 @@ const adminAggregationSchema = {
 if (ajv.validateSchema(adminAggregationSchema)) {
 	ajv.addSchema(adminAggregationSchema, JSchema.AdminAggregationSchema.name);
 } else {
-	console.error(`${JSchema.AdminAggregationSchema.name} did not validate`);
+	throw Error(`${JSchema.AdminAggregationSchema.name} did not validate`);
 }
 
