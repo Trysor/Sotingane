@@ -75,7 +75,7 @@ export class AuthService {
 			catchError(() => of(null as TokenResponse)),
 		).subscribe(res => {
 			if (!res) {
-				this.logOut({ expired: true, popup: true });
+				this.logOut({ expired: this.hasToken, popup: true });
 				return;
 			}
 
@@ -161,7 +161,7 @@ export class AuthService {
 	private renewToken() {
 		return this.http.fromState(
 			USERTOKEN_KEY,
-			this.http.client.post<TokenResponse>(this.http.apiUrl(env.API.auth.token), null)
+			this.http.client.get<TokenResponse>(this.http.apiUrl(env.API.auth.token) + '?ts=' + Date.now())
 		);
 	}
 

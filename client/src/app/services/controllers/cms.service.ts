@@ -11,7 +11,7 @@ const SEARCH_KEY = makeStateKey<SearchResultContent[]>('cmssearch');
 import { AuthService } from '@app/services/controllers/auth.service';
 import { HttpService } from '@app/services/http/http.service';
 
-import { Observable, BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 
@@ -20,39 +20,34 @@ export class CMSService {
 	private readonly _listSubject: BehaviorSubject<Content[]> = new BehaviorSubject(null);
 	private _pageSubject: BehaviorSubject<Content> = new BehaviorSubject(null);
 
-	private readonly _failedToLoad: Content =  {
+	private readonly _failedToLoad: Content = {
 		access: [],
 		title: 'Page not available',
 		content: 'Uhm. There appears to be nothing here. Sorry.',
 		description: '404 - Not found',
 		version: 0,
 		route: '',
-	} as Content;
+	};
+
+	public get content() { return this._pageSubject; }
+
 
 	constructor(
 		private authService: AuthService,
 		private http: HttpService) {
 
 		// Whenever a user logs in or out we should force-update.
-		this.authService.user.subscribe(() => {
-			this.getContentList(true);
-		});
+		this.authService.user.subscribe(() => this.getContentList(true));
 	}
-
-	public get content() {
-		return this._pageSubject;
-	}
-
 
 	/**
 	 * Gets the cmsRoutes as a BehaviorSubject
 	 */
-	public getContentList(forceUpdate = false): BehaviorSubject<Content[]> {
-		if (!forceUpdate) { return this._listSubject; }
+	public getContentList(forceUpdate = false) {
+		if (forceUpdate) {
+			this.requestContentList().subscribe(list => this._listSubject.next(list));
+		}
 
-		this.requestContentList().subscribe(contentList => {
-			this._listSubject.next(contentList);
-		});
 		return this._listSubject;
 	}
 
@@ -63,7 +58,7 @@ export class CMSService {
 	/**
 	 * Requests the content list
 	 */
-	private requestContentList(): Observable<Content[]> {
+	private requestContentList() {
 		return this.http.fromState(
 			LIST_KEY,
 			this.http.client.get<Content[]>(this.http.apiUrl(env.API.cms.content))
@@ -73,7 +68,7 @@ export class CMSService {
 	/**
 	 * Requests the content from the given url
 	 */
-	public searchContent(searchTerm: string): Observable<SearchResultContent[]> {
+	public searchContent(searchTerm: string) {
 		return this.http.fromState(
 			SEARCH_KEY,
 			this.http.client.get<SearchResultContent[]>(this.http.apiUrl(env.API.cms.search + '/' + searchTerm))
@@ -95,28 +90,28 @@ export class CMSService {
 	/**
 	 * Requests the content History array from the given url
 	 */
-	public requestContentHistory(contentUrl: string): Observable<Content[]> {
+	public requestContentHistory(contentUrl: string) {
 		return this.http.client.get<Content[]>(this.http.apiUrl(env.API.cms.history + '/' + contentUrl));
 	}
 
 	/**
 	 * Requests to update the content for a given url
 	 */
-	public updateContent(contentUrl: string, updatedContent: Content): Observable<Content> {
+	public updateContent(contentUrl: string, updatedContent: Content) {
 		return this.http.client.patch<Content>(this.http.apiUrl(env.API.cms.content + '/' + contentUrl), updatedContent);
 	}
 
 	/**
 	 * Requests to update the content for a given url
 	 */
-	public deleteContent(contentUrl: string): Observable<boolean> {
+	public deleteContent(contentUrl: string) {
 		return this.http.client.delete<boolean>(this.http.apiUrl(env.API.cms.content + '/' + contentUrl));
 	}
 
 	/**
 	 * Requests to create the content for a given url
 	 */
-	public createContent(newContent: Content): Observable<Content> {
+	public createContent(newContent: Content) {
 		return this.http.client.post<Content>(this.http.apiUrl(env.API.cms.content), newContent);
 	}
 }

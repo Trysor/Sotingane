@@ -52,11 +52,9 @@ export class AuthController extends Controller {
 	/**
 	 * Returns a new token for a user in a session which is about to expire, if authorized to do so
 	 */
-	@POST({ path: '/token', do: [Auth.ByRefresh] })
+	@GET({ path: '/token', do: [Auth.ByRefresh] })
 	@POST({ path: '/login', do: [validate(JSchema.UserLoginSchema), Auth.ByLogin] })
 	public async token(req: Req, res: Res) {
-		// TODO: Think of a way of changing @POST({ path: '/token' away from POST, to make Angular Universal happy
-
 		// we have through Auth validated the user exists in DB.
 		const user: JWTUser = req.user;
 
@@ -75,24 +73,22 @@ export class AuthController extends Controller {
 		// or if the refresh token is about to expire
 		const doSendRefreshToken =  req.route.path === '/login' || (expiryDate < checkAgainst);
 
-		// Initiate the response object
-		let response = AuthController.AddCookie(res, JWT_Type.AUTH, token);
+		AuthController.AddCookie(res, JWT_Type.AUTH, token);
 
 		// Create Refresh Token and cookie if necessary
 		let refreshToken;
 		if (doSendRefreshToken) {
 			refreshToken = await AuthController.createSignedJWT(jwtObject, JWT_Type.REFRESH);
-			response = AuthController.AddCookie(res, JWT_Type.REFRESH, refreshToken);
+			AuthController.AddCookie(res, JWT_Type.REFRESH, refreshToken);
 		}
 
 		jwtObject.exp = (now / 1000) + (JWT.EXPIRES_AUTH * (1 - JWT.THRESHOLD_EXPIRY)); // Add in the expiry info
 
-		const responseBody: TokenResponse = {
+		return res.status(200).send({
 			token,
 			refreshToken,
 			user: jwtObject,
-		};
-		return response.status(200).send(responseBody);
+		} as TokenResponse);
 	}
 
 	/**
