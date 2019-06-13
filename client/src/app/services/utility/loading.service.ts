@@ -9,7 +9,7 @@ import { filter, distinctUntilChanged, debounceTime, takeWhile } from 'rxjs/oper
 
 @Injectable({ providedIn: 'root' })
 export class LoadingService {
-	private static readonly TICK_RATE = 10;
+	private static readonly TICK_RATE = 20;
 
 	private readonly _requests = new BehaviorSubject<number>(0);
 	private readonly _isLoading = new Subject<boolean>();
@@ -40,10 +40,14 @@ export class LoadingService {
 			if (!newVal) { return; }
 
 			// Start timer, ticks every TICK_RATE ms.
+			let now = Date.now();
+			const startTime = now;
+
 			this._subscription = interval(LoadingService.TICK_RATE).pipe(
-				takeWhile(num => (num * LoadingService.TICK_RATE) < env.TIMEOUT)
-			).subscribe(num => {
-				this._loadingBarValue.next((num * LoadingService.TICK_RATE * 100) / env.TIMEOUT);
+				takeWhile(() => (now - startTime) < env.TIMEOUT)
+			).subscribe( () => {
+				now = Date.now();
+				this._loadingBarValue.next( ((now - startTime) / env.TIMEOUT) * 100 );
 			});
 		});
 
