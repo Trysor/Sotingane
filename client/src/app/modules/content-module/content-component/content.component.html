@@ -25,9 +25,9 @@
 
 <!-- Details -->
 <ng-container *ngIf="cmsService.content | async as contentObject">
-	<ng-container  *ngIf="contentObject.access.length > 0">
+	<div class="info" *ngIf="contentObject.access.length > 0">
 		Access groups: <span *ngFor="let role of contentObject.access; last as last">{{role}}<ng-container *ngIf="!last">, </ng-container></span>
-	</ng-container>
+	</div>
 	<div class="info right" *ngIf="contentObject.route !== (settings | async).indexRoute && contentObject.updatedAt">
 		<div>
 			Updated by: {{contentObject.updatedBy.username}}, <span [matTooltip]="contentObject.updatedAt | TimeAgo" matTooltipPosition="above">
