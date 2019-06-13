@@ -3,14 +3,15 @@
 // Http
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { TransferState } from '@angular/platform-browser';
 
 // Material
-// import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '@app/modules';
 
 // Routing
-const routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
 import { Router } from '@angular/router';
+const routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
+
 
 import { AuthService, HttpService } from '@app/services';
 import { User, TokenResponse } from '@types';
@@ -25,18 +26,14 @@ describe('AuthService', () => {
 	let httpTestingController: HttpTestingController;
 
 	beforeEach(() => {
-		const httpServiceSpy = jasmine.createSpyObj<HttpService>('HttpService', ['apiUrl', 'fromState']);
-
-		// change the calls to fromState and apiUrl and return modified values
-		// the only fromState-call there is in auth.service returns TokenResponse
-		httpServiceSpy.fromState.and.callFake(  ((_key: any, req: any) => of<TokenResponse>( {} as any)) as any );
-		httpServiceSpy.apiUrl.and.callFake((api: string) => api);
+		const httpServiceSpy = jasmine.createSpyObj<HttpService>('HttpService', ['client']);
 
 		// Use our spies in the module
 		TestBed.configureTestingModule({
 			providers: [
 				{ provide: HttpService, useValue: httpServiceSpy },
 				{ provide: Router, useValue: routerSpy },
+				TransferState,
 				AuthService
 			],
 			imports: [
@@ -52,10 +49,11 @@ describe('AuthService', () => {
 		// Get the service, and the httpTestingController, so we can use these in our tests
 		service = TestBed.get(AuthService);
 		httpTestingController = TestBed.get(HttpTestingController as Type<HttpTestingController>);
-	});
 
+		// Deal with the refresh token request from the constructor (moved to SetupService)
+		// const req = httpTestingController.expectOne(r => r.url.includes(env.API.auth.token));
+		// req.flush({});
 
-	beforeEach(() => {
 		service.user.next(null); // Reset user to null
 	});
 
@@ -80,10 +78,10 @@ describe('AuthService', () => {
 		expect(req.request.method).toEqual('POST');
 
 		// Reply with test data
-		req.flush( { // tslint:disable:max-line-length
-			token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjk0NjY4NDgwMCwiZXhwIjozMjUwMzY4MDAwMCwiYXVkIjoiIiwic3ViIjoidGVzdCIsIl9pZCI6IjEyMzQ1NiIsInVzZXJuYW1lIjoidGVzdCIsInJvbGUiOiJhZG1pbiJ9.uI0Z1CmNRGBxG5HxC_UHZCbsx_kJ0CvRqRuy2YG-Zu0',
+		req.flush({
+			token: 'someToken',
 			user: testUser
-		} as TokenResponse); // tslint:enable:max-line-length
+		} as TokenResponse);
 	});
 
 	it('login() fail', () => {

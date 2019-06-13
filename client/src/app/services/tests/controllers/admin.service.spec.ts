@@ -15,7 +15,7 @@ describe('AdminService', () => {
 	let httpTestingController: HttpTestingController;
 
 	beforeEach(() => {
-		const spy = jasmine.createSpyObj<HttpService>('HttpService', ['client', 'apiUrl']);
+		const spy = jasmine.createSpyObj<HttpService>('HttpService', ['client']);
 
 		TestBed.configureTestingModule({
 			providers: [
@@ -29,9 +29,6 @@ describe('AdminService', () => {
 
 		// Override the client property to use the test client
 		( service as any).http.client = TestBed.get(HttpClient);
-
-		// skip api base etc
-		TestBed.get(HttpService).apiUrl.and.callFake((api: string) => api);
 	});
 
 	afterEach(() => {

@@ -22,9 +22,6 @@ export class ServerService {
 
 		this._urlBase = this.req.protocol + '://' + this.req.hostname;
 
-		// Override the environment API routes to include the base
-		if (env.API_BASE === '') { env.API_BASE = this._urlBase; }
-
 		// Set tokens if one exists
 		if (this.req.cookies && this.req.cookies[JWT.COOKIE_AUTH]) {
 			this.tokenService.token = this.req.cookies[JWT.COOKIE_AUTH];
