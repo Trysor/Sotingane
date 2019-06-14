@@ -17,6 +17,6 @@ export class RedirectGuard implements CanActivate {
 		this.settingsService.settings.pipe(first(settings => settings.indexRoute !== '')).subscribe(settings => {
 			this.router.navigateByUrl(`/${settings.indexRoute}`);
 		});
-		return false;
+		return true;
 	}
 }
