@@ -1,2 +1,8 @@
-<span>{{ (settingsService.settings | async).footer.text }}</span>
-<span>{{ (settingsService.settings | async).footer.copyright }}</span>
+<ng-container *ngIf="settingsService.settings | async as settings; else err">
+	<span>{{ settings.footer.text }}</span>
+	<span>{{ settings.footer.copyright }}</span>
+</ng-container>
+<ng-template #err>
+	<span></span>
+	<span></span>
+</ng-template>

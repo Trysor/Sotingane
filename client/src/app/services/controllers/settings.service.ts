@@ -6,8 +6,8 @@ import { HttpService } from '@app/services/http/http.service';
 import { PlatformService } from '@app/services/utility/platform.service';
 
 import { env } from '@env';
-import { take } from 'rxjs/operators';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
+import { take, catchError } from 'rxjs/operators';
 
 const emptySettings: Settings = {
 	indexRoute: '',
@@ -87,7 +87,16 @@ export class SettingsService {
 
 
 	public updateSettings() {
-		this.getSettings().pipe(take(1)).subscribe((settings) => this._settingsSubject.next(settings));
+		this.getSettings().pipe(
+			take(1),
+			catchError(() => of(null))
+		).subscribe(settings => {
+			if (settings) {
+				this._settingsSubject.next(settings);
+			} else {
+				this._settingsSubject.error(emptySettings);
+			}
+		});
 	}
 
 	public updateTheme() {
