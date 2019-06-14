@@ -3,11 +3,15 @@ import { Injectable, Optional } from '@angular/core';
 import { AuthService } from '@app/services/controllers/auth.service';
 import { CMSService } from '@app/services/controllers/cms.service';
 import { PlatformService } from '@app/services/utility/platform.service';
+import { WorkerService } from '@app/services/http/worker.service';
+import { ServerService } from '@app/services/http/server.service';
 
 import { JWTUser } from '@types';
 
-import { Subscription, timer, of } from 'rxjs';
+import { Subscription, timer } from 'rxjs';
 import { take, distinctUntilChanged } from 'rxjs/operators';
+
+
 
 
 @Injectable({ providedIn: 'root' })
@@ -19,6 +23,8 @@ export class SetupService {
 
 
 	constructor(
+		@Optional() private workerService: WorkerService,
+		@Optional() public serverService: ServerService,
 		private platform: PlatformService,
 		private authService: AuthService,
 		private cmsService: CMSService) {

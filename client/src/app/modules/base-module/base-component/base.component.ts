@@ -1,9 +1,9 @@
-import { Component, AfterViewInit, OnDestroy, Optional, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { MatDrawer } from '@app/modules/material.types';
 
-import { MobileService, AuthService, WorkerService, ServerService, SEOService, SetupService } from '@app/services';
+import { MobileService, AuthService, SEOService, SetupService } from '@app/services';
 
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -20,9 +20,7 @@ export class BaseComponent implements AfterViewInit, OnDestroy {
 	@ViewChild('sidenavRight', { static: false }) private sidenavRight: MatDrawer;
 
 	constructor(
-		@Optional() private workerService: WorkerService,
-		@Optional() public serverService: ServerService,
-		@Optional() public setupService: SetupService,
+		public setupService: SetupService,
 		public seoService: SEOService,
 		public mobileService: MobileService,
 		public authService: AuthService,
