@@ -64,6 +64,7 @@ export class DynamicMediaComponent extends DynamicLazyLoader implements DynamicC
 
 	private _iframe: HTMLElement;
 	private _img: HTMLElement;
+	private readonly _listeners: (() => void)[] = [];
 
 	constructor(
 		private platform: PlatformService,
@@ -124,8 +125,9 @@ export class DynamicMediaComponent extends DynamicLazyLoader implements DynamicC
 			this.renderer.addClass(this._iframe, 'iframelazy');
 			this.renderer.addClass(wrapper, 'lazy');
 		}
-		this.renderer.listen(this._img, 'load', () => this.renderer.removeClass(wrapper, 'lazy'));
-
+		this._listeners.push(
+			this.renderer.listen(this._img, 'load', () => this.renderer.removeClass(wrapper, 'lazy'))
+		);
 
 		// Set common attributes
 		this.renderer.setAttribute(this._iframe, 'frameBorder', '0');
@@ -151,7 +153,14 @@ export class DynamicMediaComponent extends DynamicLazyLoader implements DynamicC
 	load() {
 		this.renderer.setAttribute(this._iframe, 'src', this._iframe.getAttribute('data-src'));
 		this.renderer.removeAttribute(this._iframe, 'data-src');
-		this.renderer.listen(this._iframe, 'load', () => this.renderer.removeClass(this._iframe, 'iframelazy'));
+
+		this._listeners.push(
+			this.renderer.listen(this._iframe, 'load', () => this.renderer.removeClass(this._iframe, 'iframelazy'))
+		);
+	}
+
+	unload() {
+		this._listeners.forEach(dispose => dispose());
 	}
 
 	/**

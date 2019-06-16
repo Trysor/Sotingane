@@ -25,6 +25,7 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 	private _srcset: string;
 	private _imgEl: HTMLImageElement;
 	private readonly _sources: PictureSource[] = [];
+	private readonly _listeners: (() => void)[] = [];
 
 	private _content: Content;
 
@@ -61,7 +62,7 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 		this._sources.push({ media: null, src });
 
 		this._srcset = this._sources.map((s) => `${s.src} ${(s.media ? s.media : '')}`).join(', ');
-		this.renderer.listen(this._imgEl, 'click', this.onclick.bind(this));
+		this._listeners.push(this.renderer.listen(this._imgEl, 'click', this.onclick.bind(this)));
 
 		this.mobileService.isMobile().pipe(takeUntil(this._ngUnsub)).subscribe(isMobile => {
 			if (isMobile) {
@@ -71,27 +72,31 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 			}
 		});
 
-		if (!this.platform.isServer) {
-			this.hookLazyLoader(this.elRef.nativeElement);
-		}
+		this.hookLazyLoader(this.elRef.nativeElement);
 	}
 
 	load() {
 		// Add the srcset
 		this.renderer.setAttribute(this._imgEl, 'srcset', this._srcset);
-		// Remove lazy tag
-		this.renderer.listen(this._imgEl, 'load', () => {
-			this.renderer.removeStyle(this._imgEl, 'padding-bottom');
-			this.renderer.removeClass(this.elRef.nativeElement, 'lazy');
-		});
+
+		if (this._imgEl.complete) {
+			this.onload();
+			return;
+		}
+
+		this._listeners.push(this.renderer.listen(this._imgEl, 'load', this.onload.bind(this)));
+		this._listeners.push(this.renderer.listen(this._imgEl, 'error', this.onerror.bind(this)));
+	}
+
+	unload() {
+		this._listeners.forEach(dispose => dispose());
 	}
 
 	/**
 	 * OnClick handler for the image. Opens a modal with the original-sized image
 	 */
 	onclick() {
-		if (!this.modalService) { return; }
-		if (this.mobileService.isMobile().getValue()) { return; }
+		if (!this.modalService || this.mobileService.isMobile().getValue()) { return; }
 
 		// this.sources[0] is auto-format original-sized image
 		const altAttr = this._imgEl.attributes.getNamedItem('alt');
@@ -99,5 +104,15 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 			startIndex: this._content.images.map(i => i.url).indexOf(this._sources[0].src),
 			images: this._content.images
 		});
+	}
+
+	onload() {
+		this.renderer.removeStyle(this._imgEl, 'padding-bottom');
+		this.renderer.removeClass(this.elRef.nativeElement, 'lazy');
+	}
+
+	onerror() {
+		this.renderer.removeClass(this.elRef.nativeElement, 'lazy');
+		this.renderer.addClass(this.elRef.nativeElement, 'error');
 	}
 }

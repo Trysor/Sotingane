@@ -33,8 +33,7 @@ export class DynamicLinkComponent implements DynamicComponent, OnInit {
 		if (!this.link || this.link.length === 0) { return; }
 
 		if (this.platform.document) {
-			const origin = this.platform.document.location.origin;
-			this.link = this.link.replace(origin, '');
+			this.link = this.link.replace(this.platform.document.location.origin, '');
 		}
 
 		this._isRemoteUrl = !this.link.startsWith('/');

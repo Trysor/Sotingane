@@ -2,13 +2,13 @@
 
 import { PlatformService } from '@app/services/utility/platform.service';
 
-import { Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 
 @Injectable({ providedIn: 'root' })
 export class IntersectionService {
 	private _obs: IntersectionObserver;
-	private _subject = new Subject<IntersectionObserverEntry[]>();
+	private _subject = new BehaviorSubject<Element[]>([]);
 
 	public get targets() { return this._subject; }
 
@@ -17,7 +17,11 @@ export class IntersectionService {
 
 		this._obs = new IntersectionObserver(
 			(entries: IntersectionObserverEntry[]) => {
-				this._subject.next(entries);
+				this._subject.next(
+					entries
+						.filter(entry => entry.intersectionRatio > 0)
+						.map(entry => entry.target)
+				);
 			},
 			{
 				rootMargin: '0px',
@@ -31,22 +35,8 @@ export class IntersectionService {
 	 * Observe the on-screen visiblity of a given element
 	 */
 	public observe(el: Element) {
-		if (this.platform.isBrowser) {
-			this._obs.observe(el);
-			return;
-		}
-
-		// On server
-		const intersect: IntersectionObserverEntry = {
-			target: el, // the element
-			isIntersecting: true, // isIntersecting
-			boundingClientRect: null,
-			intersectionRatio: 1,
-			intersectionRect: null,
-			rootBounds: null,
-			time: 0
-		};
-		this._subject.next([intersect]);
+		if (this.platform.isServer) { return; }
+		this._obs.observe(el);
 	}
 
 	/**
