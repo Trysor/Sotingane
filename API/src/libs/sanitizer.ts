@@ -9,7 +9,7 @@ import * as sanitizeHtml from 'sanitize-html';
 
 const sanitizeOptions: sanitizeHtml.IOptions = {
 	allowedTags: [
-		'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
+		'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'span', 'a', 'ul', 'ol',
 		'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',
 		'table', 'thead', 'tbody', 'tr', 'th', 'td', 'pre',
 		'figure', 'caption', 'figcaption', 'img',
@@ -17,20 +17,28 @@ const sanitizeOptions: sanitizeHtml.IOptions = {
 	],
 	allowedAttributes: {
 		'*': ['class', 'style'],
-		'a': ['href'],
-		'img': ['src', 'alt'],
-		'div': ['data-oembed-url'],
-		'oembed': ['url']
+		a: ['href'],
+		img: ['src', 'alt'],
+		div: ['data-oembed-url'],
+		oembed: ['url']
+	},
+	allowedStyles: {
+		'*': {
+			color: [
+				/^#(0x)?[0-9a-f]+$/i,																		// HEX
+				/^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/,									// RGB
+				/^hsl\(\d{1,3}(?:,\s*\d{1,3}%){2}\)|hsla\(\d{1,3}(?:,\s*\d{1,3}%){2},\s*\d*\.?\d+\)$/gi		// HSL(A)
+			],
+			'text-align': [/^left$/, /^right$/, /^center$/],
+		}
 	},
 	allowedSchemesByTag: {
-		'a': ['http', 'https', 'steam']
+		a: ['http', 'https', 'steam']
 	}
 };
 
 /**
  * Sanitize HTML
- * @param  {string} htmlInput       the HTML to sanitize
- * @return {string}                 the sanitized HTML output
  */
 export const sanitize = (htmlInput: string) => sanitizeHtml(htmlInput, sanitizeOptions);
 
@@ -42,7 +50,7 @@ export const sanitize = (htmlInput: string) => sanitizeHtml(htmlInput, sanitizeO
 */
 
 const stripOptions = {
-	allowedTags: <string[]>[],
+	allowedTags:  [] as string[],
 	allowedAttributes: {},
 	exclusiveFilter: (frame: sanitizeHtml.IFrame) => !frame.text.trim(),
 	textFilter: (text: string) => text.trim().concat(' '),
@@ -50,7 +58,5 @@ const stripOptions = {
 
 /**
  * Removes all HTML tags from a serialized HTML string
- * @param  {string} htmlInput       the HTML to sanitize
- * @return {string}                 plain text output
  */
 export const stripHTML = (htmlInput: string): string => sanitizeHtml(htmlInput, stripOptions).trim().replace(/ {1,}/g, ' ');

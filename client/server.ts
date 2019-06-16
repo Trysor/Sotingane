@@ -38,7 +38,7 @@ app.engine('html', ngExpressEngine({
 app.set('view engine', 'html');
 app.set('views', join(DIST_FOLDER, 'browser'));
 app.get('*.*', express.static(join(DIST_FOLDER, 'browser'), { maxAge: '1y' })); // Files
-app.get('*', (req, res) => res.render('index', { req: req, cache: true })); // Catch-all
+app.get('*', (req, res) => res.render('index', { req, res, cache: true })); // Catch-all
 
 // Start up the Node server
 app.listen(PORT, () => {

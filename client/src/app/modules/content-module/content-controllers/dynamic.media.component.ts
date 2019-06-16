@@ -1,4 +1,4 @@
-﻿import { Component, Renderer2, ElementRef, ChangeDetectionStrategy, Input, OnInit } from '@angular/core';
+﻿import { Component, Renderer2, ElementRef, ChangeDetectionStrategy, Input } from '@angular/core';
 
 import { DynamicComponent } from '@types';
 
@@ -29,33 +29,33 @@ enum VideoSite {
 	template: `<div></div>`, // element gets removed from DOM
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DynamicMediaComponent extends DynamicLazyLoader implements DynamicComponent, OnInit {
+export class DynamicMediaComponent extends DynamicLazyLoader implements DynamicComponent {
 	private static readonly VideoFilters: VideoFilter[] = [
 		{
-			'site': VideoSite.youtube,
-			'match': 'youtu.be',
-			'idFrom': /be\/([a-zA-Z0-9_-]+)/,
-			'start': /[\&\?]t=([0-9]+)/
+			site: VideoSite.youtube,
+			match: 'youtu.be',
+			idFrom: /be\/([a-zA-Z0-9_-]+)/,
+			start: /[\&\?]t=([0-9]+)/
 		},
 		{
-			'site': VideoSite.youtube,
-			'match': 'youtube',
-			'idFrom': /\?v=([a-zA-Z0-9_-]+)/,
-			'start': /[&?]t=([0-9]+)/
+			site: VideoSite.youtube,
+			match: 'youtube',
+			idFrom: /\?v=([a-zA-Z0-9_-]+)/,
+			start: /[&?]t=([0-9]+)/
 		},
 		{
-			'site': VideoSite.twitch,
-			'match': 'twitch.tv/videos/',
-			'idFrom': /videos\/([a-zA-Z0-9_-]+)/,
-			'start': /[&?]t=([0-9]+)/, // t=04h30m37s. TODO: fix me.
-			'prefix': 'video=v'
+			site: VideoSite.twitch,
+			match: 'twitch.tv/videos/',
+			idFrom: /videos\/([a-zA-Z0-9_-]+)/,
+			start: /[&?]t=([0-9]+)/, // t=04h30m37s. TODO: fix me.
+			prefix: 'video=v'
 		},
 		{
-			'site': VideoSite.twitch,
-			'match': 'twitch.tv/',
-			'idFrom': /tv\/([a-zA-Z0-9_-]+)/,
-			'start': /[&?]t=([0-9]+)/,  // t=04h30m37s. TODO: fix me.
-			'prefix': 'channel='
+			site: VideoSite.twitch,
+			match: 'twitch.tv/',
+			idFrom: /tv\/([a-zA-Z0-9_-]+)/,
+			start: /[&?]t=([0-9]+)/,  // t=04h30m37s. TODO: fix me.
+			prefix: 'channel='
 		}
 	];
 
@@ -64,6 +64,7 @@ export class DynamicMediaComponent extends DynamicLazyLoader implements DynamicC
 
 	private _iframe: HTMLElement;
 	private _img: HTMLElement;
+	private readonly _listeners: (() => void)[] = [];
 
 	constructor(
 		private platform: PlatformService,
@@ -74,7 +75,12 @@ export class DynamicMediaComponent extends DynamicLazyLoader implements DynamicC
 		super(elRef, inters);
 	}
 
-	ngOnInit() {
+	/**
+	 * DynamicComponent interface method. Triggered as the component is injected
+	 */
+	public buildJob(el: Element): void {
+		this.url = el.children[0].getAttribute('url');
+
 		// Protect against template issues
 		if (!this.elRef.nativeElement.parentNode) { return; }
 		if (!this.url) { return; }
@@ -90,7 +96,7 @@ export class DynamicMediaComponent extends DynamicLazyLoader implements DynamicC
 			const ID = match ? match[1] : undefined;
 			if (!ID) { break; }
 
-			const params: VideoParams = { 'ID': ID };
+			const params: VideoParams = { ID };
 			const startMatch = filter.start.exec(this.url);
 			if (startMatch) { params.start = startMatch[1]; }
 			if (filter.prefix) { params.prefix = filter.prefix; }
@@ -119,8 +125,9 @@ export class DynamicMediaComponent extends DynamicLazyLoader implements DynamicC
 			this.renderer.addClass(this._iframe, 'iframelazy');
 			this.renderer.addClass(wrapper, 'lazy');
 		}
-		this.renderer.listen(this._img, 'load', () => this.renderer.removeClass(wrapper, 'lazy'));
-
+		this._listeners.push(
+			this.renderer.listen(this._img, 'load', () => this.renderer.removeClass(wrapper, 'lazy'))
+		);
 
 		// Set common attributes
 		this.renderer.setAttribute(this._iframe, 'frameBorder', '0');
@@ -131,20 +138,12 @@ export class DynamicMediaComponent extends DynamicLazyLoader implements DynamicC
 		this.renderer.appendChild(wrapper, this._img);
 		this.renderer.appendChild(wrapper, this._iframe);
 		const parent = this.renderer.parentNode(this.elRef.nativeElement);
+
 		this.renderer.insertBefore(parent, wrapper, this.elRef.nativeElement);
 		this.renderer.removeChild(parent, this.elRef.nativeElement);
 		this.renderer.destroy();
 
 		this.hookLazyLoader(wrapper);
-	}
-
-	/**
-	 * DynamicComponent interface method. Triggered as the component is injected
-	 * @param el
-	 * @param textContent
-	 */
-	public buildJob(el: Element): void {
-		this.url = el.children[0].getAttribute('url');
 	}
 
 
@@ -154,7 +153,14 @@ export class DynamicMediaComponent extends DynamicLazyLoader implements DynamicC
 	load() {
 		this.renderer.setAttribute(this._iframe, 'src', this._iframe.getAttribute('data-src'));
 		this.renderer.removeAttribute(this._iframe, 'data-src');
-		this.renderer.listen(this._iframe, 'load', () => this.renderer.removeClass(this._iframe, 'iframelazy'));
+
+		this._listeners.push(
+			this.renderer.listen(this._iframe, 'load', () => this.renderer.removeClass(this._iframe, 'iframelazy'))
+		);
+	}
+
+	unload() {
+		this._listeners.forEach(dispose => dispose());
 	}
 
 	/**

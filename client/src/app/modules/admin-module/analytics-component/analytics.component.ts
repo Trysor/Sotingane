@@ -2,20 +2,19 @@ import { Component, OnDestroy, AfterViewInit, ChangeDetectionStrategy } from '@a
 
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { MatSnackBar } from '@angular/material';
+import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 
 import {
 	AggregationQuery, AggregationResult, AggregationResultSummarized, AggregationResultUnwinded, User, TableSettings
 } from '@types';
-import { CMSService, AdminService, MobileService } from '@app/services';
+import { CMSService, AdminService, MobileService, SnackBarService } from '@app/services';
 
 import { FormErrorInstant, AccessHandler } from '@app/classes';
 
 import { min as DateMin } from 'date-fns';
 
-import { Subject, BehaviorSubject } from 'rxjs';
-import { takeUntil, distinctUntilChanged } from 'rxjs/operators';
+import { Subject, BehaviorSubject, of } from 'rxjs';
+import { takeUntil, distinctUntilChanged, catchError } from 'rxjs/operators';
 
 enum AnalyticsState {
 	QUERY,
@@ -51,25 +50,25 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 	public get maxSeenAfterDate() {
 		return !this.aggregateForm.get('seenBeforeDate').value
 			? this.today
-			: DateMin([this.today, <Date>this.aggregateForm.get('seenBeforeDate').value]);
+			: DateMin([this.today, this.aggregateForm.get('seenBeforeDate').value as Date]);
 	}
 
 	public get minSeenBeforeDate() {
 		return !this.aggregateForm.get('seenAfterDate').value
 			? null
-			: DateMin([this.today, <Date>this.aggregateForm.get('seenAfterDate').value]);
+			: DateMin([this.today, this.aggregateForm.get('seenAfterDate').value as Date]);
 	}
 
 	public get maxCreatedAfterDate() {
 		return !this.aggregateForm.get('createdBeforeDate').value
 			? this.today
-			: DateMin([this.today, <Date>this.aggregateForm.get('createdBeforeDate').value]);
+			: DateMin([this.today, this.aggregateForm.get('createdBeforeDate').value as Date]);
 	}
 
 	public get minCreatedBeforeDate() {
 		return !this.aggregateForm.get('createdAfterDate').value
 			? null
-			: DateMin([this.today, <Date>this.aggregateForm.get('createdAfterDate').value]);
+			: DateMin([this.today, this.aggregateForm.get('createdAfterDate').value as Date]);
 	}
 
 	// Browsers
@@ -135,8 +134,13 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 			{
 				header: 'Access',
 				property: 'access',
-				icon: { val: a => this.accessHandler.getAccessChoice(a.access).icon },
-				val: a => this.accessHandler.getAccessChoice(a.access).plural
+				// icon: { val: a => this.accessHandler.getAccessChoice(a.access).icon },
+				val: c => {
+					if (c.access.length === 0) {
+						return this.accessHandler.getAccessChoice(null).single;
+					}
+					return c.access.map(role => this.accessHandler.getAccessChoice(role).single).join(', ');
+				}
 			},
 			{
 				header: 'Views',
@@ -166,30 +170,40 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 		private fb: FormBuilder,
 		private cmsService: CMSService,
 		private adminService: AdminService,
-		private snackBar: MatSnackBar,
+		private snackBar: SnackBarService,
 		private datePipe: DatePipe) {
 
 		// Form
+		const _disableAccessOnInit = true;
 		this.aggregateForm = fb.group({
 			// Content Filters
-			'createdBy': [''],
-			'access': [''],
-			'published': [true],
-			'route': [''],
-			'folder': [''],
-			'createdAfterDate': [''],
-			'createdBeforeDate': [''],
+			createdBy: [''],
+			access: new FormControl({ value: [], disabled: _disableAccessOnInit }),
+			accessFilter: [!_disableAccessOnInit],
+			published: [true],
+			route: [''],
+			folder: [''],
+			createdAfterDate: [''],
+			createdBeforeDate: [''],
 			// User Filters
-			'seenAfterDate': [''],
-			'seenBeforeDate': [''],
-			'readBy': [[]],
-			'browsers': [[]],
-			'unwind': [false],
+			seenAfterDate: [''],
+			seenBeforeDate: [''],
+			readBy: [[]],
+			browsers: [[]],
+			unwind: [false],
 		});
 
 		// Get users
 		this.adminService.getAllusers().pipe(takeUntil(this._ngUnsub)).subscribe(users => {
 			this.users.next(users);
+		});
+
+		this.aggregateForm.get('accessFilter').valueChanges.pipe(takeUntil(this._ngUnsub)).subscribe(val => {
+			if (val) {
+				this.aggregateForm.get('access').enable();
+			} else {
+				this.aggregateForm.get('access').disable();
+			}
 		});
 	}
 
@@ -208,9 +222,20 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 
 	public submitForm() {
 		const query: AggregationQuery = this.aggregateForm.value;
+		if (!(query as any).accessFilter) {
+			delete query.access;
+		}
+		delete (query as any).accessFilter; // noAccessFilter isn't part of the request to the API
 
 		this.setState(AnalyticsState.LOADING);
-		this.adminService.getAggregatedData(query).subscribe(data => {
+		this.adminService.getAggregatedData(query).pipe(
+			catchError(() => of(null))
+		).subscribe(data => {
+			if (!data) {
+				this.setState(AnalyticsState.QUERY);
+				return;
+			}
+
 			if (Array.isArray(data)) {
 				this.data.next(data);
 				this.setState(AnalyticsState.RESULTS);
@@ -218,27 +243,13 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 			}
 			this.setState(AnalyticsState.QUERY);
 			this.data.next(null);
-			this.openSnackBar((<any>data).message);
-		}, err => {
-			this.setState(AnalyticsState.QUERY);
+			this.snackBar.open((data as any).message);
 		});
 	}
 
 	public newQuery() {
 		this.data.next(null);
 	}
-
-	/**
-	 * Opens a snackbar with the given message and action message
-	 * @param  {string} message The message that is to be displayed
-	 * @param  {string} action  the action message that is to be displayed
-	 */
-	private openSnackBar(message: string, action?: string) {
-		this.snackBar.open(message, action, {
-			duration: 5000,
-		});
-	}
-
 
 	setState(newState: AnalyticsState) {
 		this.state.next(newState);

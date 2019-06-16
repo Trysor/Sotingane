@@ -1,5 +1,5 @@
 import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
-import { MatDialog, MatDialogConfig } from '@angular/material';
+import { MatDialog, MatDialogConfig } from '@app/modules/material.types';
 
 import { DatePipe } from '@angular/common';
 
@@ -34,10 +34,9 @@ export class UsersComponent implements OnDestroy {
 				property: 'username',
 			},
 			{
-				header: 'Role',
-				property: 'role',
-				icon: { val: user => this._accessHandler.getAccessChoice(user.role).icon },
-				val: user => this._accessHandler.getAccessChoice(user.role).single
+				header: 'Roles',
+				property: 'roles',
+				val: user => user.roles.map(role => this._accessHandler.getAccessChoice(role).single).join(', ')
 			},
 			{
 				header: 'Joined date',
@@ -52,11 +51,12 @@ export class UsersComponent implements OnDestroy {
 				noSort: true,
 				type: ColumnType.Button,
 				icon: { val: () => 'settings' },
-				noText: true,
+				ariaLabel: u => `Edit user: ${u.username}`,
+				removeText: true,
 				func: (user, users) => {
 					this.dialog.open(
 						UserModalComponent,
-						<MatDialogConfig>{ data: <UserModalData>{ user: user, userList: users } }
+						{ data: { user, userList: users } as UserModalData } as MatDialogConfig
 					).afterClosed().subscribe((closedResult: boolean) => {
 						if (closedResult) { this.updateList(); }
 					});
@@ -71,7 +71,7 @@ export class UsersComponent implements OnDestroy {
 
 		trackBy: (index: number, user: User) => user._id,
 
-		mobile: ['username', 'role', '_id'], // _id = edit
+		mobile: ['username', 'roles', '_id'], // _id = edit
 
 	};
 

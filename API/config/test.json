@@ -1,9 +1,12 @@
 {
 	"secret": "testtesttesttesttesttesttesttesttesttest",
+	"refreshSecret": "refreshtestrefreshtestrefreshtestrefresh",
 	"database": "mongodb://localhost:27017/sotingtest",
 	"port": 2001,
 	"allowedOrigins": [
 		"localhost:2001"
 	],
-	"loggingMode": "dev" /*'combined' outputs the Apache style LOGs*/
+	"loggingMode": "dev",
+	"tokenAudience": "someAudienceForTheAuthToken",
+	"refreshTokenAudience": "someAudienceForTheRefresherToken"
 }

@@ -5,7 +5,7 @@ import { DatePipe } from '@angular/common';
 
 import { ModalService, SettingsService, AdminService } from '@app/services';
 
-import { Content, TableSettings, ColumnType } from '@types';
+import { Content, TableSettings, ColumnType, AccessRoles } from '@types';
 
 import { AccessHandler } from '@app/classes';
 
@@ -32,7 +32,8 @@ export class PagesComponent implements OnDestroy {
 				noSort: true,
 				type: ColumnType.InternalLink,
 				icon: { val: () => 'mode_edit' },
-				noText: true,
+				ariaLabel: c => `Edit content: ${c.title}`,
+				removeText: true,
 				func: c => `/compose/${c.route}`,
 				narrow: true,
 			},
@@ -52,8 +53,13 @@ export class PagesComponent implements OnDestroy {
 			{
 				header: 'Access',
 				property: 'access',
-				icon: { val: c => this._accessHandler.getAccessChoice(c.access).icon },
-				val: c => this._accessHandler.getAccessChoice(c.access).single
+				// icon: { val: c => this._accessHandler.getAccessChoice(c.access).icon },
+				val: c => {
+					if (c.access.length === 0) {
+						return this._accessHandler.getAccessChoice(null).single;
+					}
+					return c.access.map(role => this._accessHandler.getAccessChoice(role).single).join(', ');
+				}
 			},
 			{
 				header: 'Published',
@@ -83,7 +89,7 @@ export class PagesComponent implements OnDestroy {
 					val: () => 'delete',
 					color: 'warn'
 				},
-				noText: true,
+				removeText: true,
 				func: c => this.modalService.openDeleteContentModal(c),
 				disabled: c => c.route === this.settingsService.settings.getValue().indexRoute,
 				narrow: true

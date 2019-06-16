@@ -10,7 +10,7 @@ import { AccessRoles, ContentEntry } from '../../types';
 const schema = new Schema({
 	current: {
 		title: { type: String, unique: true, required: true },
-		access: { type: String, enum: [AccessRoles.admin, AccessRoles.user, AccessRoles.everyone], default: AccessRoles.everyone, index: true },
+		access: [{ type: String, enum: Object.values(AccessRoles) }],
 		route: { type: String, required: true, unique: true, index: { unique: true } },
 		published: { type: Boolean, default: true },
 		version: { type: Number, required: true },

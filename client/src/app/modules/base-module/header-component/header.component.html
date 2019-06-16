@@ -33,8 +33,8 @@
 				<mat-icon color="primary">person</mat-icon> {{ user.username }}
 			</button>
 			<!-- Menu for DESKTOP -->
-			<mat-menu #userPanel="matMenu" xPosition="before" yPosition="below" [overlapTrigger]="false">
-				<control-panel-component *ngIf="!(mobileService.isMobile() | async)" layout="menu"></control-panel-component>
+			<mat-menu #userPanel="matMenu" xPosition="before" yPosition="below" overlapTrigger="false">
+				<control-panel-component layout="menu"></control-panel-component>
 			</mat-menu>
 		</div>
 	</ng-container>

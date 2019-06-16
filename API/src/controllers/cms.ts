@@ -13,7 +13,7 @@ import { ImageSize } from '../libs/image-size';
 import { LogModel, ContentModel } from '../models';
 
 // Types and global settings
-import { User, AccessRoles, Log, Content, ContentEntry } from '../../types';
+import { JWTUser, AccessRoles, Log, Content, ContentEntry } from '../../types';
 import { CONTENT_MAX_LENGTH } from '../../global';
 
 
@@ -25,7 +25,6 @@ export class CMSController extends Controller {
 
 	/**
 	 * Retrieves the src of the first image if found.
-	 * @param html
 	 */
 	private static getImageSrcFromContent(html: string) {
 		// entire match, grouping, index, entire input
@@ -36,32 +35,26 @@ export class CMSController extends Controller {
 			images.push(match[1]);
 			match = CMSController.ImageSrcRegex.exec(html);
 		}
-
 		return images;
 	}
 
 
+
 	/**
 	 * Gets all content routes that the user has access to, and that are visible in the navigation
-	 * @param  {Req}		req  request
-	 * @param  {Res}		res  response
-	 * @param  {Next}		next next
 	 */
 	@GET({ path: '/', do: [Auth.Personalize] })
 	public async getContentList(req: Req, res: Res, next: Next) {
-		const user: User = <User>req.user;
+		const user = req.user as JWTUser;
 
-		const accessRights: AccessRoles[] = [AccessRoles.everyone];
-		if (user) {
-			accessRights.push(AccessRoles.user);
-			if (user.role === AccessRoles.admin) { accessRights.push(AccessRoles.admin); }
-		}
+		const match = Auth.getUserAccessMatchObject(user, {
+			'current.nav': true,
+			'current.published': true
+		});
 
 		const contentList: Content[] = await ContentModel.aggregate([
-			{ $match: { 'current.access': { $in: accessRights }, 'current.nav': true, 'current.published': true } },
-			{
-				$project: { current: { title: 1, route: 1, folder: 1 } }
-			},
+			{ $match: match },
+			{ $project: { current: { title: 1, route: 1, folder: 1 } } },
 			{ $replaceRoot: { newRoot: '$current' } }
 		]);
 		if (!contentList) {
@@ -73,16 +66,13 @@ export class CMSController extends Controller {
 
 	/**
 	 * Gets content of a given route, declared by the param
-	 * @param  {Req}		req  request
-	 * @param  {Res}		res  response
-	 * @param  {Next}		next next
 	 */
 	@GET({ path: '/:route', do: [Auth.Personalize] })
 	public async getContent(req: Req, res: Res, next: Next) {
-		const route: string = req.params.route,
-			user: User = <User>req.user;
+		const route: string = req.params.route;
+		const user = req.user as JWTUser;
 
-		const contentDoc = <ContentEntry>await ContentModel.findOne(
+		const contentDoc: ContentEntry = await ContentModel.findOne(
 			{ 'current.route': route, 'current.published': true },
 			{
 				'current.title': 1, 'current.access': 1, 'current.route': 1, 'current.content': 1, 'current.description': 1,
@@ -90,27 +80,28 @@ export class CMSController extends Controller {
 				'current.images.height': 1, 'current.images.width': 1, 'current.images.url': 1
 			}
 		).populate([
-			{ path: 'current.updatedBy', select: 'username -_id' }, // exclude _id
-			{ path: 'current.createdBy', select: 'username -_id' }  // exclude _id
+			{ path: 'current.updatedBy', select: 'username' },
+			{ path: 'current.createdBy', select: 'username' }
 		]).lean();
 
 		if (!contentDoc) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
 
-		const access = contentDoc.current.access === AccessRoles.everyone || (user && user.canAccess(contentDoc.current.access));
-		if (!access) { return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED)); }
+		if (!Auth.CanUserAccess(user, contentDoc.current.access, contentDoc.current.createdBy)) {
+			return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED));
+		}
 
 		res.status(200).send(contentDoc.current);
 
 		// Logging
 		const dnt = req.headers.dnt && isProduction; // Do not track header
-		const log = <Log>{
+		const log = {
 			user: (user && !dnt) ? user._id : undefined,
 			route: contentDoc.current.route,
 			content: contentDoc._id,
 			ts: new Date()
-		};
+		} as Log;
 		if (user || !dnt) {
-			const browser = new UAParser(<string>req.headers['user-agent']).getBrowser();
+			const browser = new UAParser(req.headers['user-agent']).getBrowser();
 			if (browser && browser.name) {
 				log.browser = browser.name;
 				log.browser_ver = browser.version;
@@ -122,11 +113,8 @@ export class CMSController extends Controller {
 
 	/**
 	 * Gets content history of a given route
-	 * @param  {Req}		req  request
-	 * @param  {Res}		res  response
-	 * @param  {Next}		next next
 	 */
-	@GET({ path: '/history/:route', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
+	@GET({ path: '/history/:route', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.writer)] })
 	public async getContentHistory(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route;
 
@@ -144,20 +132,17 @@ export class CMSController extends Controller {
 
 	/**
 	 * Creates new content
-	 * @param  {Req}		req  request
-	 * @param  {Res}		res  response
-	 * @param  {Next}		next next
 	 */
-	@POST({		path: '/',			do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.ContentSchema)] })
-	@PATCH({	path: '/:route',	do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.ContentSchema)] })
+	@POST({		path: '/',			do: [Auth.ByToken, Auth.RequireRole(AccessRoles.writer), validate(JSchema.ContentSchema)] })
+	@PATCH({	path: '/:route',	do: [Auth.ByToken, Auth.RequireRole(AccessRoles.writer), validate(JSchema.ContentSchema)] })
 	public async submitContent(req: Req, res: Res, next: Next) {
 		const isPatch = (!!req.params && !!req.params.route);
 		const data: Content = req.body;
-		const user: User = <User>req.user;
+		const user = req.user as JWTUser;
 
 		let existingDoc: ContentEntry;
 		if (isPatch) {
-			existingDoc = <ContentEntry>await ContentModel.findOne({ 'current.route': req.params.route }, { prev: false }).lean();
+			existingDoc = await ContentModel.findOne({ 'current.route': req.params.route }, { prev: false }).lean();
 			if (!existingDoc) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
 		}
 
@@ -203,19 +188,10 @@ export class CMSController extends Controller {
 
 	/**
 	 * Deletes content of a given route, declared by the param
-	 * @param  {Req}		req  request
-	 * @param  {Res}		res  response
-	 * @param  {Next}		next next
 	 */
-	@DELETE({ path: '/:route', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
+	@DELETE({ path: '/:route', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.writer)] })
 	public async deleteContent(req: Req, res: Res, next: Next) {
-		const route: string = req.params.route,
-			user: User = <User>req.user;
-
-		if (!user.isOfRole(AccessRoles.admin)) {
-			return res.status(401).send(status(ROUTE_STATUS.UNAUTHORISED));
-		}
-
+		const route: string = req.params.route;
 		const result: { n: number, ok: number } = await ContentModel.deleteOne({ 'current.route': route }).lean();
 		if (result.n === 0) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
 		return res.status(200).send(status(CMS_STATUS.CONTENT_DELETED));
@@ -224,29 +200,26 @@ export class CMSController extends Controller {
 
 	/**
 	 * Returns search results for a given search term provided in the body
-	 * @param  {Req}		req  request
-	 * @param  {Res}		res  response
-	 * @param  {Next}		next next
 	 */
 	@GET({ path: '/search/:searchTerm', do: [Auth.Personalize] })
 	public async searchContent(req: Req, res: Res, next: Next) {
-		const searchTerm: string = req.params.searchTerm || '',
-			user: User = <User>req.user;
+		const searchTerm: string = req.params.searchTerm || '';
+		const user = req.user as JWTUser;
 
-		const accessRights: AccessRoles[] = [AccessRoles.everyone];
-		if (user) {
-			accessRights.push(AccessRoles.user);
-			if (user.role === AccessRoles.admin) { accessRights.push(AccessRoles.admin); }
-		}
+
+		const match = Auth.getUserAccessMatchObject(user, {
+			$text: { $search: searchTerm },
+			'current.published': true
+		});
 
 		try {
 			const contentList: Content[] = await ContentModel.aggregate([
-				{ $match: { $text: { $search: searchTerm }, 'current.access': { $in: accessRights }, 'current.published': true } },
+				{ $match: match },
 				{ $project: { current: 1, relevance: { $meta: 'textScore' } } },
-				{ $lookup: { from: 'logs', localField: '_id', 'foreignField': 'content', as: 'logData' } },
+				{ $lookup: { from: 'logs', localField: '_id', foreignField: 'content', as: 'logData' } },
 				{ $unwind: { path: '$logData', preserveNullAndEmptyArrays: true } },
-				{ $group: { _id: '$_id', 'current': { $first: '$current' }, 'views': { $sum: 1 }, 'relevance': { $first: '$relevance' } } },
-				{ $sort: { 'relevance': 1 } },
+				{ $group: { _id: '$_id', current: { $first: '$current' }, views: { $sum: 1 }, relevance: { $first: '$relevance' } } },
+				{ $sort: { relevance: 1 } },
 				{ $limit: 1000 },
 				{
 					$project: {
@@ -276,46 +249,50 @@ export class CMSController extends Controller {
 */
 
 const createPatchContentSchema = {
-	'$id': JSchema.ContentSchema.name,
-	'type': 'object',
-	'additionalProperties': false,
-	'properties': {
-		'title': {
-			'type': 'string',
-			'maxLength': CONTENT_MAX_LENGTH.TITLE
+	$id: JSchema.ContentSchema.name,
+	type: 'object',
+	additionalProperties: false,
+	properties: {
+		title: {
+			type: 'string',
+			maxLength: CONTENT_MAX_LENGTH.TITLE
 		},
-		'access': {
-			'type': 'string',
-			'enum': [AccessRoles.admin, AccessRoles.user, AccessRoles.everyone]
+		access: {
+			type: 'array',
+			items: {
+				type: 'string',
+				enum: Object.values(AccessRoles)
+			},
+			uniqueItems: true
 		},
-		'published': {
-			'type': 'boolean'
+		published: {
+			type: 'boolean'
 		},
-		'route': {
-			'type': 'string',
-			'maxLength': CONTENT_MAX_LENGTH.ROUTE
+		route: {
+			type: 'string',
+			maxLength: CONTENT_MAX_LENGTH.ROUTE
 		},
-		'content': {
-			'type': 'string'
+		content: {
+			type: 'string'
 		},
-		'description': {
-			'type': 'string',
-			'maxLength': CONTENT_MAX_LENGTH.DESC
+		description: {
+			type: 'string',
+			maxLength: CONTENT_MAX_LENGTH.DESC
 		},
-		'folder': {
-			'type': 'string',
-			'maxLength': CONTENT_MAX_LENGTH.FOLDER
+		folder: {
+			type: 'string',
+			maxLength: CONTENT_MAX_LENGTH.FOLDER
 		},
-		'nav': {
-			'type': 'boolean'
+		nav: {
+			type: 'boolean'
 		}
 	},
-	'required': ['title', 'published', 'access', 'route', 'content', 'description', 'folder', 'nav']
+	required: ['title', 'published', 'access', 'route', 'content', 'description', 'folder', 'nav']
 };
 
 if (ajv.validateSchema(createPatchContentSchema)) {
 	ajv.addSchema(createPatchContentSchema, JSchema.ContentSchema.name);
 } else {
-	console.error(`${JSchema.ContentSchema.name} did not validate`);
+	throw Error(`${JSchema.ContentSchema.name} did not validate`);
 }
 

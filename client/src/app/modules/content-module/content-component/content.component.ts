@@ -1,11 +1,11 @@
 import {
-	Component, Input, AfterViewInit, OnDestroy, DoCheck, ChangeDetectionStrategy,
+	Component, AfterViewInit, OnDestroy, ChangeDetectionStrategy,
 	ViewChild, ElementRef, Optional
 } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 
 import { CMSService, AuthService, ModalService, ContentService, SettingsService } from '@app/services';
-import { Content, AccessRoles } from '@types';
+import { AccessRoles } from '@types';
 
 import { Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
@@ -17,9 +17,9 @@ import { takeUntil, filter } from 'rxjs/operators';
 	styleUrls: ['./content.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
+export class ContentComponent implements AfterViewInit, OnDestroy {
 	// Content
-	@ViewChild('contentHost') private _contentHost: ElementRef<HTMLDivElement>;
+	@ViewChild('contentHost', { static: false }) private _contentHost: ElementRef<HTMLDivElement>;
 
 	// Template Helpers
 	public readonly AccessRoles = AccessRoles;
@@ -35,14 +35,14 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 		private contentService: ContentService,
 		private route: ActivatedRoute,
 		private router: Router,
-		public authService: AuthService,
 		private settingsService: SettingsService,
+		public authService: AuthService,
 		public cmsService: CMSService) {
 
 		this.router.events.pipe(
 			filter(e => e instanceof NavigationEnd), takeUntil(this._ngUnsub)
-		).subscribe(e => {
-			this.cmsService.requestContent(this.route.snapshot.params['content']);
+		).subscribe(() => {
+			this.cmsService.requestContent(this.route.snapshot.params.content);
 		});
 	}
 
@@ -62,10 +62,6 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 		this.cmsService.content.next(null);
 	}
 
-	ngDoCheck() {
-		this.contentService.detectChanges();
-	}
-
 	/**
 	 * Navigate the user to the editor page.
 	 */
@@ -81,12 +77,10 @@ export class ContentComponent implements AfterViewInit, OnDestroy, DoCheck {
 		this.modalService.openDeleteContentModal(content).afterClosed().subscribe(doDelete => {
 			if (!doDelete) { return; }
 
-			this.cmsService.deleteContent(content.route).subscribe(
-				() => {
-					this.cmsService.getContentList(true);
-					this.router.navigateByUrl('/');
-				}
-			);
+			this.cmsService.deleteContent(content.route).subscribe(() => {
+				this.cmsService.getContentList(true);
+				this.router.navigateByUrl('/');
+			});
 		});
 	}
 }

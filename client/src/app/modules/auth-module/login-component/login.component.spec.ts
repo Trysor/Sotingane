@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed, tick } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { DebugElement, NO_ERRORS_SCHEMA, Component } from '@angular/core';
+import { DebugElement, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
 // Material
@@ -23,7 +23,7 @@ import { authServiceStub, AuthServiceStub } from '@app/services/tests/stubs';
 import { LoginComponent } from './login.component';
 
 // Rxjs
-import { of, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 
 describe('LoginComponent', () => {
 	let component: LoginComponent;
@@ -162,7 +162,6 @@ describe('LoginComponent', () => {
 
 	it('should successfully give error message on faulty login', () => {
 		const button: HTMLButtonElement = fixture.debugElement.query(By.css('.loginButton')).nativeElement;
-		const errorDebugElem = fixture.debugElement.query(By.css('mat-error'));
 
 		// Expect error to not be visible
 		// expect(errorDebugElem).toBeFalsy('Should not show mat-error on page load');
@@ -189,8 +188,8 @@ describe('LoginComponent', () => {
 		expect(component.state.getValue()).toBe(component.STATES.TRY_AGAIN, 'Should be in the TRY_AGAIN state');
 
 		// Expect error text to be visible
-		const error: HTMLElement = fixture.debugElement.query(By.css('mat-error')).nativeElement;
-		expect(error).toBeDefined('Should have an error message on screen');
+		const errorDebugElement: DebugElement = fixture.debugElement.query(By.css('mat-error'));
+		expect(errorDebugElement).toBeDefined('Should have an error message on screen');
 	});
 
 	it('should successfully give error message on faulty login: http error', () => {
@@ -215,7 +214,7 @@ describe('LoginComponent', () => {
 		expect(component.state.getValue()).toBe(component.STATES.LOADING, 'Should be in the LOADING state');
 
 		// Trigger login
-		loginSubject.error(<HttpErrorResponse>{ status: 401 });
+		loginSubject.error(new HttpErrorResponse({ status: 401 }));
 		fixture.detectChanges();
 
 		// Expect try_again state
@@ -249,7 +248,7 @@ describe('LoginComponent', () => {
 		expect(component.state.getValue()).toBe(component.STATES.LOADING, 'Should be in the LOADING state');
 
 		// Trigger login
-		loginSubject.error(null); // Timed out
+		loginSubject.error({}); // Timed out
 		fixture.detectChanges();
 
 		// Expect try_again state

@@ -11,7 +11,8 @@
 							<mat-form-field appearance="outline">
 								<mat-label>Title</mat-label>
 								<input matInput id="title" #title formControlName="title" type="text"
-									   [errorStateMatcher]="formErrorInstant" autocomplete="off" required [maxlength]="CONTENT_MAX_LENGTH.TITLE">
+									[errorStateMatcher]="formErrorInstant" autocomplete="off" required
+									> <!-- [maxlength]="CONTENT_MAX_LENGTH.TITLE" -->
 								<mat-error *ngIf="contentForm.get('title').hasError('required')">
 									Title is <strong>required</strong>
 								</mat-error>
@@ -27,7 +28,7 @@
 							<mat-form-field appearance="outline">
 								<mat-label>Route</mat-label>
 								<input matInput id="route" #route formControlName="route" type="text"
-									   [errorStateMatcher]="formErrorInstant" autocomplete="off" required [maxlength]="CONTENT_MAX_LENGTH.ROUTE">
+									[errorStateMatcher]="formErrorInstant" autocomplete="off" required>
 								<mat-error *ngIf="contentForm.get('route').hasError('required')">
 									Route is <strong>required</strong>
 								</mat-error>
@@ -51,15 +52,18 @@
 						<!-- ACCESS -->
 						<div class="field">
 							<mat-form-field appearance="outline">
-								<mat-label>Access</mat-label>
-								
-								<mat-select id="access" #access="matSelect" formControlName="access" required>
+								<mat-label>Limit Access</mat-label>
+								<mat-select id="access" #access="matSelect" formControlName="access" multiple>
 									<mat-select-trigger>
-										<mat-icon>{{accessHandler.getAccessChoice(contentForm.get('access').value).icon}}</mat-icon>{{ accessHandler.getAccessChoice(contentForm.get('access').value).plural }}
+										<ng-container *ngFor="let selected of contentForm.get('access').value; last as last">
+											<mat-icon>{{accessHandler.getAccessChoice(selected).icon}}</mat-icon> {{ accessHandler.getAccessChoice(selected).plural }}<span *ngIf="!last">, </span>
+										</ng-container>
 									</mat-select-trigger>
-									<mat-option *ngFor="let option of accessHandler.accessChoices" [value]="option.value">
-										<mat-icon matPrefix>{{ option.icon }}</mat-icon>{{ option.plural }}
-									</mat-option>
+									<ng-container *ngFor="let option of accessHandler.accessChoices">
+										<mat-option *ngIf="option.value" [value]="option.value">
+											<mat-icon matPrefix>{{ option.icon }}</mat-icon>{{ option.plural }}
+										</mat-option>
+									</ng-container>
 								</mat-select>
 							</mat-form-field>
 						</div>
@@ -69,7 +73,7 @@
 							<mat-form-field appearance="outline">
 								<mat-label>Folder</mat-label>
 								<input matInput id="folder" #folder formControlName="folder" type="text"
-									   autocomplete="off" [matAutocomplete]="folderAuto" [maxlength]="CONTENT_MAX_LENGTH.FOLDER">
+									autocomplete="off" [matAutocomplete]="folderAuto">
 								<mat-hint align="end">{{folder.value.length}} / {{CONTENT_MAX_LENGTH.FOLDER}}</mat-hint>
 
 								<mat-autocomplete #folderAuto="matAutocomplete">
@@ -82,7 +86,8 @@
 
 						<!-- NAV -->
 						<div class="field">
-							<mat-checkbox formControlName="nav" (change)="setFormDisabledState()" class="full" labelPosition="before">
+							<mat-checkbox formControlName="nav" (change)="setFormDisabledState()" class="full"
+								labelPosition="before">
 								Show in navigation
 							</mat-checkbox>
 						</div>
@@ -93,7 +98,7 @@
 							<mat-form-field appearance="outline">
 								<mat-label>Description</mat-label>
 								<textarea matInput id="desc" #desc formControlName="description" type="text"
-										  autocomplete="off" required [maxlength]="CONTENT_MAX_LENGTH.DESC" matTextareaAutosize></textarea>
+									autocomplete="off" required></textarea> <!-- matTextareaAutosize -->
 								<mat-error *ngIf="contentForm.get('description').hasError('required')">
 									Description is <strong>required</strong>
 								</mat-error>
@@ -117,7 +122,8 @@
 		<div class="group">
 			<!-- VERSION -->
 			<mat-form-field appearance="outline">
-				<mat-select id="access" [disabled]="!history" [(value)]="versionIndex" (selectionChange)="versionChange($event)">
+				<mat-select id="access" [disabled]="!history" [(value)]="versionIndex"
+					(selectionChange)="versionChange($event)">
 					<ng-container *ngIf="(!!history && history.length > 0); else noHistoryAvailable">
 						<mat-option [value]="VersionHistory.Draft">
 							{{getHistoryItemFormatted(history[0].version + 2, 'Current draft')}}
@@ -141,7 +147,8 @@
 
 
 		<div class="group">
-			<button mat-raised-button form="contentForm" class="submit" type="submit" [disabled]="!contentForm.valid" color="primary">
+			<button mat-raised-button form="contentForm" class="submit" type="submit" [disabled]="!contentForm.valid"
+				color="primary">
 				{{ originalContent ? 'Update page' : 'Create page' }}
 			</button>
 		</div>

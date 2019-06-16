@@ -18,7 +18,6 @@ export class SEOComponent implements OnChanges {
 
 	/**
 	 * Creates the trusted script element to inject
-	 * @param json
 	 */
 	private toScript(json: object): SafeHtml {
 		return this.san.bypassSecurityTrustHtml(`<script type="application/ld+json">${JSON.stringify(json)}</script>`);

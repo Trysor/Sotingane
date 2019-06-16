@@ -1,20 +1,20 @@
 ﻿import { Component, OnInit, Input, ChangeDetectionStrategy, HostBinding, HostListener } from '@angular/core';
 
-import { Router, ActivatedRoute, RouterLinkWithHref } from '@angular/router';
+import { Router } from '@angular/router';
 
 import { DynamicComponent } from '@types';
 import { PlatformService } from '@app/services/utility/platform.service';
+import { Subject } from 'rxjs';
 
 
 @Component({
-	selector: 'router-link',
-	template: `{{text}}`,
+	selector: 'dynamic-link',
+	template: `<ng-content></ng-content>`,
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DynamicLinkComponent implements DynamicComponent, OnInit {
 	private _isRemoteUrl = true;
 	@Input() @HostBinding('attr.href') link: string;
-	@Input() text: string;
 
 	@HostListener('click', ['$event']) onclick(e: MouseEvent) {
 		if (this._isRemoteUrl) { return; }
@@ -33,8 +33,7 @@ export class DynamicLinkComponent implements DynamicComponent, OnInit {
 		if (!this.link || this.link.length === 0) { return; }
 
 		if (this.platform.document) {
-			const origin = this.platform.document.location.origin;
-			this.link = this.link.replace(origin, '');
+			this.link = this.link.replace(this.platform.document.location.origin, '');
 		}
 
 		this._isRemoteUrl = !this.link.startsWith('/');
@@ -42,11 +41,8 @@ export class DynamicLinkComponent implements DynamicComponent, OnInit {
 
 	/**
 	 * DynamicComponent interface method. Triggered as the component is injected
-	 * @param el
-	 * @param textContent
 	 */
 	public buildJob(el: Element): void {
 		this.link = el.getAttribute('href');
-		this.text = el.textContent;
 	}
 }

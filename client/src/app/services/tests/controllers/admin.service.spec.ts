@@ -4,9 +4,10 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { HttpClient } from '@angular/common/http';
 
 import { AdminService, HttpService } from '@app/services';
-import { User, Content, AccessRoles } from '@types';
+import { User, Content } from '@types';
 
 import { env } from '@env';
+import { Type } from '@angular/core';
 
 
 describe('AdminService', () => {
@@ -14,7 +15,7 @@ describe('AdminService', () => {
 	let httpTestingController: HttpTestingController;
 
 	beforeEach(() => {
-		const spy = jasmine.createSpyObj<HttpService>('HttpService', ['client', 'apiUrl']);
+		const spy = jasmine.createSpyObj<HttpService>('HttpService', ['client']);
 
 		TestBed.configureTestingModule({
 			providers: [
@@ -24,13 +25,10 @@ describe('AdminService', () => {
 			imports: [HttpClientTestingModule]
 		});
 		service = TestBed.get(AdminService);
-		httpTestingController = TestBed.get(HttpTestingController);
+		httpTestingController = TestBed.get(HttpTestingController as Type<HttpTestingController>);
 
 		// Override the client property to use the test client
-		(<any>service).http.client = TestBed.get(HttpClient);
-
-		// skip api base etc
-		TestBed.get(HttpService).apiUrl.and.callFake((api: string) => api);
+		( service as any).http.client = TestBed.get(HttpClient);
 	});
 
 	afterEach(() => {
@@ -77,8 +75,8 @@ describe('AdminService', () => {
 
 	it('getAllContent()', () => {
 		const testContent: Content[] = [
-			{ title: 'test', route: 'test', access: AccessRoles.everyone },
-			{ title: 'test2', route: 'test2', access: AccessRoles.everyone },
+			{ title: 'test', route: 'test' },
+			{ title: 'test2', route: 'test2' },
 		];
 
 		// Subscribe to request
@@ -96,7 +94,7 @@ describe('AdminService', () => {
 	});
 
 	it('getContentPage()', () => {
-		const testContent: Content = { title: 'test', route: 'test', access: AccessRoles.everyone };
+		const testContent: Content = { title: 'test', route: 'test' };
 
 		// Subscribe to request
 		service.getContentPage(testContent.route).subscribe(content => {

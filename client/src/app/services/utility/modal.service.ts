@@ -1,7 +1,5 @@
 ﻿import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { MatDialog, MatDialogConfig } from '@angular/material';
-
+import { MatDialog, MatDialogConfig } from '@app/modules/material.types';
 import { ModalData, ImageModalData, Content } from '@types';
 import { ModalComponent } from '@app/modules/shared-module/modals/modal.component';
 import { ImageModalComponent } from '@app/modules/shared-module/modals/imagemodal.component';
@@ -9,14 +7,11 @@ import { ImageModalComponent } from '@app/modules/shared-module/modals/imagemoda
 @Injectable({ providedIn: 'root' })
 export class ModalService {
 
-	constructor(
-		private dialog: MatDialog,
-		private router: Router) { }
+	constructor(private dialog: MatDialog) { }
 
 
 	/**
 	 * Opens a delete content modal for the given content item
-	 * @param content
 	 */
 	public openDeleteContentModal(content: Content) {
 		const data: ModalData = {
@@ -25,7 +20,7 @@ export class ModalService {
 			proceedText: 'Delete', proceedColor: 'warn',
 			cancelText: 'Cancel', cancelColor: 'accent',
 		};
-		return this.dialog.open(ModalComponent, <MatDialogConfig>{ data: data });
+		return this.dialog.open(ModalComponent,  { data } as MatDialogConfig);
 	}
 
 	/**
@@ -38,12 +33,11 @@ export class ModalService {
 			proceedColor: 'accent', proceedText: 'Proceed',
 			cancelColor: 'primary', cancelText: 'Cancel',
 		};
-		return this.dialog.open(ModalComponent, <MatDialogConfig>{ data: data });
+		return this.dialog.open(ModalComponent,  { data } as MatDialogConfig);
 	}
 
 	/**
 	 * Opens a restore old version modal
-	 * @param version
 	 */
 	public openRestoreOldVersionModal(version: string) {
 		const data: ModalData = {
@@ -53,12 +47,11 @@ export class ModalService {
 			cancelText: 'Cancel',
 		};
 
-		return this.dialog.open(ModalComponent, <MatDialogConfig>{ data: data });
+		return this.dialog.open(ModalComponent,  { data } as MatDialogConfig);
 	}
 
 	/**
 	 * Opens a password change success state modal
-	 * @param success
 	 */
 	public openPasswordChangeModal(success: boolean) {
 		const data: ModalData = {
@@ -69,14 +62,13 @@ export class ModalService {
 			proceedColor: 'primary',
 			proceedText: 'Okay',
 		};
-		return this.dialog.open(ModalComponent, <MatDialogConfig>{ data: data });
+		return this.dialog.open(ModalComponent,  { data } as MatDialogConfig);
 	}
 
 	/**
 	 * Opens a modal displaying an image
-	 * @param data
 	 */
 	public openImageModal(data: ImageModalData) {
-		this.dialog.open(ImageModalComponent, <MatDialogConfig>{ data: data, panelClass: 'imagemodal', autoFocus: false });
+		this.dialog.open(ImageModalComponent, { data, panelClass: 'imagemodal', autoFocus: false } as MatDialogConfig);
 	}
 }

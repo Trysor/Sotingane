@@ -1,7 +1,7 @@
 /// <reference path="_theme_vars.scss" />
 /// <reference path="_mixins.scss" />
 
-@import '_mixins';
+@import 'mixins';
 
 html {
 	background: center top fixed linear-gradient(120deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 75%, var(--color-shade) 75%, var(--color-shade) 100%),

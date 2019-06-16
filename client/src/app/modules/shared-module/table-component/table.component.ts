@@ -1,5 +1,6 @@
 import { Component, ViewChild, Input, OnInit, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
-import { MatPaginator, MatSort, MatTable, MatTableDataSource } from '@angular/material';
+
+import { MatTable, MatTableDataSource, MatSort, MatPaginator } from '@app/modules/material.types';
 
 import { FormBuilder, FormGroup } from '@angular/forms';
 
@@ -16,16 +17,18 @@ import { takeUntil, distinctUntilChanged, debounceTime } from 'rxjs/operators';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TableComponent implements OnInit, AfterViewInit {
-	@ViewChild(MatTable) table: MatTable<object>;
-	@ViewChild(MatPaginator) paginator: MatPaginator;
-	@ViewChild(MatSort) sort: MatSort;
+	@ViewChild(MatTable, { static: false }) table: MatTable<object>;
+	@ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+	@ViewChild(MatSort, { static: false }) sort: MatSort;
 	@Input() settings: TableSettings<any>;
 	@Input() filterSettings: TableFilterSettings = {}; // default empty object
 	@Input() set data(value: object[]) { this.Source.data = value || []; }
 
 	public readonly ColumnType = ColumnType;
+	public readonly isNaN = isNaN;
 
 	public readonly pageSizes = [10, 25, 50, 100];
+	public readonly defaultPageSize = 25;
 	public readonly Source = new MatTableDataSource<object>([]);
 	public displayedColumns: Column<any>[];
 
@@ -41,7 +44,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 		this.Source.data = [];
 
 		// Filter form
-		this.filterForm = fb.group({ filterControl: [''] });
+		this.filterForm = this.fb.group({ filterControl: [''] });
 		this.filterForm.get('filterControl').valueChanges.pipe(
 			distinctUntilChanged(), debounceTime(300), takeUntil(this._ngUnsub)
 		).subscribe(value => {
@@ -70,8 +73,6 @@ export class TableComponent implements OnInit, AfterViewInit {
 	ngOnInit() {
 		if (!this.settings) { throw Error('No settings'); }
 
-		this.table.trackBy = this.settings.trackBy;
-
 		this.mobileService.isMobile().subscribe(isMobile => {
 			this.displayedColumns = isMobile ? this.settings.mobile : this.settings.columns.map(col => col.property);
 		});
@@ -79,13 +80,13 @@ export class TableComponent implements OnInit, AfterViewInit {
 
 	ngAfterViewInit() {
 		// These must be placed here; the view must've been initialized.
+		this.table.trackBy = this.settings.trackBy;
 		this.Source.paginator = this.paginator;
 		this.Source.sort = this.sort;
 	}
 
 	/**
 	 * method to perform the click function on a row
-	 * @param row
 	 */
 	public rowClick(row: object) {
 		if (this.settings.rowClick) {
@@ -95,9 +96,6 @@ export class TableComponent implements OnInit, AfterViewInit {
 
 	/**
 	 * Handler for column func button clicks
-	 * @param col
-	 * @param obj
-	 * @param e
 	 */
 	public buttonClick(col: ColumnSettings<any>, obj: object, e: MouseEvent) {
 		col.func(obj, this.Source.data);
@@ -106,7 +104,6 @@ export class TableComponent implements OnInit, AfterViewInit {
 
 	/**
 	 * Click override for hyperlinks and buttons - disable propagation so that row clicks do not trigger
-	 * @param e
 	 */
 	public overrideClick(e: MouseEvent) {
 		e.stopPropagation();

@@ -37,8 +37,7 @@
 		{
 			"name": "api-freshness",
 			"urls": [
-				"/api/cms$",
-				"/api/steam$"
+				"/api/cms$"
 			],
 			"cacheConfig": {
 				"strategy": "freshness",
@@ -50,8 +49,7 @@
 		{
 			"name": "api-performance",
 			"urls": [
-				"/api/cms/**",
-				"/api/steam/**"
+				"/api/cms/**"
 			],
 			"cacheConfig": {
 				"strategy": "performance",

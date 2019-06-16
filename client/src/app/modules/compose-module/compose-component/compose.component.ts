@@ -3,7 +3,7 @@ import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms'
 import { Router, ActivatedRoute, CanDeactivate } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
-import { MatSelectChange } from '@angular/material';
+import { MatSelectChange } from '@app/modules/material.types';
 
 import ClassicEditor from '@app/ckeditor';
 
@@ -14,8 +14,8 @@ import { CONTENT_MAX_LENGTH } from '@global';
 
 import { FormErrorInstant, AccessHandler } from '@app/classes';
 
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { takeUntil, take } from 'rxjs/operators';
+import { BehaviorSubject, Observable, Subject, of } from 'rxjs';
+import { takeUntil, take, catchError } from 'rxjs/operators';
 
 enum VersionHistory { Draft = -1 }
 
@@ -26,7 +26,8 @@ enum VersionHistory { Draft = -1 }
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeComponent> {
-	public readonly contentForm: FormGroup; // Form
+
+	public contentForm: FormGroup; // Form
 	public readonly formErrorInstant = new FormErrorInstant(); // Form validation errors trigger instantly
 	public readonly ClassicEditor = ClassicEditor; // CKEditor
 	public originalContent: Content; // When editing, the original content is kept here
@@ -64,29 +65,30 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 		public mobileService: MobileService) {
 
 		// Form
-		this.contentForm = fb.group({
-			'route': ['', Validators.compose([
+		this.contentForm = this.fb.group({
+			route: ['', Validators.compose([
 				Validators.maxLength(this.CONTENT_MAX_LENGTH.ROUTE),
-				this.disallowed(cmsService.getContentList(), 'route').bind(this)
+				this.disallowed(this.cmsService.getContentList(), 'route').bind(this)
 			])],
-			'title': ['', Validators.compose([
+			title: ['', Validators.compose([
 				Validators.maxLength(this.CONTENT_MAX_LENGTH.TITLE),
-				this.disallowed(cmsService.getContentList(), 'title').bind(this)
+				this.disallowed(this.cmsService.getContentList(), 'title').bind(this)
 			])],
-			'published': [true],
-			'description': ['', Validators.compose([
+			published: [true],
+			description: ['', Validators.compose([
 				Validators.required,
 				Validators.maxLength(this.CONTENT_MAX_LENGTH.DESC)
 			])],
-			'access': [AccessRoles.everyone, Validators.required],
-			'nav': [true],
-			'folder': ['', Validators.maxLength(this.CONTENT_MAX_LENGTH.FOLDER)],
-			'content': ['', Validators.required],
+			access: [[]],
+			nav: [true],
+			folder: ['', Validators.maxLength(this.CONTENT_MAX_LENGTH.FOLDER)],
+			content: ['', Validators.required],
 		});
 		this._currentDraft = this.contentForm.getRawValue();
 
 		// Hook (non-dirty) route to title.
-		const routeEdit = this.contentForm.get('route'), titleEdit = this.contentForm.get('title');
+		const routeEdit = this.contentForm.get('route');
+		const titleEdit = this.contentForm.get('title');
 		let oldTitleValue = titleEdit.value;
 		this.contentForm.get('title').valueChanges.pipe(takeUntil(this._ngUnsub)).subscribe(newVal => {
 			// Update routeEdit IFF the user specifically edits title without having touched route, and the values are equal
@@ -115,16 +117,21 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 		));
 
 		// Router: Check if we are editing or creating content. Load from API
-		const editingContentRoute = route.snapshot.params['route'];
+		const editingContentRoute = this.route.snapshot.params.route;
 		if (editingContentRoute) {
-			this.adminService.getContentPage(editingContentRoute).subscribe(data => {
+			this.adminService.getContentPage(editingContentRoute).pipe(
+				catchError(() => {
+					this.router.navigateByUrl('/compose');
+					return of(null);
+				})
+			).subscribe(data => {
+				if (!data) { return; }
+
 				this.originalContent = data;
 				this._currentDraft = data;
 
 				this.contentForm.patchValue(data);
 				this.setFormDisabledState();
-			}, err => {
-				router.navigateByUrl('/compose');
 			});
 
 			this.cmsService.requestContentHistory(editingContentRoute).subscribe(historyList => {
@@ -135,7 +142,6 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 
 	/**
 	 * Event handler for when the currently viewed version changes
-	 * @param event
 	 */
 	public versionChange(event: MatSelectChange) {
 		const c = this.history ? this.history[event.value] : null;
@@ -169,8 +175,6 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 
 	/**
 	 * Form Validation that disallows values that are considered unique for the given property.
-	 * @param contentList
-	 * @param prop
 	 */
 	private disallowed(contentList: BehaviorSubject<Content[]>, prop: string) {
 		return (control: FormControl): { [key: string]: any } => {
@@ -217,23 +221,24 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 
 		// Helper
 		const onSubmit = (obs: Observable<Content>) => {
-			obs.pipe(take(1)).subscribe(
-				newContent => {
-					if (newContent) {
-						this.cmsService.getContentList(true);
-						this._hasSaved = true;
-
-						if (newContent.published) {
-							this.router.navigateByUrl(newContent.route);
-						} else {
-							this.router.navigateByUrl(''); // redirect to homepage instead.
-						}
-					}
-				},
-				error => {
+			obs.pipe(
+				take(1),
+				catchError(() => of(null as Content))
+			).subscribe(newContent => {
+				if (!newContent) {
 					// TODO: Tell the user why it failed
-				},
-			);
+					return;
+				}
+
+				this.cmsService.getContentList(true);
+				this._hasSaved = true;
+
+				if (newContent.published) {
+					this.router.navigateByUrl(newContent.route);
+				} else {
+					this.router.navigateByUrl(''); // redirect to homepage instead.
+				}
+			});
 		};
 
 		if (this.originalContent) {
@@ -247,10 +252,8 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 
 	/**
 	 * Returns the display format of history items
-	 * @param ver
-	 * @param text
 	 */
-	public getHistoryItemFormatted(ver: number, text: string): string {
+	public getHistoryItemFormatted(ver: number, text: string) {
 		return `${ver}. ${text}`;
 	}
 

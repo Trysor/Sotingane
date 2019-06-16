@@ -5,25 +5,20 @@ import { Settings, Theme } from '@types';
 import { HttpService } from '@app/services/http/http.service';
 import { PlatformService } from '@app/services/utility/platform.service';
 
-import { makeStateKey } from '@angular/platform-browser';
-const SETTINGS_KEY = makeStateKey<Settings>('settings'),
-	  THEME_KEY = makeStateKey<Theme>('theme');
-
-
 import { env } from '@env';
-import { take } from 'rxjs/operators';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
+import { take, catchError } from 'rxjs/operators';
 
 const emptySettings: Settings = {
-	'indexRoute': '',
-	'org': '',
-	'meta': {
-		'title': '',
-		'desc': ''
+	indexRoute: '',
+	org: '',
+	meta: {
+		title: '',
+		desc: ''
 	},
-	'footer': {
-		'text': '',
-		'copyright': ''
+	footer: {
+		text: '',
+		copyright: ''
 	}
 };
 
@@ -92,16 +87,23 @@ export class SettingsService {
 
 
 	public updateSettings() {
-		this.getSettings().pipe(take(1)).subscribe((settings) => this._settingsSubject.next(settings));
+		this.getSettings().pipe(
+			take(1),
+			catchError(() => of(null))
+		).subscribe(settings => {
+			if (settings) {
+				this._settingsSubject.next(settings);
+			} else {
+				this._settingsSubject.error(emptySettings);
+			}
+		});
 	}
 
 	public updateTheme() {
-		this.getTheme().pipe(take(1)).subscribe(
-			(theme) => {
-				this._themeSubject.next(theme);
-				this.renderTheme(theme);
-			}
-		);
+		this.getTheme().pipe(take(1)).subscribe((theme) => {
+			this._themeSubject.next(theme);
+			this.renderTheme(theme);
+		});
 	}
 
 	private renderTheme(theme: Theme) {
@@ -117,24 +119,18 @@ export class SettingsService {
 	// ---------------------------------------
 
 	private getSettings() {
-		return this.http.fromState(
-			SETTINGS_KEY,
-			this.http.client.get<Settings>(this.http.apiUrl(env.API.settings))
-		);
+		return this.http.client.get<Settings>(env.API.settings);
 	}
 
 	public postSettings(settings: Settings) {
-		return this.http.client.post<boolean>(this.http.apiUrl(env.API.settings), settings);
+		return this.http.client.post<boolean>(env.API.settings, settings);
 	}
 
 	private getTheme() {
-		return this.http.fromState(
-			THEME_KEY,
-			this.http.client.get<Theme>(this.http.apiUrl(env.API.theme))
-		);
+		return this.http.client.get<Theme>(env.API.theme);
 	}
 
 	public postTheme(theme: Theme) {
-		return this.http.client.post<boolean>(this.http.apiUrl(env.API.theme), theme);
+		return this.http.client.post<boolean>(env.API.theme, theme);
 	}
 }

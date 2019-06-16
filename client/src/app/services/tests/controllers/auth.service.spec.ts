@@ -3,51 +3,57 @@
 // Http
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-const httpServiceSpy = jasmine.createSpyObj<HttpService>('HttpService', ['client', 'apiUrl']);
+import { TransferState } from '@angular/platform-browser';
 
 // Material
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '@app/modules';
 
 // Routing
-const routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
 import { Router } from '@angular/router';
+const routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
+
 
 import { AuthService, HttpService } from '@app/services';
-import { User, UserToken } from '@types';
+import { User, TokenResponse } from '@types';
 
 import { env } from '@env';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { Type } from '@angular/core';
 
 describe('AuthService', () => {
 	let service: AuthService;
 	let httpTestingController: HttpTestingController;
 
 	beforeEach(() => {
+		const httpServiceSpy = jasmine.createSpyObj<HttpService>('HttpService', ['client']);
 
+		// Use our spies in the module
 		TestBed.configureTestingModule({
 			providers: [
 				{ provide: HttpService, useValue: httpServiceSpy },
 				{ provide: Router, useValue: routerSpy },
+				TransferState,
 				AuthService
 			],
 			imports: [
-				NoopAnimationsModule,
 				MaterialModule,
 				HttpClientTestingModule
 			]
 		});
-		service = TestBed.get(AuthService);
-		httpTestingController = TestBed.get(HttpTestingController);
 
 		// Override the client property to use the test client
-		(<any>service).http.client = TestBed.get(HttpClient);
+		// This needs to happen before we do TestBed.get(AuthService);
+		TestBed.get(HttpService).client = TestBed.get(HttpClient);
 
-		// skip api base etc
-		TestBed.get(HttpService).apiUrl.and.callFake((api: string) => api);
-	});
+		// Get the service, and the httpTestingController, so we can use these in our tests
+		service = TestBed.get(AuthService);
+		httpTestingController = TestBed.get(HttpTestingController as Type<HttpTestingController>);
 
+		// Deal with the refresh token request from the constructor (moved to SetupService)
+		// const req = httpTestingController.expectOne(r => r.url.includes(env.API.auth.token));
+		// req.flush({});
 
-	beforeEach(() => {
 		service.user.next(null); // Reset user to null
 	});
 
@@ -72,24 +78,27 @@ describe('AuthService', () => {
 		expect(req.request.method).toEqual('POST');
 
 		// Reply with test data
-		req.flush(<UserToken>{ // tslint:disable:max-line-length
-			token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjk0NjY4NDgwMCwiZXhwIjozMjUwMzY4MDAwMCwiYXVkIjoiIiwic3ViIjoidGVzdCIsIl9pZCI6IjEyMzQ1NiIsInVzZXJuYW1lIjoidGVzdCIsInJvbGUiOiJhZG1pbiJ9.uI0Z1CmNRGBxG5HxC_UHZCbsx_kJ0CvRqRuy2YG-Zu0',
+		req.flush({
+			token: 'someToken',
 			user: testUser
-		}); // tslint:enable:max-line-length
+		} as TokenResponse);
 	});
 
 	it('login() fail', () => {
 		const testUser: User = { username: 'test', password: 'pass', _id: null };
 
 		// Subscribe to request
-		service.login(testUser).subscribe(
-			success => { fail('a status 401 should never enter the success handler'); },
-			(error: HttpErrorResponse) => {
+		service.login(testUser).pipe(
+			catchError((error: HttpErrorResponse) => {
 				// Once a reply is given, test that it is correct
 				expect(error.status).toBe(401, 'Should not have logged in');
 				expect(service.user.getValue()).toBe(null, 'should NOT have set user');
-			}
-		);
+
+				return of(false);
+			})
+		).subscribe(success => {
+			if (success) { fail('a status 401 should never enter the success handler'); }
+		});
 
 		// Expect a request to be made
 		const req = httpTestingController.expectOne(env.API.auth.login);

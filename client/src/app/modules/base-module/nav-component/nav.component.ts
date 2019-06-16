@@ -12,15 +12,10 @@ import { BehaviorSubject } from 'rxjs';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NavComponent {
-	private _contentSubject = new BehaviorSubject(null);
-
-	public get contentSubject() { return this._contentSubject; }
+	public readonly contentSubject = new BehaviorSubject(null);
 
 	/**
 	 * Sort arrangement function for Content, CmsFolders and SteamServer, based on either's title.
-	 * @param  {Content | CmsFolder}   a object to be sorted
-	 * @param  {Content | CmsFolder}   b object to be sorted
-	 * @return {number}                                 a's relative position to b.
 	 */
 	private static sortMethod(a: Content | CmsFolder, b: Content | CmsFolder): number {
 		return a.title.localeCompare(b.title);
@@ -31,13 +26,12 @@ export class NavComponent {
 		private cmsService: CMSService) {
 
 		// Subscribe to content updates
-		cmsService.getContentList().subscribe(contentList => this.updateContentList(contentList));
+		this.cmsService.getContentList().subscribe(contentList => this.updateContentList(contentList));
 
 	}
 
 	/**
 	 * Creates and organizes the navigation tree from the Content list provided
-	 * @param  {Content[]} contentList the Content list to create the nav tree from
 	 */
 	private updateContentList(contentList: Content[]) {
 		if (!contentList) { return; }
@@ -52,8 +46,8 @@ export class NavComponent {
 			const folder = folders.find(f => f.title === content.folder);
 			if (!folder) {
 				folders.push({
-					'title': content.folder,
-					'content': [content],
+					title: content.folder,
+					content: [content],
 				});
 				continue;
 			}
@@ -64,17 +58,14 @@ export class NavComponent {
 		folders.sort(NavComponent.sortMethod);
 		for (const folder of folders) { folder.content.sort(NavComponent.sortMethod); }
 		// Push
-		this._contentSubject.next({
-			rootContent: rootContent,
-			folders: folders
+		this.contentSubject.next({
+			rootContent,
+			folders
 		});
 	}
 
 	/**
 	 * Helper function for angular's *ngFor
-	 * @param  {number}                   index the index of the item to track
-	 * @param  {Content | CmsFolder}   item the item tracked
-	 * @return {string}                   the item's title; used for tracking
 	 */
 	trackBy(index: number, item: Content | CmsFolder): string {
 		return item.title;

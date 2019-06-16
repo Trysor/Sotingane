@@ -44,7 +44,7 @@ class App {
 		mongoose.set('useFindAndModify', false);
 
 		mongoose.connect(uri, {
-			keepAlive: 120,
+			keepAlive: true,
 			useNewUrlParser: true
 		}, (error) => {
 			if (error) {

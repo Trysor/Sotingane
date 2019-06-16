@@ -28,8 +28,6 @@ export class ContentService {
 
 	/**
 	 * Builds the content for the given elementRef
-	 * @param element
-	 * @param Content
 	 */
 	public buildContentForElement(element: ElementRef<HTMLDivElement>, content: Content) {
 		// null ref checks
@@ -51,7 +49,7 @@ export class ContentService {
 
 			for (let i = 0; i < elems.length; i++) {
 				const el = elems.item(i);
-				const origEl = <Element>el.cloneNode(true);
+				const origEl =  el.cloneNode(true) as Element;
 
 				// convert NodeList into an array, since Angular dosen't like having a NodeList passed for projectableNodes
 				const comp = fac.create(this.injector, [Array.prototype.slice.call(el.childNodes)], el);
@@ -67,13 +65,6 @@ export class ContentService {
 				this._embeddedComponents.push(comp);
 			}
 		});
-	}
-
-	/**
-	 * Detects changes and refreshes the components that have been injected
-	 */
-	public detectChanges() {
-		this._embeddedComponents.forEach(comp => comp.changeDetectorRef.detectChanges());
 	}
 
 	/**

@@ -1,13 +1,15 @@
-export interface User {
+
+export interface JWTUser {
 	_id: any;
 	username: string;
+	roles?: AccessRoles[];
+	exp?: number;
+}
+export interface User extends JWTUser {
 	username_lower?: string;
-	role?: AccessRoles.user | AccessRoles.admin;
 	password?: string;
 	createdAt?: Date;
-	exp?: number;
 	comparePassword?: (candidatePassword: string) => Promise<boolean>;
-	isOfRole?: (role: AccessRoles) => boolean;
 	canAccess?: (level: AccessRoles) => boolean;
 }
 
@@ -17,13 +19,14 @@ export interface UpdatePasswordUser {
 	confirm: string;
 }
 
-export interface UserToken {
-	token: string;
-	user?: User;
+export interface TokenResponse {
+	token?: string;
+	refreshToken?: string | null;
+	user: JWTUser;
 }
 
 export enum AccessRoles {
 	admin = 'admin',
-	user = 'user',
-	everyone = 'everyone'
+	member = 'member',
+	writer = 'writer',
 }

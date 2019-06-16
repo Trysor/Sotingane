@@ -8,7 +8,8 @@ import { readdirSync } from 'fs';
 import { join as pathjoin } from 'path';
 
 import { ContentModel, LogModel, SettingsModel, UserModel, ThemeModel, UserDoc } from '../src/models';
-import { User, UserToken, AccessRoles } from '../types';
+import { User, TokenResponse, AccessRoles } from '../types';
+import { JWT } from '../global';
 
 import app from '../src/app';
 
@@ -18,12 +19,16 @@ class TestBedSingleton {
 	public get http() { return this._http; }
 	public AdminUser: UserDoc;
 	public AdminCookie: string;
+	public AdminRefreshCookie: string;
 
 	public AdminUser2: UserDoc;
 	public Admin2Cookie: string;
 
-	public User: UserDoc;
-	public UserCookie: string;
+	public Member: UserDoc;
+	public MemberCookie: string;
+
+	public Writer: UserDoc;
+	public WriterCookie: string;
 
 	constructor() {
 		if (configUtil.getEnv('NODE_ENV') !== 'test') { return; }
@@ -42,43 +47,57 @@ class TestBedSingleton {
 			console.time('Setting up DB for tests');
 
 			// Drop Test collections
-			await Promise.all([
+			await this.dropAllTestCollections();
+
+			// Create new users and log them in
+			const [member, admin, admin2, writer] = await Promise.all([
+				this.createUser(TestMember),
+				this.createUser(AdminUser),
+				this.createUser(AdminUser2),
+				this.createUser(TestWriterUser)
+			]);
+			// Member
+			TestBed.Member = member.user;
+			TestBed.MemberCookie = member.cookie;
+			// Admin 1
+			TestBed.AdminUser = admin.user;
+			TestBed.AdminCookie = admin.cookie;
+			TestBed.AdminRefreshCookie = admin.refreshCookie;
+			// Admin 2
+			TestBed.AdminUser2 = admin2.user;
+			TestBed.Admin2Cookie = admin2.cookie;
+			// Writer
+			TestBed.Writer = writer.user;
+			TestBed.WriterCookie = writer.cookie;
+
+			// Initiate tests
+			console.timeEnd('Setting up DB for tests');
+			console.log('Initiating tests');
+			mocha.run(async (failures) => process.exit(failures > 0 ? 1 : 0));
+		});
+	}
+
+
+	private async createUser(user: Partial<User>) {
+		const userObj = await new UserModel(user).save();
+		const res = await TestBed.http.post('/api/auth/login').send({ username: user.username, password: user.password });
+		const tokens: TokenResponse = res.body;
+
+		return {
+			user: userObj,
+			cookie: JWT.COOKIE_AUTH + '=' + tokens.token, // slightly modified
+			refreshCookie: JWT.COOKIE_REFRESH + '=' + tokens.refreshToken
+		};
+	}
+
+	private dropAllTestCollections() {
+			return Promise.all([
 				UserModel.deleteMany({}).exec(),
 				ContentModel.deleteMany({}).exec(),
 				LogModel.deleteMany({}).exec(),
 				SettingsModel.deleteMany({}).exec(),
 				ThemeModel.deleteMany({}).exec()
 			]);
-
-			// Create new users and log them in
-			const [user, admin, admin2] = await Promise.all([
-				this.createUser(TestUser),
-				this.createUser(AdminUser),
-				this.createUser(AdminUser2)
-			]);
-			TestBed.User = user.user;
-			TestBed.UserCookie = user.cookie;
-			TestBed.AdminUser = admin.user;
-			TestBed.AdminCookie = admin.cookie;
-			TestBed.AdminUser2 = admin2.user;
-			TestBed.Admin2Cookie = admin2.cookie;
-
-			// Initiate tests
-			console.timeEnd('Setting up DB for tests');
-			console.log('Initiating tests');
-			mocha.run((failures) => process.exit(failures > 0 ? 1 : 0));
-		});
-	}
-
-
-	private async createUser(user: Partial<User>): Promise<{ user: UserDoc, cookie: string }> {
-		const userObj = await new UserModel(user).save();
-		const res = await TestBed.http.post('/api/auth/login').send({ username: user.username, password: user.password });
-
-		return {
-			user: userObj,
-			cookie: 'jwt=' + (<UserToken>res.body).token // slightly modified
-		};
 	}
 }
 
@@ -87,19 +106,26 @@ export const AdminUser: Partial<User> = {
 	username: 'Admin',
 	username_lower: 'admin',
 	password: 'test',
-	role: AccessRoles.admin,
+	roles: Object.values(AccessRoles), // easier
 };
 export const AdminUser2: Partial<User> = {
 	username: 'Admin2',
 	username_lower: 'admin2',
 	password: 'test',
-	role: AccessRoles.admin,
+	roles: Object.values(AccessRoles), // easier
 };
-export const TestUser: Partial<User> = {
-	username: 'User',
-	username_lower: 'user',
+export const TestMember: Partial<User> = {
+	username: 'Member',
+	username_lower: 'member',
 	password: 'test',
-	role: AccessRoles.user,
+	roles: [AccessRoles.member],
+};
+
+export const TestWriterUser: Partial<User> = {
+	username: 'Writer',
+	username_lower: 'writer',
+	password: 'test',
+	roles: [AccessRoles.writer],
 };
 
 export const TestBed = new TestBedSingleton();

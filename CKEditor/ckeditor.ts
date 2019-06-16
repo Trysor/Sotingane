@@ -23,6 +23,8 @@ import CodePlugin from '@ckeditor/ckeditor5-basic-styles/src/code';
 import MediaEmbedPlugin from '@ckeditor/ckeditor5-media-embed/src/mediaembed';
 import TablePlugin from '@ckeditor/ckeditor5-table/src/table';
 import TableToolbarPlugin from '@ckeditor/ckeditor5-table/src/tabletoolbar';
+import RemoveFormatPlugin from '@ckeditor/ckeditor5-remove-format/src/removeformat';
+import FontPlugin from '@ckeditor/ckeditor5-font/src/font';
 
 // Typings
 import { CKEditorDefaultConfig } from './model';
@@ -30,7 +32,7 @@ import { CKEditorDefaultConfig } from './model';
 export default class ClassicEditor extends ClassicEditorBase {
 	static defaultConfig: CKEditorDefaultConfig;
 	static builtinPlugins: any[];
-	static create: (e?: HTMLElement) => Promise<any>
+	static create: (e?: HTMLElement) => Promise<any>;
 }
 
 ClassicEditor.builtinPlugins = [
@@ -50,7 +52,9 @@ ClassicEditor.builtinPlugins = [
 	CodePlugin,
 	MediaEmbedPlugin,
 	TablePlugin,
-	TableToolbarPlugin
+	TableToolbarPlugin,
+	RemoveFormatPlugin,
+	FontPlugin
 ];
 ClassicEditor.defaultConfig = {
 	toolbar: {
@@ -58,7 +62,9 @@ ClassicEditor.defaultConfig = {
 		items: [
 			'heading',
 			'|',
-			'bold', 'italic', 'link',
+			'bold', 'italic', 'fontColor', 'removeFormat',
+			'|',
+			'link',
 			'|',
 			'bulletedList', 'numberedList', 'alignment',
 			'|',

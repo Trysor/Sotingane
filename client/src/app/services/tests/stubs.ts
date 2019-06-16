@@ -16,7 +16,7 @@ import { BehaviorSubject, of, Subject } from 'rxjs';
 // ---------------------------------------
 
 export const authServiceStub: Partial<AuthService> = {
-	user: new BehaviorSubject(<User>{ username: null, role: null }),
+	user: new BehaviorSubject({ username: null, roles: [], _id: null } as User),
 	login: (user: User) => {
 		throw Error('Implement in test');
 	} // create in test

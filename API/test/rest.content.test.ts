@@ -25,7 +25,7 @@ describe('REST: Content', () => {
 				title: 'test',
 				route: 'test',
 				content: 'test',
-				access: AccessRoles.everyone,
+				access: [],
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -48,19 +48,19 @@ describe('REST: Content', () => {
 			expect(res2).to.have.property('body');
 			expect(res2.body).to.be.an('array');
 
-			const resContent = (<Content[]>res2.body).find(c => c.route === content.route);
+			const resContent = (res2.body as Content[]).find(c => c.route === content.route);
 			expect(resContent).to.have.property('route');
 			expect(resContent).property('route').to.equal(content.route);
 		});
 
-		it('POST /api/cms/ 200, sanitation', async () => {
+		it('POST /api/cms/ 200, sanitation security', async () => {
 
 			const content: Content = {
 				title: 'test2',
 				route: 'test/test//test\\test',
 				content: `
           <h2>Hello World</h2>
-          <p>
+          <p style="background:url('attack.site')">
             <img src="javascript:alert('Vulnerable');" />
             <a href="javascript:alert('Vulnerable');">evil</a>
           </p>
@@ -68,7 +68,7 @@ describe('REST: Content', () => {
           <script src="/evil.js"></script>
           <a href="/acceptable">good</a>
           <img src="/acceptable.jpg" />`,
-				access: AccessRoles.everyone,
+				access: [],
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -89,6 +89,8 @@ describe('REST: Content', () => {
 			expect(res.body).property('content').to.not.contain('Vulnerable');
 			expect(res.body).property('content').to.not.contain('<script>');
 			expect(res.body).property('content').to.not.contain('evil.js');
+			expect(res.body).property('content').to.not.contain('url');
+			expect(res.body).property('content').to.not.contain('attack.site');
 
 			expect(res.body).property('content').to.contain('<a href="/acceptable">good</a>');
 			expect(res.body).property('content').to.contain('<img src="/acceptable.jpg" />');
@@ -96,6 +98,43 @@ describe('REST: Content', () => {
 			expect(res.body).have.property('route');
 			expect(res.body).property('route').to.not.contain('/');
 			expect(res.body).property('route').to.not.contain('\\');
+		});
+
+		it('POST /api/cms/ 200, sanitation formatting', async () => {
+
+			const content: Content = {
+				title: 'test sanitation',
+				route: 'test sanitation',
+				content:
+`<p class="test">
+	<span style="color:#ffffff">fsdfdsfds</span>
+</p>
+<p>
+	<span style="color:hsl(150,75%,60%)">fsfds</span>
+</p>
+<p style="text-align:right">fdsdsfsd</p>
+<p>
+	<span style="color:hsl(240,75%,60%)">fsdfds</span>
+</p>`,
+				access: [],
+				description: 'test',
+				folder: 'test',
+				published: true,
+				nav: true
+			};
+
+			const res = await TestBed.http.post('/api/cms/')
+				.set('Cookie', TestBed.AdminCookie)
+				.send(content);
+
+			expect(res).to.have.status(200);
+			expect(res).to.have.property('body');
+			expect(res.body).to.be.an('object');
+
+			expect(res.body).have.property('content');
+			expect(res.body).property('content').to.contain('class="test"');
+			expect(res.body).property('content').to.contain('style="color:#ffffff"');
+			expect(res.body).property('content').to.contain('style="text-align:right"');
 		});
 
 		it('POST /api/cms/ 401', async () => {
@@ -111,7 +150,7 @@ describe('REST: Content', () => {
 				title: 'test3',
 				route: 'test3',
 				content: 'test',
-				access: AccessRoles.everyone,
+				access: [],
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -148,11 +187,11 @@ describe('REST: Content', () => {
 			// badEverythingRes
 			expect(badEverythingRes).to.have.status(422);
 			expect(badEverythingRes.body.errors.length).to.equal(5);
-			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'route')).to.not.equal(null);
-			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'title')).to.not.equal(null);
-			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'content')).to.not.equal(null);
-			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'description')).to.not.equal(null);
-			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'published')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find((e: any) => e.params.missingProperty === 'route')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find((e: any) => e.params.missingProperty === 'title')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find((e: any) => e.params.missingProperty === 'content')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find((e: any) => e.params.missingProperty === 'description')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find((e: any) => e.params.missingProperty === 'published')).to.not.equal(null);
 		});
 
 		it('GET /api/cms/ 200', async () => {
@@ -165,25 +204,25 @@ describe('REST: Content', () => {
 			expect(res.body[0]).to.have.property('route');
 		});
 
-		it('GET /api/cms/ 200, user', async () => {
+		it('GET /api/cms/ 200, member', async () => {
 			const content: Content = {
-				title: 'list200user',
-				route: 'list200user',
+				title: 'list200member',
+				route: 'list200member',
 				content: 'test',
-				access: AccessRoles.user, // USER RIGHTS REQUIRED
+				access: [AccessRoles.member], // MEMBER RIGHTS REQUIRED
 				description: 'test',
 				folder: 'test',
 				published: true,
 				nav: true,
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie)
 				.send(content);
 
-			const [noAuthRes, userRes, adminRes] = await Promise.all([
+			const [noAuthRes, memberRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/cms/'),
-				TestBed.http.get('/api/cms/').set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/cms/').set('Cookie', TestBed.MemberCookie),
 				TestBed.http.get('/api/cms/').set('Cookie', TestBed.AdminCookie)
 			]);
 
@@ -191,20 +230,20 @@ describe('REST: Content', () => {
 			expect(noAuthRes).to.have.property('body');
 			expect(noAuthRes.body).to.be.an('array');
 			// Should not show up for unauthed.
-			expect((<Content[]>noAuthRes.body).filter(list => list.route === content.route)).to.be.of.length(0);
+			expect((noAuthRes.body as Content[]).filter(list => list.route === content.route)).to.be.of.length(0);
 
 
-			expect(userRes).to.have.status(200);
-			expect(userRes).to.have.property('body');
-			expect(userRes.body).to.be.an('array');
-			// should show up for users
-			expect((<Content[]>userRes.body).filter(list => list.route === content.route)).to.be.of.length(1);
+			expect(memberRes).to.have.status(200);
+			expect(memberRes).to.have.property('body');
+			expect(memberRes.body).to.be.an('array');
+			// should show up for members
+			expect((memberRes.body as Content[]).filter(list => list.route === content.route)).to.be.of.length(1);
 
 			expect(adminRes).to.have.status(200);
 			expect(adminRes).to.have.property('body');
 			expect(adminRes.body).to.be.an('array');
 			// should also show up for admins
-			expect((<Content[]>adminRes.body).filter(list => list.route === content.route)).to.be.of.length(1);
+			expect((adminRes.body as Content[]).filter(list => list.route === content.route)).to.be.of.length(1);
 		});
 
 		it('GET /api/cms/ 200, admin', async () => {
@@ -212,20 +251,20 @@ describe('REST: Content', () => {
 				title: 'list200admin',
 				route: 'list200admin',
 				content: 'test',
-				access: AccessRoles.admin, // ADMIN RIGHTS REQUIRED
+				access: [AccessRoles.admin], // ADMIN RIGHTS REQUIRED
 				description: 'test',
 				folder: 'test',
 				published: true,
 				nav: true,
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie)
 				.send(content);
 
 			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/cms/'),
-				TestBed.http.get('/api/cms/').set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/cms/').set('Cookie', TestBed.MemberCookie),
 				TestBed.http.get('/api/cms/').set('Cookie', TestBed.AdminCookie)
 			]);
 
@@ -233,20 +272,20 @@ describe('REST: Content', () => {
 			expect(noAuthRes).to.have.property('body');
 			expect(noAuthRes.body).to.be.an('array');
 			// Should not show up for unauthed.
-			expect((<Content[]>noAuthRes.body).filter(list => list.route === content.route)).to.be.of.length(0);
+			expect((noAuthRes.body as Content[]).filter(list => list.route === content.route)).to.be.of.length(0);
 
 
 			expect(userRes).to.have.status(200);
 			expect(userRes).to.have.property('body');
 			expect(userRes.body).to.be.an('array');
 			// nor for users
-			expect((<Content[]>userRes.body).filter(list => list.route === content.route)).to.be.of.length(0);
+			expect((userRes.body as Content[]).filter(list => list.route === content.route)).to.be.of.length(0);
 
 			expect(adminRes).to.have.status(200);
 			expect(adminRes).to.have.property('body');
 			expect(adminRes.body).to.be.an('array');
 			// but should show up for admins
-			expect((<Content[]>adminRes.body).filter(list => list.route === content.route)).to.be.of.length(1);
+			expect((adminRes.body as Content[]).filter(list => list.route === content.route)).to.be.of.length(1);
 		});
 
 	});
@@ -260,7 +299,7 @@ describe('REST: Content', () => {
 
 			const testRoute = 'test';
 
-			const res = await TestBed.http.get('/api/cms/' + testRoute).set('Cookie', TestBed.AdminCookie);
+			const res = await TestBed.http.get('/api/cms/' + testRoute).set('Cookie', TestBed.Admin2Cookie);
 
 			expect(res).to.have.status(200);
 			expect(res).to.have.property('body');
@@ -270,26 +309,26 @@ describe('REST: Content', () => {
 			expect(res.body).property('content').to.equal('test');
 		});
 
-		it('GET /api/cms/:route 200, user', async () => {
+		it('GET /api/cms/:route 200, member', async () => {
 			const content: Content = {
-				title: 'get200user',
-				route: 'get200user',
+				title: 'get200member',
+				route: 'get200member',
 				content: 'test',
-				access: AccessRoles.user, // user role
+				access: [AccessRoles.member], // member role
 				description: 'test',
 				folder: 'test',
 				published: true,
 				nav: true
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
-				.set('Cookie', TestBed.AdminCookie) // admin creates
+			await TestBed.http.post('/api/cms/')
+				.set('Cookie', TestBed.Admin2Cookie) // admin 2 creates
 				.send(content);
 
 
 			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/cms/' + content.route),
-				TestBed.http.get('/api/cms/' + content.route).set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/cms/' + content.route).set('Cookie', TestBed.MemberCookie),
 				TestBed.http.get('/api/cms/' + content.route).set('Cookie', TestBed.AdminCookie)
 			]);
 
@@ -308,7 +347,7 @@ describe('REST: Content', () => {
 			expect(adminRes).to.have.status(200);
 			expect(adminRes).to.have.property('body');
 			expect(adminRes.body).to.have.property('route');
-			expect(adminRes.body).property('route').to.equal('get200user');
+			expect(adminRes.body).property('route').to.equal('get200member');
 			expect(adminRes.body).to.have.property('content');
 			expect(adminRes.body).property('content').to.equal('test');
 		});
@@ -318,21 +357,21 @@ describe('REST: Content', () => {
 				title: 'get200admin',
 				route: 'get200admin',
 				content: 'test',
-				access: AccessRoles.admin, // admin role
+				access: [AccessRoles.admin], // admin role
 				description: 'test',
 				folder: 'test',
 				published: true,
 				nav: true
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
-				.set('Cookie', TestBed.AdminCookie) // admin creates
+			await TestBed.http.post('/api/cms/')
+				.set('Cookie', TestBed.Admin2Cookie) // admin 2 creates
 				.send(content);
 
 
 			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/cms/' + content.route),
-				TestBed.http.get('/api/cms/' + content.route).set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/cms/' + content.route).set('Cookie', TestBed.MemberCookie),
 				TestBed.http.get('/api/cms/' + content.route).set('Cookie', TestBed.AdminCookie)
 			]);
 
@@ -348,6 +387,35 @@ describe('REST: Content', () => {
 			expect(adminRes.body).property('route').to.equal(content.route);
 			expect(adminRes.body).to.have.property('content');
 			expect(adminRes.body).property('content').to.equal(content.content);
+		});
+
+		it('GET /api/cms/:route 200, writer specialcase', async () => {
+			const content: Content = {
+				title: 'get200writerSpecialcase',
+				route: 'get200writerspecialcase',
+				content: 'test',
+				access: [AccessRoles.member], // member role!! <-- important
+				description: 'test',
+				folder: 'test',
+				published: true,
+				nav: true
+			};
+
+			await TestBed.http.post('/api/cms/')
+				.set('Cookie', TestBed.WriterCookie) // Writer (without member role)
+				.send(content);
+
+			// fetch this very route as the writer (who by by content.access has no access, but by author
+			// and by having the writer role does)
+			const res = await TestBed.http.get('/api/cms/' + content.route).set('Cookie', TestBed.WriterCookie);
+
+			// Should have access!!
+			expect(res).to.have.status(200);
+			expect(res).to.have.property('body');
+			expect(res.body).to.have.property('route');
+			expect(res.body).property('route').to.equal(content.route);
+			expect(res.body).to.have.property('content');
+			expect(res.body).property('content').to.equal(content.content);
 		});
 
 		it('GET /api/cms/:route 404', async () => {
@@ -367,14 +435,14 @@ describe('REST: Content', () => {
 				title: 'patch200',
 				route: 'patch200',
 				content: 'test',
-				access: AccessRoles.everyone,
+				access: [],
 				description: 'test',
 				folder: 'test',
 				published: true,
 				nav: true
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(content);
 
@@ -395,20 +463,20 @@ describe('REST: Content', () => {
 				title: 'patch401',
 				route: 'patch401',
 				content: 'test',
-				access: AccessRoles.everyone,
+				access: [],
 				description: 'test',
 				folder: 'test',
 				published: true,
 				nav: true
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(content);
 
 			const [noAuthRes, userRes] = await Promise.all([
 				TestBed.http.patch('/api/cms/' + content.route).send(content),
-				TestBed.http.patch('/api/cms/' + content.route).set('Cookie', TestBed.UserCookie).send(content)
+				TestBed.http.patch('/api/cms/' + content.route).set('Cookie', TestBed.MemberCookie).send(content)
 			]);
 
 			expect(noAuthRes).to.have.status(401);
@@ -420,9 +488,9 @@ describe('REST: Content', () => {
 
 			const content: Content = {
 				title: 'some404route',
-				route: route,
+				route,
 				content: 'test',
-				access: AccessRoles.everyone,
+				access: [],
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -444,7 +512,7 @@ describe('REST: Content', () => {
 				title: 'patch422',
 				route: 'patch422',
 				content: 'test',
-				access: AccessRoles.everyone,
+				access: [],
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -461,7 +529,7 @@ describe('REST: Content', () => {
 			delete badEverything.published;
 
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(properContent);
 
@@ -485,11 +553,11 @@ describe('REST: Content', () => {
 			// badEverythingRes
 			expect(badEverythingRes).to.have.status(422);
 			expect(badEverythingRes.body.errors.length).to.equal(5);
-			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'route')).to.not.equal(null);
-			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'title')).to.not.equal(null);
-			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'content')).to.not.equal(null);
-			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'description')).to.not.equal(null);
-			expect(badEverythingRes.body.errors.find( (e: any) => e.params.missingProperty === 'published')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find((e: any) => e.params.missingProperty === 'route')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find((e: any) => e.params.missingProperty === 'title')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find((e: any) => e.params.missingProperty === 'content')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find((e: any) => e.params.missingProperty === 'description')).to.not.equal(null);
+			expect(badEverythingRes.body.errors.find((e: any) => e.params.missingProperty === 'published')).to.not.equal(null);
 		});
 
 
@@ -498,14 +566,14 @@ describe('REST: Content', () => {
 				title: 'delete200',
 				route: 'delete200',
 				content: 'test',
-				access: AccessRoles.everyone,
+				access: [],
 				description: 'test',
 				folder: 'test',
 				published: true,
 				nav: true
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(content);
 
@@ -522,20 +590,20 @@ describe('REST: Content', () => {
 				title: 'delete401',
 				route: 'delete401',
 				content: 'test',
-				access: AccessRoles.everyone,
+				access: [],
 				description: 'test',
 				folder: 'test',
 				published: true,
 				nav: true
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(content);
 
 			const [noAuthRes, userRes] = await Promise.all([
 				TestBed.http.del('/api/cms/' + content.route).send(content),
-				TestBed.http.del('/api/cms/' + content.route).set('Cookie', TestBed.UserCookie).send(content)
+				TestBed.http.del('/api/cms/' + content.route).set('Cookie', TestBed.MemberCookie).send(content)
 			]);
 
 			expect(noAuthRes).to.have.status(401);
@@ -564,7 +632,7 @@ describe('REST: Content', () => {
 				title: 'history',
 				route: 'history',
 				content: 'test',
-				access: AccessRoles.everyone,
+				access: [],
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -575,19 +643,19 @@ describe('REST: Content', () => {
 				title: 'history',
 				route: 'history',
 				content: 'new patched content',
-				access: AccessRoles.everyone,
+				access: [],
 				description: 'test',
 				folder: 'test',
 				published: true,
 				nav: true
 			};
 
-			const postRes = await TestBed.http.post('/api/cms/')
+			await TestBed.http.post('/api/cms/')
 				.set('Cookie', TestBed.AdminCookie) // admin creates
 				.send(content);
 
 
-			const patchRes = await TestBed.http.patch('/api/cms/' + content.route)
+			await TestBed.http.patch('/api/cms/' + content.route)
 				.set('Cookie', TestBed.AdminCookie) // admin patches
 				.send(patched);
 
@@ -606,7 +674,7 @@ describe('REST: Content', () => {
 			const route = 'history';
 			const [noAuthRes, userRes] = await Promise.all([
 				TestBed.http.get('/api/cms/history/' + route),
-				TestBed.http.get('/api/cms/history/' + route).set('Cookie', TestBed.UserCookie)
+				TestBed.http.get('/api/cms/history/' + route).set('Cookie', TestBed.MemberCookie)
 			]);
 
 			expect(noAuthRes).to.have.status(401);
@@ -630,7 +698,7 @@ describe('REST: Content', () => {
 					title: 'search' + i,
 					route: 'search' + i,
 					content: 'search',
-					access: AccessRoles.everyone, // FOR EVERYONE
+					access: [], // FOR EVERYONE
 					description: 'search',
 					folder: 'test',
 					published: true,
@@ -641,7 +709,7 @@ describe('REST: Content', () => {
 					title: 'searchUser' + i,
 					route: 'searchUser' + i,
 					content: 'search',
-					access: AccessRoles.user, // USER RIGHTS REQUIRED
+					access: [AccessRoles.member], // MEMBER RIGHTS REQUIRED
 					description: 'search',
 					folder: 'test',
 					published: true,
@@ -652,7 +720,7 @@ describe('REST: Content', () => {
 					title: 'searchAdmin' + i,
 					route: 'searchAdmin' + i,
 					content: 'search',
-					access: AccessRoles.admin, // ADMIN RIGHTS REQUIRED
+					access: [AccessRoles.admin], // ADMIN RIGHTS REQUIRED
 					description: 'search',
 					folder: 'test',
 					published: true,
@@ -667,7 +735,7 @@ describe('REST: Content', () => {
 
 			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/cms/search/' + searchTerm),
-				TestBed.http.get('/api/cms/search/' + searchTerm).set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/cms/search/' + searchTerm).set('Cookie', TestBed.MemberCookie),
 				TestBed.http.get('/api/cms/search/' + searchTerm).set('Cookie', TestBed.AdminCookie)
 			]);
 

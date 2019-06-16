@@ -26,7 +26,7 @@
 				<mat-icon color="primary">person</mat-icon>
 				<div class="user">
 					<h3>{{ user.username }}</h3>
-					<h4>{{ user.role }}</h4>
+					<h4>{{ user.roles.join(', ') }}</h4>
 				</div>
 			</div>
 			<control-panel-component></control-panel-component>

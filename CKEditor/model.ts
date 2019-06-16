@@ -1,4 +1,3 @@
-
 export interface CKEditorDefaultConfig {
 	toolbar: {
 		viewportTopOffset?: number;
@@ -17,17 +16,22 @@ export interface CKEditorDefaultConfig {
 	};
 	table?: {
 		contentToolbar: CKETablePluginToolbar[];
-	}
+	};
 	language: string;
 }
 
 type CKEImagePluginToolbar = 'imageTextAlternative' | '|' | 'imageStyle:alignLeft' | 'imageStyle:full' | 'imageStyle:alignRight';
 type CKEMediaEmbedPluginToolbar = 'imageTextAlternative' | '|' | 'imageStyle:alignLeft' | 'imageStyle:full' | 'imageStyle:alignRight';
-type CKEMediaEmbedProviders = 'dailymotion' | 'spotify' | 'youtube' | 'vimeo' | 'instagram' | 'twitter' | 'googleMaps' | 'flickr' | 'facebook';
+type CKEMediaEmbedProviders =
+	'dailymotion' | 'spotify' | 'youtube' | 'vimeo' | 'instagram'
+	| 'twitter' | 'googleMaps' | 'flickr' | 'facebook';
+
 type CKETablePluginToolbar = 'tableColumn' | 'tableRow' | 'mergeTableCells';
 
 
 type CKEToolbarItems =
-	'heading' | 'bold' | 'italic' | 'link' | 'bulletedList' | 'numberedList' |
+	'heading' | 'bold' | 'italic' | 'link' | 'bulletedList' | 'numberedList' | 'removeFormat'
+	| 'fontSize' | 'fontFamily' | 'fontSize' | 'fontColor' |
 	'alignment' | 'blockQuote' | 'code' | 'mediaEmbed' | 'insertTable' | 'undo' | 'redo';
+
 type CKEToolbarItemSpacer = '|';

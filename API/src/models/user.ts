@@ -27,11 +27,10 @@ const schema = new Schema({
 		type: String, // Not in clear text
 		required: true
 	},
-	role: {
+	roles: [{
 		type: String,
-		enum: [AccessRoles.admin, AccessRoles.user],
-		default: AccessRoles.user
-	},
+		enum: Object.values(AccessRoles),
+	}],
 },
 {
 	timestamps: { createdAt: true, updatedAt: false }
@@ -46,8 +45,8 @@ const schema = new Schema({
 
 
 // Before saving do the following
-schema.pre('save', function (next: NextFunction) {
-	const u = <UserDoc>this; // hard-casting
+schema.pre('save', function(next: NextFunction) {
+	const u = this as UserDoc; // hard-casting
 	if (!u.isModified('password')) { return next(); }
 	hash(u.password, BCRYPT_SALT_FACTOR, (err, hashed) => {
 		if (err) { return next(err); }
@@ -62,19 +61,13 @@ schema.pre('save', function (next: NextFunction) {
  |--------------------------------------------------------------------------
 */
 
-schema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
+schema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
 	const u: User = this;
 	return compare(candidatePassword, u.password);
 };
 
-schema.methods.isOfRole = function (role: AccessRoles): boolean {
-	const u: User = this;
-	return u.role === role;
-};
-
-schema.methods.canAccess = function (level: AccessRoles): boolean {
-	const u: User = this;
-	return level === AccessRoles.everyone || u.role === AccessRoles.admin || u.isOfRole(level);
+schema.methods.canAccess = function(level: AccessRoles): boolean {
+	return (this as User).roles.includes(level);
 };
 
 export interface UserDoc extends User, Document { }

@@ -3,10 +3,10 @@
 	<form [formGroup]="patchUserForm" id="patchUserForm" autocomplete="off" (ngSubmit)="submitForm()">
 		<!-- USERNAME -->
 		<div class="row">
-			<mat-form-field class="field" appearance="outline">
-				<mat-label>New username</mat-label>
+			<mat-form-field appearance="outline">
+				<mat-label>Username</mat-label>
 
-				<input matInput id="username" #username type="text" formControlName="username" required>
+				<input matInput id="username" #username type="text" formControlName="username">
 				<mat-error *ngIf="patchUserForm.get('username').hasError('required')">
 					Username is <strong>required</strong>
 				</mat-error>
@@ -16,18 +16,21 @@
 			</mat-form-field>
 		</div>
 
-		<!-- ROLE -->
+		<!-- ROLES -->
 		<div class="row">
-			<mat-form-field ngClass="field" appearance="outline">
-				<mat-label>New role</mat-label>
-				<mat-select formControlName="role" required>
-					<mat-select-trigger *ngIf="patchUserForm.get('role').value">
-						<mat-icon>{{accessHandler.getAccessChoice(patchUserForm.get('role').value).icon}}</mat-icon>
-						{{ accessHandler.getAccessChoice(patchUserForm.get('role').value).single }}
+			<mat-form-field appearance="outline">
+				<mat-label>Roles</mat-label>
+				<mat-select formControlName="roles" multiple>
+					<mat-select-trigger>
+						<ng-container *ngFor="let selected of patchUserForm.get('roles').value; last as last">
+							<mat-icon>{{accessHandler.getAccessChoice(selected).icon}}</mat-icon> {{ accessHandler.getAccessChoice(selected).single }}<span *ngIf="!last">, </span>
+						</ng-container>
 					</mat-select-trigger>
-					<mat-option *ngFor="let option of accessHandler.accessChoices" [value]="option.value">
-						<mat-icon matPrefix>{{ option.icon }}</mat-icon>{{ option.single }}
-					</mat-option>
+					<ng-container *ngFor="let option of accessHandler.accessChoices">
+						<mat-option *ngIf="option.value" [value]="option.value">
+							<mat-icon matPrefix>{{ option.icon }}</mat-icon>{{ option.single }}
+						</mat-option>
+					</ng-container>
 				</mat-select>
 			</mat-form-field>
 		</div>

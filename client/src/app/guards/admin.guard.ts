@@ -4,29 +4,27 @@ import { CanActivate, CanLoad, Router } from '@angular/router';
 import { AuthService } from '@app/services';
 import { AccessRoles } from '@types';
 
+import { handleForUser } from './guard.user.handler';
+
+
 @Injectable({ providedIn: 'root' })
 export class AdminGuard implements CanActivate, CanLoad {
 
-	constructor(
-		private authService: AuthService,
-		private router: Router) { }
+	constructor(private authService: AuthService, private router: Router) { }
 
-
-	/**
-	 * Dictates the access rights to a given route
-	 * @return {boolean} whether access is granted
-	 */
-	canActivate() {
-		const isExpired = this.authService.getUserSessionExpired();
-		const accessGranted = !isExpired && this.authService.isUserOfRole(AccessRoles.admin);
+	private handleAccess() {
+		const accessGranted = this.authService.isUserOfRole(AccessRoles.admin);
 		if (!accessGranted) {
 			this.router.navigateByUrl('/');
 		}
 		return accessGranted;
 	}
 
+	canActivate() {
+		return handleForUser(this.authService, this.handleAccess.bind(this));
+	}
+
 	canLoad() {
 		return this.canActivate();
 	}
-
 }

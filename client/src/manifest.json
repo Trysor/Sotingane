@@ -27,6 +27,11 @@
 			"src": "assets/logo512themed.svg",
 			"sizes": "512x512",
 			"type": "image/svg"
+		},
+		{
+			"src": "assets/logo512themed.png",
+			"sizes": "512x512",
+			"type": "image/png"
 		}
 	],
 	"related_applications": []

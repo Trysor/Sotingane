@@ -1,5 +1,5 @@
 import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatSelectChange } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@app/modules/material.types';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 
 import { AdminService, AuthService } from '@app/services';
@@ -7,8 +7,8 @@ import { User } from '@types';
 
 import { AccessHandler } from '@app/classes';
 
-import { Subject } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
+import { take, catchError } from 'rxjs/operators';
 
 
 @Component({
@@ -35,8 +35,8 @@ export class UserModalComponent {
 		this.otherUsernames = this.data.userList.filter(user => user !== data.user).map(user => user.username.toLowerCase());
 
 		this.patchUserForm = fb.group({
-			'username': [data.user.username, Validators.compose([Validators.required, this.usernameTaken.bind(this)])],
-			'role': [data.user.role, Validators.required]
+			username: [data.user.username, Validators.compose([Validators.required, this.usernameTaken.bind(this)])],
+			roles: [data.user.roles, Validators.required]
 		});
 	}
 
@@ -50,16 +50,19 @@ export class UserModalComponent {
 		const user: User = this.patchUserForm.value;
 		user._id = this.data.user._id;
 
-		this.adminService.patchUser(user).pipe(take(1)).subscribe(
-			() => {
+		this.adminService.patchUser(user).pipe(
+			take(1),
+			catchError(() => of(null))
+		).subscribe(result => {
+			if (!!result) {
 				this.issue.next(null);
 				this.dialogRef.close(true);
-			},
-			() => {
-				this.issue.next('Could not save the user.');
-				this.patchUserForm.enable();
+				return;
 			}
-		);
+			this.issue.next('Could not save the user.');
+			this.patchUserForm.enable();
+
+		});
 	}
 
 	/**
@@ -71,7 +74,6 @@ export class UserModalComponent {
 
 	/**
 	 * Form Validation that disallows values that are considered unique for the username property.
-	 * @param control
 	 */
 	private usernameTaken(control: FormControl) {
 		return this.otherUsernames.includes(control.value.toLowerCase()) ? { usernameTaken: true } : null;

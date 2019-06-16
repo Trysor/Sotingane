@@ -21,18 +21,18 @@ export interface ColumnSettings<T> {
 	type?: ColumnType; // Defaults to Normal
 
 	property: Column<T>;
-
 	header: string;
 	val?: (obj?: T, all?: T[]) => string | number;
 	val2?: (obj?: T, all?: T[]) => string | number;
 
 	tooltip?: (obj?: T, all?: T[]) => string;
+	ariaLabel?: (obj?: T, all?: T[]) => string;
 
 	icon?: ColIconSettings<T>;
 
 	func?: (obj?: T, all?: T[]) => void;
 	disabled?: (obj?: T, all?: T[]) => boolean;
-	noText?: boolean;
+	removeText?: boolean;
 	narrow?: boolean;
 	noSort?: boolean;
 

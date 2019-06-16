@@ -49,7 +49,6 @@ export const isProduction = configUtil.getEnv('NODE_ENV') === 'production';
 
 /**
  * Method Decorator: Assigns the method to a GET request handler
- * @param opts
  */
 export function GET(opts: RoutingOptions) {
 	return (target: Controller, propertyKey: string, descriptor: PropertyDescriptor) => {
@@ -61,7 +60,6 @@ export function GET(opts: RoutingOptions) {
 
 /**
  * Method Decorator: Assigns the method to a POST request handler
- * @param opts
  */
 export function POST(opts: RoutingOptions) {
 	return (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) => {
@@ -73,7 +71,6 @@ export function POST(opts: RoutingOptions) {
 
 /**
  * Method Decorator: Assigns the method to a PATCH request handler
- * @param opts
  */
 export function PATCH(opts: RoutingOptions) {
 	return (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) => {
@@ -85,7 +82,6 @@ export function PATCH(opts: RoutingOptions) {
 
 /**
  * Method Decorator: Assigns the method to a DELETE request handler
- * @param opts
  */
 export function DELETE(opts: RoutingOptions) {
 	return (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) => {

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import { ContentModel } from '../src/models';
-import { Content, AccessRoles, AggregationQuery } from '../types';
+import { Content, AccessRoles, AggregationQuery, JWTUser } from '../types';
 import { CMS_STATUS, VALIDATION_FAILED, USERS_STATUS, ADMIN_STATUS } from '../src/libs/validate';
 
 import { TestBed } from './testbed';
@@ -27,13 +27,13 @@ describe('REST: Admin', () => {
 			expect(res.body[0]).to.have.property('_id'); // important to keep id here.
 			expect(res.body[0]).to.have.property('username');
 			expect(res.body[0]).to.have.property('createdAt');
-			expect(res.body[0]).to.have.property('role');
+			expect(res.body[0]).to.have.property('roles');
 		});
 
 		it('GET /api/admin/users/ 401', async () => {
 			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/admin/users/'),
-				TestBed.http.get('/api/admin/users/').set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/admin/users/').set('Cookie', TestBed.MemberCookie),
 				TestBed.http.get('/api/admin/users/').set('Cookie', TestBed.AdminCookie)
 			]);
 
@@ -52,13 +52,13 @@ describe('REST: Admin', () => {
 	describe('/api/admin/users/:id', () => {
 
 		it('PATCH /api/admin/users/:id 200', async () => {
-			const patchUser = {
-				_id: TestBed.User.id,
-				username: TestBed.User.username,
-				role: TestBed.User.role,
+			const patchUser: JWTUser = {
+				_id: TestBed.Member.id,
+				username: TestBed.Member.username,
+				roles: TestBed.Member.roles,
 			};
 
-			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 				.set('Cookie', TestBed.AdminCookie)
 				.send(patchUser);
 
@@ -68,13 +68,13 @@ describe('REST: Admin', () => {
 		});
 
 		it('PATCH /api/admin/users/:id 400', async () => {
-			const patchUser = {
+			const patchUser: JWTUser = {
 				_id: TestBed.AdminUser.id, // Using AdminUser's ID instead
-				username: TestBed.User.username,
-				role: TestBed.User.role,
+				username: TestBed.Member.username,
+				roles: TestBed.Member.roles,
 			};
 
-			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 				.set('Cookie', TestBed.AdminCookie)
 				.send(patchUser);
 
@@ -85,19 +85,19 @@ describe('REST: Admin', () => {
 
 		it('PATCH /api/admin/users/:id 401', async () => {
 
-			const patchUser = {
-				_id: TestBed.User.id,
-				username: TestBed.User.username,
-				role: TestBed.User.role,
+			const patchUser: JWTUser = {
+				_id: TestBed.Member.id,
+				username: TestBed.Member.username,
+				roles: TestBed.Member.roles,
 			};
 
 			const [noAuthRes, userRes, adminRes] = await Promise.all([
-				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+				TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 					.send(patchUser),
-				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
-					.set('Cookie', TestBed.UserCookie)
+				TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
+					.set('Cookie', TestBed.MemberCookie)
 					.send(patchUser),
-				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+				TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 					.set('Cookie', TestBed.AdminCookie)
 					.send(patchUser)
 			]);
@@ -108,13 +108,13 @@ describe('REST: Admin', () => {
 		});
 
 		it('PATCH /api/admin/users/:id 409', async () => {
-			const patchUser = {
-				_id: TestBed.User.id,
+			const patchUser: JWTUser = {
+				_id: TestBed.Member.id,
 				username: TestBed.AdminUser.username, // Trying to use the admin user's username.
-				role: TestBed.User.role,
+				roles: TestBed.Member.roles,
 			};
 
-			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+			const res = await TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 				.set('Cookie', TestBed.AdminCookie)
 				.send(patchUser);
 
@@ -125,36 +125,36 @@ describe('REST: Admin', () => {
 
 		it('PATCH /api/admin/users/:id 422', async () => {
 
-			const idMissing = {
-				username: TestBed.User.username,
-				role: TestBed.User.role
+			const idMissing: Partial<JWTUser> = {
+				username: TestBed.Member.username,
+				roles: TestBed.Member.roles
 			};
-			const usernameMissing = {
-				_id: TestBed.User.id,
-				role: TestBed.User.role
+			const usernameMissing: Partial<JWTUser> = {
+				_id: TestBed.Member.id,
+				roles: TestBed.Member.roles
 			};
-			const roleMissing = {
-				_id: TestBed.User.id,
-				username: TestBed.User.username
+			const roleMissing: Partial<JWTUser> = {
+				_id: TestBed.Member.id,
+				username: TestBed.Member.username
 			};
-			const tooManyProperties = {
-				_id: TestBed.User.id,
-				username: TestBed.User.username,
-				role: TestBed.User.role,
+			const tooManyProperties: { test: string } & JWTUser = {
+				_id: TestBed.Member.id,
+				username: TestBed.Member.username,
+				roles: TestBed.Member.roles,
 				test: 'extra property'
 			};
 
 			const [idRes, userRes, roleRes, tooManyRes] = await Promise.all([
-				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+				TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 					.set('Cookie', TestBed.AdminCookie)
 					.send(idMissing),
-				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+				TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 					.set('Cookie', TestBed.AdminCookie)
 					.send(usernameMissing),
-				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+				TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 					.set('Cookie', TestBed.AdminCookie)
 					.send(roleMissing),
-				TestBed.http.patch('/api/admin/users/' + TestBed.User.id)
+				TestBed.http.patch('/api/admin/users/' + TestBed.Member.id)
 					.set('Cookie', TestBed.AdminCookie)
 					.send(tooManyProperties)
 			]);
@@ -176,7 +176,7 @@ describe('REST: Admin', () => {
 
 			expect(roleRes).to.have.status(422);
 			expect(roleRes.body.errors[0].params).to.have.property('missingProperty');
-			expect(roleRes.body.errors[0].params.missingProperty).to.equal('role');
+			expect(roleRes.body.errors[0].params.missingProperty).to.equal('roles');
 
 			expect(tooManyRes.body.errors).to.be.an('array');
 			expect(tooManyRes.body.errors[0].params).to.have.property('additionalProperty');
@@ -207,7 +207,7 @@ describe('REST: Admin', () => {
 		it('GET /api/admin/cms/ 401', async () => {
 			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/admin/cms/'),
-				TestBed.http.get('/api/admin/cms/').set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/admin/cms/').set('Cookie', TestBed.MemberCookie),
 				TestBed.http.get('/api/admin/cms/').set('Cookie', TestBed.AdminCookie)
 			]);
 
@@ -228,7 +228,7 @@ describe('REST: Admin', () => {
 				title: 'getadmin200',
 				route: 'getadmin200',
 				content: 'test',
-				access: AccessRoles.everyone,
+				access: [],
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -253,7 +253,7 @@ describe('REST: Admin', () => {
 				title: 'getadmin401',
 				route: 'getadmin401',
 				content: 'test',
-				access: AccessRoles.everyone,
+				access: [],
 				description: 'test',
 				folder: 'test',
 				published: true,
@@ -266,7 +266,7 @@ describe('REST: Admin', () => {
 
 			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.get('/api/admin/cms/' + content.route),
-				TestBed.http.get('/api/admin/cms/' + content.route).set('Cookie', TestBed.UserCookie),
+				TestBed.http.get('/api/admin/cms/' + content.route).set('Cookie', TestBed.MemberCookie),
 				TestBed.http.get('/api/admin/cms/' + content.route).set('Cookie', TestBed.AdminCookie)
 			]);
 
@@ -302,15 +302,15 @@ describe('REST: Admin', () => {
 			expect(res).to.have.property('body');
 			expect(res.body).to.be.an('array');
 
-			const allPagesCount = (<Content[]>allPagesRes.body).length;
-			const resCount = (<any[]>res.body).length;
+			const allPagesCount = ( allPagesRes.body as Content[]).length;
+			const resCount = ( res.body as any[]).length;
 
 			expect(resCount).to.equal(allPagesCount, 'should not have filtered anything');
 		});
 
 		it('POST /api/admin/cms/aggregate 200, route only', async () => {
 			const route = 'getadmin200';
-			const query: AggregationQuery = { route: route };
+			const query: AggregationQuery = { route };
 
 			const [res, allPagesRes] = await Promise.all([
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(query),
@@ -321,15 +321,15 @@ describe('REST: Admin', () => {
 			expect(res).to.have.property('body');
 			expect(res.body).to.be.an('array');
 
-			const filteredAllPagesCount = (<Content[]>allPagesRes.body).filter(c => c.route === route).length;
-			const resCount = (<any[]>res.body).length;
+			const filteredAllPagesCount = ( allPagesRes.body as Content[]).filter(c => c.route === route).length;
+			const resCount = ( res.body as any[]).length;
 
 			expect(resCount).to.equal(filteredAllPagesCount, 'should have filtered based on route');
 		});
 
 		it('POST /api/admin/cms/aggregate 200, folder only', async () => {
 			const folder = 'test';
-			const query: AggregationQuery = { folder: folder };
+			const query: AggregationQuery = { folder };
 
 			const [res, allPagesRes] = await Promise.all([
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(query),
@@ -340,8 +340,8 @@ describe('REST: Admin', () => {
 			expect(res).to.have.property('body');
 			expect(res.body).to.be.an('array');
 
-			const filteredAllPagesCount = (<Content[]>allPagesRes.body).filter(c => c.folder === folder).length;
-			const resCount = (<any[]>res.body).length;
+			const filteredAllPagesCount = ( allPagesRes.body as Content[]).filter(c => c.folder === folder).length;
+			const resCount = ( res.body as any[]).length;
 
 			expect(resCount).to.equal(filteredAllPagesCount, 'should have filtered based on folder');
 		});
@@ -350,7 +350,7 @@ describe('REST: Admin', () => {
 			const afterDate = new Date();
 
 			const content: Content = {
-				title: 'aggregDate', route: 'aggregdate', content: 'test', access: AccessRoles.everyone,
+				title: 'aggregDate', route: 'aggregdate', content: 'test', access: [],
 				description: 'test', folder: 'test', published: true, nav: true
 			};
 
@@ -370,7 +370,7 @@ describe('REST: Admin', () => {
 			expect(resAfter).to.have.status(200);
 			expect(resAfter).to.have.property('body');
 			expect(resAfter.body).to.be.an('array');
-			const contentFind = (<any[]>resAfter.body).find((c: any) => c.route === content.route);
+			const contentFind = ( resAfter.body as any[]).find((c: any) => c.route === content.route);
 			expect(contentFind).to.not.be.an('undefined'); // to NOT be.
 			expect(contentFind.title).to.equal(content.title);
 
@@ -385,7 +385,7 @@ describe('REST: Admin', () => {
 			const beforeDate = new Date();
 
 			const content: Content = {
-				title: 'aggregDateBefore', route: 'aggregdatebefore', content: 'test', access: AccessRoles.everyone,
+				title: 'aggregDateBefore', route: 'aggregdatebefore', content: 'test', access: [],
 				description: 'test', folder: 'test', published: true, nav: true
 			};
 
@@ -405,14 +405,14 @@ describe('REST: Admin', () => {
 			expect(resBefore).to.have.status(200);
 			expect(resBefore).to.have.property('body');
 			expect(resBefore.body).to.be.an('array');
-			const contentFind = (<any[]>resBefore.body).find((c: any) => c.route === content.route);
+			const contentFind = ( resBefore.body as any[]).find((c: any) => c.route === content.route);
 			expect(contentFind).to.be.an('undefined'); // to ACTUALLY be undefined.
 
 			// the second before was created AFTER the new content, and should thus include the content we POSTed above
 			expect(resBefore2).to.have.status(200);
 			expect(resBefore2).to.have.property('body');
 			expect(resBefore2.body).to.be.an('array');
-			const contentFind2 = (<any[]>resBefore2.body).find((c: any) => c.route === content.route);
+			const contentFind2 = ( resBefore2.body as any[]).find((c: any) => c.route === content.route);
 			expect(contentFind2).to.not.be.an('undefined'); // to NOT be undefined.
 			expect(contentFind2.title).to.equal(content.title);
 
@@ -422,7 +422,7 @@ describe('REST: Admin', () => {
 		it('POST /api/admin/cms/aggregate 200, written by only', async () => {
 			const content: Content = {
 				title: 'writtenByAdmin2', route: 'writtenbyadmin2',
-				content: 'test', access: AccessRoles.everyone,
+				content: 'test', access: [],
 				description: 'test', folder: 'test',
 				published: true, nav: true
 			};
@@ -454,29 +454,30 @@ describe('REST: Admin', () => {
 			const filteredAdmin1Count = allPages.filter(c => TestBed.AdminUser._id.equals(c.createdBy)).length;
 			const filteredAdmin2Count = allPages.filter(c => TestBed.AdminUser2._id.equals(c.createdBy)).length;
 
-			const admin1Count = (<any[]>resAdmin1.body).length;
-			const admin2Count = (<any[]>resAdmin2.body).length;
+			const admin1Count = ( resAdmin1.body as any[]).length;
+			const admin2Count = ( resAdmin2.body as any[]).length;
 
 			expect(admin1Count).to.equal(filteredAdmin1Count, 'should have filtered based on creator (admin1)');
 			expect(admin2Count).to.equal(filteredAdmin2Count, 'should have filtered based on creator (admin2)');
 		});
 
 		it('POST /api/admin/cms/aggregate 200, access only', async () => {
-			const queryEveryone: AggregationQuery = { access: AccessRoles.everyone };
-			const queryUsers: AggregationQuery = { access: AccessRoles.user };
-			const queryAdmins: AggregationQuery = { access: AccessRoles.admin };
+			const queryAll: AggregationQuery = { };
+			const queryEveryone: AggregationQuery = { access: [] };
+			const queryMembers: AggregationQuery = { access: [AccessRoles.member] };
+			const queryAdmins: AggregationQuery = { access: [AccessRoles.admin] };
 
 			const content: Partial<Content> = { content: 'test', description: 'test', folder: 'test', published: true, nav: true };
 
 			const [res1, res2, res3] = await Promise.all([
 				TestBed.http.post('/api/cms').set('Cookie', TestBed.AdminCookie).send(Object.assign({
-					route: 'aggregAccess1', title: 'aggregAccess1', access: AccessRoles.everyone
+					route: 'aggregAccess1', title: 'aggregAccess1', access: []
 				}, content)),
 				TestBed.http.post('/api/cms').set('Cookie', TestBed.AdminCookie).send(Object.assign({
-					route: 'aggregAccess2', title: 'aggregAccess2', access: AccessRoles.user
+					route: 'aggregAccess2', title: 'aggregAccess2', access: [AccessRoles.member]
 				}, content)),
 				TestBed.http.post('/api/cms').set('Cookie', TestBed.AdminCookie).send(Object.assign({
-					route: 'aggregAccess3', title: 'aggregAccess3', access: AccessRoles.admin
+					route: 'aggregAccess3', title: 'aggregAccess3', access: [AccessRoles.admin]
 				}, content))
 			]);
 
@@ -484,37 +485,34 @@ describe('REST: Admin', () => {
 			expect(res2).to.have.status(200);
 			expect(res3).to.have.status(200);
 
-			const [resEveryone, resUsers, resAdmins] = await Promise.all([
+			const [resAll, resEveryone, resMembers, resAdmins] = await Promise.all([
+				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryAll),
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryEveryone),
-				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryUsers),
+				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryMembers),
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryAdmins),
 			]);
 			const allContentDocs = await ContentModel.find({}, { current: 1 });
-
-			expect(resEveryone).to.have.status(200);
-			expect(resEveryone).to.have.property('body');
-			expect(resEveryone.body).to.be.an('array');
-
-			expect(resUsers).to.have.status(200);
-			expect(resUsers).to.have.property('body');
-			expect(resUsers.body).to.be.an('array');
-
-			expect(resAdmins).to.have.status(200);
-			expect(resAdmins).to.have.property('body');
-			expect(resAdmins.body).to.be.an('array');
-
 			const allPages = allContentDocs.map(contentDoc => contentDoc.current);
 
-			const everyoneCount = allPages.filter(c => c.access === AccessRoles.everyone).length;
-			const usersCount = allPages.filter(c => c.access === AccessRoles.user).length;
-			const adminsCount = allPages.filter(c => c.access === AccessRoles.admin).length;
+			for (const res of [resAll, resEveryone, resMembers, resAdmins]) {
+				expect(res).to.have.status(200);
+				expect(res).to.have.property('body');
+				expect(res.body).to.be.an('array');
+			}
 
-			const queryEveryoneCount = (<any[]>resEveryone.body).length;
-			const queryUsersCount = (<any[]>resUsers.body).length;
-			const queryAdminsCount = (<any[]>resAdmins.body).length;
+			const allCount = allPages.length;
+			const everyoneCount = allPages.filter(c => c.access.length === 0).length;
+			const membersCount = allPages.filter(c => c.access.includes(AccessRoles.member)).length;
+			const adminsCount = allPages.filter(c => c.access.includes(AccessRoles.admin)).length;
 
+			const queryAllCount = ( resAll.body as any[]).length;
+			const queryEveryoneCount = ( resEveryone.body as any[]).length;
+			const queryMembersCount = ( resMembers.body as any[]).length;
+			const queryAdminsCount = ( resAdmins.body as any[]).length;
+
+			expect(allCount).to.equal(queryAllCount, 'should have filtered based on access (all)');
 			expect(everyoneCount).to.equal(queryEveryoneCount, 'should have filtered based on access (everyone)');
-			expect(usersCount).to.equal(queryUsersCount, 'should have filtered based on access (users)');
+			expect(membersCount).to.equal(queryMembersCount, 'should have filtered based on access (members)');
 			expect(adminsCount).to.equal(queryAdminsCount, 'should have filtered based on access (admins)');
 		});
 
@@ -524,7 +522,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'unpubAggreg', route: 'unpubaggreg',
-				content: 'test', access: AccessRoles.everyone,
+				content: 'test', access: [],
 				description: 'test', folder: 'test',
 				published: false, nav: true // published === false
 			};
@@ -553,8 +551,8 @@ describe('REST: Admin', () => {
 			const publishedCount = allPages.filter(c => c.published === true).length;
 			const unpublishedCount = allPages.filter(c => c.published === false).length;
 
-			const queryPublishedCount = (<any[]>resPublished.body).length;
-			const queryUnpublishedCount = (<any[]>resUnpublished.body).length;
+			const queryPublishedCount = ( resPublished.body as any[]).length;
+			const queryUnpublishedCount = ( resUnpublished.body as any[]).length;
 
 			expect(publishedCount).to.equal(queryPublishedCount, 'should have filtered based on published (true)');
 			expect(unpublishedCount).to.equal(queryUnpublishedCount, 'should have filtered based on published (false)');
@@ -564,7 +562,7 @@ describe('REST: Admin', () => {
 			const afterDate = new Date();
 
 			const content: Content = {
-				title: 'aggregSeenAfter', route: 'aggregseenafter', content: 'test', access: AccessRoles.everyone,
+				title: 'aggregSeenAfter', route: 'aggregseenafter', content: 'test', access: [],
 				description: 'test', folder: 'test', published: true, nav: true
 			};
 
@@ -588,7 +586,7 @@ describe('REST: Admin', () => {
 			expect(resAfter).to.have.status(200);
 			expect(resAfter).to.have.property('body');
 			expect(resAfter.body).to.be.an('array');
-			const contentFind = (<any[]>resAfter.body).find((c: any) => c.route === content.route);
+			const contentFind = ( resAfter.body as any[]).find((c: any) => c.route === content.route);
 			expect(contentFind).to.not.be.an('undefined'); // to NOT be.
 			expect(contentFind.views).to.equal(1);
 
@@ -602,7 +600,7 @@ describe('REST: Admin', () => {
 			const beforeDate = new Date();
 
 			const content: Content = {
-				title: 'aggregSeenBefore', route: 'aggregseenbefore', content: 'test', access: AccessRoles.everyone,
+				title: 'aggregSeenBefore', route: 'aggregseenbefore', content: 'test', access: [],
 				description: 'test', folder: 'test', published: true, nav: true
 			};
 
@@ -613,15 +611,12 @@ describe('REST: Admin', () => {
 			const viewRes = await TestBed.http.get('/api/cms/' + content.route);
 			expect(viewRes).to.have.status(200);
 
-			// Date2
-			const beforeDate2 = new Date();
+			const queryBefore: AggregationQuery = { seenBeforeDate: beforeDate };
+			const queryBefore2: AggregationQuery = { seenBeforeDate: new Date() };
 
 			// viewBefore2
 			const viewRes2 = await TestBed.http.get('/api/cms/' + content.route);
 			expect(viewRes2).to.have.status(200);
-
-			const queryBefore: AggregationQuery = { seenBeforeDate: beforeDate };
-			const queryBefore2: AggregationQuery = { seenBeforeDate: beforeDate2 };
 
 			const [resBefore, resBefore2] = await Promise.all([
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(queryBefore),
@@ -631,16 +626,20 @@ describe('REST: Admin', () => {
 			expect(resBefore).to.have.status(200);
 			expect(resBefore).to.have.property('body');
 			expect(resBefore.body).to.be.an('array');
-			const contentFind = (<any[]>resBefore.body).find((c: any) => c.route === content.route);
+			const contentFind = (resBefore.body as any[]).find((c: any) => c.route === content.route);
 			expect(contentFind).to.be.an('undefined'); // to be undefined. It wasn't seen before the date specified
 
 			// the second before was created AFTER the new content, and should thus include the content we POSTed above
 			expect(resBefore2).to.have.status(200);
 			expect(resBefore2).to.have.property('body');
 			expect(resBefore2.body).to.be.an('array');
-			const contentFind2 = (<any[]>resBefore2.body).find((c: any) => c.route === content.route);
+			const contentFind2 = (resBefore2.body as any[]).find((c: any) => c.route === content.route);
+			if (!contentFind2) {
+				console.log('queryBefore2 seenBeforeDate:', queryBefore2.seenBeforeDate);
+				console.log(resBefore2.body);
+			}
 			expect(contentFind2).to.not.be.an('undefined'); // to NOT be undefined.
-			expect(contentFind2.views).to.be.equal(1); // Views count should have increased.
+			expect(contentFind2.views).to.equal(1); // Views count should have increased.
 		});
 
 		it('POST /api/admin/cms/aggregate 200, browser only', async () => {
@@ -650,7 +649,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'browserAggreg', route: 'browseraggreg',
-				content: 'test', access: AccessRoles.everyone,
+				content: 'test', access: [],
 				description: 'test', folder: 'test',
 				published: true, nav: true
 			};
@@ -676,8 +675,8 @@ describe('REST: Admin', () => {
 			expect(resEdge.body).to.have.property('message');
 			expect(resEdge.body.message).to.equal(ADMIN_STATUS.AGGREGATION_RESULT_NONE_FOUND);
 
-			const resChromeContent = (<Content[]>resChrome.body).find(c => c.route === content.route);
-			const resBothContent = (<Content[]>resBoth.body).find(c => c.route === content.route);
+			const resChromeContent = ( resChrome.body as Content[]).find(c => c.route === content.route);
+			const resBothContent = ( resBoth.body as Content[]).find(c => c.route === content.route);
 
 			expect(resChrome).to.have.status(200);
 			expect(resChrome).to.have.property('body');
@@ -696,7 +695,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'unwindAggreg', route: 'unwindaggreg',
-				content: 'test', access: AccessRoles.everyone,
+				content: 'test', access: [],
 				description: 'test', folder: 'test',
 				published: true, nav: true
 			};
@@ -718,7 +717,7 @@ describe('REST: Admin', () => {
 			expect(res.body).to.be.an('array');
 
 			// Expect all properties we expect to find
-			const resContent = (<any[]>res.body).find(c => c.route === content.route);
+			const resContent = ( res.body as any[]).find(c => c.route === content.route);
 			expect(resContent).to.have.property('title');
 			expect(resContent).to.have.property('route');
 			expect(resContent).to.have.property('logDataTs');
@@ -735,7 +734,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'propAggreg', route: 'propaggreg',
-				content: 'test', access: AccessRoles.everyone,
+				content: 'test', access: [],
 				description: 'test', folder: 'test',
 				published: true, nav: true
 			};
@@ -757,7 +756,7 @@ describe('REST: Admin', () => {
 			expect(res.body).to.be.an('array');
 
 			// Expect all properties we expect to find
-			const resContent = (<any[]>res.body).find(c => c.route === content.route);
+			const resContent = ( res.body as any[]).find(c => c.route === content.route);
 			expect(resContent).to.have.property('title');
 			expect(resContent).to.have.property('route');
 			expect(resContent).to.have.property('views');
@@ -773,7 +772,7 @@ describe('REST: Admin', () => {
 
 			const [noAuthRes, userRes, adminRes] = await Promise.all([
 				TestBed.http.post('/api/admin/cms/aggregate').send(query),
-				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.UserCookie).send(query),
+				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.MemberCookie).send(query),
 				TestBed.http.post('/api/admin/cms/aggregate').set('Cookie', TestBed.AdminCookie).send(query)
 			]);
 

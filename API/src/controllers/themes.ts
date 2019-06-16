@@ -42,49 +42,49 @@ export class ThemeController extends Controller {
 */
 
 const ThemeSchema = {
-	'$id': JSchema.ThemeSchema.name,
-	'type': 'object',
-	'additionalProperties': false,
-	'properties': {
-		'name': { 'type': 'string' },
-		'vars': {
-			'type': 'object',
-			'additionalProperties': false,
-			'properties': {
-				'--app-prim-1': { 'type': 'string' },
-				'--app-prim-2': { 'type': 'string' },
-				'--app-prim-3': { 'type': 'string' },
-				'--app-prim-c-1': { 'type': 'string' },
-				'--app-prim-c-2': { 'type': 'string' },
-				'--app-prim-c-3': { 'type': 'string' },
+	$id: JSchema.ThemeSchema.name,
+	type: 'object',
+	additionalProperties: false,
+	properties: {
+		name: { type: 'string' },
+		vars: {
+			type: 'object',
+			additionalProperties: false,
+			properties: {
+				'--app-prim-1': { type: 'string' },
+				'--app-prim-2': { type: 'string' },
+				'--app-prim-3': { type: 'string' },
+				'--app-prim-c-1': { type: 'string' },
+				'--app-prim-c-2': { type: 'string' },
+				'--app-prim-c-3': { type: 'string' },
 
-				'--app-acc-1': { 'type': 'string' },
-				'--app-acc-2': { 'type': 'string' },
-				'--app-acc-3': { 'type': 'string' },
-				'--app-acc-c-1': { 'type': 'string' },
-				'--app-acc-c-2': { 'type': 'string' },
-				'--app-acc-c-3': { 'type': 'string' },
+				'--app-acc-1': { type: 'string' },
+				'--app-acc-2': { type: 'string' },
+				'--app-acc-3': { type: 'string' },
+				'--app-acc-c-1': { type: 'string' },
+				'--app-acc-c-2': { type: 'string' },
+				'--app-acc-c-3': { type: 'string' },
 
-				'--color-text': { 'type': 'string' },
+				'--color-text': { type: 'string' },
 
-				'--color-background': { 'type': 'string' },
-				'--color-header': { 'type': 'string' },
-				'--color-sidepanel': { 'type': 'string' },
-				'--color-material': { 'type': 'string' },
-				'--color-content': { 'type': 'string' },
-				'--color-shade': { 'type': 'string' },
-				'--color-active': { 'type': 'string' },
-				'--color-overlay': { 'type': 'string' },
-				'--color-border': { 'type': 'string' },
-				'--color-disabled': { 'type': 'string' },
+				'--color-background': { type: 'string' },
+				'--color-header': { type: 'string' },
+				'--color-sidepanel': { type: 'string' },
+				'--color-material': { type: 'string' },
+				'--color-content': { type: 'string' },
+				'--color-shade': { type: 'string' },
+				'--color-active': { type: 'string' },
+				'--color-overlay': { type: 'string' },
+				'--color-border': { type: 'string' },
+				'--color-disabled': { type: 'string' },
 
-				'--border': { 'type': 'string' },
-				'--shadow': { 'type': 'string' },
+				'--border': { type: 'string' },
+				'--shadow': { type: 'string' },
 
-				'--width-wrapper': { 'type': 'string' },
-				'--width-side': { 'type': 'string' },
-				'--width-max-field': { 'type': 'string' },
-				'--height-header': { 'type': 'string' },
+				'--width-wrapper': { type: 'string' },
+				'--width-side': { type: 'string' },
+				'--width-max-field': { type: 'string' },
+				'--height-header': { type: 'string' },
 			},
 			required: [
 				'--app-prim-1', '--app-prim-2', '--app-prim-3', '--app-prim-c-1', '--app-prim-c-2', '--app-prim-c-3',
@@ -107,5 +107,5 @@ const ThemeSchema = {
 if (ajv.validateSchema(ThemeSchema)) {
 	ajv.addSchema(ThemeSchema, JSchema.ThemeSchema.name);
 } else {
-	console.error(`${JSchema.ThemeSchema.name} did not validate`);
+	throw Error(`${JSchema.ThemeSchema.name} did not validate`);
 }

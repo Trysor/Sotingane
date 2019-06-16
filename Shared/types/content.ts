@@ -17,7 +17,7 @@ export interface ContentEntry {
 
 export interface Content {
 	title: string;
-	access?: AccessRoles;
+	access?: AccessRoles[];
 	route: string;
 	published?: boolean;
 	version?: number;
@@ -33,8 +33,8 @@ export interface Content {
 	folder?: string;
 	nav?: boolean;
 
-	updatedBy?: UserObject;
-	createdBy?: UserObject;
+	updatedBy?: AuthorObject;
+	createdBy?: AuthorObject;
 
 	updatedAt?: Date;
 	createdAt?: Date;
@@ -62,12 +62,13 @@ export interface CmsFolder {
 
 export interface ImageContentData {
 	width: number;
-    height: number;
+	height: number;
 	type: string;
 	url: string;
 }
 
 
-interface UserObject {
+export interface AuthorObject {
 	username: string;
+	_id?: string;
 }

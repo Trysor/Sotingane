@@ -9,7 +9,6 @@ export class AppRouter {
 
 	/**
 	 * Initiates a route
-	 * @param  {Express} app expressModule
 	 */
 	public static initiate(app: Express) {
 		// API routes

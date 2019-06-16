@@ -17,23 +17,22 @@ export class AdminService {
 	// ---------------------------------------
 
 	public getAllusers() {
-		return this.http.client.get<User[]>(this.http.apiUrl(env.API.admin.users));
+		return this.http.client.get<User[]>(env.API.admin.users);
 	}
 
 	public patchUser(user: User) {
-		return this.http.client.patch<boolean>(this.http.apiUrl(env.API.admin.users + '/' + user._id), user);
+		return this.http.client.patch<boolean>(`${env.API.admin.users}/${user._id}`, user);
 	}
 
-
 	public getAllContent() {
-		return this.http.client.get<Content[]>(this.http.apiUrl(env.API.admin.cms));
+		return this.http.client.get<Content[]>(env.API.admin.cms);
 	}
 
 	public getContentPage(route: string) {
-		return this.http.client.get<Content>(this.http.apiUrl(env.API.admin.cms + '/' + route));
+		return this.http.client.get<Content>(`${env.API.admin.cms}/${route}`);
 	}
 
 	public getAggregatedData(query: AggregationQuery) {
-		return this.http.client.post<AggregationResult[]>(this.http.apiUrl(env.API.admin.aggregate), query);
+		return this.http.client.post<AggregationResult[]>(env.API.admin.aggregate, query);
 	}
 }

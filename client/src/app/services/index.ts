@@ -17,5 +17,7 @@ export * from './utility/modal.service';
 export * from './utility/platform.service';
 export * from './utility/loading.service';
 export * from './utility/seo.service';
+export * from './utility/setup.service';
 export * from './utility/storage.service';
+export * from './utility/snackbar.service';
 export * from './utility/token.service';
