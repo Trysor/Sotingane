@@ -223,7 +223,7 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 		const onSubmit = (obs: Observable<Content>) => {
 			obs.pipe(
 				take(1),
-				catchError(() => of( null as Content))
+				catchError(() => of(null as Content))
 			).subscribe(newContent => {
 				if (!newContent) {
 					// TODO: Tell the user why it failed

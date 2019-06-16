@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 
 import { MatDrawer } from '@app/modules/material.types';
 
-import { MobileService, AuthService, SEOService, SetupService } from '@app/services';
+import { MobileService, AuthService, SEOService } from '@app/services';
 
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -20,7 +20,6 @@ export class BaseComponent implements AfterViewInit, OnDestroy {
 	@ViewChild('sidenavRight', { static: false }) private sidenavRight: MatDrawer;
 
 	constructor(
-		public setupService: SetupService,
 		public seoService: SEOService,
 		public mobileService: MobileService,
 		public authService: AuthService,
