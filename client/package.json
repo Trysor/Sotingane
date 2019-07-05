@@ -42,7 +42,8 @@
     "hammerjs": "2.0.8",
     "rxjs": "6.5.2",
     "tslib": "1.10.0",
-    "zone.js": "git+https://git@github.com/angular/zone.js.git"
+    "zone.js": "git+https://git@github.com/angular/zone.js.git",
+    "CKEditorClassicBuild": "../CKEditor"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "0.800.3",

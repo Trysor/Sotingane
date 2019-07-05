@@ -1,21 +1,16 @@
 import { Injectable } from '@angular/core';
-import { CanDeactivate } from '@angular/router';
-
-import { ComposeComponent } from '@app/modules/compose-module/compose-component/compose.component';
-import { AuthService } from '@app/services/controllers/auth.service';
-
-import { Observable } from 'rxjs';
+import { CanDeactivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
-export class DeactivateGuard implements CanDeactivate<ComposeComponent> {
-
-	constructor(private authService: AuthService) { }
-
+export class DeactivateGuard<T extends CanDeactivate<T>> implements CanDeactivate<T> {
 	/**
 	 * Denies the user from leaving a route until conditions are met
 	 */
-	canDeactivate(comp: ComposeComponent): boolean|Observable<boolean> {
-		if (!this.authService.user.getValue()) { return true; }
-		return comp.canDeactivate();
+	canDeactivate(
+		comp: T,
+		currRoute: ActivatedRouteSnapshot,
+		currState: RouterStateSnapshot, nextState?: RouterStateSnapshot) {
+
+		return comp && comp.canDeactivate(comp, currRoute, currState, nextState);
 	}
 }

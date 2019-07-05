@@ -1,6 +1,8 @@
 ﻿import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@app/modules/material.types';
-import { ModalData, ImageModalData, Content } from '@types';
+
+import { ModalData, ImageModalData, Content, StatusMessage } from '@types';
+
 import { ModalComponent } from '@app/modules/shared-module/modals/modal.component';
 import { ImageModalComponent } from '@app/modules/shared-module/modals/imagemodal.component';
 
@@ -8,6 +10,18 @@ import { ImageModalComponent } from '@app/modules/shared-module/modals/imagemoda
 export class ModalService {
 
 	constructor(private dialog: MatDialog) { }
+
+	/**
+	 * Opens a delete content modal for the given content item
+	 */
+	public openHTTPErrorModal(status: StatusMessage) {
+		const data: ModalData = {
+			headerText: `An Error has occured!`,
+			bodyText: status.message,
+			proceedText: 'Okay'
+		};
+		return this.dialog.open(ModalComponent, { data } as MatDialogConfig);
+	}
 
 
 	/**
@@ -20,7 +34,7 @@ export class ModalService {
 			proceedText: 'Delete', proceedColor: 'warn',
 			cancelText: 'Cancel', cancelColor: 'accent',
 		};
-		return this.dialog.open(ModalComponent,  { data } as MatDialogConfig);
+		return this.dialog.open(ModalComponent, { data } as MatDialogConfig);
 	}
 
 	/**
@@ -33,7 +47,7 @@ export class ModalService {
 			proceedColor: 'accent', proceedText: 'Proceed',
 			cancelColor: 'primary', cancelText: 'Cancel',
 		};
-		return this.dialog.open(ModalComponent,  { data } as MatDialogConfig);
+		return this.dialog.open(ModalComponent, { data } as MatDialogConfig);
 	}
 
 	/**
@@ -47,7 +61,7 @@ export class ModalService {
 			cancelText: 'Cancel',
 		};
 
-		return this.dialog.open(ModalComponent,  { data } as MatDialogConfig);
+		return this.dialog.open(ModalComponent, { data } as MatDialogConfig);
 	}
 
 	/**
@@ -62,7 +76,7 @@ export class ModalService {
 			proceedColor: 'primary',
 			proceedText: 'Okay',
 		};
-		return this.dialog.open(ModalComponent,  { data } as MatDialogConfig);
+		return this.dialog.open(ModalComponent, { data } as MatDialogConfig);
 	}
 
 	/**

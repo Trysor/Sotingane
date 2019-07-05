@@ -20,16 +20,9 @@ matrix:
     - env: PROJECT="client"
       addons:
         chrome: stable
-      install:
-        - cd CKEditor && npm install && cd ../client
-        - npm install
-      cache:
-        directories: 
-          - "CKEditor/node_modules" 
-          - "client/node_modules"
-      script:
-        - cd ../CKEditor && npm run build && cd ../client
-        - npm run test
+        cache:
+          directories: 
+            - "client/node_modules"
     - env: PROJECT="CKEditor"
       cache: 
         directories: 

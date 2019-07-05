@@ -1,0 +1,126 @@
+/// <reference path="../../../scss/_theme_vars.scss" />
+
+.editor {
+	box-sizing: border-box;
+	overflow: hidden;
+	display: block;
+
+	::ng-deep .ck-content.ck-editor__editable {
+		padding: 10px 0;
+		min-height: 245px;
+		background: none;
+		border: var(--border);
+		border-style: none none solid none;
+	}
+
+	::ng-deep .ck-editor .ck-toolbar {
+		ul, ol {
+			padding-left: 0 !important;
+		}
+	}
+}
+
+// reference
+// https://github.com/ckeditor/ckeditor5-theme-lark/blob/master/theme/ckeditor5-ui/globals/_colors.css
+::ng-deep :root {
+	--ck-color-base-foreground: 								var(--color-header);
+	--ck-color-base-background: 								var(--color-header);
+	--ck-color-base-border:										var(--color-border);
+	--ck-color-base-action:										var(--color-active);
+	--ck-color-base-focus:										var(--color-active);
+	--ck-color-base-text:										var(--color-text);
+	--ck-color-base-active:										var(--color-active);
+	--ck-color-base-active-focus:								var(--color-active);
+	--ck-color-base-error:										hsl(15, 100%, 43%);
+
+	/* -- Generic colors ------------------------------------------------------------------------ */
+
+	--ck-color-focus-border:									var(--color-border);
+	--ck-color-focus-shadow:									var(--color-background);
+	--ck-color-focus-disabled-shadow:							var(--color-disabled);
+	--ck-color-focus-error-shadow:								hsla(9,100%,56%,.3);
+	--ck-color-text: 											var(--color-text);
+	--ck-color-shadow-drop: 									hsla(0, 0%, 0%, 0.15);
+	--ck-color-shadow-drop-active:								hsla(0, 0%, 0%, 0.2);
+	--ck-color-shadow-inner: 									hsla(0, 0%, 0%, 0.1);
+
+	/* -- Buttons ------------------------------------------------------------------------------- */
+
+	--ck-color-button-default-background: 						transparent;
+	--ck-color-button-default-hover-background: 				var(--color-material);
+	--ck-color-button-default-active-background: 				var(--color-material);
+	--ck-color-button-default-active-shadow:					var(--color-background);
+	--ck-color-button-default-disabled-background:				transparent;
+
+	--ck-color-button-on-background:							var(--color-background);
+	--ck-color-button-on-hover-background:						var(--color-material);
+	--ck-color-button-on-active-background:						var(--color-active);
+	--ck-color-button-on-active-shadow:							var(--color-background);
+	--ck-color-button-on-disabled-background:					var(--color-disabled);
+
+	--ck-color-button-action-background: 						var(--ck-color-base-action);
+	--ck-color-button-action-hover-background: 					var(--color-active);
+	--ck-color-button-action-active-background:					var(--color-active);
+	--ck-color-button-action-active-shadow:						var(--color-background);
+	--ck-color-button-action-disabled-background:				var(--color-disabled);
+	--ck-color-button-action-text: 								var(--ck-color-base-background);
+
+	--ck-color-button-save: 									var(--color-primary);
+	--ck-color-button-cancel: 									hsl(15, 100%, 43%);
+
+	--ck-color-switch-button-off-background:					var(--color-material);
+	--ck-color-switch-button-on-background:						var(--ck-color-button-action-background);
+	--ck-color-switch-button-inner-background:					var(--ck-color-base-background);
+
+	/* -- Dropdown ------------------------------------------------------------------------------ */
+
+	--ck-color-dropdown-panel-background: 						var(--ck-color-base-background);
+	--ck-color-dropdown-panel-border: 							var(--ck-color-base-border);
+
+	/* -- Input --------------------------------------------------------------------------------- */
+
+	--ck-color-input-background: 								var(--ck-color-base-background);
+	--ck-color-input-border: 									var(--color-border);
+	--ck-color-input-error-border:								var(--ck-color-base-error);
+	--ck-color-input-text: 										var(--ck-color-base-text);
+	--ck-color-input-disabled-background: 						var(--color-disabled);
+	--ck-color-input-disabled-border: 							var(--color-border);
+	--ck-color-input-disabled-text: 							var(--color-text);
+
+	/* -- List ---------------------------------------------------------------------------------- */
+
+	--ck-color-list-background: 								var(--ck-color-base-background);
+	--ck-color-list-button-hover-background: 					var(--ck-color-button-default-hover-background);
+	--ck-color-list-button-on-background: 						var(--ck-color-base-active);
+	--ck-color-list-button-on-background-focus: 				var(--ck-color-base-active-focus);
+	--ck-color-list-button-on-text:								var(--color-text);
+
+	/* -- Panel --------------------------------------------------------------------------------- */
+
+	--ck-color-panel-background: 								var(--ck-color-base-background);
+	--ck-color-panel-border: 									var(--ck-color-base-border);
+
+	/* -- Toolbar ------------------------------------------------------------------------------- */
+
+	--ck-color-toolbar-background: 								var(--ck-color-base-foreground);
+	--ck-color-toolbar-border: 									var(--ck-color-base-border);
+
+	/* -- Tooltip ------------------------------------------------------------------------------- */
+
+	--ck-color-tooltip-background: 								var(--ck-color-base-text);
+	--ck-color-tooltip-text: 									var(--ck-color-base-background);
+
+	/* -- Engine -------------------------------------------------------------------------------- */
+
+	--ck-color-engine-placeholder-text: 						var(--color-disabled);
+
+	/* -- Upload -------------------------------------------------------------------------------- */
+
+	--ck-color-upload-bar-background:		 					var(--color-primary);
+	--ck-color-upload-infinite-background:		 				hsla(0, 0%, 0%, 0.1);
+
+	/* -- Link -------------------------------------------------------------------------------- */
+
+	--ck-color-link-default:									var(--color-primary);
+	--ck-color-link-selected-background: 						var(--color-shade);
+}

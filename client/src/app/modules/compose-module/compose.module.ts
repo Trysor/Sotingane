@@ -12,11 +12,12 @@ import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 // Components
 import { ComposeComponent } from './compose-component/compose.component';
-
+import { CKEDitorComponent } from './ckeditor-component/ckeditor.component';
 
 @NgModule({
 	declarations: [
-		ComposeComponent
+		ComposeComponent,
+		CKEDitorComponent
 	],
 	imports: [
 		SharedModule,
