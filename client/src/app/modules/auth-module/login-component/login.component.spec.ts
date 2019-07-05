@@ -4,7 +4,7 @@ import { DebugElement, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
 // Material
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '@app/modules';
 
 // Routing
@@ -42,7 +42,7 @@ describe('LoginComponent', () => {
 				FormBuilder
 			],
 			imports: [
-				BrowserAnimationsModule,
+				NoopAnimationsModule,
 				RouterTestingModule,
 				ReactiveFormsModule,
 				MaterialModule
