@@ -1,7 +1,7 @@
-import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { ReplaySubject } from 'rxjs';
+import { ReplaySubject, BehaviorSubject } from 'rxjs';
 const ClassicEditor = require('CKEditorClassicBuild');
 
 @Component({
@@ -13,8 +13,13 @@ const ClassicEditor = require('CKEditorClassicBuild');
 export class CKEDitorComponent {
 	public readonly ClassicEditor = ClassicEditor;
 	private readonly _editorSubject = new ReplaySubject<any>(1);
+	private readonly _wordCountSubject = new BehaviorSubject<number>(0);
+	private readonly _charCountSubject = new BehaviorSubject<number>(0);
 
 	@Input() form: FormGroup;
+
+	public get WordCount() { return this._wordCountSubject.asObservable(); }
+	public get CharacterCount() { return this._charCountSubject.asObservable(); }
 
 	public get Editor() { return this._editorSubject.asObservable(); }
 
@@ -22,5 +27,11 @@ export class CKEDitorComponent {
 	public editorReady(editor: any) {
 		this._editorSubject.next(editor);
 		this._editorSubject.complete();
+
+		const wordCountPlugin = editor.plugins.get('WordCount');
+		wordCountPlugin.on('update', (evt: any, data: any) => {
+			this._wordCountSubject.next(data.words);
+			this._charCountSubject.next(data.characters);
+		});
 	}
 }

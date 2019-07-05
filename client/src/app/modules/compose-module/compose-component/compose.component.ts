@@ -28,7 +28,7 @@ import { takeUntil, catchError, distinctUntilChanged, finalize } from 'rxjs/oper
 })
 export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeComponent> {
 
-	// Public fields required for HTML
+	// Public readonly fields required for HTML
 	public readonly AccessRoles = AccessRoles;
 	public readonly accessHandler = new AccessHandler();
 	public readonly HistoryHandler: HistoryHandler;
@@ -36,13 +36,14 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 	public readonly formErrorInstant = new FormErrorInstant(); // Form validation errors trigger instantly
 	public readonly ContentForm: FormGroup; // Form
 
-
 	// Public properties used by HTML
 	public get OriginalRoute() { return this._originalContent && this._originalContent.route; }
 	public get FilteredFolderList() { return this._filteredFolders; }
 
 	public get tabIndex() { return this.storage.getSession(StorageKey.ComposeTabIndex); }
 	public set tabIndex(value: string) { this.storage.setSession(StorageKey.ComposeTabIndex, value); }
+
+
 
 
 	// Private helper fields

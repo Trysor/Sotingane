@@ -20,6 +20,14 @@
 	}
 }
 
+.count {
+	margin-top: 10px;
+	font-size: 0.7em;
+	font-weight: 600;
+	text-align: right;
+}
+
+
 // reference
 // https://github.com/ckeditor/ckeditor5-theme-lark/blob/master/theme/ckeditor5-ui/globals/_colors.css
 ::ng-deep :root {

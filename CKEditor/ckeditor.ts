@@ -5,7 +5,6 @@ import EssentialsPlugin from '@ckeditor/ckeditor5-essentials/src/essentials';
 import AlignmentPlugin from '@ckeditor/ckeditor5-alignment/src/alignment';
 import BoldPlugin from '@ckeditor/ckeditor5-basic-styles/src/bold';
 import ItalicPlugin from '@ckeditor/ckeditor5-basic-styles/src/italic';
-
 import HeadingPlugin from '@ckeditor/ckeditor5-heading/src/heading';
 import ParagraphPlugin from '@ckeditor/ckeditor5-paragraph/src/paragraph';
 
@@ -25,6 +24,7 @@ import TablePlugin from '@ckeditor/ckeditor5-table/src/table';
 import TableToolbarPlugin from '@ckeditor/ckeditor5-table/src/tabletoolbar';
 import RemoveFormatPlugin from '@ckeditor/ckeditor5-remove-format/src/removeformat';
 import FontPlugin from '@ckeditor/ckeditor5-font/src/font';
+import WordCountPlugin from '@ckeditor/ckeditor5-word-count/src/wordcount';
 
 // Typings
 import { CKEditorDefaultConfig } from './model';
@@ -54,7 +54,8 @@ ClassicEditor.builtinPlugins = [
 	TablePlugin,
 	TableToolbarPlugin,
 	RemoveFormatPlugin,
-	FontPlugin
+	FontPlugin,
+	WordCountPlugin
 ];
 ClassicEditor.defaultConfig = {
 	toolbar: {
