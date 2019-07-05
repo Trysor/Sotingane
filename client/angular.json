@@ -54,6 +54,18 @@
 									"with": "src/environments/environment.prod.ts"
 								}
 							]
+						},
+						"localssr": {
+							"optimization": true,
+							"outputHashing": "all",
+							"sourceMap": true,
+							"extractCss": true,
+							"namedChunks": false,
+							"aot": true,
+							"extractLicenses": false,
+							"vendorChunk": false,
+							"buildOptimizer": true,
+							"serviceWorker": false
 						}
 					}
 				},
@@ -125,12 +137,12 @@
 							"includePaths": [
 								"src/app/scss"
 							]
-						}
+						},
+						"sourceMap": true
 					},
 					"configurations": {
 						"production": {
 							"optimization": true,
-							"sourceMap": true,
 							"fileReplacements": [
 								{
 									"replace": "src/environments/environment.ts",

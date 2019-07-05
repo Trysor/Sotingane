@@ -35,6 +35,11 @@ module.exports = {
 			/(.+)?express(\\|\/)(.+)?/,
 			path.join(__dirname, 'src'),
 			{}
-		)
+		),
+		new webpack.SourceMapDevToolPlugin({
+			filename: null,
+			exclude: [/node_modules/],
+			test: /\.ts($|\?)/i
+		})
 	]
 };

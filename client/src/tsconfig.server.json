@@ -2,7 +2,9 @@
 	"extends": "../tsconfig.json",
 	"compilerOptions": {
 		"outDir": "../out-tsc/app",
-		"module": "commonjs"
+		"module": "commonjs",
+		"sourceMap": false,
+		"inlineSourceMap": true
 	},
 	"exclude": [
 		"test.ts",
