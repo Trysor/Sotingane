@@ -1,6 +1,6 @@
 ﻿import { Response as Res, NextFunction as Next } from 'express';
 import { QueryCursor, Aggregate, Query } from 'mongoose';
-import { StatusMessage } from './validate';
+import { StatusMessage } from 'types';
 
 interface StreamerOptions {
 	type: 'query' | 'aggregation';

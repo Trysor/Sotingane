@@ -4,5 +4,6 @@ export * from './content';
 export * from './log';
 export * from './seo';
 export * from './settings';
+export * from './statusmessage';
 export * from './table';
 export * from './user';

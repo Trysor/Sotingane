@@ -2,6 +2,9 @@ import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 import * as Ajv from 'ajv';
 import { ErrorObject } from 'ajv';
 
+import { StatusMessage, ErrorMessage } from 'types';
+
+
 /*
  |--------------------------------------------------------------------------
  | AJV
@@ -154,15 +157,6 @@ export const enum THEME_STATUS {
 }
 
 
-export interface StatusMessage {
-	message: string;
-	errors?: ErrorMessage[];
-}
-interface ErrorMessage {
-	property?: string;
-	error: string;
-	params: Ajv.ErrorParameters;
-}
 
 interface SchemaValidation {
 	[key: string]: SchemaValidationObject;
