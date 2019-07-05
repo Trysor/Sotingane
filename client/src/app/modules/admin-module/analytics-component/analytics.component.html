@@ -176,7 +176,11 @@
 	</mat-expansion-panel>
 	<mat-expansion-panel [disabled]="!(data | async)" [expanded]="(state | async) == AnalyticsState.RESULTS" (opened)="setState(AnalyticsState.RESULTS)">
 		<mat-expansion-panel-header>Results</mat-expansion-panel-header>
-		<table-component *ngIf="aggregateForm.get('unwind').value" [settings]="unwindSettings" [data]="data | async"></table-component>
-		<table-component *ngIf="!aggregateForm.get('unwind').value" [settings]="settings" [data]="data | async"></table-component>
+		<ng-template matExpansionPanelContent>
+			<div [ngSwitch]="aggregateForm.get('unwind').value">
+				<table-component *ngSwitchCase="true" [settings]="unwindSettings" [data]="(data | async)"></table-component>
+				<table-component *ngSwitchCase="false" [settings]="settings" [data]="(data | async)"></table-component>
+			</div>
+		</ng-template>
 	</mat-expansion-panel>
 </mat-accordion>

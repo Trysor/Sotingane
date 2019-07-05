@@ -84,27 +84,25 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 		'WeChat', 'Yandex'
 	].sort();
 
-
 	// Results Settings
 	public readonly unwindSettings: TableSettings<AggregationResultUnwinded> = {
 		columns: [
 			{
 				header: 'Timestamp',
 				property: 'logDataTs',
-				val: a => this.datePipe.transform(a.logDataTs, 'yyyy-MM-dd HH:mm:ss')
+				val: a => this.datePipe.transform(a.logDataTs, 'yyyy-MM-dd HH:mm:ss'),
+				tooltip: a => this.datePipe.transform(a.logDataTs, 'yyyy-MM-dd HH:mm:ss'),
 			},
 			{
 				header: 'Route',
 				property: 'route',
+				tooltip: a => a.route,
 			},
 			{
 				header: 'User',
 				property: 'logDataUser',
-				val: a => {
-					const user = this.users.getValue().find(u => u._id === a.logDataUser);
-					if (user) { return user.username; }
-					return 'Anonymous';
-				},
+				val: this._helperUserValue.bind(this),
+				tooltip: this._helperUserValue.bind(this)
 			},
 			{
 				header: 'Browser',
@@ -112,7 +110,7 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 				val: a => a.logDataBrowser ? `${a.logDataBrowser} ${a.logDataBrowserVer}` : 'Unknown'
 			}
 		],
-		mobile: ['logDataTs', 'title', 'logDataUser'],
+		mobile: ['logDataTs', 'route', 'logDataUser'],
 
 		active: 'logDataTs',
 		dir: 'desc',
@@ -251,7 +249,16 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 		this.data.next(null);
 	}
 
-	setState(newState: AnalyticsState) {
+	public setState(newState: AnalyticsState) {
 		this.state.next(newState);
 	}
+
+
+	// HELPERS for settings
+	private _helperUserValue(agg: AggregationResultUnwinded) {
+		const user = this.users.getValue().find(u => u._id === agg.logDataUser);
+		if (user) { return user.username; }
+		return 'Anonymous';
+	}
+
 }
