@@ -31,7 +31,6 @@ Each of the projects require setup before they can be built. Install npm package
 #### CKEditor
 
 * Configure the toolbar and plugins in CKEditor/ckeditor.ts
-* Webpack the Editor by using npm run webpack in the CKEditor folder. This step is required for the Client to work.
 
 #### Client
 
