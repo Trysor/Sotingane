@@ -158,7 +158,7 @@ export class AuthController extends Controller {
 	 * Deletes a user-account of a given id from req.body.id
 	 */
 	@POST({ path: '/deleteaccount', ignore: true, do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
-	public async deleteAccount(req: Req, res: Res, next: Next) { // TODO: Implement security
+	public async deleteAccount(req: Req, res: Res, next: Next) {
 		const id: string = req.body.id;
 
 		try {

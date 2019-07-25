@@ -24,8 +24,7 @@ export class UsersController extends Controller {
 			}
 		).lean().sort('username_lower');
 
-		if (!users) { return res.status(404); } // TODO: Fix me
-		return res.status(200).send(users);
+		return res.status(200).send(users); // At least one user has to exist
 	}
 
 	/**
