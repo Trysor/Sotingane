@@ -71,7 +71,6 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 		private fb: FormBuilder,
 		private cmsService: CMSService,
 		private adminService: AdminService,
-		public platform: PlatformService,
 		public mobileService: MobileService) {
 
 		this.HistoryHandler = new HistoryHandler(this.datePipe);

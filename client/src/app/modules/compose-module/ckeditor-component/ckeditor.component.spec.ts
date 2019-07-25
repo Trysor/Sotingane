@@ -1,5 +1,5 @@
 // Testing
-import { async, ComponentFixture, TestBed, fakeAsync, discardPeriodicTasks } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, async, discardPeriodicTasks, tick } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA, DebugElement } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 
@@ -41,13 +41,14 @@ describe('CKEDitorComponent', () => {
 		});
 
 		fixture.detectChanges();
-
 		editor = await component.Editor.toPromise(); // Aquire the editor instance
-		discardPeriodicTasks(); // Discard tasks set by the CKEditor Angular component by the CK team
+
+		// Discard tasks set by the CKEditor Angular component by the CK team
+		discardPeriodicTasks(); // periodic (setIntervals)
+		tick(Infinity); // timeout (setTimeouts)
 	}));
 
 	afterEach(() => {
-		// if (!!editor) { editor.destroy(); }
 		fixture.destroy();
 	});
 
@@ -65,11 +66,17 @@ describe('CKEDitorComponent', () => {
 		const el: HTMLElement = fixture.nativeElement.querySelector('#content .ck-content');
 		expect(el).toBeDefined('CKEditor should be defined in DOM');
 
+		const wordCountBeforeDataSet = await component.WordCount.toPromise();
+		expect(wordCountBeforeDataSet).toEqual(0, 'The word count should be 0 when the data has not been set');
+
 		// SET DATA
 		editor.setData('<p>hello world!</p>');
 		fixture.detectChanges();
 
 		expect(component.form.get('content').value).toContain('<p>hello world!</p>',
 			'The form should have been updated with content from CKEditor');
+
+		const wordCountAfterDataSet = await component.WordCount.toPromise();
+		expect(wordCountAfterDataSet).toEqual(2, 'The word count should have been updated based on the content set');
 	}));
 });
