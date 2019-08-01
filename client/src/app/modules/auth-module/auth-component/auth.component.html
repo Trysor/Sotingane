@@ -1,5 +1,5 @@
 <h1>Login</h1>
-<div [ngClass]="{auth: true, mobile: (mobileService.isMobile() | async)}">
+<div class="auth" appMobile>
 	<login-component ngClass="login"></login-component>
 	<div ngClass="register">
 		<h2>Do not have an account?</h2>

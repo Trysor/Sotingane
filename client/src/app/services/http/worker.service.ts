@@ -17,8 +17,7 @@ export class WorkerService {
 		private updates: SwUpdate,
 		private snackBar: SnackBarService) {
 
-		if (!env.production) { return; }
-		if (this.platform.isServer) { return; }
+		if (!env.production || this.platform.isServer) { return; }
 
 		// TODO: revert this back when it has been fixed
 		// interval(6 * 60 * 60).subscribe(() => updates.checkForUpdate());

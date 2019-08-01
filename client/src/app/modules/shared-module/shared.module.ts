@@ -38,7 +38,8 @@ import { TableComponent } from './table-component/table.component';
 		NumberPipe,
 		SectionWrapperComponent,
 		SectionComponent,
-		TableComponent
+		TableComponent,
+		MobileDirective
 	],
 	declarations: [
 		TimeAgoPipe,

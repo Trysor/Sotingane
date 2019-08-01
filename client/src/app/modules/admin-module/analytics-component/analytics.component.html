@@ -1,11 +1,11 @@
-<mat-accordion [ngClass]="{ analyze: true, mobile: (mobileService.isMobile() | async) }">
+<mat-accordion class="analyze" appMobile #mobile="appMobile">
 
 	<mat-expansion-panel [expanded]="(state | async) !== AnalyticsState.RESULTS" (opened)="setState(AnalyticsState.QUERY)">
 		<mat-expansion-panel-header>Query</mat-expansion-panel-header>
 
 		<form [formGroup]="aggregateForm" id="aggregateForm" autocomplete="off" (ngSubmit)="submitForm()">
 
-			<sectionwrapper-component>
+			<sectionwrapper-component appMobile>
 				<section-component header="Content Filters">
 					<!-- ROUTE -->
 					<div class="field">
@@ -32,7 +32,7 @@
 								   [max]="maxCreatedAfterDate"
 								   formControlName="createdAfterDate" type="text" autocomplete="off">
 							<mat-datepicker-toggle matPrefix [for]="createdAfterPicker"></mat-datepicker-toggle>
-							<mat-datepicker #createdAfterPicker [touchUi]="mobileService.isMobile() | async"></mat-datepicker>
+							<mat-datepicker #createdAfterPicker [touchUi]="mobile.isMobile | async"></mat-datepicker>
 							<button *ngIf="aggregateForm.get('createdAfterDate').value" matSuffix mat-icon-button
 									(click)="aggregateForm.get('createdAfterDate').reset('')" aria-label="Reset created after date">
 								<mat-icon>clear</mat-icon>
@@ -45,7 +45,7 @@
 								   [max]="today" [min]="minCreatedBeforeDate"
 								   formControlName="createdBeforeDate" type="text" autocomplete="off">
 							<mat-datepicker-toggle matPrefix [for]="createdBeforePicker"></mat-datepicker-toggle>
-							<mat-datepicker #createdBeforePicker [touchUi]="mobileService.isMobile() | async"></mat-datepicker>
+							<mat-datepicker #createdBeforePicker [touchUi]="mobile.isMobile | async"></mat-datepicker>
 							<button *ngIf="aggregateForm.get('createdBeforeDate').value" matSuffix mat-icon-button
 									(click)="aggregateForm.get('createdBeforeDate').reset('')" aria-label="Reset created before date">
 								<mat-icon>clear</mat-icon>
@@ -116,7 +116,7 @@
 									(click)="aggregateForm.get('seenAfterDate').reset('')">
 								<mat-icon>clear</mat-icon>
 							</button>
-							<mat-datepicker #seenAfterPicker [touchUi]="mobileService.isMobile() | async"></mat-datepicker>
+							<mat-datepicker #seenAfterPicker [touchUi]="mobile.isMobile | async"></mat-datepicker>
 						</mat-form-field>
 						<!-- SEEN BEFORE -->
 						<mat-form-field appearance="outline">
@@ -129,7 +129,7 @@
 									(click)="aggregateForm.get('seenBeforeDate').reset('')">
 								<mat-icon>clear</mat-icon>
 							</button>
-							<mat-datepicker #seenBeforePicker [touchUi]="mobileService.isMobile() | async"></mat-datepicker>
+							<mat-datepicker #seenBeforePicker [touchUi]="mobile.isMobile | async"></mat-datepicker>
 						</mat-form-field>
 					</div>
 

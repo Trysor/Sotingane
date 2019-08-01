@@ -1,2 +1,3 @@
-﻿export * from './FormErrorInstant';
-export * from './AccessHandler';
+﻿export * from './AccessHandler';
+export * from './Destroyable';
+export * from './FormErrorInstant';

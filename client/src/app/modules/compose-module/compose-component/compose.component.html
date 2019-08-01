@@ -1,5 +1,5 @@
 <h1>Compose</h1>
-<div class="compose" [ngClass]="{ mobile: (mobileService.isMobile() | async) }">
+<div class="compose" appMobile>
 	<form [formGroup]="ContentForm" (ngSubmit)="submitForm()" id="ContentForm">
 
 		<mat-tab-group [(selectedIndex)]="tabIndex">

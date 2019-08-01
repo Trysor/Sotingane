@@ -24,6 +24,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 	@Input() filterSettings: TableFilterSettings = {}; // default empty object
 	@Input() set data(value: object[]) { this.Source.data = value || []; }
 
+	// HTML helpers
 	public readonly ColumnType = ColumnType;
 	public readonly isNaN = isNaN;
 

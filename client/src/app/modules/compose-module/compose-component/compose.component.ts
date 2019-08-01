@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ChangeDetectionStrategy, Optional } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Optional } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, CanDeactivate } from '@angular/router';
 import { DatePipe } from '@angular/common';
@@ -6,8 +6,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 import { MatSelectChange } from '@app/modules/material.types';
 
-import { FormErrorInstant, AccessHandler } from '@app/classes';
-import { ModalService, CMSService, MobileService, AdminService, StorageService, StorageKey, PlatformService } from '@app/services';
+import { FormErrorInstant, AccessHandler, DestroyableClass } from '@app/classes';
+import { ModalService, CMSService, AdminService, StorageService, StorageKey } from '@app/services';
 
 import { HistoryHandler } from './compose.history.handler';
 
@@ -15,7 +15,7 @@ import { Content, AccessRoles } from '@types';
 import { CONTENT_MAX_LENGTH } from '@global';
 
 
-import { BehaviorSubject, Subject, of, pipe, Observable } from 'rxjs';
+import { BehaviorSubject, of, pipe, Observable } from 'rxjs';
 import { takeUntil, catchError, distinctUntilChanged, finalize } from 'rxjs/operators';
 
 
@@ -26,7 +26,7 @@ import { takeUntil, catchError, distinctUntilChanged, finalize } from 'rxjs/oper
 	styleUrls: ['./compose.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeComponent> {
+export class ComposeComponent extends DestroyableClass implements CanDeactivate<ComposeComponent> {
 
 	// Public readonly fields required for HTML
 	public readonly AccessRoles = AccessRoles;
@@ -42,13 +42,6 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 
 	public get tabIndex() { return this.storage.getSession(StorageKey.ComposeTabIndex); }
 	public set tabIndex(value: string) { this.storage.setSession(StorageKey.ComposeTabIndex, value); }
-
-
-
-
-	// Private helper fields
-	private readonly _ngUnsub = new Subject();
-
 
 
 	// FOLDER FIELDS
@@ -70,9 +63,9 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 		private route: ActivatedRoute,
 		private fb: FormBuilder,
 		private cmsService: CMSService,
-		private adminService: AdminService,
-		public mobileService: MobileService) {
+		private adminService: AdminService) {
 
+		super();
 		this.HistoryHandler = new HistoryHandler(this.datePipe);
 
 		// Form
@@ -120,7 +113,7 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 
 
 	private initFormHooks() {
-		const pipes = <T>() => pipe<Observable<T>, Observable<T>, Observable<T>>(distinctUntilChanged(), takeUntil(this._ngUnsub));
+		const pipes = <T>() => pipe<Observable<T>, Observable<T>, Observable<T>>(distinctUntilChanged(), takeUntil(this.OnDestroy));
 
 		// Create Folder autocomplete list
 		this.cmsService.getContentList().pipe(pipes()).subscribe(contentList => this.setFoldersFromList(contentList));
@@ -182,13 +175,6 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 	// ---------------------------------------
 	// ------------- INTERFACES --------------
 	// ---------------------------------------
-
-
-	// Implements interface: OnDestroy
-	ngOnDestroy() {
-		this._ngUnsub.next();
-		this._ngUnsub.complete();
-	}
 
 
 	// Implements interface: CanDeactivate<ComposeComponent>

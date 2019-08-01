@@ -1,19 +1,18 @@
-import { Component, OnDestroy, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 
-import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 
 import {
 	AggregationQuery, AggregationResult, AggregationResultSummarized, AggregationResultUnwinded, User, TableSettings
 } from '@types';
-import { CMSService, AdminService, MobileService, SnackBarService } from '@app/services';
+import { AdminService, SnackBarService } from '@app/services';
 
-import { FormErrorInstant, AccessHandler } from '@app/classes';
+import { FormErrorInstant, AccessHandler, DestroyableClass } from '@app/classes';
 
 import { min as DateMin } from 'date-fns';
 
-import { Subject, BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { takeUntil, distinctUntilChanged, catchError } from 'rxjs/operators';
 
 enum AnalyticsState {
@@ -28,8 +27,7 @@ enum AnalyticsState {
 	styleUrls: ['./analytics.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AnalyticsComponent implements OnDestroy, AfterViewInit {
-	private _ngUnsub = new Subject();
+export class AnalyticsComponent extends DestroyableClass implements AfterViewInit {
 
 	// Subjects
 	public data = new BehaviorSubject<AggregationResult[]>(null);
@@ -163,13 +161,12 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 
 
 	constructor(
-		public mobileService: MobileService,
-		private router: Router,
 		private fb: FormBuilder,
-		private cmsService: CMSService,
 		private adminService: AdminService,
 		private snackBar: SnackBarService,
 		private datePipe: DatePipe) {
+
+		super();
 
 		// Form
 		const _disableAccessOnInit = true;
@@ -192,11 +189,11 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 		});
 
 		// Get users
-		this.adminService.getAllusers().pipe(takeUntil(this._ngUnsub)).subscribe(users => {
+		this.adminService.getAllusers().pipe(takeUntil(this.OnDestroy)).subscribe(users => {
 			this.users.next(users);
 		});
 
-		this.aggregateForm.get('accessFilter').valueChanges.pipe(takeUntil(this._ngUnsub)).subscribe(val => {
+		this.aggregateForm.get('accessFilter').valueChanges.pipe(takeUntil(this.OnDestroy)).subscribe(val => {
 			if (val) {
 				this.aggregateForm.get('access').enable();
 			} else {
@@ -205,10 +202,7 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 		});
 	}
 
-	ngOnDestroy(): void {
-		this._ngUnsub.next();
-		this._ngUnsub.complete();
-	}
+
 
 	ngAfterViewInit(): void {
 		// Track changes

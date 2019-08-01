@@ -1,16 +1,16 @@
-import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@app/modules/material.types';
 
 import { DatePipe } from '@angular/common';
 
 import { AdminService, AuthService } from '@app/services';
-import { AccessHandler } from '@app/classes';
+import { AccessHandler, DestroyableClass } from '@app/classes';
 
 import { User, TableSettings, ColumnType } from '@types';
 import { UserModalComponent, UserModalData } from '../user-modal-component/user.modal.component';
 
 
-import { Subject, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 
@@ -21,8 +21,7 @@ import { takeUntil } from 'rxjs/operators';
 	styleUrls: ['./users.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class UsersComponent implements OnDestroy {
-	private _ngUnsub = new Subject();
+export class UsersComponent extends DestroyableClass {
 	public data = new BehaviorSubject<User[]>(null);
 
 	private readonly _accessHandler = new AccessHandler();
@@ -81,21 +80,16 @@ export class UsersComponent implements OnDestroy {
 		private datePipe: DatePipe,
 		public authService: AuthService,
 		public adminService: AdminService) {
+
+		super();
 		this.updateList();
 	}
-
-
-	ngOnDestroy(): void {
-		this._ngUnsub.next();
-		this._ngUnsub.complete();
-	}
-
 
 	/**
 	 * Updates the user list
 	 */
 	private updateList() {
-		this.adminService.getAllusers().pipe(takeUntil(this._ngUnsub)).subscribe(users => {
+		this.adminService.getAllusers().pipe(takeUntil(this.OnDestroy)).subscribe(users => {
 			this.data.next(users);
 		});
 	}

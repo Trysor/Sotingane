@@ -1,34 +1,31 @@
-import { Directive, Input, Renderer2, ElementRef, OnDestroy } from '@angular/core';
+import { Directive, Renderer2, ElementRef } from '@angular/core';
 
+import { DestroyableClass } from '@app/classes';
 import { MobileService } from '@app/services/utility/mobile.service';
 
-import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Directive({
 	selector: '[appMobile]',
-	exportAs: 'mobile'
+	exportAs: 'appMobile'
 })
-export class MobileDirective implements OnDestroy {
-	private _ngUnsub = new Subject();
-
+export class MobileDirective extends DestroyableClass {
 	get isMobile() {
-		return this.mobile.isMobile();
+		return this.mobile.isMobile().asObservable();
 	}
 
 	constructor(private el: ElementRef, private renderer: Renderer2, private mobile: MobileService) {
+		super();
 
-		this.mobile.isMobile().pipe(takeUntil(this._ngUnsub)).subscribe((isMobile) => {
+		console.log('MOBILE DIRECTIVE INSTANTIATED', el);
+
+		if (!el || !el.nativeElement.classList) { return; }
+		this.mobile.isMobile().pipe(takeUntil(this.OnDestroy)).subscribe(isMobile => {
 			if (isMobile) {
 				this.renderer.addClass(this.el.nativeElement, 'mobile');
 			} else {
 				this.renderer.removeClass(this.el.nativeElement, 'mobile');
 			}
 		});
-	}
-
-	ngOnDestroy() {
-		this._ngUnsub.next();
-		this._ngUnsub.complete();
 	}
 }

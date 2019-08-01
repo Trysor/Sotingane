@@ -1,12 +1,13 @@
-import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
 import { CMSService, MobileService } from '@app/services';
 import { SearchResultContent, TableSettings, ColumnType, TableFilterSettings } from '@types';
 
-import { Subject, BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { takeUntil, take, catchError } from 'rxjs/operators';
+import { DestroyableClass } from '@app/classes';
 
 @Component({
 	selector: 'search-results-component',
@@ -14,9 +15,7 @@ import { takeUntil, take, catchError } from 'rxjs/operators';
 	styleUrls: ['./search.results.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SearchResultsComponent implements OnDestroy {
-	private _ngUnsub = new Subject();
-
+export class SearchResultsComponent extends DestroyableClass {
 	public data = new BehaviorSubject<SearchResultContent[]>([]);
 
 	public readonly settings: TableSettings<SearchResultContent> = {
@@ -78,13 +77,10 @@ export class SearchResultsComponent implements OnDestroy {
 		public route: ActivatedRoute,
 		public mobileService: MobileService) {
 
-		this.route.paramMap.pipe(takeUntil(this._ngUnsub)).subscribe(p => {
+		super();
+		this.route.paramMap.pipe(takeUntil(this.OnDestroy)).subscribe(p => {
 			this.setResults(p.get('term'));
 		});
-	}
-
-	ngOnDestroy() {
-		this._ngUnsub.complete();
 	}
 
 	/**
@@ -94,7 +90,7 @@ export class SearchResultsComponent implements OnDestroy {
 		this.cmsService.searchContent(term).pipe(
 			take(1),
 			catchError(() => of(null)),
-			takeUntil(this._ngUnsub)
+			takeUntil(this.OnDestroy)
 		).subscribe(
 			list => this.data.next(!!list && Array.isArray(list) ? list : null)
 		);

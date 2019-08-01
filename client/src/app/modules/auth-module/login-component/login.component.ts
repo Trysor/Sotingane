@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -6,8 +6,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { User } from '@types';
 import { AuthService } from '@app/services';
 
-import { Subject, BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { takeUntil, catchError } from 'rxjs/operators';
+import { DestroyableClass } from '@app/classes';
 
 
 enum STATES {
@@ -23,9 +24,7 @@ enum STATES {
 	styleUrls: ['./login.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LoginComponent implements OnDestroy {
-	private _ngUnsub = new Subject();
-
+export class LoginComponent extends DestroyableClass {
 	public loginForm: FormGroup;
 	public STATES = STATES;
 	public state = new BehaviorSubject<STATES>(STATES.READY);
@@ -34,15 +33,17 @@ export class LoginComponent implements OnDestroy {
 		private router: Router,
 		private fb: FormBuilder,
 		public authService: AuthService) {
+
+		super();
 		this.loginForm = fb.group({
 			username: ['', Validators.required],
 			password: ['', Validators.required]
 		});
-		authService.user.pipe(takeUntil(this._ngUnsub)).subscribe(user => {
+		authService.user.pipe(takeUntil(this.OnDestroy)).subscribe(user => {
 			if (!user) { this.state.next(STATES.READY); }
 		});
 
-		this.state.pipe(takeUntil(this._ngUnsub)).subscribe(state => {
+		this.state.pipe(takeUntil(this.OnDestroy)).subscribe(state => {
 			if (state === this.STATES.LOADING) {
 				this.loginForm.get('username').disable();
 				this.loginForm.get('password').disable();
@@ -51,11 +52,6 @@ export class LoginComponent implements OnDestroy {
 				this.loginForm.get('password').enable();
 			}
 		});
-	}
-
-	ngOnDestroy() {
-		this._ngUnsub.next();
-		this._ngUnsub.complete();
 	}
 
 

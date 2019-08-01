@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 import { Content, CmsFolder } from '@types';
-import { CMSService, MobileService } from '@app/services';
+import { CMSService } from '@app/services';
 
 import { BehaviorSubject } from 'rxjs';
 
@@ -21,13 +21,9 @@ export class NavComponent {
 		return a.title.localeCompare(b.title);
 	}
 
-	constructor(
-		public mobileService: MobileService,
-		private cmsService: CMSService) {
-
+	constructor(private cmsService: CMSService) {
 		// Subscribe to content updates
 		this.cmsService.getContentList().subscribe(contentList => this.updateContentList(contentList));
-
 	}
 
 	/**

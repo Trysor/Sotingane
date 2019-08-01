@@ -7,8 +7,8 @@ import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { CMSService, AuthService, ModalService, ContentService, SettingsService } from '@app/services';
 import { AccessRoles } from '@types';
 
-import { Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
+import { DestroyableClass } from '@app/classes';
 
 
 @Component({
@@ -17,7 +17,7 @@ import { takeUntil, filter } from 'rxjs/operators';
 	styleUrls: ['./content.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ContentComponent implements AfterViewInit, OnDestroy {
+export class ContentComponent extends DestroyableClass implements AfterViewInit, OnDestroy {
 	// Content
 	@ViewChild('contentHost', { static: false }) private _contentHost: ElementRef<HTMLDivElement>;
 
@@ -25,9 +25,6 @@ export class ContentComponent implements AfterViewInit, OnDestroy {
 	public readonly AccessRoles = AccessRoles;
 	public readonly isPlatformServer: boolean;
 	public get settings() { return this.settingsService.settings; }
-
-	// Code helpers
-	private readonly _ngUnsub = new Subject();
 
 	// Constructor
 	constructor(
@@ -39,23 +36,22 @@ export class ContentComponent implements AfterViewInit, OnDestroy {
 		public authService: AuthService,
 		public cmsService: CMSService) {
 
+		super();
 		this.router.events.pipe(
-			filter(e => e instanceof NavigationEnd), takeUntil(this._ngUnsub)
+			filter(e => e instanceof NavigationEnd), takeUntil(this.OnDestroy)
 		).subscribe(() => {
 			this.cmsService.requestContent(this.route.snapshot.params.content);
 		});
 	}
 
 	ngAfterViewInit() {
-		this.cmsService.content.pipe(filter(c => !!c), takeUntil(this._ngUnsub)).subscribe(content => {
+		this.cmsService.content.pipe(filter(c => !!c), takeUntil(this.OnDestroy)).subscribe(content => {
 			this.contentService.buildContentForElement(this._contentHost, content); // Build content
 		});
 	}
 
 	ngOnDestroy() {
-		// Also unsubscribe from other observables
-		this._ngUnsub.next();
-		this._ngUnsub.complete();
+		super.ngOnDestroy();
 		// Clean components
 		this.contentService.cleanEmbeddedComponents();
 		// We're no longer watching content

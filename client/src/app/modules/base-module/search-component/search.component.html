@@ -1,4 +1,4 @@
-<div [ngClass]="{ searchBox: true, mobile: (mobileService.isMobile() | async), wide: (form.get('search').value.length > 0), 'altCol': alternativeColor }">
+<div [ngClass]="{ searchBox: true, wide: (form.get('search').value.length > 0), 'altCol': alternativeColor }" appMobile>
 	<form [formGroup]="form" (ngSubmit)="search()">
 		<mat-form-field class="field" floatLabel="never">
 			<button matPrefix mat-icon-button type="submit" aria-label="Search"><mat-icon>search</mat-icon></button>
