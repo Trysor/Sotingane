@@ -17,8 +17,6 @@ export class MobileDirective extends DestroyableClass {
 	constructor(private el: ElementRef, private renderer: Renderer2, private mobile: MobileService) {
 		super();
 
-		console.log('MOBILE DIRECTIVE INSTANTIATED', el);
-
 		if (!el || !el.nativeElement.classList) { return; }
 		this.mobile.isMobile().pipe(takeUntil(this.OnDestroy)).subscribe(isMobile => {
 			if (isMobile) {

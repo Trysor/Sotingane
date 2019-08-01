@@ -1,8 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { DebugElement, Injectable, Component } from '@angular/core';
+import { Component } from '@angular/core';
 
 
+import { MobileDirective } from '@app/directives';
 import { MobileService } from '@app/services';
 import { mobileServiceStub } from '@app/services/tests/stubs';
 
@@ -20,18 +21,15 @@ describe('AuthComponent', () => {
 
 	beforeEach(async(() => {
 		TestBed.configureTestingModule({
-			declarations: [AuthComponent, LoginStubComponent],
+			declarations: [AuthComponent, LoginStubComponent, MobileDirective],
 			providers: [{ provide: MobileService, useValue: mobileServiceStub }],
-		})
-			.compileComponents();
-	}));
+		}).compileComponents();
 
-	beforeEach(() => {
 		fixture = TestBed.createComponent(AuthComponent);
 		component = fixture.componentInstance;
 		mobileService = TestBed.get(MobileService);
 		fixture.detectChanges();
-	});
+	}));
 
 	it('should create', () => {
 		expect(component).toBeTruthy();
