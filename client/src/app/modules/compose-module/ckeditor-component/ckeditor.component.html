@@ -1,6 +1,6 @@
-<div [formGroup]="form">
-		<ckeditor *ngIf="(!!form && !!ClassicEditor)" class="editor" id="content" formControlName="content"
-		[editor]="ClassicEditor" (ready)="editorReady($event)"></ckeditor>
+<ng-container [formGroup]="form">
+	<ckeditor *ngIf="(!!form && !!ClassicEditor)" class="editor" id="content" formControlName="content"
+	[editor]="ClassicEditor" (ready)="editorReady($event)"></ckeditor>
 
-		<div class="count">{{ WordCount | async }} words, {{ CharacterCount | async }} characters</div>
-</div>
+	<div class="count">{{ WordCount | async }} words, {{ CharacterCount | async }} characters</div>
+</ng-container>

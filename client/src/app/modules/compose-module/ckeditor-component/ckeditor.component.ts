@@ -29,7 +29,7 @@ export class CKEDitorComponent {
 		this._editorSubject.complete();
 
 		const wordCount = editor.plugins.get('WordCount');
-		const container = wordCount.wordCountContainer // TODO: Once the (CKE plugin-) destroy bug is fixed, remove this line
+		const container = wordCount.wordCountContainer; // TODO: Once the (CKE plugin-) destroy bug is fixed, remove this line
 
 		wordCount.on('update', (evt: any, data: any) => {
 			this._wordCountSubject.next(data.words);
