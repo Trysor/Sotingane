@@ -32,7 +32,7 @@ module.exports = {
 				use: [
 					{
 						loader: 'style-loader',
-						options: { singleton: true }
+						options: { injectType: 'singletonStyleTag' }
 					},
 					{
 						loader: 'postcss-loader',

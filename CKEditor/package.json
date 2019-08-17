@@ -29,17 +29,17 @@
 		"@ckeditor/ckeditor5-theme-lark": "14.1.1"
 	},
 	"devDependencies": {
-		"@ckeditor/ckeditor5-dev-utils": "12.0.3",
-		"@ckeditor/ckeditor5-dev-webpack-plugin": "8.0.3",
-		"@types/node": "12.6.8",
+		"@ckeditor/ckeditor5-dev-utils": "12.0.5",
+		"@ckeditor/ckeditor5-dev-webpack-plugin": "8.0.5",
+		"@types/node": "12.7.2",
 		"postcss-loader": "3.0.0",
 		"raw-loader": "3.1.0",
-		"style-loader": "0.23.1",
-		"terser-webpack-plugin": "1.3.0",
+		"style-loader": "1.0.0",
+		"terser-webpack-plugin": "1.4.1",
 		"ts-loader": "6.0.4",
 		"tslint": "5.18.0",
 		"typescript": "3.5.3",
-		"webpack": "4.37.0",
+		"webpack": "4.39.2",
 		"webpack-cli": "3.3.6",
 		"wrapper-webpack-plugin": "2.1.0"
 	}
