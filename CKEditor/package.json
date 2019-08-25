@@ -37,10 +37,10 @@
 		"style-loader": "1.0.0",
 		"terser-webpack-plugin": "1.4.1",
 		"ts-loader": "6.0.4",
-		"tslint": "5.18.0",
+		"tslint": "5.19.0",
 		"typescript": "3.5.3",
 		"webpack": "4.39.2",
-		"webpack-cli": "3.3.6",
+		"webpack-cli": "3.3.7",
 		"wrapper-webpack-plugin": "2.1.0"
 	}
 }
