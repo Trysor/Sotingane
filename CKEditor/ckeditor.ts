@@ -13,6 +13,7 @@ import ImagePlugin from '@ckeditor/ckeditor5-image/src/image';
 import ImagecaptionPlugin from '@ckeditor/ckeditor5-image/src/imagecaption';
 import ImagestylePlugin from '@ckeditor/ckeditor5-image/src/imagestyle';
 import ImagetoolbarPlugin from '@ckeditor/ckeditor5-image/src/imagetoolbar';
+import SimpleUploadAdapterPlugin from '@ckeditor/ckeditor5-upload/src/adapters/simpleuploadadapter';
 
 // Features
 import LinkPlugin from '@ckeditor/ckeditor5-link/src/link';
@@ -46,6 +47,7 @@ ClassicEditor.builtinPlugins = [
 	ImagecaptionPlugin,
 	ImagestylePlugin,
 	ImagetoolbarPlugin,
+	SimpleUploadAdapterPlugin,
 	LinkPlugin,
 	ListPlugin,
 	BlockquotePlugin,
