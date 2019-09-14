@@ -14,6 +14,13 @@ export interface CKEditorDefaultConfig {
 		removeProviders?: CKEMediaEmbedProviders[];
 		extraProviders?: string[];
 	};
+	simpleUpload?: {
+		uploadUrl: string;
+		headers?: {
+			'X-CSRF-TOKEN'?: string;
+			Authorization?: string;
+		}
+	};
 	table?: {
 		contentToolbar: CKETablePluginToolbar[];
 	};
@@ -32,6 +39,6 @@ type CKETablePluginToolbar = 'tableColumn' | 'tableRow' | 'mergeTableCells';
 type CKEToolbarItems =
 	'heading' | 'bold' | 'italic' | 'link' | 'bulletedList' | 'numberedList' | 'removeFormat'
 	| 'fontSize' | 'fontFamily' | 'fontSize' | 'fontColor' |
-	'alignment' | 'blockQuote' | 'code' | 'mediaEmbed' | 'insertTable' | 'undo' | 'redo';
+	'alignment' | 'blockQuote' | 'code' | 'imageUpload' | 'mediaEmbed' | 'insertTable' | 'undo' | 'redo';
 
 type CKEToolbarItemSpacer = '|';

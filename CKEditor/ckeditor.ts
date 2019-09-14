@@ -13,7 +13,10 @@ import ImagePlugin from '@ckeditor/ckeditor5-image/src/image';
 import ImagecaptionPlugin from '@ckeditor/ckeditor5-image/src/imagecaption';
 import ImagestylePlugin from '@ckeditor/ckeditor5-image/src/imagestyle';
 import ImagetoolbarPlugin from '@ckeditor/ckeditor5-image/src/imagetoolbar';
-import SimpleUploadAdapterPlugin from '@ckeditor/ckeditor5-upload/src/adapters/simpleuploadadapter';
+
+// Upload
+import ImageUploadPlugin from '@ckeditor/ckeditor5-image/src/imageupload';
+import CustomUploadAdapter from './plugins/customUploadAdapter/customUploadAdapter';
 
 // Features
 import LinkPlugin from '@ckeditor/ckeditor5-link/src/link';
@@ -47,7 +50,8 @@ ClassicEditor.builtinPlugins = [
 	ImagecaptionPlugin,
 	ImagestylePlugin,
 	ImagetoolbarPlugin,
-	SimpleUploadAdapterPlugin,
+	ImageUploadPlugin,
+	CustomUploadAdapter,
 	LinkPlugin,
 	ListPlugin,
 	BlockquotePlugin,
@@ -73,7 +77,7 @@ ClassicEditor.defaultConfig = {
 			'|',
 			'blockQuote', 'code',
 			'|',
-			'mediaEmbed', 'insertTable',
+			'imageUpload', 'mediaEmbed', 'insertTable',
 			'|',
 			'undo', 'redo'
 		]
@@ -98,8 +102,10 @@ ClassicEditor.defaultConfig = {
 			{ name: 'alignRight', icon: 'right' },
 		]
 	},
+
 	table: {
 		contentToolbar: [ 'tableColumn', 'tableRow', 'mergeTableCells' ]
 	},
+
 	language: 'en'
 };
