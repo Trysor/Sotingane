@@ -1,9 +1,8 @@
 import { Express, Router } from 'express';
 import {
 	AdminController, AuthController, CMSController, UsersController,
-	ErrorController, SettingsController, ThemeController
+	FilesController, ErrorController, SettingsController, ThemeController
 } from './controllers';
-
 
 export class AppRouter {
 
@@ -14,6 +13,7 @@ export class AppRouter {
 		// API routes
 		const apiRoutes = Router();
 		apiRoutes.use('/cms', new CMSController().router);
+		apiRoutes.use('/files', new FilesController().router);
 		apiRoutes.use('/admin', new AdminController().router);
 		apiRoutes.use('/admin', new UsersController().router);
 		apiRoutes.use('/auth', new AuthController().router);

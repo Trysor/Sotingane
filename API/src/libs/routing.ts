@@ -38,12 +38,13 @@ const getRouter = (target: Controller): Router => {
  |--------------------------------------------------------------------------
 */
 
-export const isProduction = configUtil.getEnv('NODE_ENV') === 'production';
+const env = configUtil.getEnv('NODE_ENV');
+export const isProduction = env === 'production';
 
 
 /*
  |--------------------------------------------------------------------------
- | Decorators
+ | CRUD Decorators
  |--------------------------------------------------------------------------
 */
 

@@ -1,6 +1,6 @@
 ﻿import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
-import { status, ajv, JSchema, USERS_STATUS, validate } from '../libs/validate';
+import { status, JSchema, USERS_STATUS, validate, RegisterSchema } from '../libs/validate';
 import { User, AccessRoles } from '../../types';
 import { UserModel, UserDoc } from '../models';
 
@@ -68,42 +68,39 @@ export class UsersController extends Controller {
 		}
 		UserModel.findById(user._id, patchUser);
 	}
-}
 
-/*
- |--------------------------------------------------------------------------
- | JSON schema
- |--------------------------------------------------------------------------
-*/
+	// ---------------------------------------
+	// ------------ JSON SCHEMAS -------------
+	// ---------------------------------------
 
-const userAdminUpdateUser = {
-	$id: JSchema.UserAdminUpdateUser.name,
-	type: 'object',
-	additionalProperties: false,
-	properties: {
-		_id: {
-			type: 'string',
-			maxLength: 24,
-			minLength: 24
-		},
-		username: {
-			type: 'string',
-		},
-		roles: {
-			type: 'array',
-			items: {
-				type: 'string',
-				enum: Object.values(AccessRoles)
+
+	@RegisterSchema(JSchema.UserAdminUpdateUser)
+	public get patchUserSchema() {
+		return {
+			type: 'object',
+			additionalProperties: false,
+			properties: {
+				_id: {
+					type: 'string',
+					maxLength: 24,
+					minLength: 24
+				},
+				username: {
+					type: 'string',
+				},
+				roles: {
+					type: 'array',
+					items: {
+						type: 'string',
+						enum: Object.values(AccessRoles)
+					},
+					uniqueItems: true
+				}
 			},
-			uniqueItems: true
-		}
-	},
-	required: ['_id', 'username', 'roles']
-};
-
-if (ajv.validateSchema(userAdminUpdateUser)) {
-	ajv.addSchema(userAdminUpdateUser, JSchema.UserAdminUpdateUser.name);
-} else {
-	throw Error(`${JSchema.UserAdminUpdateUser.name} did not validate`);
+			required: ['_id', 'username', 'roles']
+		};
+	}
 }
+
+
 

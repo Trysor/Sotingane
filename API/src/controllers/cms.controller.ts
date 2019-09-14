@@ -4,10 +4,10 @@ import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 import { UAParser } from 'ua-parser-js';
 import { escape } from 'validator';
 import { sanitize, stripHTML } from '../libs/sanitizer';
-import { status, ajv, JSchema, ROUTE_STATUS, CMS_STATUS, validate } from '../libs/validate';
+import { status, JSchema, ROUTE_STATUS, CMS_STATUS, validate, RegisterSchema } from '../libs/validate';
 import { Controller, GET, POST, PATCH, DELETE, isProduction } from '../libs/routing';
 import { Auth } from '../libs/auth';
-import { ImageSize } from '../libs/image-size';
+import { ImageSize } from '../libs/imageSize';
 
 // Models
 import { LogModel, ContentModel } from '../models';
@@ -15,7 +15,6 @@ import { LogModel, ContentModel } from '../models';
 // Types and global settings
 import { JWTUser, AccessRoles, Log, Content, ContentEntry } from '../../types';
 import { CONTENT_MAX_LENGTH } from '../../global';
-
 
 
 
@@ -133,8 +132,8 @@ export class CMSController extends Controller {
 	/**
 	 * Creates new content
 	 */
-	@POST({		path: '/',			do: [Auth.ByToken, Auth.RequireRole(AccessRoles.writer), validate(JSchema.ContentSchema)] })
-	@PATCH({	path: '/:route',	do: [Auth.ByToken, Auth.RequireRole(AccessRoles.writer), validate(JSchema.ContentSchema)] })
+	@POST({ path: '/', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.writer), validate(JSchema.ContentSchema)] })
+	@PATCH({ path: '/:route', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.writer), validate(JSchema.ContentSchema)] })
 	public async submitContent(req: Req, res: Res, next: Next) {
 		const isPatch = (!!req.params && !!req.params.route);
 		const data: Content = req.body;
@@ -240,59 +239,53 @@ export class CMSController extends Controller {
 			return res.status(200).send(status(CMS_STATUS.SEARCH_RESULT_MONGOOSE_ERROR));
 		}
 	}
-}
 
-/*
- |--------------------------------------------------------------------------
- | JSON schema
- |--------------------------------------------------------------------------
-*/
 
-const createPatchContentSchema = {
-	$id: JSchema.ContentSchema.name,
-	type: 'object',
-	additionalProperties: false,
-	properties: {
-		title: {
-			type: 'string',
-			maxLength: CONTENT_MAX_LENGTH.TITLE
-		},
-		access: {
-			type: 'array',
-			items: {
-				type: 'string',
-				enum: Object.values(AccessRoles)
+	// ---------------------------------------
+	// ------------ JSON SCHEMAS -------------
+	// ---------------------------------------
+
+	@RegisterSchema(JSchema.ContentSchema)
+	public get submitContentSchema() {
+		return {
+			type: 'object',
+			additionalProperties: false,
+			properties: {
+				title: {
+					type: 'string',
+					maxLength: CONTENT_MAX_LENGTH.TITLE
+				},
+				access: {
+					type: 'array',
+					items: {
+						type: 'string',
+						enum: Object.values(AccessRoles)
+					},
+					uniqueItems: true
+				},
+				published: {
+					type: 'boolean'
+				},
+				route: {
+					type: 'string',
+					maxLength: CONTENT_MAX_LENGTH.ROUTE
+				},
+				content: {
+					type: 'string'
+				},
+				description: {
+					type: 'string',
+					maxLength: CONTENT_MAX_LENGTH.DESC
+				},
+				folder: {
+					type: 'string',
+					maxLength: CONTENT_MAX_LENGTH.FOLDER
+				},
+				nav: {
+					type: 'boolean'
+				}
 			},
-			uniqueItems: true
-		},
-		published: {
-			type: 'boolean'
-		},
-		route: {
-			type: 'string',
-			maxLength: CONTENT_MAX_LENGTH.ROUTE
-		},
-		content: {
-			type: 'string'
-		},
-		description: {
-			type: 'string',
-			maxLength: CONTENT_MAX_LENGTH.DESC
-		},
-		folder: {
-			type: 'string',
-			maxLength: CONTENT_MAX_LENGTH.FOLDER
-		},
-		nav: {
-			type: 'boolean'
-		}
-	},
-	required: ['title', 'published', 'access', 'route', 'content', 'description', 'folder', 'nav']
-};
-
-if (ajv.validateSchema(createPatchContentSchema)) {
-	ajv.addSchema(createPatchContentSchema, JSchema.ContentSchema.name);
-} else {
-	throw Error(`${JSchema.ContentSchema.name} did not validate`);
+			required: ['title', 'published', 'access', 'route', 'content', 'description', 'folder', 'nav']
+		};
+	}
 }
-

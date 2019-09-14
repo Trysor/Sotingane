@@ -3,7 +3,7 @@ import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 import { get as configGet } from 'config';
 import { sign } from 'jsonwebtoken';
 
-import { status, ajv, JSchema, AUTH_STATUS, validate } from '../libs/validate';
+import { status, JSchema, AUTH_STATUS, validate, RegisterSchema } from '../libs/validate';
 import { UserModel } from '../models';
 import { JWTUser, AccessRoles, TokenResponse, User } from '../../types';
 import { JWT } from '../../global';
@@ -56,10 +56,10 @@ export class AuthController extends Controller {
 	@POST({ path: '/login', do: [validate(JSchema.UserLoginSchema), Auth.ByLogin] })
 	public async token(req: Req, res: Res) {
 		// we have through Auth validated the user exists in DB.
-		const user: JWTUser = req.user;
+		const user = req.user as JWTUser;
 
 		// Generate JWT Object to be sent
-		const jwtObject: JWTUser = { _id: user._id, username: user.username, roles: user.roles };
+		const jwtObject = { _id: user._id, username: user.username, roles: user.roles } as JWTUser;
 
 		// Generate API JWT
 		const now = Date.now(); // right before signing, so we're never ahead with nextExpiry
@@ -137,7 +137,7 @@ export class AuthController extends Controller {
 		const currentPassword: string = req.body.currentPassword;
 		const password: string = req.body.password;
 		const confirm: string = req.body.confirm;
-		const jwtUser: JWTUser = req.user as JWTUser;
+		const jwtUser = req.user as JWTUser;
 
 		if (password !== confirm) {
 			return res.status(401).send(status(AUTH_STATUS.PASSWORD_DID_NOT_MATCH));
@@ -168,95 +168,71 @@ export class AuthController extends Controller {
 		}
 		return res.status(200).send(status(AUTH_STATUS.ACCOUNT_DELETED));
 	}
-}
 
 
+	// ---------------------------------------
+	// ------------ JSON SCHEMAS -------------
+	// ---------------------------------------
 
-/*
- |--------------------------------------------------------------------------
- | JSON schema
- |--------------------------------------------------------------------------
-*/
-
-
-// Registration
-const userRegistrationSchema = {
-	$id: JSchema.UserRegistrationSchema.name,
-	type: 'object',
-	additionalProperties: false,
-	properties: {
-		username: {
-			type: 'string'
-		},
-		roles: {
-			type: 'array',
-			items: {
-				type: 'string',
-				enum: Object.values(AccessRoles)
+	@RegisterSchema(JSchema.UserRegistrationSchema)
+	public get registerSchema() {
+		return {
+			type: 'object',
+			additionalProperties: false,
+			properties: {
+				username: {
+					type: 'string'
+				},
+				roles: {
+					type: 'array',
+					items: {
+						type: 'string',
+						enum: Object.values(AccessRoles)
+					},
+					uniqueItems: true
+				},
+				password: {
+					type: 'string'
+				}
 			},
-			uniqueItems: true
-		},
-		password: {
-			type: 'string'
-		}
-	},
-	required: ['username', 'roles', 'password']
-};
+			required: ['username', 'roles', 'password']
+		};
+	}
 
-if (ajv.validateSchema(userRegistrationSchema)) {
-	ajv.addSchema(userRegistrationSchema, JSchema.UserRegistrationSchema.name);
-} else {
-	throw Error(`${JSchema.UserRegistrationSchema.name} did not validate`);
+	@RegisterSchema(JSchema.UserLoginSchema)
+	public get loginSchema() {
+		return {
+			type: 'object',
+			additionalProperties: false,
+			properties: {
+				username: {
+					type: 'string'
+				},
+				password: {
+					type: 'string',
+				},
+			},
+			required: ['username', 'password']
+		};
+	}
+
+	@RegisterSchema(JSchema.UserUpdatePasswordSchema)
+	public get updatePasswordSchema() {
+		return {
+			type: 'object',
+			additionalProperties: false,
+			properties: {
+				currentPassword: {
+					type: 'string'
+				},
+				password: {
+					type: 'string',
+				},
+				confirm: {
+					constant: { $data: '1/password' } // equal to password
+				}
+			},
+			required: ['currentPassword', 'password', 'confirm']
+		};
+	}
 }
-
-
-// Login
-const loginSchema = {
-	$id: JSchema.UserLoginSchema.name,
-	type: 'object',
-	additionalProperties: false,
-	properties: {
-		username: {
-			type: 'string'
-		},
-		password: {
-			type: 'string',
-		},
-	},
-	required: ['username', 'password']
-};
-
-if (ajv.validateSchema(loginSchema)) {
-	ajv.addSchema(loginSchema, JSchema.UserLoginSchema.name);
-} else {
-	throw Error(`${JSchema.UserLoginSchema.name} did not validate`);
-}
-
-
-
-// UpdatePassword
-const userUpdatePasswordSchema = {
-	$id: JSchema.UserUpdatePasswordSchema.name,
-	type: 'object',
-	additionalProperties: false,
-	properties: {
-		currentPassword: {
-			type: 'string'
-		},
-		password: {
-			type: 'string',
-		},
-		confirm: {
-			constant: { $data: '1/password' } // equal to password
-		}
-	},
-	required: ['currentPassword', 'password', 'confirm']
-};
-
-if (ajv.validateSchema(userUpdatePasswordSchema)) {
-	ajv.addSchema(userUpdatePasswordSchema, JSchema.UserUpdatePasswordSchema.name);
-} else {
-	throw Error(`${JSchema.UserUpdatePasswordSchema.name} did not validate`);
-}
-
-

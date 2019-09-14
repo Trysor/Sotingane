@@ -1,11 +1,9 @@
 ﻿import { Document, model, Schema } from 'mongoose';
 import { Settings } from '../../types';
 
-/*
- |--------------------------------------------------------------------------
- | Settings schema
- |--------------------------------------------------------------------------
-*/
+// ---------------------------------------
+// ----------- SETTINGS SCHEMA -----------
+// ---------------------------------------
 
 const schema = new Schema({
 	indexRoute: { type: String, required: true },

@@ -4,14 +4,14 @@ import { ErrorObject } from 'ajv';
 
 import { StatusMessage, ErrorMessage } from 'types';
 
-
 /*
  |--------------------------------------------------------------------------
  | AJV
  |--------------------------------------------------------------------------
 */
 
-export const ajv = new Ajv({ allErrors: true });
+const ajv = new Ajv({ allErrors: true });
+
 
 export const validate = (schema: SchemaValidationObject) => {
 	return (req: Req, res: Res, next: Next): Res => {
@@ -23,6 +23,27 @@ export const validate = (schema: SchemaValidationObject) => {
 	};
 };
 
+/**
+ * Property Decorator: Registers the schema into AJV.
+ * Also assigns the $id field its name, given the validation object
+ */
+export const RegisterSchema = (schemaValidationObject: SchemaValidationObject) => {
+	return (target: any, propertyKey: string | symbol) => {
+		const schema = target[propertyKey];
+		schema.$id = schemaValidationObject.name;
+
+		if (ajv.validateSchema(schema)) {
+			ajv.addSchema(schema, schemaValidationObject.name);
+		} else {
+			throw Error(`${schemaValidationObject.name} did not validate`);
+		}
+	};
+};
+
+
+/**
+ * Returns a status formatted json object containing the message and any error messages given
+ */
 export const status = (value: string, errors?: ErrorObject[]): StatusMessage => {
 	const msg: StatusMessage = { message: value };
 	if (errors) {
@@ -156,6 +177,13 @@ export const enum THEME_STATUS {
 	THEME_NONE_FOUND = 'Could not find theme',
 }
 
+export const enum FILE_STATUS {
+	NO_FILES_FOUND = 'No files were found',
+	ERROR_BAD_FILE = 'Bad request',
+	ERROR_BAD_UPLOAD_FOLDER = 'Cannot process your request',
+	ERROR_IMAGE_TOO_LARGE = 'Image too large',
+	ERROR_WRITING = 'Could not complete request'
+}
 
 
 interface SchemaValidation {

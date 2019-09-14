@@ -2,11 +2,11 @@
 
 import { Types as MongoTypes } from 'mongoose';
 
-import { status, ajv, JSchema, ADMIN_STATUS, CMS_STATUS, validate } from '../libs/validate';
+import { status, JSchema, ADMIN_STATUS, CMS_STATUS, validate, RegisterSchema } from '../libs/validate';
 import { ContentModel } from '../models';
 import { Content, ContentEntry, AccessRoles, AggregationQuery, AggregationResult } from '../../types';
 
-import { MongoStream } from '../libs/MongoStreamer';
+import { MongoStream } from '../libs/mongoStreamer';
 import { Controller, GET, POST } from '../libs/routing';
 import { Auth } from '../libs/auth';
 
@@ -72,15 +72,15 @@ export class AdminController extends Controller {
 		// Content filtering
 		const match: any[] = [];
 		if (query.createdBy) { match.push({'current.createdBy': MongoTypes.ObjectId(query.createdBy) }); }		// CreatedBy
-		if (query.hasOwnProperty('published')) { match.push({'current.published': query.published}); }				// Published
-		if (query.route) { match.push({'current.route': query.route.toLowerCase()}); }								// Route
-		if (query.folder) { match.push({'current.folder': query.folder}); }											// Folder
-		if (query.access && query.access.length > 0) {																// Access
+		if (query.hasOwnProperty('published')) { match.push({'current.published': query.published}); }			// Published
+		if (query.route) { match.push({'current.route': query.route.toLowerCase()}); }							// Route
+		if (query.folder) { match.push({'current.folder': query.folder}); }										// Folder
+		if (query.access && query.access.length > 0) {															// Access
 			match.push({ 'current.access': { $elemMatch: { $in: query.access } } });
 		} else if (query.access && query.access.length === 0) {
 			match.push({ 'current.access': { $eq: [] } });
 		}
-		if (!!query.createdAfterDate && !!query.createdBeforeDate) {												// CreatedAt
+		if (!!query.createdAfterDate && !!query.createdBeforeDate) {											// CreatedAt
 			match.push({'current.createdAt': { $gte: new Date(query.createdAfterDate), $lt: new Date(query.createdBeforeDate) }});
 		} else if (query.createdAfterDate) {
 			match.push({'current.createdAt': { $gte: new Date(query.createdAfterDate) }});
@@ -169,37 +169,31 @@ export class AdminController extends Controller {
 			return res.status(200).send(status(ADMIN_STATUS.AGGREGATION_MONGOOSE_ERROR));
 		}
 	}
+
+
+	// ---------------------------------------
+	// ------------ JSON SCHEMAS -------------
+	// ---------------------------------------
+
+	@RegisterSchema(JSchema.AdminAggregationSchema)
+	public get aggregateContentSchema() {
+		return {
+			type: 'object',
+			additionalProperties: false,
+			properties: {
+				createdBy: { type: 'string' },
+				access: { type: 'array', items: { type: 'string', enum: Object.values(AccessRoles) }, uniqueItems: true },
+				published: { type: 'boolean' },
+				route: { type: 'string' },
+				folder: { type: 'string' },
+				createdAfterDate: { oneOf: [{ type: 'string', format: 'date-time' }, { type: 'string', maxLength: 0 }] },
+				createdBeforeDate: { oneOf: [{ type: 'string', format: 'date-time' }, { type: 'string', maxLength: 0 }] },
+				seenAfterDate: { oneOf: [{ type: 'string', format: 'date-time' }, { type: 'string', maxLength: 0 }] },
+				seenBeforeDate: { oneOf: [{ type: 'string', format: 'date-time' }, { type: 'string', maxLength: 0 }] },
+				readBy: { type: 'array', items: { type: 'string' }, uniqueItems: true },
+				browsers: { type: 'array', items: { type: 'string' }, uniqueItems: true },
+				unwind: { type: 'boolean' }
+			},
+		};
+	}
 }
-
-/*
- |--------------------------------------------------------------------------
- | JSON schema
- |--------------------------------------------------------------------------
-*/
-
-const adminAggregationSchema = {
-	$id: JSchema.AdminAggregationSchema.name,
-	type: 'object',
-	additionalProperties: false,
-	properties: {
-		createdBy: { type: 'string' },
-		access: { type: 'array', items: { type: 'string', enum: Object.values(AccessRoles) }, uniqueItems: true },
-		published: { type: 'boolean' },
-		route: { type: 'string' },
-		folder: { type: 'string' },
-		createdAfterDate: { oneOf: [{ type: 'string', format: 'date-time' }, { type: 'string', maxLength: 0 }] },
-		createdBeforeDate: { oneOf: [{ type: 'string', format: 'date-time' }, { type: 'string', maxLength: 0 }] },
-		seenAfterDate: { oneOf: [{ type: 'string', format: 'date-time' }, { type: 'string', maxLength: 0 }] },
-		seenBeforeDate: { oneOf: [{ type: 'string', format: 'date-time' }, { type: 'string', maxLength: 0 }] },
-		readBy: { type: 'array', items: { type: 'string' }, uniqueItems: true },
-		browsers: { type: 'array', items: { type: 'string' }, uniqueItems: true },
-		unwind: { type: 'boolean' }
-	},
-};
-
-if (ajv.validateSchema(adminAggregationSchema)) {
-	ajv.addSchema(adminAggregationSchema, JSchema.AdminAggregationSchema.name);
-} else {
-	throw Error(`${JSchema.AdminAggregationSchema.name} did not validate`);
-}
-

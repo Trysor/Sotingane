@@ -1,11 +1,9 @@
 ﻿import { Document, model, Schema } from 'mongoose';
 import { Log } from '../../types';
 
-/*
- |--------------------------------------------------------------------------
- | Log schema
- |--------------------------------------------------------------------------
-*/
+// ---------------------------------------
+// ------------- LOG SCHEMA --------------
+// ---------------------------------------
 
 const schema = new Schema({
 	user: { type: Schema.Types.ObjectId, ref: 'User', required: false, index: true },
