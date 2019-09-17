@@ -5,7 +5,7 @@ import { UAParser } from 'ua-parser-js';
 import { escape } from 'validator';
 import { sanitize, stripHTML } from '../libs/sanitizer';
 import { status, JSchema, ROUTE_STATUS, CMS_STATUS, validate, RegisterSchema } from '../libs/validate';
-import { Controller, GET, POST, PATCH, DELETE, isProduction } from '../libs/routing';
+import { Controller, RouteDomain, GET, POST, PATCH, DELETE, isProduction } from '../libs/routing';
 import { Auth } from '../libs/auth';
 import { ImageSize } from '../libs/imageSize';
 
@@ -17,9 +17,9 @@ import { JWTUser, AccessRoles, Log, Content, ContentEntry } from '../../types';
 import { CONTENT_MAX_LENGTH } from '../../global';
 
 
-
-
+@RouteDomain('/cms')
 export class CMSController extends Controller {
+
 	private static ImageSrcRegex = /<img[^>]*src="([^"]*)"/g;
 
 	/**

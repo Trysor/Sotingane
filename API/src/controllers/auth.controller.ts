@@ -8,7 +8,7 @@ import { UserModel } from '../models';
 import { JWTUser, AccessRoles, TokenResponse, User } from '../../types';
 import { JWT } from '../../global';
 
-import { Controller, GET, POST, isProduction } from '../libs/routing';
+import { Controller, RouteDomain, GET, POST, isProduction } from '../libs/routing';
 import { Auth } from '../libs/auth';
 
 enum JWT_Type {
@@ -16,7 +16,9 @@ enum JWT_Type {
 	REFRESH = 1
 }
 
+@RouteDomain('/auth')
 export class AuthController extends Controller {
+
 	private static createSignedJWT(jwtObject: JWTUser, type: JWT_Type) {
 		return new Promise<string>((resolve) => {
 			sign(jwtObject, type === JWT_Type.REFRESH ? configGet<string>('refreshSecret') : configGet<string>('secret'), {

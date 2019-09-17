@@ -1,8 +1,8 @@
 import { get, IncomingMessage, ClientRequest } from 'http';
 import { get as httpsGet } from 'https';
-import * as sizeOf from 'image-size';
+import { imageSize } from 'image-size';
 
-import { ImageContentData  } from '../../types';
+import { ImageContentData } from '../../types';
 
 export class ImageSize {
 
@@ -22,7 +22,7 @@ export class ImageSize {
 						}
 					}).on('end', () => {
 						try {
-							const data = sizeOf(Buffer.concat(chunks)) as ImageContentData;
+							const data = imageSize(Buffer.concat(chunks)) as ImageContentData;
 							data.url = url;
 							resolve(data);
 						} catch (e) {

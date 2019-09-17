@@ -3,13 +3,15 @@ import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 import { ThemeModel } from '../models';
 import { AccessRoles, Theme } from '../../types';
 
-import { Controller, GET, POST, PATCH } from '../libs/routing';
+import { Controller, RouteDomain, GET, POST, PATCH } from '../libs/routing';
 import { THEME_STATUS, status, JSchema, RegisterSchema, validate } from '../libs/validate';
 
 import { Auth } from '../libs/auth';
 
 
+@RouteDomain('/theme')
 export class ThemeController extends Controller {
+
 
 	@PATCH({ path: '/:theme', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.ThemeSchema)] })
 	@POST({ path: '/', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.ThemeSchema)] })

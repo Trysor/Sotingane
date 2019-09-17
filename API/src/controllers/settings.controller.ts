@@ -3,13 +3,16 @@
 import { SettingsModel } from '../models';
 import { AccessRoles, Settings } from '../../types';
 
-import { Controller, GET, POST } from '../libs/routing';
+import { Controller, RouteDomain, GET, POST } from '../libs/routing';
 import { SETTINGS_STATUS, status, JSchema, validate, RegisterSchema } from '../libs/validate';
 
 import { Auth } from '../libs/auth';
 
 
+
+@RouteDomain('/settings')
 export class SettingsController extends Controller {
+
 
 	@POST({ path: '/', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin), validate(JSchema.SettingsSchema)] })
 	public async postSettings(req: Req, res: Res, next: Next) {

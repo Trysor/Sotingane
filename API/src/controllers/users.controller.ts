@@ -4,11 +4,13 @@ import { status, JSchema, USERS_STATUS, validate, RegisterSchema } from '../libs
 import { User, AccessRoles } from '../../types';
 import { UserModel, UserDoc } from '../models';
 
-import { Controller, GET, PATCH } from '../libs/routing';
+import { Controller, RouteDomain, GET, PATCH } from '../libs/routing';
 import { Auth } from '../libs/auth';
 
 
+@RouteDomain('/admin')
 export class UsersController extends Controller {
+
 
 	/**
 	 * Gets All registered users

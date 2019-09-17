@@ -10,18 +10,16 @@ export class AppRouter {
 	 * Initiates a route
 	 */
 	public static initiate(app: Express) {
-		// API routes
 		const apiRoutes = Router();
-		apiRoutes.use('/cms', new CMSController().router);
-		apiRoutes.use('/files', new FilesController().router);
-		apiRoutes.use('/admin', new AdminController().router);
-		apiRoutes.use('/admin', new UsersController().router);
-		apiRoutes.use('/auth', new AuthController().router);
-		apiRoutes.use('/settings', new SettingsController().router);
-		apiRoutes.use('/theme', new ThemeController().router);
-		// Set a common fallback for /api/*; 404 for invalid route
-		apiRoutes.all('*', ErrorController.error);
 
+		const controllers = [
+			new AdminController(), new AuthController(), new CMSController(),
+			new FilesController(), new ErrorController(), new SettingsController(),
+			new ThemeController(), new UsersController()
+		];
+		controllers.sort( (a, b) => b.Priority - a.Priority).forEach(controller => {
+			apiRoutes.use(controller.RouteDomain, controller.Router);
+		});
 
 		// Assign routers to Express app
 		app.use('/api', apiRoutes);

@@ -1,5 +1,5 @@
 import { Request as Req, Response as Res, NextFunction as Next } from 'express';
-import { Controller, GET, POST, PATCH, DELETE, isProduction } from '../libs/routing';
+import { Controller, RouteDomain, GET, POST } from '../libs/routing';
 
 import { Auth } from '../libs/auth';
 import { UploadedFile } from 'express-fileupload';
@@ -12,6 +12,9 @@ import { File } from '../../types';
 import { JWTUser, AccessRoles } from '../../types';
 import { status, FILE_STATUS } from '../libs/validate';
 
+
+
+@RouteDomain('/files')
 export class FilesController extends Controller {
 
 	/**

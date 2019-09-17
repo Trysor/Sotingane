@@ -7,9 +7,11 @@ import { ContentModel } from '../models';
 import { Content, ContentEntry, AccessRoles, AggregationQuery, AggregationResult } from '../../types';
 
 import { MongoStream } from '../libs/mongoStreamer';
-import { Controller, GET, POST } from '../libs/routing';
+import { Controller, RouteDomain, GET, POST } from '../libs/routing';
 import { Auth } from '../libs/auth';
 
+
+@RouteDomain('/admin')
 export class AdminController extends Controller {
 
 	/**
