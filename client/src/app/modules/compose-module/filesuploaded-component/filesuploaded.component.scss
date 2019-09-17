@@ -1,0 +1,21 @@
+
+cdk-virtual-scroll-viewport {
+	height: 100%;
+}
+
+button {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.item {
+	height: 110px; // Match this with the itemSize in the HTML
+	position: relative;
+	overflow: hidden;
+	img {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+}

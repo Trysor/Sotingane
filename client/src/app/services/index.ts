@@ -2,6 +2,7 @@
 export * from './controllers/admin.service';
 export * from './controllers/auth.service';
 export * from './controllers/cms.service';
+export * from './controllers/files.service';
 export * from './controllers/settings.service';
 // http
 export * from './http/http.service';

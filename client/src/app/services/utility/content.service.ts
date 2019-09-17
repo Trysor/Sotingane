@@ -40,7 +40,7 @@ export class ContentService {
 
 		// Clean components before rebuilding.
 		this.cleanEmbeddedComponents();
-		e.innerHTML = content.content.replace(/src/g, 'data-src');
+		e.innerHTML = this.transformContentData(content.content);
 
 		// Inject
 		this._dynamicContent.forEach((fac, selector) => {
@@ -74,5 +74,10 @@ export class ContentService {
 		// destroycomponents to avoid be memory leaks
 		this._embeddedComponents.forEach(comp => comp.destroy());
 		this._embeddedComponents.length = 0;
+	}
+
+
+	private transformContentData(content: string) {
+		return content.replace(/src=/g, 'data-src=').replace(/srcset=/g, 'data-srcset=');
 	}
 }

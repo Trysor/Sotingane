@@ -12,6 +12,10 @@ export const API = {
 		history: '/api/cms/history',
 		search: '/api/cms/search',
 	},
+	files: {
+		uploadimage: '/api/files/uploadimage',
+		getThumbnails: '/api/files/'
+	},
 	admin: {
 		users: '/api/admin/users',
 		cms: '/api/admin/cms',

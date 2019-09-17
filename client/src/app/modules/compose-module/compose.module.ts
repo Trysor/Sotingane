@@ -13,11 +13,13 @@ import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 // Components
 import { ComposeComponent } from './compose-component/compose.component';
 import { CKEDitorComponent } from './ckeditor-component/ckeditor.component';
+import { FilesUploadedComponent } from './filesuploaded-component/filesuploaded.component';
 
 @NgModule({
 	declarations: [
 		ComposeComponent,
-		CKEDitorComponent
+		CKEDitorComponent,
+		FilesUploadedComponent
 	],
 	imports: [
 		SharedModule,

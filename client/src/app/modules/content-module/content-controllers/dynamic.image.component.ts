@@ -22,9 +22,9 @@ interface PictureSource {
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DynamicImageComponent extends DynamicLazyLoader implements DynamicComponent {
+	private _src: string;
 	private _srcset: string;
 	private _imgEl: HTMLImageElement;
-	private readonly _sources: PictureSource[] = [];
 	private readonly _listeners: (() => void)[] = [];
 
 	private _content: Content;
@@ -44,24 +44,28 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 		this._content = content;
 
 		this._imgEl = this.elRef.nativeElement.querySelector('img');
+		if (!this._imgEl.attributes['data-src']) { return; }
+
+		// Get image sources
 		const src: string = this._imgEl.attributes['data-src'].nodeValue;
+		this._src = src;
 		this.renderer.removeAttribute(this._imgEl, 'data-src');
 
-		// Add size attributes
+		if (this._imgEl.attributes['data-srcset']) {
+			this._srcset = this._imgEl.attributes['data-srcset'].nodeValue;
+			this.renderer.removeAttribute(this._imgEl, 'data-srcset');
+		}
+
+		// Force the image ratio
 		const imageData = content.images && content.images.find(imgData => src === imgData.url);
 		if (!!imageData) {
 			const ratio = imageData.height / imageData.width;
 			this.renderer.setStyle(this._imgEl, 'padding-bottom', `${ratio * 100}%`);
-			// this.renderer.setAttribute(this._imgEl, 'width', imageData.width.toString());
-			// this.renderer.setAttribute(this._imgEl, 'height', imageData.height.toString());
 		}
 
 		// Add lazy tag
 		this.renderer.addClass(this.elRef.nativeElement, 'lazy');
 
-		this._sources.push({ media: null, src });
-
-		this._srcset = this._sources.map((s) => `${s.src} ${(s.media ? s.media : '')}`).join(', ');
 		this._listeners.push(this.renderer.listen(this._imgEl, 'click', this.onclick.bind(this)));
 
 		this.mobileService.isMobile().pipe(takeUntil(this._ngUnsub)).subscribe(isMobile => {
@@ -77,7 +81,10 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 
 	load() {
 		// Add the srcset
-		this.renderer.setAttribute(this._imgEl, 'srcset', this._srcset);
+		this.renderer.setAttribute(this._imgEl, 'src', this._src);
+		if (!!this._srcset) {
+			this.renderer.setAttribute(this._imgEl, 'srcset', this._srcset);
+		}
 
 		if (this._imgEl.complete) {
 			this.onload();
@@ -101,7 +108,7 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 		// this.sources[0] is auto-format original-sized image
 		const altAttr = this._imgEl.attributes.getNamedItem('alt');
 		this.modalService.openImageModal({
-			startIndex: this._content.images.map(i => i.url).indexOf(this._sources[0].src),
+			startIndex: this._content.images.map(i => i.url).indexOf(this._src),
 			images: this._content.images
 		});
 	}

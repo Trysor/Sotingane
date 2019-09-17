@@ -15,6 +15,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialogModule } from '@angular/material/dialog';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 
 
@@ -33,7 +34,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 		MatSnackBarModule,
 		MatTooltipModule,
 		MatMenuModule,
-		MatDialogModule
+		MatDialogModule,
+		ScrollingModule
 	]
 })
 export class MaterialModule { }

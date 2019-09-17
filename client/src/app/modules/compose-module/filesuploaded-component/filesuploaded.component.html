@@ -1,0 +1,14 @@
+<div>Need to fix such that clicking the</div>
+<div>image gives the ORIGINAL image as</div>
+<div>link, and NOT the thumbnail!</div>
+
+<ng-container *ngIf="Editor | async">
+	<button mat-icon-button type="button" (click)="refreshImages()" aria-label="Show uploaded images">
+		<mat-icon color="primary">update</mat-icon>
+	</button>
+	<cdk-virtual-scroll-viewport itemSize="110" class="example-viewport">
+		<div *cdkVirtualFor="let url of imageURLs | async" class="item" (click)="clickImage(url)">
+			<img [src]="url">
+		</div>
+	</cdk-virtual-scroll-viewport>
+</ng-container>

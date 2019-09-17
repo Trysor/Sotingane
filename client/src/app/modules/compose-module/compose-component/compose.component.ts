@@ -43,6 +43,9 @@ export class ComposeComponent extends DestroyableClass implements CanDeactivate<
 	public get tabIndex() { return this.storage.getSession(StorageKey.ComposeTabIndex); }
 	public set tabIndex(value: string) { this.storage.setSession(StorageKey.ComposeTabIndex, value); }
 
+	private _editor: any;
+	public get Editor() { return this._editor; }
+	public set Editor(editor: any) { this._editor = editor; }
 
 	// FOLDER FIELDS
 	private _folders: string[] = []; // Holds a list of used Folders

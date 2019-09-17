@@ -54,8 +54,11 @@
 								<mat-label>Limit Access</mat-label>
 								<mat-select id="access" #access="matSelect" formControlName="access" multiple>
 									<mat-select-trigger>
-										<ng-container *ngFor="let selected of ContentForm.get('access').value; last as last">
-											<mat-icon>{{accessHandler.getAccessChoice(selected).icon}}</mat-icon> {{ accessHandler.getAccessChoice(selected).plural }}<span *ngIf="!last">, </span>
+										<ng-container
+											*ngFor="let selected of ContentForm.get('access').value; last as last">
+											<mat-icon>{{accessHandler.getAccessChoice(selected).icon}}</mat-icon>
+											{{ accessHandler.getAccessChoice(selected).plural }}<span *ngIf="!last">,
+											</span>
 										</ng-container>
 									</mat-select-trigger>
 									<ng-container *ngFor="let option of accessHandler.accessChoices">
@@ -110,7 +113,26 @@
 			<mat-tab label="Content">
 				<!-- CONTENT -->
 				<ng-template matTabContent>
-					<ckeditor-component [form]="ContentForm"></ckeditor-component>
+					<mat-sidenav-container #sidenav>
+						<mat-sidenav #imageContainer mode="over" position="end" ngClass="sidenav">
+							<!-- (swipeleft)="closeSideNavs()" -->
+							<filesuploaded-component [Editor]="Editor"></filesuploaded-component>
+						</mat-sidenav>
+
+						<button mat-icon-button class="imageUploadButton" type="button" (click)="imageContainer.toggle()" aria-label="Show uploaded images">
+							<mat-icon color="primary">add_photo_alternate</mat-icon>
+						</button>
+						<ckeditor-component [form]="ContentForm" (Editor)="Editor = $event"></ckeditor-component>
+					</mat-sidenav-container>
+
+
+					<!-- <button mat-icon-button class="imageUploadButton" type="button" [matMenuTriggerFor]="imagePanel"
+						aria-label="Show uploaded images">
+						<mat-icon color="primary">menu</mat-icon>
+					</button>
+					<mat-menu #imagePanel="matMenu" xPosition="before" yPosition="below" overlapTrigger="false">
+						
+					</mat-menu> -->
 				</ng-template>
 			</mat-tab>
 		</mat-tab-group>
@@ -120,9 +142,10 @@
 		<div class="group">
 			<!-- HISTORY -->
 			<mat-form-field appearance="outline">
-				<mat-select id="history" [disabled]="!HistoryHandler.HistoryList" (selectionChange)="onSetStateAsHistroyFromVersion($event)"
-							[(value)]="HistoryHandler.HistoryVersionIndex">
-					
+				<mat-select id="history" [disabled]="!HistoryHandler.HistoryList"
+					(selectionChange)="onSetStateAsHistroyFromVersion($event)"
+					[(value)]="HistoryHandler.HistoryVersionIndex">
+
 					<!-- Drafting option -->
 					<mat-option [value]="HistoryHandler.VersionHistory.Draft">
 						{{HistoryHandler.getHistoryItemFormatted(HistoryHandler.VersionHistory.Draft)}}
@@ -137,7 +160,8 @@
 				</mat-select>
 			</mat-form-field>
 
-			<button mat-raised-button id="restore" ngClass="offset" *ngIf="!HistoryHandler.isDrafting" (click)="onSetSateFromHistoryAsCurrentDraft()">
+			<button mat-raised-button id="restore" ngClass="offset" *ngIf="!HistoryHandler.isDrafting"
+				(click)="onSetSateFromHistoryAsCurrentDraft()">
 				Restore
 			</button>
 		</div>

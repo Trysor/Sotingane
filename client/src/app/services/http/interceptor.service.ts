@@ -27,6 +27,7 @@ export class InterceptorService implements HttpInterceptor {
 	intercept(req: HttpRequest<any>, next: HttpHandler) {
 		// Only intercept if the request is going to our server.
 		if (!req.url.startsWith(env.API.api)) { return next.handle(req); }
+		const shouldSetAsJson = !req.url.startsWith(env.API.files.uploadimage);
 
 		// LoadingService
 		this.loadingService.addRequest();
@@ -34,7 +35,7 @@ export class InterceptorService implements HttpInterceptor {
 		// Handle the request, set headers and pipe it
 		return next.handle(
 			req.clone({
-				headers: this.getHeadersObject(req),
+				headers: this.getHeadersObject(req, shouldSetAsJson),
 				withCredentials: true,
 				url: this.getAPIUrl(req)							// Deal with server vs client side URL handling
 			})
@@ -57,8 +58,14 @@ export class InterceptorService implements HttpInterceptor {
 	/**
 	 * Create the HttpHeaders object with headers set
 	 */
-	private getHeadersObject(req: HttpRequest<any>) {
-		let headers = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
+	private getHeadersObject(req: HttpRequest<any>, shouldSetAsJson: boolean) {
+		let headers = new HttpHeaders();
+		if (req.headers.has('Content-Type')) {
+			headers.set('Content-Type', req.headers.get('Content-Type'));
+		} else if (shouldSetAsJson) {
+			headers.set('Content-Type', 'application/json; charset=utf-8');
+		}
+
 		const token = req.url.startsWith(env.API.auth.token)
 			? this.tokenService.refreshToken
 			: this.tokenService.token;
