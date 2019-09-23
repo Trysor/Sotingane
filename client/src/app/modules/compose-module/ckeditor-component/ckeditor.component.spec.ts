@@ -2,6 +2,7 @@
 import { ComponentFixture, TestBed, fakeAsync, async, discardPeriodicTasks, tick } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA, DebugElement } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
+import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing';
 
 // Material
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -16,6 +17,8 @@ describe('CKEDitorComponent', () => {
 	let fixture: ComponentFixture<CKEDitorComponent>;
 	let debug: DebugElement;
 
+	let httpTestingController: HttpTestingController;
+
 	let editor: any;
 
 
@@ -27,13 +30,16 @@ describe('CKEDitorComponent', () => {
 			imports: [
 				NoopAnimationsModule,
 				ReactiveFormsModule,
-				CKEditorModule
+				CKEditorModule,
+				HttpClientTestingModule
 			]
 		}).compileComponents();
 
 		fixture = TestBed.createComponent(CKEDitorComponent);
 		component = fixture.componentInstance;
 		debug = fixture.debugElement;
+
+		httpTestingController = TestBed.inject(HttpTestingController);
 
 		// Create form
 		component.form = new FormGroup({
@@ -79,4 +85,8 @@ describe('CKEDitorComponent', () => {
 		const wordCountAfterDataSet = await component.WordCount.toPromise();
 		expect(wordCountAfterDataSet).toEqual(2, 'The word count should have been updated based on the content set');
 	}));
+
+	it('should upload images to the FileStore API');
+
+	it('should add images to the editor when returning from the FileStore GUI');
 });

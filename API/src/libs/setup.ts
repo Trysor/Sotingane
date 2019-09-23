@@ -26,7 +26,9 @@ export class Setup {
 		app.use(json({ type: 'application/json' }));
 
 		// express-fileupload
-		app.use(fileUpload({ limits: { fileSize: 15 * 1024 * 1024 }, })); // 15 MB
+		app.use(fileUpload({
+			// limits: { fileSize: 10 * 1024 * 1024 } // 10 MB
+		}));
 
 		// Logging
 		if (configUtil.getEnv('NODE_ENV') !== 'test') {

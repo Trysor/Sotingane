@@ -47,4 +47,4 @@ const schema = new Schema({
 });
 
 export interface ThemeDoc extends Theme, Document { }
-export let ThemeModel = model<ThemeDoc>('Theme', schema);
+export const ThemeModel = model<ThemeDoc>('Theme', schema);

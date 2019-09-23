@@ -24,11 +24,11 @@ describe('AdminService', () => {
 			],
 			imports: [HttpClientTestingModule]
 		});
-		service = TestBed.get(AdminService);
-		httpTestingController = TestBed.get(HttpTestingController as Type<HttpTestingController>);
+		service = TestBed.inject(AdminService);
+		httpTestingController = TestBed.inject(HttpTestingController as Type<HttpTestingController>);
 
 		// Override the client property to use the test client
-		( service as any).http.client = TestBed.get(HttpClient);
+		( service as any).http.client = TestBed.inject(HttpClient);
 	});
 
 	afterEach(() => {

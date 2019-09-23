@@ -15,4 +15,4 @@ const schema = new Schema({
 });
 
 export interface LogDoc extends Log, Document { }
-export let LogModel = model<LogDoc>('Log', schema);
+export const LogModel = model<LogDoc>('Log', schema);

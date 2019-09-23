@@ -1,6 +1,6 @@
 <div *ngIf="((!!filterSettings.hidden && filterSettings.hidden | async) || (!filterSettings.hidden && true))" [formGroup]="filterForm"
 	 [ngClass]="{ filterBox: true, mobile: (mobileService.isMobile() | async) }">
-	<mat-form-field floatLabel="never" ngClass="filter" appearance="standard">
+	<mat-form-field floatLabel="never" ngClass="filter">
 		<input matInput [placeholder]="filterSettings.placeholder || 'Filter'" type="text" autocomplete="off" formControlName="filterControl">
 		<button *ngIf="filterForm.get('filterControl').value.length > 0" matSuffix mat-icon-button
 				(click)="filterForm.get('filterControl').reset('')">

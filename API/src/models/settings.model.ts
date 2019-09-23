@@ -20,4 +20,4 @@ const schema = new Schema({
 
 
 export interface SettingsDoc extends Settings, Document { }
-export let SettingsModel = model<SettingsDoc>('Setting', schema);
+export const SettingsModel = model<SettingsDoc>('Setting', schema);

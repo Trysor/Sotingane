@@ -6,10 +6,12 @@ import { ModalData, ImageModalData, Content, StatusMessage } from '@types';
 import { ModalComponent } from '@app/modules/shared-module/modals/modal.component';
 import { ImageModalComponent } from '@app/modules/shared-module/modals/imagemodal.component';
 
+
 @Injectable({ providedIn: 'root' })
 export class ModalService {
 
 	constructor(private dialog: MatDialog) { }
+
 
 	/**
 	 * Opens a delete content modal for the given content item
@@ -20,7 +22,7 @@ export class ModalService {
 			bodyText: status.message,
 			proceedText: 'Okay'
 		};
-		return this.dialog.open(ModalComponent, { data } as MatDialogConfig);
+		return this.dialog.open(ModalComponent, { data } as MatDialogConfig<ModalData>);
 	}
 
 
@@ -34,7 +36,7 @@ export class ModalService {
 			proceedText: 'Delete', proceedColor: 'warn',
 			cancelText: 'Cancel', cancelColor: 'accent',
 		};
-		return this.dialog.open(ModalComponent, { data } as MatDialogConfig);
+		return this.dialog.open(ModalComponent, { data } as MatDialogConfig<ModalData>);
 	}
 
 	/**
@@ -47,7 +49,7 @@ export class ModalService {
 			proceedColor: 'accent', proceedText: 'Proceed',
 			cancelColor: 'primary', cancelText: 'Cancel',
 		};
-		return this.dialog.open(ModalComponent, { data } as MatDialogConfig);
+		return this.dialog.open(ModalComponent, { data } as MatDialogConfig<ModalData>);
 	}
 
 	/**
@@ -61,7 +63,7 @@ export class ModalService {
 			cancelText: 'Cancel',
 		};
 
-		return this.dialog.open(ModalComponent, { data } as MatDialogConfig);
+		return this.dialog.open(ModalComponent, { data } as MatDialogConfig<ModalData>);
 	}
 
 	/**
@@ -76,7 +78,7 @@ export class ModalService {
 			proceedColor: 'primary',
 			proceedText: 'Okay',
 		};
-		return this.dialog.open(ModalComponent, { data } as MatDialogConfig);
+		return this.dialog.open(ModalComponent, { data } as MatDialogConfig<ModalData>);
 	}
 
 	/**

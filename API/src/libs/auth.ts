@@ -108,11 +108,11 @@ const RequireRole = (role: AccessRoles) => {
 
 export class Auth {
 	// Authentication Handlers
-	public static ByLogin: Handler = authenticate('local', { session: false });
-	public static ByToken: Handler = authenticate(ByTokenName, { session: false });
-	public static ByRefresh: Handler = authenticate(ByRefreshName, { session: false });
-	public static Personalize: Handler = Personalize;
-	public static RequireRole = RequireRole;
+	public static readonly ByLogin: Handler = authenticate('local', { session: false });
+	public static readonly ByToken: Handler = authenticate(ByTokenName, { session: false });
+	public static readonly ByRefresh: Handler = authenticate(ByRefreshName, { session: false });
+	public static readonly Personalize: Handler = Personalize;
+	public static readonly RequireRole = RequireRole;
 
 
 	// Access Rights methods

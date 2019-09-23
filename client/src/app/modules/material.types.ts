@@ -29,7 +29,6 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 
 
-
 export {
 	// CORE: Dates
 	MAT_DATE_LOCALE, DateAdapter, NativeDateAdapter,

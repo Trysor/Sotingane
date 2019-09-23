@@ -9,6 +9,8 @@ import { ContentModule } from '@app/modules/content-module/content.module';
 import { SharedModule } from '@app/modules/shared-module/shared.module';
 import { CommonModule } from '@app/modules/common.module';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { MatDialogModule } from '@angular/material/dialog';
+
 
 // Components
 import { ComposeComponent } from './compose-component/compose.component';
@@ -21,7 +23,11 @@ import { FilesUploadedComponent } from './filesuploaded-component/filesuploaded.
 		CKEDitorComponent,
 		FilesUploadedComponent
 	],
+	entryComponents: [
+		FilesUploadedComponent
+	],
 	imports: [
+		MatDialogModule,
 		SharedModule,
 		ContentModule,
 		CommonModule,

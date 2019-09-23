@@ -2,9 +2,9 @@
 	"compilerOptions": {
 		"outDir": "./dist/out-tsc",
 		"declaration": false,
-		"target": "es6",
+		"target": "es2020",
 		"lib": [
-			"es2017",
+			"es2020",
 			"dom"
 		],
 		"moduleResolution": "node",

@@ -13,8 +13,10 @@ export const API = {
 		search: '/api/cms/search',
 	},
 	files: {
-		uploadimage: '/api/files/uploadimage',
-		getThumbnails: '/api/files/'
+		deleteFile: '/api/files/',
+		getThumbnails: '/api/files/',
+		uploadimage: '/api/files/',
+		fileURLs: '/api/files/'
 	},
 	admin: {
 		users: '/api/admin/users',

@@ -27,7 +27,7 @@ describe('AuthComponent', () => {
 
 		fixture = TestBed.createComponent(AuthComponent);
 		component = fixture.componentInstance;
-		mobileService = TestBed.get(MobileService);
+		mobileService = TestBed.inject(MobileService);
 		fixture.detectChanges();
 	}));
 

@@ -1,4 +1,5 @@
 export * from './aggregation';
+export * from './ckeditor';
 export * from './components';
 export * from './content';
 export * from './file';
@@ -7,5 +8,4 @@ export * from './seo';
 export * from './settings';
 export * from './statusmessage';
 export * from './table';
-export * from './uploadAdapter';
 export * from './user';

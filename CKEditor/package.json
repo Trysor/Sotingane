@@ -32,16 +32,16 @@
 	"devDependencies": {
 		"@ckeditor/ckeditor5-dev-utils": "12.0.5",
 		"@ckeditor/ckeditor5-dev-webpack-plugin": "8.0.5",
-		"@types/node": "12.7.3",
+		"@types/node": "12.7.5",
 		"postcss-loader": "3.0.0",
 		"raw-loader": "3.1.0",
 		"style-loader": "1.0.0",
-		"terser-webpack-plugin": "1.4.1",
-		"ts-loader": "6.0.4",
-		"tslint": "5.19.0",
-		"typescript": "3.6.2",
-		"webpack": "4.39.3",
-		"webpack-cli": "3.3.7",
+		"terser-webpack-plugin": "2.1.0",
+		"ts-loader": "6.1.2",
+		"tslint": "5.20.0",
+		"typescript": "3.6.3",
+		"webpack": "4.40.2",
+		"webpack-cli": "3.3.9",
 		"wrapper-webpack-plugin": "2.1.0"
 	}
 }

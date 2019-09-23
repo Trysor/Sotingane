@@ -18,6 +18,9 @@ import ImagetoolbarPlugin from '@ckeditor/ckeditor5-image/src/imagetoolbar';
 import ImageUploadPlugin from '@ckeditor/ckeditor5-image/src/imageupload';
 import CustomUploadAdapter from './plugins/customUploadAdapter/customUploadAdapter';
 
+// FileStore
+import FileStorePlugin from './plugins/FileStore/fileStore.plugin';
+
 // Features
 import LinkPlugin from '@ckeditor/ckeditor5-link/src/link';
 import ListPlugin from '@ckeditor/ckeditor5-list/src/list';
@@ -31,7 +34,7 @@ import FontPlugin from '@ckeditor/ckeditor5-font/src/font';
 import WordCountPlugin from '@ckeditor/ckeditor5-word-count/src/wordcount';
 
 // Typings
-import { CKEditorDefaultConfig } from './model';
+import { CKEditorDefaultConfig } from './types';
 
 export default class ClassicEditor extends ClassicEditorBase {
 	static defaultConfig: CKEditorDefaultConfig;
@@ -61,7 +64,8 @@ ClassicEditor.builtinPlugins = [
 	TableToolbarPlugin,
 	RemoveFormatPlugin,
 	FontPlugin,
-	WordCountPlugin
+	WordCountPlugin,
+	FileStorePlugin
 ];
 ClassicEditor.defaultConfig = {
 	toolbar: {
@@ -77,7 +81,7 @@ ClassicEditor.defaultConfig = {
 			'|',
 			'blockQuote', 'code',
 			'|',
-			'imageUpload', 'mediaEmbed', 'insertTable',
+			'imageUpload', 'FileStore', 'mediaEmbed', 'insertTable',
 			'|',
 			'undo', 'redo'
 		]

@@ -71,4 +71,4 @@ schema.methods.canAccess = function(level: AccessRoles): boolean {
 };
 
 export interface UserDoc extends User, Document { }
-export let UserModel = model<UserDoc>('User', schema);
+export const UserModel = model<UserDoc>('User', schema);

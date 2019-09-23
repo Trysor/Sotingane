@@ -113,26 +113,7 @@
 			<mat-tab label="Content">
 				<!-- CONTENT -->
 				<ng-template matTabContent>
-					<mat-sidenav-container #sidenav>
-						<mat-sidenav #imageContainer mode="over" position="end" ngClass="sidenav">
-							<!-- (swipeleft)="closeSideNavs()" -->
-							<filesuploaded-component [Editor]="Editor"></filesuploaded-component>
-						</mat-sidenav>
-
-						<button mat-icon-button class="imageUploadButton" type="button" (click)="imageContainer.toggle()" aria-label="Show uploaded images">
-							<mat-icon color="primary">add_photo_alternate</mat-icon>
-						</button>
-						<ckeditor-component [form]="ContentForm" (Editor)="Editor = $event"></ckeditor-component>
-					</mat-sidenav-container>
-
-
-					<!-- <button mat-icon-button class="imageUploadButton" type="button" [matMenuTriggerFor]="imagePanel"
-						aria-label="Show uploaded images">
-						<mat-icon color="primary">menu</mat-icon>
-					</button>
-					<mat-menu #imagePanel="matMenu" xPosition="before" yPosition="below" overlapTrigger="false">
-						
-					</mat-menu> -->
+					<ckeditor-component [form]="ContentForm" (Editor)="Editor = $event"></ckeditor-component>
 				</ng-template>
 			</mat-tab>
 		</mat-tab-group>

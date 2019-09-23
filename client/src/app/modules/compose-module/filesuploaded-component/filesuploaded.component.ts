@@ -1,9 +1,19 @@
-import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Inject, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { DatePipe } from '@angular/common';
+
+import { MatDialogRef, MAT_DIALOG_DATA } from '@app/modules/material.types';
+
 import { DestroyableClass } from '@app/classes';
-import { FilesService } from '@app/services';
+import { FilesService } from '@app/services/controllers/files.service';
+
+import { FileThumbnail } from '@types';
 
 import { BehaviorSubject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, distinctUntilChanged, debounceTime } from 'rxjs/operators';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+
+
 
 @Component({
 	selector: 'filesuploaded-component',
@@ -12,27 +22,65 @@ import { takeUntil } from 'rxjs/operators';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FilesUploadedComponent extends DestroyableClass {
-	private _subject = new BehaviorSubject<string[]>([]);
-	private _editor = new BehaviorSubject<any>(null);
+	@ViewChild(CdkVirtualScrollViewport, { static: true }) viewPort: CdkVirtualScrollViewport;
 
-	public get imageURLs() { return this._subject; }
+	private readonly _subjectAll = new BehaviorSubject<FileThumbnail[]>([]);
+	private readonly _subject = new BehaviorSubject<FileThumbnail[]>([]);
 
-	@Input() public set Editor(editor: any) { this._editor.next(editor); }
-	public get Editor() { return this._editor; }
+	public readonly DateFormat = 'dd. MMM yyyy, HH:mm';
 
-	constructor(private fileService: FilesService) {
+
+	public get Thumbnails() {
+		return this._subject.asObservable();
+	}
+	public readonly filterForm: FormGroup;
+
+
+	constructor(
+		private ref: MatDialogRef<FilesUploadedComponent>,
+		private fileService: FilesService,
+		private fb: FormBuilder,
+		private datePipe: DatePipe,
+		@Inject(MAT_DIALOG_DATA) public data: any) {
 		super();
-		this.refreshImages();
-	}
 
-	public refreshImages() {
 		this.fileService.getThumbnails().pipe(takeUntil(this.OnDestroy)).subscribe(
-			files => this._subject.next(files)
+			files => {
+				this._subjectAll.next(files);
+				this._subject.next(files);
+			}
 		);
+
+		// Filter form
+		this.filterForm = this.fb.group({ filterControl: [''] });
+		this.filterForm.get('filterControl').valueChanges.pipe(
+			distinctUntilChanged(), debounceTime(300), takeUntil(this.OnDestroy)
+		).subscribe( (value: string) => {
+			this.filterList(value.toLowerCase().trim());
+		});
 	}
 
-	public clickImage(url: string) {
-		this._editor.getValue();
-		// TODO: Insert magic.
+
+	private filterList(filterString: string) {
+		const newList = this._subjectAll.getValue().filter( file => {
+
+			return file.title.toLowerCase().includes(filterString)
+				|| file.uploadedBy.username.toLowerCase().includes(filterString)
+				|| this.datePipe.transform(file.uploadedDate, this.DateFormat).toLowerCase().includes(filterString);
+		});
+		this._subject.next(newList);
+		this.viewPort.scrollToIndex(0);
+	}
+
+
+	public clickImage(uuid: string) {
+		this.fileService.getFileURLs(uuid).pipe(takeUntil(this.OnDestroy)).subscribe(urlObject => {
+			this.ref.close(urlObject);
+		});
+	}
+
+	public close() {
+		this.ref.close();
+		console.log('close');
 	}
 }

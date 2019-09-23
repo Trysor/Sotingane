@@ -4,8 +4,7 @@ import { env } from '@env';
 
 import { HttpService } from '@app/services/http/http.service';
 
-import { BehaviorSubject, of, combineLatest } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { FileThumbnail, FileURLPayload, FileUploadResult } from '@types';
 
 @Injectable({ providedIn: 'root' })
 export class FilesService {
@@ -24,7 +23,7 @@ export class FilesService {
 		const formData = new FormData();
 		formData.append('file', file, file.name);
 
-		return this.http.client.post<File>(
+		return this.http.client.post<FileUploadResult>(
 			env.API.files.uploadimage,
 			formData,
 			{
@@ -39,6 +38,21 @@ export class FilesService {
 	 * Requests the smallest images' urls
 	 */
 	public getThumbnails() {
-		return this.http.client.get<string[]>(env.API.files.getThumbnails);
+		return this.http.client.get<FileThumbnail[]>(env.API.files.getThumbnails);
+	}
+
+	/**
+	 * Requests all URL data for the given UUID
+	 */
+	public getFileURLs(uuid: string) {
+		return this.http.client.get<FileURLPayload[]>(`${env.API.files.fileURLs}/${uuid}`);
+	}
+
+
+	/**
+	 * Request to delete the file of a given uuid
+	 */
+	public deleteFile(uuid: string) {
+		return this.http.client.delete<boolean>(`${env.API.files.deleteFile}/${uuid}`);
 	}
 }

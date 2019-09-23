@@ -182,7 +182,8 @@ export const enum FILE_STATUS {
 	ERROR_BAD_FILE = 'Bad request',
 	ERROR_BAD_UPLOAD_FOLDER = 'Cannot process your request',
 	ERROR_IMAGE_TOO_LARGE = 'Image too large',
-	ERROR_WRITING = 'Could not complete request'
+	ERROR_WRITING = 'Could not complete request',
+	DELETE_SUCCESSFUL = 'Successfully deleted the file.'
 }
 
 

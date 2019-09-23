@@ -1,7 +1,7 @@
 // Testing
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { NO_ERRORS_SCHEMA, Type, DebugElement, Component } from '@angular/core';
+import { NO_ERRORS_SCHEMA, DebugElement, Component } from '@angular/core';
 import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { Router, ActivatedRoute, Params } from '@angular/router';
@@ -85,9 +85,9 @@ describe('ComposeComponent', () => {
 		}).compileComponents();
 
 		createNewFixture();
-		httpTestingController = TestBed.get(HttpTestingController as Type<HttpTestingController>);
+		httpTestingController = TestBed.inject(HttpTestingController);
 
-		routerSpy = TestBed.get(Router);
+		routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
 		routerSpy.navigateByUrl.and.callFake(((newUrl: string) => {
 			const canDeactivate = component.canDeactivate();
 			if (!newUrl.startsWith('/')) { newUrl = '/' + newUrl; }		// make sure it always has a leading /.
@@ -105,7 +105,7 @@ describe('ComposeComponent', () => {
 			});
 		}));
 
-		route = TestBed.get(ActivatedRoute);
+		route = TestBed.inject(ActivatedRoute);
 	}));
 
 	afterEach(async(() => {
@@ -268,7 +268,7 @@ describe('ComposeComponent', () => {
 
 			fixture.detectChanges();
 
-			const spy = TestBed.get(ModalService).openHTTPErrorModal as jasmine.Spy;
+			const spy = TestBed.inject(ModalService).openHTTPErrorModal as jasmine.Spy;
 			expect(spy.calls.first()).toBeTruthy('should opened http error modal');
 		});
 
@@ -398,7 +398,7 @@ describe('ComposeComponent', () => {
 			routerSpy.navigateByUrl('/');
 			fixture.detectChanges();
 
-			const spy = TestBed.get(ModalService).openDeactivateComposeModal as jasmine.Spy;
+			const spy = TestBed.inject(ModalService).openDeactivateComposeModal as jasmine.Spy;
 			expect(spy.calls.first()).toBeFalsy('should not have attempted to guard us from leaving');
 			expect(routerSpy.url).toBe('', 'should have routed away');
 		});

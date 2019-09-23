@@ -21,6 +21,7 @@ import { SectionWrapperComponent } from './sectionwrapper-component/sectionwrapp
 import { SectionComponent } from './section-component/section.component';
 import { TableComponent } from './table-component/table.component';
 
+
 @NgModule({
 	imports: [
 		CommonModule,

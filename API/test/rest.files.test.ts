@@ -4,6 +4,7 @@ import { FILE_STATUS } from '../src/libs/validate';
 import { Filestore } from '../src/libs/filestore';
 
 import { TestBed } from './testbed';
+import { FileThumbnail } from '../types';
 
 // ---------------------------------
 // -------- Files TestSuite --------
@@ -14,12 +15,12 @@ let validImageUploadResult: any;
 describe('REST: Files', () => {
 
 	// ---------------------------------
-	// ---- /api/files/uploadimage -----
+	// ---- /api/files/ -----
 	// ---------------------------------
 
-	describe('/api/files/uploadimage', () => {
-		it('POST /api/files/uploadimage 200', async () => {
-			const res = await TestBed.http.post('/api/files/uploadimage')
+	describe('/api/files/', () => {
+		it('POST /api/files/ 200', async () => {
+			const res = await TestBed.http.post('/api/files/')
 				.set('Cookie', TestBed.AdminCookie)
 				.attach('file', './test/test.png', 'test.png');
 
@@ -32,10 +33,10 @@ describe('REST: Files', () => {
 			validImageUploadResult = res.body;
 		});
 
-		it('POST /api/files/uploadimage 400 - Bad file', async () => {
-			const res = await TestBed.http.post('/api/files/uploadimage')
+		it('POST /api/files/ 400 - Bad file', async () => {
+			const res = await TestBed.http.post('/api/files/')
 				.set('Cookie', TestBed.AdminCookie);
-				// No file
+			// No file
 
 			expect(res).to.have.status(400);
 			expect(res).to.have.property('body');
@@ -44,35 +45,13 @@ describe('REST: Files', () => {
 			expect(res.body.error).have.equal(FILE_STATUS.ERROR_BAD_FILE);
 		});
 
-		it('POST /api/files/uploadimage 401', async () => {
-			const res = await TestBed.http.post('/api/files/uploadimage')
+		it('POST /api/files/ 401', async () => {
+			const res = await TestBed.http.post('/api/files/')
 				.attach('file', './test/test.png', 'test.png');
 
 			expect(res).to.have.status(401);
 		});
-	});
 
-	// ---------------------------------
-	// ------ /api/files/:filename -----
-	// ---------------------------------
-
-	describe('/api/files/:filename', () => {
-		it('GET /api/files/:filename 200', async () => {
-			const groups = validImageUploadResult.default.split('/');
-			const filename = groups[groups.length - 1];
-
-			const res = await TestBed.http.get('/api/files/' + filename);
-			expect(res).to.have.status(200);
-			expect(res.body).to.be.instanceOf(Buffer);
-		});
-	});
-
-
-	// ---------------------------------
-	// ---------- /api/files/ ----------
-	// ---------------------------------
-
-	describe('/api/files/', () => {
 		it('GET /api/files/ 200', async () => {
 			const res = await TestBed.http.get('/api/files/')
 				.set('Cookie', TestBed.AdminCookie);
@@ -80,14 +59,29 @@ describe('REST: Files', () => {
 			expect(res).to.have.status(200);
 			expect(res.body).to.be.instanceOf(Array);
 
-			const imageURL = res.body[0];
+			const fileThumbnail = res.body[0] as FileThumbnail;
 
-			expect(imageURL).to.equal(validImageUploadResult[Filestore.IMAGE_SIZES[0]]);
+			expect(fileThumbnail.thumbnail).to.equal(validImageUploadResult[Filestore.IMAGE_SIZES[0]]);
 		});
 
 		it('GET /api/files/ 401', async () => {
 			const res = await TestBed.http.get('/api/files/');
 			expect(res).to.have.status(401);
+		});
+	});
+
+	// ---------------------------------
+	// - /api/files/download/:filename -
+	// ---------------------------------
+
+	describe('/api/files/download/:fileURL', () => {
+		it('GET /api/files/download/:fileURL 200', async () => {
+			const groups = validImageUploadResult.default.split('/');
+			const fileURL = groups[groups.length - 1];
+
+			const res = await TestBed.http.get('/api/files/download/' + fileURL);
+			expect(res).to.have.status(200);
+			expect(res.body).to.be.instanceOf(Buffer);
 		});
 	});
 });

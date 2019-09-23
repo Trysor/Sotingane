@@ -54,8 +54,8 @@ describe('LoginComponent', () => {
 	beforeEach(() => {
 		fixture = TestBed.createComponent(LoginComponent);
 		component = fixture.componentInstance;
-		auth = TestBed.get(AuthService);
-		router = TestBed.get(Router);
+		auth = TestBed.inject(AuthService);
+		router = TestBed.inject(Router);
 		loginSubject = new Subject<boolean>();
 		auth.login = () => loginSubject.asObservable();
 

@@ -1,10 +1,15 @@
-import { Component, ChangeDetectionStrategy, Input, Output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input, Output, Optional, NgZone } from '@angular/core';
+import { HttpEventType, HttpErrorResponse } from '@angular/common/http';
+
 import { FormGroup } from '@angular/forms';
 
-import { ReplaySubject, BehaviorSubject, of } from 'rxjs';
-import { CustomUploadAdapterOptions } from '@types';
+import { MatDialog } from '@app/modules/material.types';
+import { FilesUploadedComponent } from '../filesuploaded-component/filesuploaded.component';
+
 import { FilesService } from '@app/services';
-import { HttpEventType, HttpErrorResponse } from '@angular/common/http';
+import { CKECustomUploadAdapterOptions, FileUploadResult, CKEFileStoreOptions, FileURLPayload } from '@types';
+
+import { ReplaySubject, BehaviorSubject, of, Subject } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 const ClassicEditor = require('CKEditorClassicBuild');
@@ -23,9 +28,13 @@ export class CKEDitorComponent {
 
 	@Input() form: FormGroup;
 
-	constructor(private filesService: FilesService) {
+	constructor(
+		@Optional() private dialog: MatDialog,
+		private ngZone: NgZone,
+		private filesService: FilesService) {
 		// Configure upload. has to be done before the editor initializes
 		ClassicEditor.defaultConfig.customUpload = this.createCustomUploadSettings();
+		ClassicEditor.defaultConfig.fileStore = this.createCustomFileStoreSettings();
 	}
 
 	// ---------------------------------------
@@ -60,7 +69,7 @@ export class CKEDitorComponent {
 				const obs = this.filesService.uploadImage(file);
 
 				let cancelFunc: () => void;
-				const promise = new Promise<File>((resolve, reject) => {
+				const promise = new Promise<FileUploadResult>((resolve, reject) => {
 					const sub = obs.pipe(catchError((e: HttpErrorResponse) => of(e))).subscribe(event => {
 						// Error
 						if (event instanceof HttpErrorResponse) {
@@ -94,6 +103,27 @@ export class CKEDitorComponent {
 					cancelFunc
 				};
 			}
-		} as CustomUploadAdapterOptions;
+		} as CKECustomUploadAdapterOptions;
+	}
+
+	private createCustomFileStoreSettings() {
+		return {
+			openGUI: () => {
+				const _sub = new Subject<FileURLPayload>();
+				const dialog = this.dialog; // avoid 'this' issues.
+
+				this.ngZone.run(() => {
+					// this part requires ngZone as it is triggered from CKEditor plugin / button
+					dialog.open(FilesUploadedComponent, {
+						closeOnNavigation: true
+					}).afterClosed().subscribe(payload => {
+						_sub.next(payload);
+						_sub.complete();
+					});
+				});
+
+				return _sub.toPromise();
+			}
+		} as CKEFileStoreOptions;
 	}
 }
