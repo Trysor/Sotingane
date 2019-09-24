@@ -7,37 +7,27 @@ import * as cookieParser from 'cookie-parser';
 
 // Express Engine
 import { ngExpressEngine } from '@nguniversal/express-engine';
-// Import module map for lazy loading
-import { provideModuleMap } from '@nguniversal/module-map-ngfactory-loader';
 
-
+// Express node server
 import * as express from 'express';
 import { join } from 'path';
 
-// Faster server renders w/ Prod mode (dev mode never needed)
-enableProdMode();
+// App Server module
+import { AppServerModule } from './src/main.server';
+
 
 // Express server
 const app = express();
 app.use(cookieParser());
 
 const PORT = process.env.PORT || 4000;
-const DIST_FOLDER = join(process.cwd(), 'dist');
+const DIST_FOLDER = join(process.cwd(), 'dist', 'browser');
 
-
-// * NOTE :: leave this as require()
-const { AppServerModuleNgFactory, LAZY_MODULE_MAP } = require('./dist/server/main');
-
-app.engine('html', ngExpressEngine({
-	bootstrap: AppServerModuleNgFactory,
-	providers: [
-		provideModuleMap(LAZY_MODULE_MAP)
-	]
-}));
+app.engine('html', ngExpressEngine({ bootstrap: AppServerModule }));
 
 app.set('view engine', 'html');
-app.set('views', join(DIST_FOLDER, 'browser'));
-app.get('*.*', express.static(join(DIST_FOLDER, 'browser'), { maxAge: '1y' })); // Files
+app.set('views', DIST_FOLDER);
+app.get('*.*', express.static(DIST_FOLDER, { maxAge: '1y' })); // Files
 app.get('*', (req, res) => res.render('index', { req, res, cache: true })); // Catch-all
 
 // Start up the Node server
