@@ -41,7 +41,7 @@ export class AuthController extends Controller {
 			? JWT.EXPIRES_REFRESH * 1000
 			: JWT.EXPIRES_AUTH * 1000;
 
-		if (isDelete) { maxAge = 1000; }
+		if (isDelete) { maxAge = 1; }
 
 		return res.cookie(cookieKey, isDelete ? '' : token, {
 			maxAge,
