@@ -142,13 +142,13 @@ export class AnalyticsComponent extends DestroyableClass implements AfterViewIni
 				header: 'Views',
 				property: 'views',
 				rightAlign: true,
-				val: (a) => a.views
+				val: a => a.views
 			},
 			{
 				header: 'Last visited',
 				property: 'lastVisit',
 				rightAlign: true,
-				val: (a) => this.datePipe.transform(a.lastVisit, 'yyyy-MM-dd HH:mm:ss')
+				val: a => this.datePipe.transform(a.lastVisit, 'yyyy-MM-dd HH:mm:ss')
 			}
 		],
 		mobile: ['title', 'route', 'views'],

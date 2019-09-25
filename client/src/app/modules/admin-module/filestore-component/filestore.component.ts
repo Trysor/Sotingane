@@ -10,6 +10,7 @@ import { FileThumbnail, TableSettings, ColumnType } from '@types';
 
 import { BehaviorSubject, of } from 'rxjs';
 import { takeUntil, catchError, map } from 'rxjs/operators';
+import { fi } from 'date-fns/locale';
 
 
 
@@ -25,40 +26,69 @@ export class FileStoreComponent extends DestroyableClass {
 	public readonly settings: TableSettings<FileThumbnail> = {
 		columns: [
 			{
+				header: ' ',
+				noSort: true,
+				type: ColumnType.Image,
+				property: 'thumbnail',
+				narrow: true
+			},
+			{
 				header: 'Title',
 				property: 'title',
 			},
 			{
 				header: 'Uploaded date',
 				property: 'uploadedDate',
-				val: (file: FileThumbnail): string => {
-					return this.datePipe.transform(file.uploadedDate);
-				}
+				val: file => this.datePipe.transform(file.uploadedDate)
+			},
+			{
+				header: 'Uploaded by',
+				property: 'uploadedBy',
+				val: file => file.uploadedBy.username
 			},
 			{
 				header: '',
-				property: 'uuid',
+				property: 'edit',
+				noSort: true,
+				type: ColumnType.Button,
+				icon: { val: () => 'edit' },
+				ariaLabel: file => `Edit file: ${file.title}`,
+				tooltip: file => `Edit file: ${file.title}`,
+				removeText: true,
+				func: (file, files) => {
+					console.log('EDIT:', file);
+				},
+				narrow: true
+			},
+			{
+				header: '',
+				property: 'delete',
 				noSort: true,
 				type: ColumnType.Button,
 				icon: { val: () => 'delete' },
 				ariaLabel: file => `Delete file: ${file.title}`,
+				tooltip: file => `Delete file: ${file.title}`,
 				removeText: true,
 				func: (file, files) => {
 					this.fileService.deleteFile(file.uuid).pipe<boolean>(
 						catchError(() => of(false))
-					).subscribe( success => {
-						if (success) {
-							const index = files.indexOf(file);
-							files.splice(index, 1);
-						}
+					).subscribe(success => {
+						if (!success) { return; }
+
+						this.data.next([]);
+						console.log(file);
+						console.log(files.length);
+						files.splice(files.indexOf(file), 1);
+						console.log(files.length);
+						this.data.next(files);
 					});
 				},
 				narrow: true
-			}
+			},
 		],
 
-		active: 'title',
-		dir: 'asc',
+		active: 'uploadedDate',
+		dir: 'desc',
 
 		trackBy: (index, file) => file.uuid,
 
