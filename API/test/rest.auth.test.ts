@@ -3,10 +3,7 @@ import { expect } from 'chai';
 import { User, AccessRoles, TokenResponse } from '../types';
 import { AUTH_STATUS, VALIDATION_FAILED } from '../src/libs/validate';
 
-import { verify } from 'jsonwebtoken';
-import { get as configGet } from 'config';
-
-import { TestBed, AdminUser } from './testbed';
+import { TestBed, AdminUser, AdminUser2 } from './testbed';
 
 
 // ---------------------------------
@@ -107,15 +104,23 @@ describe('REST: Authorization', () => {
 
 	describe('/api/auth/logout', () => {
 		it('POST /api/auth/logout 200', async () => {
-			const res = await TestBed.http.post('/api/auth/logout').send();
+			const user: Partial<User> = { username: AdminUser2.username, password: AdminUser2.password };
+			const resLogin = await TestBed.http.post('/api/auth/login').send(user);
 
-			expect(res).to.have.status(200);
-			expect(res).to.have.property('body');
+			expect(resLogin).to.have.status(200);
+			expect(resLogin).to.have.property('body');
+			expect(resLogin).to.have.cookie('jwt');
+			expect(resLogin).to.have.cookie('jwtRefresh');
 
-			expect(res).to.have.cookie('jwt');
-			expect(res).to.have.cookie('jwtRefresh');
-			expect(res.body).to.have.property('message');
-			expect(res.body).property('message').to.equal(AUTH_STATUS.USER_LOGGED_OUT);
+			const resLogut = await TestBed.http.post('/api/auth/logout').send();
+
+			expect(resLogut).to.have.status(200);
+			expect(resLogut).to.have.property('body');
+
+			expect(resLogut).to.not.have.cookie('jwt');
+			expect(resLogut).to.not.have.cookie('jwtRefresh');
+			expect(resLogut.body).to.have.property('message');
+			expect(resLogut.body).property('message').to.equal(AUTH_STATUS.USER_LOGGED_OUT);
 		});
 	});
 

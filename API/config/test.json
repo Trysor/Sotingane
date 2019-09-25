@@ -9,7 +9,6 @@
 	"loggingMode": "dev",
 	"tokenAudience": "someAudienceForTheAuthToken",
 	"refreshTokenAudience": "someAudienceForTheRefresherToken",
-	"imageUploadPath": "/some/path/accessible/to/api",
 	"browserRelativeUploadPath": "some/relative/url",
 	"UUID_Namespace_Filestore": "ad9a4643-7f70-462d-8d8a-ded0b2dc44ac"
 }
