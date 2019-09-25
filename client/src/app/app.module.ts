@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { TransferHttpCacheModule } from '@nguniversal/common';
 
 // Directly load base module
 import { BaseModule } from '@app/modules/base-module/base.module';
@@ -18,7 +19,7 @@ import { InterceptorService } from '@app/services/http/interceptor.service';
 	],
 	imports: [
 		BrowserModule.withServerTransition({ appId: 'soting' }), // must be in app.module
-		// TransferHttpCacheModule,
+		TransferHttpCacheModule,
 		BaseModule,
 		BaseRoutingModule,
 		MaterialDateModule
