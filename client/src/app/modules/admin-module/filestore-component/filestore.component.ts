@@ -1,16 +1,16 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-
 import { DatePipe } from '@angular/common';
 
-import { FilesService } from '@app/services';
+import { MatDialog, MatDialogConfig } from '@app/modules/material.types';
+
+import { FilesService, ModalService } from '@app/services';
 import { DestroyableClass } from '@app/classes';
 
-import { FileThumbnail, TableSettings, ColumnType } from '@types';
-
+import { FileThumbnail, TableSettings, ColumnType, ImageContentData } from '@types';
 
 import { BehaviorSubject, of } from 'rxjs';
 import { takeUntil, catchError, map } from 'rxjs/operators';
-import { fi } from 'date-fns/locale';
+import { FileModalComponent } from '../file-modal-component/file.modal.component';
 
 
 
@@ -56,7 +56,12 @@ export class FileStoreComponent extends DestroyableClass {
 				tooltip: file => `Edit file: ${file.title}`,
 				removeText: true,
 				func: (file, files) => {
-					console.log('EDIT:', file);
+					this.dialog.open(
+						FileModalComponent,
+						{ data: file as FileThumbnail } as MatDialogConfig
+					).afterClosed().subscribe((closedResult: boolean) => {
+						if (closedResult) { this.updateList(); }
+					});
 				},
 				narrow: true
 			},
@@ -75,12 +80,7 @@ export class FileStoreComponent extends DestroyableClass {
 					).subscribe(success => {
 						if (!success) { return; }
 
-						this.data.next([]);
-						console.log(file);
-						console.log(files.length);
-						files.splice(files.indexOf(file), 1);
-						console.log(files.length);
-						this.data.next(files);
+						this.updateList();
 					});
 				},
 				narrow: true
@@ -90,6 +90,15 @@ export class FileStoreComponent extends DestroyableClass {
 		active: 'uploadedDate',
 		dir: 'desc',
 
+		rowClick: file => {
+			this.fileService.getFileURLs(file.uuid).pipe(takeUntil(this.OnDestroy)).subscribe(payload => {
+				this.modalService.openImageModal({
+					startIndex: 0,
+					images: [{ url: payload.urls.default } as ImageContentData]
+				});
+			});
+		},
+
 		trackBy: (index, file) => file.uuid,
 
 		mobile: ['title', 'uploadedDate', 'uuid'], // uuid = delete
@@ -98,7 +107,9 @@ export class FileStoreComponent extends DestroyableClass {
 
 
 	constructor(
+		private dialog: MatDialog,
 		private datePipe: DatePipe,
+		public modalService: ModalService,
 		public fileService: FilesService) {
 
 		super();

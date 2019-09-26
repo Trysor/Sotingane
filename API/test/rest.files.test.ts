@@ -6,6 +6,9 @@ import { Filestore } from '../src/libs/filestore';
 import { TestBed } from './testbed';
 import { FileThumbnail } from '../types';
 
+import { FileModel } from '../src/models/file.model';
+import { FileData } from '../types';
+
 // ---------------------------------
 // -------- Files TestSuite --------
 // ---------------------------------
@@ -21,7 +24,7 @@ describe('REST: Files', () => {
 	describe('/api/files/', () => {
 		it('POST /api/files/ 200', async () => {
 			const res = await TestBed.http.post('/api/files/')
-				.set('Cookie', TestBed.AdminCookie)
+				.set('Cookie', TestBed.WriterCookie)
 				.attach('file', './test/test.png', 'test.png');
 
 			expect(res).to.have.status(200);
@@ -35,7 +38,7 @@ describe('REST: Files', () => {
 
 		it('POST /api/files/ 400 - Bad file', async () => {
 			const res = await TestBed.http.post('/api/files/')
-				.set('Cookie', TestBed.AdminCookie);
+				.set('Cookie', TestBed.WriterCookie);
 			// No file
 
 			expect(res).to.have.status(400);
@@ -54,7 +57,7 @@ describe('REST: Files', () => {
 
 		it('GET /api/files/ 200', async () => {
 			const res = await TestBed.http.get('/api/files/')
-				.set('Cookie', TestBed.AdminCookie);
+				.set('Cookie', TestBed.WriterCookie);
 
 			expect(res).to.have.status(200);
 			expect(res.body).to.be.instanceOf(Array);
@@ -65,8 +68,29 @@ describe('REST: Files', () => {
 		});
 
 		it('GET /api/files/ 401', async () => {
-			const res = await TestBed.http.get('/api/files/');
-			expect(res).to.have.status(401);
+
+			const [res1, res2] = await Promise.all([
+				TestBed.http.get('/api/files/'),
+				TestBed.http.get('/api/files/').set('Cookie', TestBed.MemberCookie)
+			]);
+
+			expect(res1).to.have.status(401);
+			expect(res2).to.have.status(401);
+		});
+
+		it('PATCH /api/files/ 200', async () => {
+			const file: FileData = await FileModel.findOne({}).lean();
+			expect(file.title).to.equal('test');
+
+			const newTitle = 'patched title';
+
+			const res = await TestBed.http.patch('/api/files/' + file.uuid)
+				.set('Cookie', TestBed.WriterCookie)
+				.send({ title: newTitle });
+
+			const body = res.body as FileData;
+			expect(res).to.have.status(200);
+			expect(body.title).to.equal(newTitle);
 		});
 	});
 

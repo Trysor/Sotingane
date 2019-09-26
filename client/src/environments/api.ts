@@ -12,12 +12,7 @@ export const API = {
 		history: '/api/cms/history',
 		search: '/api/cms/search',
 	},
-	files: {
-		deleteFile: '/api/files/',
-		getThumbnails: '/api/files/',
-		uploadimage: '/api/files/',
-		fileURLs: '/api/files/'
-	},
+	files: '/api/files/',
 	admin: {
 		users: '/api/admin/users',
 		cms: '/api/admin/cms',

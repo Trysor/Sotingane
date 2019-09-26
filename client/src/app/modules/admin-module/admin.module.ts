@@ -16,6 +16,7 @@ import { PagesComponent } from './pages-component/pages.component';
 import { AnalyticsComponent } from './analytics-component/analytics.component';
 import { FileStoreComponent } from './filestore-component/filestore.component';
 import { UserModalComponent } from './user-modal-component/user.modal.component';
+import { FileModalComponent } from './file-modal-component/file.modal.component';
 
 @NgModule({
 	declarations: [
@@ -25,7 +26,8 @@ import { UserModalComponent } from './user-modal-component/user.modal.component'
 		AnalyticsComponent,
 		SettingsComponent,
 		FileStoreComponent,
-		UserModalComponent
+		UserModalComponent,
+		FileModalComponent
 	],
 	imports: [
 		SharedModule,
@@ -33,7 +35,8 @@ import { UserModalComponent } from './user-modal-component/user.modal.component'
 		RouterModule.forChild([ { path: '', component: AdminComponent }	])
 	],
 	entryComponents: [
-		UserModalComponent
+		UserModalComponent,
+		FileModalComponent
 	]
 })
 export class AdminModule { }

@@ -1,16 +1,18 @@
 import { Request as Req, Response as Res, NextFunction as Next } from 'express';
-import { Controller, RouteDomain, GET, POST, DELETE } from '../libs/routing';
+import { Controller, RouteDomain, GET, POST, DELETE, PATCH } from '../libs/routing';
+
+import { UploadedFile } from 'express-fileupload';
 
 import { Auth } from '../libs/auth';
-import { UploadedFile } from 'express-fileupload';
 import { Filestore } from '../libs/filestore';
+import { sanitize } from '../libs/sanitizer';
 
 import { FileModel } from '../models';
-import { FileData, FileThumbnail, FileUploadStatus, FileDataObject } from '../../types';
 
 // Types and global settings
-import { JWTUser, AccessRoles } from '../../types';
-import { status, FILE_STATUS } from '../libs/validate';
+import { JWTUser, AccessRoles, FileData, FileThumbnail, FileUploadStatus, FileDataObject } from '../../types';
+import { status, FILE_STATUS, RegisterSchema, JSchema, validate } from '../libs/validate';
+import { FILE_MAX_LENGTH } from '../../global';
 
 
 
@@ -91,6 +93,26 @@ export class FilesController extends Controller {
 	}
 
 
+	@PATCH({ path: '/:uuid', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.writer), validate(JSchema.FileDataSchema)] })
+	public async patchFile(req: Req, res: Res, next: Next) {
+		const uuid: string = req.params.uuid;
+		const data: FileData = req.body;
+
+		const updatedFile = await FileModel.findOneAndUpdate(
+			{ uuid },
+			{
+				$set: {
+					title: sanitize(data.title)
+				},
+			},
+			{ new: true, projection: { data: false } }
+		).lean();
+
+		if (!updatedFile) { return res.status(500).send(status(FILE_STATUS.DATA_UNABLE_TO_SAVE)); }
+		return res.status(200).send(updatedFile);
+	}
+
+
 	@GET({ path: '/download/:fileURL', do: [] })
 	public async getImage(req: Req, res: Res, next: Next) {
 		const fileURL: string = req.params.fileURL;
@@ -118,5 +140,25 @@ export class FilesController extends Controller {
 			return res.sendStatus(404);
 		}
 
+	}
+
+
+	// ---------------------------------------
+	// ------------ JSON SCHEMAS -------------
+	// ---------------------------------------
+
+	@RegisterSchema(JSchema.FileDataSchema)
+	public get patchFileSchema() {
+		return {
+			type: 'object',
+			additionalProperties: false,
+			properties: {
+				title: {
+					type: 'string',
+					maxLength: FILE_MAX_LENGTH.TITLE
+				},
+			},
+			required: ['title']
+		};
 	}
 }

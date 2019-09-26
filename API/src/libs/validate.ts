@@ -103,6 +103,12 @@ export const JSchema: SchemaValidation = {
 		name: 'ThemeSchema',
 		err: VALIDATION_FAILED.THEME_MODEL
 	},
+
+	// File
+	FileDataSchema: {
+		name: 'FileDataSchema',
+		err: VALIDATION_FAILED.File_MODEL
+	}
 };
 
 
@@ -117,7 +123,8 @@ export const enum VALIDATION_FAILED {
 	CONTENT_MODEL = 'Content object validation failed',
 	ADMIN_MODEL = 'Query object validation failed',
 	SETTING_MODEL = 'Setting object validation failed',
-	THEME_MODEL = 'Theme object validation failed'
+	THEME_MODEL = 'Theme object validation failed',
+	File_MODEL = 'File object validation failed'
 }
 
 
@@ -183,7 +190,9 @@ export const enum FILE_STATUS {
 	ERROR_BAD_UPLOAD_FOLDER = 'Cannot process your request',
 	ERROR_IMAGE_TOO_LARGE = 'Image too large',
 	ERROR_WRITING = 'Could not complete request',
-	DELETE_SUCCESSFUL = 'Successfully deleted the file.'
+	DELETE_SUCCESSFUL = 'Successfully deleted the file.',
+	PATCH_SUCCESSFUL = 'Successfully updated file data.',
+	DATA_UNABLE_TO_SAVE = 'Could not save. Internal server error',
 }
 
 

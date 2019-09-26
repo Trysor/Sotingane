@@ -1,0 +1,20 @@
+<h2 mat-dialog-title align="center">Edit file: {{data.title}}</h2>
+<div mat-dialog-content align="start" class="wrapper">
+	<form [formGroup]="patchFileForm" id="patchFileForm" autocomplete="off" (ngSubmit)="submitForm()">
+		<!-- TITLE -->
+		<div class="row">
+			<mat-form-field appearance="outline">
+				<mat-label>Title</mat-label>
+				<input matInput id="title" #title type="text" formControlName="title">
+				<mat-error *ngIf="patchFileForm.get('title').hasError('required')">
+					Title is <strong>required</strong>
+				</mat-error>
+			</mat-form-field>
+		</div>
+	</form>
+</div>
+<div mat-dialog-actions align="center">
+	<button mat-button (click)="close()">Cancel</button>
+	<button mat-raised-button type="submit" form="patchFileForm"
+			[disabled]="(!patchFileForm.valid || !patchFileForm.dirty)">Save</button>
+</div>
