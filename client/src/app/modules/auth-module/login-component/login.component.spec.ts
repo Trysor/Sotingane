@@ -5,7 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 // Material
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule } from '@app/modules';
+import { MaterialModule } from '@app/modules/material.module';
 
 // Routing
 import { RouterTestingModule } from '@angular/router/testing';

@@ -6,7 +6,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { TransferState } from '@angular/platform-browser';
 
 // Material
-import { MaterialModule } from '@app/modules';
+import { MaterialModule } from '@app/modules/material.module';
 
 // Routing
 import { Router } from '@angular/router';

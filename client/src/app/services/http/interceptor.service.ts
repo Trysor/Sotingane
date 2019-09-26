@@ -27,7 +27,7 @@ export class InterceptorService implements HttpInterceptor {
 	intercept(req: HttpRequest<any>, next: HttpHandler) {
 		// Only intercept if the request is going to our server.
 		if (!req.url.startsWith(env.API.api)) { return next.handle(req); }
-		const shouldSetAsJson = !req.url.startsWith(env.API.files.uploadimage);
+		const shouldSetAsJson = !req.url.startsWith(env.API.files);
 
 		// LoadingService
 		this.loadingService.addRequest();

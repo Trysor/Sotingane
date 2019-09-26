@@ -20,7 +20,7 @@ import { AppServerModule } from './src/main.server';
 const app = express();
 app.use(cookieParser());
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 80;
 const DIST_FOLDER = join(process.cwd(), 'dist', 'browser');
 
 app.engine('html', ngExpressEngine({ bootstrap: AppServerModule }));

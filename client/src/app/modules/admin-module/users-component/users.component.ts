@@ -40,9 +40,7 @@ export class UsersComponent extends DestroyableClass {
 			{
 				header: 'Joined date',
 				property: 'createdAt',
-				val: (user: User): string => {
-					return this.datePipe.transform(user.createdAt);
-				}
+				val: user => this.datePipe.transform(user.createdAt)
 			},
 			{
 				header: '',
@@ -68,7 +66,7 @@ export class UsersComponent extends DestroyableClass {
 		active: 'username',
 		dir: 'asc',
 
-		trackBy: (index: number, user: User) => user._id,
+		trackBy: (index, user) => user._id,
 
 		mobile: ['username', 'roles', '_id'], // _id = edit
 

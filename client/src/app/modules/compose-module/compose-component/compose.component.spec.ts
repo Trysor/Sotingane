@@ -8,9 +8,9 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 
 // Material
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule } from '@app/modules';
+import { MaterialModule } from '@app/modules/material.module';
 import { MatSelectChange } from '@app/modules/material.types';
-import { CommonModule } from '@app/modules';
+import { CommonModule } from '@app/modules/common.module';
 
 // Types and env
 import { env } from '@env';

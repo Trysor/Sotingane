@@ -53,7 +53,7 @@ export class TableComponent implements OnInit, AfterViewInit {
 				this.filterSettings.func(value);
 				return;
 			}
-			this.filterRegex = new RegExp(value, 'i');
+			this.filterRegex = new RegExp(this.escapeFilter(value), 'i');
 			this.Source.filter = value.trim().toLowerCase();
 		});
 
@@ -110,6 +110,10 @@ export class TableComponent implements OnInit, AfterViewInit {
 		e.stopPropagation();
 	}
 
+
+	private escapeFilter(string: string) {
+		return string.replace(/[\\^$*+?.()|[\]{}]/g, '\\$&');
+	}
 }
 
 

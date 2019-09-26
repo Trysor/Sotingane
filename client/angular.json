@@ -154,10 +154,7 @@
 					},
 					"configurations": {
 						"production": {
-							"optimization": {
-								"scripts": false,
-								"styles": true
-							},
+							"optimization": true,
 							"fileReplacements": [
 								{
 									"replace": "src/environments/environment.ts",
