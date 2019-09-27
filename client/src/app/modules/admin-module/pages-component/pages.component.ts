@@ -1,9 +1,11 @@
-import { Component, Optional, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Optional, OnDestroy, ChangeDetectionStrategy, AfterViewInit } from '@angular/core';
 
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
-import { ModalService, SettingsService, AdminService } from '@app/services';
+import { SettingsService } from '@app/services/controllers/settings.service';
+import { ModalService } from '@app/services/utility/modal.service';
+import { AdminService } from '@app/services/controllers/admin.service';
 
 import { Content, TableSettings, ColumnType } from '@types';
 
@@ -18,7 +20,7 @@ import { takeUntil } from 'rxjs/operators';
 	styleUrls: ['./pages.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PagesComponent extends DestroyableClass implements OnDestroy {
+export class PagesComponent extends DestroyableClass implements AfterViewInit {
 	public data = new BehaviorSubject<Content[]>(null);
 
 	private readonly _accessHandler = new AccessHandler();
@@ -114,6 +116,10 @@ export class PagesComponent extends DestroyableClass implements OnDestroy {
 		private datePipe: DatePipe) {
 
 		super();
+
+	}
+
+	ngAfterViewInit() {
 		this.adminService.getAllContent().pipe(takeUntil(this.OnDestroy)).subscribe((contentList) => {
 			this.data.next(contentList);
 		});

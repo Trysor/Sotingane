@@ -2,20 +2,20 @@
 	<div class="search" *ngIf="mobile.isMobile | async">
 		<search-component alternativeColor="true"></search-component>
 	</div>
-	<mat-nav-list dense [style.touch-action]="'pan-y'">
-		<ng-container *ngIf="contentSubject | async as nav">
-			<a mat-list-item *ngFor="let navEntry of nav.rootContent; trackBy: trackBy"
-			   routerLink="/{{navEntry.route}}"
-			   routerLinkActive="active">{{ navEntry.title }}</a>
-	
-			<ng-container *ngFor="let folderEntry of nav.folders">
-				<mat-divider></mat-divider>
-				<h2 mat-subheader>{{ folderEntry.title }}</h2>
-				<a mat-list-item *ngFor="let navEntry of folderEntry.content; trackBy: trackBy"
-				   routerLink="/{{navEntry.route}}"
-				   routerLinkActive="active"
-				   ngClass="subItem">{{ navEntry.title }}</a>
-			</ng-container>
-		</ng-container>
-	</mat-nav-list>
+	<ul [style.touch-action]="'pan-y'" *ngIf="contentSubject | async as nav">
+		<li *ngFor="let navEntry of nav.rootContent; trackBy: trackBy">
+			<a mat-button routerLink="/{{navEntry.route}}" routerLinkActive="active">{{ navEntry.title }}</a>
+		</li>
+
+		<li *ngFor="let folderEntry of nav.folders" class="folder">
+			<mat-divider></mat-divider>
+			<h2>{{ folderEntry.title }}</h2>
+			<ul>
+				<li *ngFor="let navEntry of folderEntry.content; trackBy: trackBy">
+					<a mat-button routerLink="/{{navEntry.route}}" routerLinkActive="active"
+						ngClass="subItem">{{ navEntry.title }}</a>
+				</li>
+			</ul>
+		</li>
+	</ul>
 </ng-container>

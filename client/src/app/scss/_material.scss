@@ -18,7 +18,6 @@
 
 // Generic
 @include mat-button-theme($app-theme);
-@include mat-list-theme($app-theme);
 @include mat-divider-theme($app-theme);
 @include mat-icon-theme($app-theme);
 
@@ -29,10 +28,9 @@
 // Layout
 @include mat-sidenav-theme($app-theme);
 
-// Features
+
 @include mat-menu-theme($app-theme);
-@include mat-paginator-theme($app-theme);
-@include mat-table-theme($app-theme);
+
 
 @import 'lazy';
 

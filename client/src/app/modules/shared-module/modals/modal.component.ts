@@ -1,5 +1,5 @@
 import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@app/modules/material.types';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { ModalData } from '@types';
 

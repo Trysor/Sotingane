@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { User } from '@types';
-import { AuthService } from '@app/services';
+import { AuthService } from '@app/services/controllers/auth.service';
 
 import { BehaviorSubject, of } from 'rxjs';
 import { takeUntil, catchError } from 'rxjs/operators';

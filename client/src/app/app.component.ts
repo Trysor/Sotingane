@@ -1,6 +1,6 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 
-import { SetupService } from '@app/services';
+import { SetupService } from '@app/services/utility/setup.service';
 
 @Component({
 	selector: 'app-root',

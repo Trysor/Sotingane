@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 
 // Modules
 import { SharedModule } from '@app/modules/shared-module/shared.module';
-import { CommonModule } from '@app/modules/common.module';
+import { CommonModule } from '@app/modules//common-module/common.module';
 
 
 // Components

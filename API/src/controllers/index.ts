@@ -5,4 +5,5 @@ export * from './error.controller';
 export * from './files.controller';
 export * from './settings.controller';
 export * from './themes.controller';
+export * from './tools.controller';
 export * from './users.controller';

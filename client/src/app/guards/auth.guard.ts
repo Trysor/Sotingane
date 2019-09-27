@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, CanLoad, Router } from '@angular/router';
 
-import { AuthService } from '@app/services';
+import { AuthService } from '@app/services/controllers/auth.service';
 import { handleForUser } from './guard.user.handler';
 
 

@@ -6,7 +6,8 @@ import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import {
 	AggregationQuery, AggregationResult, AggregationResultSummarized, AggregationResultUnwinded, User, TableSettings
 } from '@types';
-import { AdminService, SnackBarService } from '@app/services';
+import { AdminService } from '@app/services/controllers/admin.service';
+import { SnackBarService } from '@app/services/utility/snackbar.service';
 
 import { FormErrorInstant, AccessHandler, DestroyableClass } from '@app/classes';
 
@@ -188,11 +189,6 @@ export class AnalyticsComponent extends DestroyableClass implements AfterViewIni
 			unwind: [false],
 		});
 
-		// Get users
-		this.adminService.getAllusers().pipe(takeUntil(this.OnDestroy)).subscribe(users => {
-			this.users.next(users);
-		});
-
 		this.aggregateForm.get('accessFilter').valueChanges.pipe(takeUntil(this.OnDestroy)).subscribe(val => {
 			if (val) {
 				this.aggregateForm.get('access').enable();
@@ -203,8 +199,12 @@ export class AnalyticsComponent extends DestroyableClass implements AfterViewIni
 	}
 
 
+	ngAfterViewInit() {
+		// Get users
+		this.adminService.getAllusers().pipe(takeUntil(this.OnDestroy)).subscribe(users => {
+			this.users.next(users);
+		});
 
-	ngAfterViewInit(): void {
 		// Track changes
 		this.aggregateForm.get('unwind').valueChanges.pipe(distinctUntilChanged()).subscribe(() => {
 			this.data.next(null);

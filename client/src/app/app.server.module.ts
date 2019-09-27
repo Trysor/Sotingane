@@ -5,7 +5,7 @@ import { ServerModule, ServerTransferStateModule } from '@angular/platform-serve
 import { AppModule } from './app.module';
 import { AppComponent } from './app.component';
 
-import { ServerService } from '@app/services';
+import { ServerService } from '@app/services/http/server.service';
 
 @NgModule({
 	imports: [

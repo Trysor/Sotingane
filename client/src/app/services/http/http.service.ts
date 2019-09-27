@@ -2,7 +2,7 @@
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer } from '@angular/platform-browser';
 
-import { MatIconRegistry } from '@app/modules/material.types';
+import { MatIconRegistry } from '@angular/material/icon';
 
 import { ServerService } from '@app/services/http/server.service';
 

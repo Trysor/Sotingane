@@ -1,9 +1,10 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, AfterViewInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 
-import { MatDialog, MatDialogConfig } from '@app/modules/material.types';
 
-import { FilesService, ModalService } from '@app/services';
+import { FilesService } from '@app/services/controllers/files.service';
+import { ModalService } from '@app/services/utility/modal.service';
 import { DestroyableClass } from '@app/classes';
 
 import { FileThumbnail, TableSettings, ColumnType, ImageContentData } from '@types';
@@ -20,7 +21,8 @@ import { FileModalComponent } from '../file-modal-component/file.modal.component
 	styleUrls: ['./filestore.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FileStoreComponent extends DestroyableClass {
+export class FileStoreComponent extends DestroyableClass implements AfterViewInit {
+
 	public data = new BehaviorSubject<FileThumbnail[]>(null);
 
 	public readonly settings: TableSettings<FileThumbnail> = {
@@ -113,6 +115,9 @@ export class FileStoreComponent extends DestroyableClass {
 		public fileService: FilesService) {
 
 		super();
+	}
+
+	ngAfterViewInit(): void {
 		this.updateList();
 	}
 

@@ -2,7 +2,8 @@ import { Component, ChangeDetectionStrategy, Optional } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
-import { ModalService, AuthService } from '@app/services';
+import { AuthService } from '@app/services/controllers/auth.service';
+import { ModalService } from '@app/services/utility/modal.service';
 import { UpdatePasswordUser } from '@types';
 
 import { of } from 'rxjs';

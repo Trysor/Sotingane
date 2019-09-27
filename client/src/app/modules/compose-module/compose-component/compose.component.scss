@@ -29,18 +29,6 @@
 		}
 	}
 
-	.imageUploadButton {
-		position: absolute;
-		top: 40px;
-		right: 0;
-		z-index: 99999;
-	}
-
-	mat-sidenav-container,
-	mat-sidenav-content {
-		background: none;
-	}
-
 	::ng-deep .mat-tab-body {
 		min-height: 320px;
 	}

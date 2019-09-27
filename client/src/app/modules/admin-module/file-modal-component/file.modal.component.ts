@@ -1,8 +1,10 @@
 import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@app/modules/material.types';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+
+
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 
-import { FilesService } from '@app/services';
+import { FilesService } from '@app/services/controllers/files.service';
 import { FileData, FileThumbnail } from '@types';
 
 import { of } from 'rxjs';

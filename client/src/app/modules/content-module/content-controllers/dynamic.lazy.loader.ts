@@ -1,6 +1,6 @@
 ﻿import { OnDestroy, ElementRef } from '@angular/core';
 
-import { IntersectionService } from '@app/services';
+import { IntersectionService } from '@app/services/utility/intersection.service';
 
 import { Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';

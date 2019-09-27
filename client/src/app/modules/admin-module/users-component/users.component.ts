@@ -1,9 +1,10 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { MatDialog, MatDialogConfig } from '@app/modules/material.types';
+import { Component, ChangeDetectionStrategy, AfterViewInit } from '@angular/core';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 
 import { DatePipe } from '@angular/common';
 
-import { AdminService, AuthService } from '@app/services';
+import { AdminService } from '@app/services/controllers/admin.service';
+import { AuthService } from '@app/services/controllers/auth.service';
 import { AccessHandler, DestroyableClass } from '@app/classes';
 
 import { User, TableSettings, ColumnType } from '@types';
@@ -21,7 +22,7 @@ import { takeUntil } from 'rxjs/operators';
 	styleUrls: ['./users.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class UsersComponent extends DestroyableClass {
+export class UsersComponent extends DestroyableClass implements AfterViewInit {
 	public data = new BehaviorSubject<User[]>(null);
 
 	private readonly _accessHandler = new AccessHandler();
@@ -80,8 +81,12 @@ export class UsersComponent extends DestroyableClass {
 		public adminService: AdminService) {
 
 		super();
+	}
+
+	ngAfterViewInit() {
 		this.updateList();
 	}
+
 
 	/**
 	 * Updates the user list

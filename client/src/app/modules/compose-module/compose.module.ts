@@ -7,9 +7,8 @@ import { ComposeRoutingModule } from './compose.routing-module';
 // Modules
 import { ContentModule } from '@app/modules/content-module/content.module';
 import { SharedModule } from '@app/modules/shared-module/shared.module';
-import { CommonModule } from '@app/modules/common.module';
+import { CommonModule } from '@app/modules//common-module/common.module';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-import { MatDialogModule } from '@angular/material/dialog';
 
 
 // Components
@@ -27,7 +26,6 @@ import { FilesUploadedComponent } from './filesuploaded-component/filesuploaded.
 		FilesUploadedComponent
 	],
 	imports: [
-		MatDialogModule,
 		SharedModule,
 		ContentModule,
 		CommonModule,

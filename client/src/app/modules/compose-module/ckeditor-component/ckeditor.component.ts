@@ -1,12 +1,11 @@
 import { Component, ChangeDetectionStrategy, Input, Output, Optional, NgZone } from '@angular/core';
 import { HttpEventType, HttpErrorResponse } from '@angular/common/http';
-
+import { MatDialog } from '@angular/material/dialog';
 import { FormGroup } from '@angular/forms';
 
-import { MatDialog } from '@app/modules/material.types';
 import { FilesUploadedComponent } from '../filesuploaded-component/filesuploaded.component';
 
-import { FilesService } from '@app/services';
+import { FilesService } from '@app/services/controllers/files.service';
 import { CKECustomUploadAdapterOptions, FileUploadResult, CKEFileStoreOptions, FileURLPayload } from '@types';
 
 import { ReplaySubject, BehaviorSubject, of, Subject } from 'rxjs';

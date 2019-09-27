@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
 
 
 import { MobileDirective } from '@app/directives';
-import { MobileService } from '@app/services';
+import { MobileService } from '@app/services/utility/mobile.service';
 import { mobileServiceStub } from '@app/services/tests/stubs';
 
 import { AuthComponent } from './auth.component';

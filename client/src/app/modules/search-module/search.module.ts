@@ -8,19 +8,20 @@ import { SharedModule } from '@app/modules/shared-module/shared.module';
 import { CommonModule } from '@app/modules//common-module/common.module';
 
 // Components
-import { LoginComponent } from './login-component/login.component';
-import { AuthComponent } from './auth-component/auth.component';
+import { SearchResultsComponent } from './search-results-component/search.results.component';
 
 
 @NgModule({
 	declarations: [
-		LoginComponent,
-		AuthComponent
+		SearchResultsComponent,
 	],
 	imports: [
-		RouterModule.forChild([ { path: '', component: AuthComponent, pathMatch: 'full' } ]),
+		RouterModule.forChild([
+			{ path: ':term', component: SearchResultsComponent },
+			{ path: '', component: SearchResultsComponent, pathMatch: 'full', data: { SearchResults: '' } },
+		]),
 		SharedModule,
 		CommonModule
 	]
 })
-export class AuthModule { }
+export class SearchModule { }

@@ -9,8 +9,8 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 // Material
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '@app/modules/material.module';
-import { MatSelectChange } from '@app/modules/material.types';
-import { CommonModule } from '@app/modules/common.module';
+import { MatSelectChange } from '@angular/material/select';
+import { CommonModule } from '@app/modules//common-module/common.module';
 
 // Types and env
 import { env } from '@env';
@@ -18,7 +18,9 @@ import { Content, StatusMessage } from '@types';
 
 // Self
 import { ComposeComponent } from './compose.component';
-import { HttpService, ModalService, StorageService } from '@app/services';
+import { HttpService } from '@app/services/http/http.service';
+import { ModalService } from '@app/services/utility/modal.service';
+import { StorageService } from '@app/services/utility/storage.service';
 import { DatePipe } from '@angular/common';
 
 // Rxjs
@@ -197,7 +199,7 @@ describe('ComposeComponent', () => {
 
 
 			const contentReq = httpTestingController.expectOne(`${env.API.admin.cms}/${route.snapshot.params.route as string}`);
-			const historyReq = httpTestingController.expectOne(`${env.API.cms.history}/${route.snapshot.params.route as string}`);
+			const historyReq = httpTestingController.expectOne(`${env.API.tools.history}/${route.snapshot.params.route as string}`);
 
 			const loadedContent: Content = {
 				content: '<p>some content</p>',
@@ -261,7 +263,7 @@ describe('ComposeComponent', () => {
 			component.submitForm();
 			fixture.detectChanges();
 
-			httpTestingController.expectOne(env.API.cms.content).flush(
+			httpTestingController.expectOne(env.API.cms).flush(
 				{ message: 'Something went wrong' } as StatusMessage,
 				{ status: 400, statusText: 'Bad Request' }
 			);
@@ -294,7 +296,7 @@ describe('ComposeComponent', () => {
 			submitEl.dispatchEvent(new Event('click'));
 			fixture.detectChanges();
 
-			const createReq = httpTestingController.expectOne(env.API.cms.content);
+			const createReq = httpTestingController.expectOne(env.API.cms);
 			httpTestingController.verify();
 
 			createReq.flush(component.ContentForm.getRawValue());
@@ -317,7 +319,7 @@ describe('ComposeComponent', () => {
 				access: [],
 				folder: '',
 			} as Content);
-			httpTestingController.expectOne(`${env.API.cms.history}/${route.snapshot.params.route as string}`).flush(null as Content[]);
+			httpTestingController.expectOne(`${env.API.tools.history}/${route.snapshot.params.route as string}`).flush(null as Content[]);
 
 			httpTestingController.verify();
 			fixture.detectChanges();
@@ -331,7 +333,7 @@ describe('ComposeComponent', () => {
 			fixture.detectChanges();
 
 			const updateReq = httpTestingController.expectOne(
-				`${env.API.cms.content}/${route.snapshot.params.route as string}`,
+				`${env.API.cms}/${route.snapshot.params.route as string}`,
 				'should update with the original route'
 			);
 			updateReq.flush(component.ContentForm.getRawValue());
@@ -364,7 +366,7 @@ describe('ComposeComponent', () => {
 
 			expect(routerSpy.url).toBe('/compose', 'we should be at the compose route prior to submitting');
 
-			httpTestingController.expectOne(env.API.cms.content).flush(component.ContentForm.getRawValue());
+			httpTestingController.expectOne(env.API.cms).flush(component.ContentForm.getRawValue());
 			fixture.detectChanges();
 
 			expect(routerSpy.url).toBe('', 'Should be routed to home if the content is set to not published');
@@ -431,7 +433,7 @@ describe('ComposeComponent', () => {
 			const historyCopy3 = Object.assign({}, loadedContent);
 			historyCopy3.description = 'history changed thrice';
 
-			httpTestingController.expectOne(`${env.API.cms.history}/${route.snapshot.params.route as string}`)
+			httpTestingController.expectOne(`${env.API.tools.history}/${route.snapshot.params.route as string}`)
 				.flush([historyCopy1, historyCopy2, historyCopy3]);
 
 			httpTestingController.verify();
@@ -489,7 +491,7 @@ describe('ComposeComponent', () => {
 			fixture.detectChanges();
 
 			const contentReq = httpTestingController.expectOne(`${env.API.admin.cms}/${route.snapshot.params.route as string}`);
-			const historyReq = httpTestingController.expectOne(`${env.API.cms.history}/${route.snapshot.params.route as string}`);
+			const historyReq = httpTestingController.expectOne(`${env.API.tools.history}/${route.snapshot.params.route as string}`);
 
 			const loadedContent: Content = {
 				content: '<p>some content</p>',

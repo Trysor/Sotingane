@@ -3,7 +3,8 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { HttpClient } from '@angular/common/http';
 
-import { AdminService, HttpService } from '@app/services';
+import { AdminService } from '@app/services/controllers/admin.service';
+import { HttpService } from '@app/services/http/http.service';
 import { User, Content } from '@types';
 
 import { env } from '@env';

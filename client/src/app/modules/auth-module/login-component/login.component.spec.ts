@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 
 // Services
-import { AuthService } from '@app/services';
+import { AuthService } from '@app/services/controllers/auth.service';
 import { authServiceStub, AuthServiceStub } from '@app/services/tests/stubs';
 
 // Self

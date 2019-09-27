@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { StorageService, StorageKey } from '@app/services';
+import { StorageService, StorageKey } from '@app/services/utility/storage.service';
 
 
 @Component({

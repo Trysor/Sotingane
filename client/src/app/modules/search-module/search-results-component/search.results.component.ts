@@ -1,8 +1,9 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, AfterViewInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
-import { CMSService, MobileService } from '@app/services';
+import { CMSService } from '@app/services/controllers/cms.service';
+import { MobileService } from '@app/services/utility/mobile.service';
 import { SearchResultContent, TableSettings, ColumnType, TableFilterSettings } from '@types';
 
 import { BehaviorSubject, of } from 'rxjs';
@@ -15,7 +16,7 @@ import { DestroyableClass } from '@app/classes';
 	styleUrls: ['./search.results.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SearchResultsComponent extends DestroyableClass {
+export class SearchResultsComponent extends DestroyableClass implements AfterViewInit {
 	public data = new BehaviorSubject<SearchResultContent[]>([]);
 
 	public readonly settings: TableSettings<SearchResultContent> = {
@@ -78,10 +79,15 @@ export class SearchResultsComponent extends DestroyableClass {
 		public mobileService: MobileService) {
 
 		super();
+
+	}
+
+	ngAfterViewInit() {
 		this.route.paramMap.pipe(takeUntil(this.OnDestroy)).subscribe(p => {
-			this.setResults(p.get('term'));
+			this.setResults(p.get('term') || '');
 		});
 	}
+
 
 	/**
 	 * Set searchResults helper

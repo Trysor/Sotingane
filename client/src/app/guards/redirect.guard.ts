@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 
-import { SettingsService } from '@app/services';
+import { SettingsService } from '@app/services/controllers/settings.service';
 
 import { first, map } from 'rxjs/operators';
 

@@ -1,7 +1,8 @@
 import { Express, Router } from 'express';
 import {
 	AdminController, AuthController, CMSController, UsersController,
-	FilesController, ErrorController, SettingsController, ThemeController
+	FilesController, ErrorController, ToolsController, SettingsController,
+	ThemeController
 } from './controllers';
 
 export class AppRouter {
@@ -15,7 +16,7 @@ export class AppRouter {
 		const controllers = [
 			new AdminController(), new AuthController(), new CMSController(),
 			new FilesController(), new ErrorController(), new SettingsController(),
-			new ThemeController(), new UsersController()
+			new ThemeController(), new ToolsController(), new UsersController()
 		];
 		controllers.sort( (a, b) => b.Priority - a.Priority).forEach(controller => {
 			apiRoutes.use(controller.RouteDomain, controller.Router);

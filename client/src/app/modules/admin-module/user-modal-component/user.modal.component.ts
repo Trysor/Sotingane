@@ -1,8 +1,10 @@
 import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@app/modules/material.types';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 
-import { AdminService, AuthService } from '@app/services';
+import { AdminService } from '@app/services/controllers/admin.service';
+import { AuthService } from '@app/services/controllers/auth.service';
 import { User } from '@types';
 
 import { AccessHandler } from '@app/classes';

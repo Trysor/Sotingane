@@ -4,10 +4,13 @@ import { Router, ActivatedRoute, CanDeactivate } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { MatSelectChange } from '@app/modules/material.types';
+import { MatSelectChange } from '@angular/material/select';
 
 import { FormErrorInstant, AccessHandler, DestroyableClass } from '@app/classes';
-import { ModalService, CMSService, AdminService, StorageService, StorageKey } from '@app/services';
+import { CMSService } from '@app/services/controllers/cms.service';
+import { AdminService } from '@app/services/controllers/admin.service';
+import { ModalService } from '@app/services/utility/modal.service';
+import { StorageService, StorageKey } from '@app/services/utility/storage.service';
 
 import { HistoryHandler } from './compose.history.handler';
 

@@ -5,7 +5,7 @@ import { BrowserTransferStateModule } from '@angular/platform-browser';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 import { env } from '@env';
-import { WorkerService } from '@app/services';
+import { WorkerService } from '@app/services/http/worker.service';
 
 import { AppModule } from './app.module';
 import { AppComponent } from './app.component';

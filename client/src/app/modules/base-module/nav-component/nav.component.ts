@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 import { Content, CmsFolder } from '@types';
-import { CMSService } from '@app/services';
+import { CMSService } from '@app/services/controllers/cms.service';
 
 import { BehaviorSubject } from 'rxjs';
 

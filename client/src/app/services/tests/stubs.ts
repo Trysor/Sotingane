@@ -1,11 +1,8 @@
 ﻿
 import { User } from '@types';
 
-import {
-	AdminService, AuthService, CMSService, HttpService, InterceptorService,
-	IntersectionService, LoadingService, MobileService
-} from '@app/services';
-
+import { AuthService } from '@app/services/controllers/auth.service';
+import { MobileService } from '@app/services/utility/mobile.service';
 
 import { BehaviorSubject, of, Subject } from 'rxjs';
 

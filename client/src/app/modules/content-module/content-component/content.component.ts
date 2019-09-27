@@ -4,7 +4,11 @@ import {
 } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 
-import { CMSService, AuthService, ModalService, ContentService, SettingsService } from '@app/services';
+import { CMSService } from '@app/services/controllers/cms.service';
+import { AuthService } from '@app/services/controllers/auth.service';
+import { SettingsService } from '@app/services/controllers/settings.service';
+import { ModalService } from '@app/services/utility/modal.service';
+import { ContentService } from '@app/services/utility/content.service';
 import { AccessRoles } from '@types';
 
 import { takeUntil, filter } from 'rxjs/operators';

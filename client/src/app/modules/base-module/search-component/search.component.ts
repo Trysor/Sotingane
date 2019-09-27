@@ -34,7 +34,7 @@ export class SearchComponent implements OnInit {
 	/**
 	 * Perform a search and navigate to the search page
 	 */
-	public search() {
+	public async search() {
 		this.router.navigateByUrl('/search/' + this.form.get('search').value);
 		// this.form.get('search').setValue('');
 	}

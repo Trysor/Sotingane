@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, Inject, ViewChild } from '@angular/
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 
-import { MatDialogRef, MAT_DIALOG_DATA } from '@app/modules/material.types';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { DestroyableClass } from '@app/classes';
 import { FilesService } from '@app/services/controllers/files.service';

@@ -1,11 +1,12 @@
 import { Component, AfterViewInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { MatDrawer } from '@app/modules/material.types';
+import { MatDrawer } from '@angular/material/sidenav';
 
-import { MobileService, AuthService, SEOService } from '@app/services';
+import { AuthService } from '@app/services/controllers/auth.service';
+import { MobileService } from '@app/services/utility/mobile.service';
+import { SEOService } from '@app/services/utility/seo.service';
 
-import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { DestroyableClass } from '@app/classes';
 

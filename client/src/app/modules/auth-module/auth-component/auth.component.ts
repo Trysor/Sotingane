@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 
-import { MobileService } from '@app/services';
+import { MobileService } from '@app/services/utility/mobile.service';
 
 @Component({
 	selector: 'auth-component',

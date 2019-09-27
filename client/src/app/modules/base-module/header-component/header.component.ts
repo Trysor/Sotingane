@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 
-import { AuthService } from '@app/services';
+import { AuthService } from '@app/services/controllers/auth.service';
 
 @Component({
 	selector: 'header-component',

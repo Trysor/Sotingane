@@ -1,6 +1,6 @@
 import { env } from '@env';
 
-import { AuthService } from '@app/services';
+import { AuthService } from '@app/services/controllers/auth.service';
 import { first, timeout, catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 

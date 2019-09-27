@@ -110,24 +110,6 @@ export class CMSController extends Controller {
 	}
 
 
-	/**
-	 * Gets content history of a given route
-	 */
-	@GET({ path: '/history/:route', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.writer)] })
-	public async getContentHistory(req: Req, res: Res, next: Next) {
-		const route: string = req.params.route;
-
-		const contentDoc = await ContentModel.findOne({ 'current.route': route }, {
-			current: true, prev: true
-		}).lean();
-		if (!contentDoc) {
-			return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND));
-		}
-		return res.status(200).send(contentDoc.prev); // length of 0 is also status 200
-	}
-
-
-
 
 	/**
 	 * Creates new content
@@ -195,51 +177,6 @@ export class CMSController extends Controller {
 		if (result.n === 0) { return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND)); }
 		return res.status(200).send(status(CMS_STATUS.CONTENT_DELETED));
 	}
-
-
-	/**
-	 * Returns search results for a given search term provided in the body
-	 */
-	@GET({ path: '/search/:searchTerm', do: [Auth.Personalize] })
-	public async searchContent(req: Req, res: Res, next: Next) {
-		const searchTerm: string = req.params.searchTerm || '';
-		const user = req.user as JWTUser;
-
-
-		const match = Auth.getUserAccessMatchObject(user, {
-			$text: { $search: searchTerm },
-			'current.published': true
-		});
-
-		try {
-			const contentList: Content[] = await ContentModel.aggregate([
-				{ $match: match },
-				{ $project: { current: 1, relevance: { $meta: 'textScore' } } },
-				{ $lookup: { from: 'logs', localField: '_id', foreignField: 'content', as: 'logData' } },
-				{ $unwind: { path: '$logData', preserveNullAndEmptyArrays: true } },
-				{ $group: { _id: '$_id', current: { $first: '$current' }, views: { $sum: 1 }, relevance: { $first: '$relevance' } } },
-				{ $sort: { relevance: 1 } },
-				{ $limit: 1000 },
-				{
-					$project: {
-						current: {
-							title: 1, route: 1, access: 1, folder: 1, updatedAt: 1, views: '$views',
-							description: 1, relevance: '$relevance',
-							images: { height: 1, width: 1, url: 1 }
-						}
-					}
-				},
-				{ $replaceRoot: { newRoot: '$current' } }
-			]).allowDiskUse(true);
-
-			if (!contentList || contentList.length === 0) { return res.status(200).send(status(CMS_STATUS.SEARCH_RESULT_NONE_FOUND)); }
-			return res.status(200).send(contentList);
-
-		} catch (e) {
-			return res.status(200).send(status(CMS_STATUS.SEARCH_RESULT_MONGOOSE_ERROR));
-		}
-	}
-
 
 	// ---------------------------------------
 	// ------------ JSON SCHEMAS -------------

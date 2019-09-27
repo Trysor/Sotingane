@@ -7,10 +7,10 @@ export const API = {
 		token: '/api/auth/token',
 		updatepass: '/api/auth/updatepassword',
 	},
-	cms: {
-		content: '/api/cms',
-		history: '/api/cms/history',
-		search: '/api/cms/search',
+	cms: '/api/cms',
+	tools: {
+		history: '/api/tools/history',
+		search: '/api/tools/search',
 	},
 	files: '/api/files/',
 	admin: {

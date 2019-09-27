@@ -1,5 +1,6 @@
 ﻿import { Injectable } from '@angular/core';
-import { MatDialog, MatDialogConfig } from '@app/modules/material.types';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+
 
 import { ModalData, ImageModalData, Content, StatusMessage } from '@types';
 

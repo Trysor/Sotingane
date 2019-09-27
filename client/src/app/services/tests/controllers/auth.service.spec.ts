@@ -12,7 +12,8 @@ import { MaterialModule } from '@app/modules/material.module';
 import { Router } from '@angular/router';
 const routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
 
-import { AuthService, HttpService } from '@app/services';
+import { AuthService } from '@app/services/controllers/auth.service';
+import { HttpService } from '@app/services/http/http.service';
 import { User, TokenResponse } from '@types';
 
 import { env } from '@env';
