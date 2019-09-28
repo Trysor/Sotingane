@@ -70,11 +70,7 @@ export class LoginComponent extends DestroyableClass {
 				return of(false);
 			})
 		).subscribe((loggedIn) => {
-			// Check if we're NOT logged in, and in loading state (which means we didn't error out)
-			if (!loggedIn && this.state.getValue() === STATES.LOADING) {
-				this.state.next(STATES.TRY_AGAIN);
-				return;
-			}
+			if (!loggedIn) { return; } // Check if we're NOT logged in
 			this.router.navigateByUrl('/');
 		});
 	}
