@@ -17,6 +17,6 @@ export const CONTENT_MAX_LENGTH = {
 };
 
 export const FILE_MAX_LENGTH = {
-	TITLE: 20
+	TITLE: 50
 };
 
