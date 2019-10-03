@@ -2,7 +2,7 @@
 <div class="compose" appMobile>
 	<form [formGroup]="ContentForm" (ngSubmit)="submitForm()" id="ContentForm">
 
-		<mat-tab-group [(selectedIndex)]="tabIndex">
+		<mat-tab-group [(selectedIndex)]="tabIndex" mat-stretch-tabs>
 			<mat-tab label="Page Settings">
 				<sectionwrapper-component>
 					<section-component header="Page Details">
