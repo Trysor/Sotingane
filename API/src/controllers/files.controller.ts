@@ -33,9 +33,7 @@ export class FilesController extends Controller {
 
 		const fileInfo = req.files && req.files.file as UploadedFile;
 
-		// const result = await Filestore.uploadImage(fileInfo, req.header('origin'));
 		const result = await Filestore.uploadImageToDatabase(fileInfo, req.user as JWTUser);
-
 		switch (result.status) {
 			case FileUploadStatus.SUCCESS:
 				return res.status(200).send(result.urls);

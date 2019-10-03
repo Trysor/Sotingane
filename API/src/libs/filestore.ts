@@ -10,7 +10,8 @@ import { FileData, FileUploadStatus, FileUploadResult, JWTUser, FileURLPayload }
 
 export class Filestore {
 	public static readonly IMAGE_SIZES = [200, 800, 1024, 1920];
-	public static readonly UUID_NAMESPACE_FILESTORE = configGet<string>('UUID_Namespace_Filestore');
+	public static readonly NAMESPACE = configGet<string>('FilestoreNamespace');
+	public static readonly FILE_URL_BASE = configGet<string>('FilestoreFileURLBase');
 
 
 
@@ -33,8 +34,7 @@ export class Filestore {
 
 
 	public static getFileURL(uuidKey: string, size: number) {
-		const host = isProduction ? '' : `http://localhost:${configGet<string>('port')}`;
-		return `${host}/api/files/download/${uuidKey}_${size}.webp`;
+		return `${Filestore.FILE_URL_BASE}/api/files/download/${uuidKey}_${size}.webp`;
 	}
 
 	// ---------------------------------------
@@ -52,7 +52,7 @@ export class Filestore {
 		if (uploadedFile.truncated) { return { status: FileUploadStatus.ERROR_IMAGE_TOO_LARGE }; }
 
 		// UUID
-		const _uuid = uuid(uploadedFile.md5, Filestore.UUID_NAMESPACE_FILESTORE);
+		const _uuid = uuid(uploadedFile.md5, Filestore.NAMESPACE);
 
 		// EXISTANCE CHECK
 		const doesExist = await FileModel.exists({ uuid: _uuid });
@@ -114,6 +114,7 @@ export class Filestore {
 			await file.save();
 			return true;
 		} catch (e) {
+			console.log(e);
 			return false;
 		}
 	}
