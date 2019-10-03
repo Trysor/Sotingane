@@ -2,7 +2,6 @@ import { Component, ChangeDetectionStrategy, AfterViewInit } from '@angular/core
 import { DatePipe } from '@angular/common';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 
-
 import { FilesService } from '@app/services/controllers/files.service';
 import { ModalService } from '@app/services/utility/modal.service';
 import { DestroyableClass } from '@app/classes';
@@ -10,7 +9,7 @@ import { DestroyableClass } from '@app/classes';
 import { FileThumbnail, TableSettings, ColumnType, ImageContentData } from '@types';
 
 import { BehaviorSubject, of } from 'rxjs';
-import { takeUntil, catchError, map } from 'rxjs/operators';
+import { takeUntil, catchError } from 'rxjs/operators';
 import { FileModalComponent } from '../file-modal-component/file.modal.component';
 
 
@@ -22,9 +21,7 @@ import { FileModalComponent } from '../file-modal-component/file.modal.component
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FileStoreComponent extends DestroyableClass implements AfterViewInit {
-
 	public data = new BehaviorSubject<FileThumbnail[]>(null);
-
 	public readonly settings: TableSettings<FileThumbnail> = {
 		columns: [
 			{
@@ -103,7 +100,7 @@ export class FileStoreComponent extends DestroyableClass implements AfterViewIni
 
 		trackBy: (index, file) => file.uuid,
 
-		mobile: ['title', 'uploadedDate', 'uuid'], // uuid = delete
+		mobile: ['thumbnail', 'title', 'edit', 'delete'],
 
 	};
 
@@ -130,5 +127,4 @@ export class FileStoreComponent extends DestroyableClass implements AfterViewIni
 			this.data.next(files);
 		});
 	}
-
 }

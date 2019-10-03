@@ -15,6 +15,20 @@ export class ModalService {
 
 
 	/**
+	 * Opens a generic modal with the provided header and body
+	 */
+	public openGenericInfoModal(header: string, body: string) {
+		const data: ModalData = {
+			headerText: header,
+			bodyText: body,
+			proceedText: 'Okay'
+		};
+		return this.dialog.open(ModalComponent, { data } as MatDialogConfig<ModalData>);
+	}
+
+
+
+	/**
 	 * Opens a delete content modal for the given content item
 	 */
 	public openHTTPErrorModal(status: StatusMessage) {

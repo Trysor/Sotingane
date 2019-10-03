@@ -17,6 +17,7 @@ import { AnalyticsComponent } from './analytics-component/analytics.component';
 import { FileStoreComponent } from './filestore-component/filestore.component';
 import { UserModalComponent } from './user-modal-component/user.modal.component';
 import { FileModalComponent } from './file-modal-component/file.modal.component';
+import { FiledropComponent } from './filedrop-component/filedrop.component';
 
 @NgModule({
 	declarations: [
@@ -27,7 +28,8 @@ import { FileModalComponent } from './file-modal-component/file.modal.component'
 		SettingsComponent,
 		FileStoreComponent,
 		UserModalComponent,
-		FileModalComponent
+		FileModalComponent,
+		FiledropComponent
 	],
 	imports: [
 		SharedModule,
