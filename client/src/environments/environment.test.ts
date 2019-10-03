@@ -3,7 +3,7 @@ import { API } from './api';
 export const env = {
 	production: true,
 
-	TIMEOUT: 5000,
+	TIMEOUT: 10000,
 
 	API,
 	API_BASE: ''
