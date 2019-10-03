@@ -180,8 +180,8 @@ describe('LoginComponent', () => {
 		// Expect loading state
 		expect(component.state.getValue()).toBe(component.STATES.LOADING, 'Should be in the LOADING state');
 
-		// Trigger login
-		loginSubject.next(false);
+		// Trigger login (unauthorized)
+		loginSubject.error(new HttpErrorResponse({ status: 401 }));
 		fixture.detectChanges();
 
 		// Expect try_again state
