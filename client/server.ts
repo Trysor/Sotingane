@@ -7,42 +7,46 @@ import { join } from 'path';
 import { AppServerModule } from './src/main.server';
 import { APP_BASE_HREF } from '@angular/common';
 
+import * as cookieParser from 'cookie-parser';
+
 // The Express app is exported so that it can be used by serverless Functions.
 export function app() {
-  const server = express();
-  const distFolder = join(process.cwd(), 'dist/browser');
+	const server = express();
+	server.use(cookieParser());
 
-  // Our Universal express-engine (found @ https://github.com/angular/universal/tree/master/modules/express-engine)
-  server.engine('html', ngExpressEngine({
-    bootstrap: AppServerModule,
-  }));
+	const distFolder = join(process.cwd(), 'dist', 'browser');
 
-  server.set('view engine', 'html');
-  server.set('views', distFolder);
+	// Our Universal express-engine (found @ https://github.com/angular/universal/tree/master/modules/express-engine)
+	server.engine('html', ngExpressEngine({
+		bootstrap: AppServerModule,
+	}));
 
-  // Example Express Rest API endpoints
-  // app.get('/api/**', (req, res) => { });
-  // Serve static files from /browser
-  server.get('*.*', express.static(distFolder, {
-    maxAge: '1y'
-  }));
+	server.set('view engine', 'html');
+	server.set('views', distFolder);
 
-  // All regular routes use the Universal engine
-  server.get('*', (req, res) => {
-    res.render('index', { req, providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }] });
-  });
+	// Example Express Rest API endpoints
+	// app.get('/api/**', (req, res) => { });
+	// Serve static files from /browser
+	server.get('*.*', express.static(distFolder, {
+		maxAge: '1y'
+	}));
 
-  return server;
+	// All regular routes use the Universal engine
+	server.get('*', (req, res) => {
+		res.render('index', { req, providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }] });
+	});
+
+	return server;
 }
 
 function run() {
-  const port = process.env.PORT || 4000;
+	const port = process.env.PORT || 80;
 
-  // Start up the Node server
-  const server = app();
-  server.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
-  });
+	// Start up the Node server
+	const server = app();
+	server.listen(port, () => {
+		console.log(`Node server listening on http://localhost:${port}`);
+	});
 }
 
 // Webpack will replace 'require' with '__webpack_require__'
@@ -51,7 +55,7 @@ function run() {
 declare const __non_webpack_require__: NodeRequire;
 const mainModule = __non_webpack_require__.main;
 if (mainModule && mainModule.filename === __filename) {
-  run();
+	run();
 }
 
 export * from './src/main.server';

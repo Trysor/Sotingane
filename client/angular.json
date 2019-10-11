@@ -27,12 +27,9 @@
 							"src/manifest.json",
 							"src/robots.txt"
 						],
+						"extractCss": true,
 						"styles": [
-							"src/app/app.scss",
-							{
-								"inject": false,
-								"input": "src/app/scss/lazy.scss"
-							}
+							"src/app/app.scss"
 						],
 						"scripts": []
 					},

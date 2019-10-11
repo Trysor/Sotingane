@@ -11,8 +11,6 @@
     "lint": "ng lint",
     "analyze": "webpack-bundle-analyzer dist/browser/stats-es2015.json",
     "analyze:build": "ng build --prod --named-chunks --stats-json --source-map && webpack-bundle-analyzer dist/browser/stats-es2015.json",
-    "build:ssr_bak": "ng build --prod && ng run sotingane:server:production",
-    "serve:ssr_bak": "node dist/server/main.js",
     "serve:ssr": "node dist/server/main.js",
     "build:ssr": "ng build --prod && ng run sotingane:server:production"
   },
@@ -54,7 +52,7 @@
     "@types/hammerjs": "2.0.36",
     "@types/jasmine": "3.4.2",
     "@types/jasminewd2": "2.0.8",
-    "@types/node": "12.7.10",
+    "@types/node": "12.7.11",
     "codelyzer": "5.1.2",
     "jasmine-core": "3.5.0",
     "jasmine-spec-reporter": "4.2.1",
