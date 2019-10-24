@@ -40,7 +40,9 @@ import { AuthGuard, AdminGuard, LoginGuard, RedirectGuard } from '@app/guards';
 					{ path: '**', children: [], canActivate: [RedirectGuard] }
 				]
 			},
-		])
+		], {
+			initialNavigation: true
+		})
 	],
 	exports: [
 		RouterModule
