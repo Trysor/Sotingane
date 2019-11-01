@@ -13,6 +13,7 @@ import { DatePipe } from '@angular/common';
 
 // Directives
 import { MobileDirective } from '@app/directives/mobile.directive';
+import { FileDropDirective } from '@app/directives/filedrop.directive';
 
 // Components
 import { ModalComponent } from './modals/modal.component';
@@ -34,13 +35,15 @@ import { ImageModalComponent } from './modals/imagemodal.component';
 		TimeAgoPipe,
 		NumberPipe,
 		MobileDirective,
+		FileDropDirective
 	],
 	declarations: [
 		TimeAgoPipe,
 		NumberPipe,
 		ModalComponent,
 		ImageModalComponent,
-		MobileDirective
+		MobileDirective,
+		FileDropDirective
 	],
 	providers: [
 		DatePipe

@@ -1,2 +1,8 @@
 <table-component [settings]="settings" [data]="data | async"></table-component>
-<filedrop-component (filesUploaded)="updateList()"></filedrop-component>
+<div class="box">
+	<input type="file" hidden (change)="filesChanged()" #files multiple="multiple" accept="image/*">
+	<button mat-raised-button (click)="files.click()">
+		<mat-icon>cloud_upload</mat-icon> Upload images
+	</button>
+	<span>Or drag and drop images onto the table above</span>
+</div>

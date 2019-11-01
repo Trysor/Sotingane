@@ -11,7 +11,7 @@
 </div>
 
 <mat-table #table [dataSource]="Source" matSort [matSortActive]="settings.active" matSortDisableClear
-	[matSortDirection]="settings.dir">
+	[matSortDirection]="settings.dir" [appFileDrop]="settings.fileDrop">
 
 	<mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
 	<mat-row *matRowDef="let row; columns: displayedColumns;" (click)="rowClick(row)"

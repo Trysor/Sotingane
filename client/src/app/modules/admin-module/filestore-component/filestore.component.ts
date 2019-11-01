@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, AfterViewInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 
@@ -11,6 +11,7 @@ import { FileThumbnail, TableSettings, ColumnType, ImageContentData } from '@typ
 import { BehaviorSubject, of } from 'rxjs';
 import { takeUntil, catchError } from 'rxjs/operators';
 import { FileModalComponent } from '../file-modal-component/file.modal.component';
+import { HttpErrorResponse, HttpEventType } from '@angular/common/http';
 
 
 
@@ -21,6 +22,7 @@ import { FileModalComponent } from '../file-modal-component/file.modal.component
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FileStoreComponent extends DestroyableClass implements AfterViewInit {
+	@ViewChild('files', { static: true }) private filesInputElem: ElementRef<HTMLInputElement>;
 	public data = new BehaviorSubject<FileThumbnail[]>(null);
 	public readonly settings: TableSettings<FileThumbnail> = {
 		columns: [
@@ -98,7 +100,13 @@ export class FileStoreComponent extends DestroyableClass implements AfterViewIni
 			});
 		},
 
-		trackBy: (index, file) => file.uuid,
+		trackBy: (_, file) => file.uuid,
+
+		fileDrop: {
+			accept: 'image/*',
+			multiple: true,
+			fileHandler: this.uploadFiles.bind(this)
+		},
 
 		mobile: ['thumbnail', 'title', 'edit', 'delete'],
 
@@ -122,9 +130,33 @@ export class FileStoreComponent extends DestroyableClass implements AfterViewIni
 	/**
 	 * Updates the user list
 	 */
-	private updateList() {
+	updateList() {
 		this.fileService.getThumbnails().pipe(takeUntil(this.OnDestroy)).subscribe(files => {
 			this.data.next(files);
 		});
+	}
+
+	private async uploadFiles(fileList: FileList | File[]) {
+		const responses = await Promise.all(
+			Array.from(fileList).map(
+				file => this.fileService.uploadImage(file).pipe(
+					catchError((err: HttpErrorResponse) => of(err))
+				).toPromise()
+			)
+		);
+
+		const successful = responses
+			.filter(res => res.type === HttpEventType.Response && res.ok)
+			.length;
+
+		this.modalService.openGenericInfoModal(
+			'Upload result',
+			`Successfully uploaded ${successful} of ${responses.length}.`
+		);
+	}
+
+	public filesChanged() {
+		this.uploadFiles(this.filesInputElem.nativeElement.files);
+		this.filesInputElem.nativeElement.value = null;
 	}
 }
