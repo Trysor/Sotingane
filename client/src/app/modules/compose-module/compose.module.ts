@@ -22,9 +22,6 @@ import { FilesUploadedComponent } from './filesuploaded-component/filesuploaded.
 		CKEDitorComponent,
 		FilesUploadedComponent
 	],
-	entryComponents: [
-		FilesUploadedComponent
-	],
 	imports: [
 		SharedModule,
 		ContentModule,

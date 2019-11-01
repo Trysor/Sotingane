@@ -33,10 +33,6 @@ import { FileModalComponent } from './file-modal-component/file.modal.component'
 		SharedModule,
 		CommonModule,
 		RouterModule.forChild([ { path: '', component: AdminComponent }	])
-	],
-	entryComponents: [
-		UserModalComponent,
-		FileModalComponent
 	]
 })
 export class AdminModule { }

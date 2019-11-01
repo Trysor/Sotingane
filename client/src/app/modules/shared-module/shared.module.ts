@@ -47,10 +47,6 @@ import { ImageModalComponent } from './modals/imagemodal.component';
 	],
 	providers: [
 		DatePipe
-	],
-	entryComponents: [
-		ModalComponent,
-		ImageModalComponent
 	]
 })
 export class SharedModule {}
