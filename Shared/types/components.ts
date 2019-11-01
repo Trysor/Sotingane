@@ -18,3 +18,9 @@ export interface ImageModalData {
 	images: ImageContentData[];
 	startIndex: number;
 }
+
+export interface FileDropSettings {
+	multiple: boolean;
+	accept: string;
+	fileHandler: (fileList: FileList | File[]) => void | Promise<void>;
+}
