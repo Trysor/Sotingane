@@ -25,13 +25,13 @@ import FileStorePlugin from './plugins/FileStore/fileStore.plugin';
 import LinkPlugin from '@ckeditor/ckeditor5-link/src/link';
 import ListPlugin from '@ckeditor/ckeditor5-list/src/list';
 import BlockquotePlugin from '@ckeditor/ckeditor5-block-quote/src/blockquote';
-import CodePlugin from '@ckeditor/ckeditor5-basic-styles/src/code';
 import MediaEmbedPlugin from '@ckeditor/ckeditor5-media-embed/src/mediaembed';
 import TablePlugin from '@ckeditor/ckeditor5-table/src/table';
 import TableToolbarPlugin from '@ckeditor/ckeditor5-table/src/tabletoolbar';
 import RemoveFormatPlugin from '@ckeditor/ckeditor5-remove-format/src/removeformat';
 import FontPlugin from '@ckeditor/ckeditor5-font/src/font';
 import WordCountPlugin from '@ckeditor/ckeditor5-word-count/src/wordcount';
+import CodeBlock from '@ckeditor/ckeditor5-code-block/src/codeblock';
 
 // Typings
 import { CKEditorDefaultConfig } from './types';
@@ -58,7 +58,7 @@ ClassicEditor.builtinPlugins = [
 	LinkPlugin,
 	ListPlugin,
 	BlockquotePlugin,
-	CodePlugin,
+	CodeBlock,
 	MediaEmbedPlugin,
 	TablePlugin,
 	TableToolbarPlugin,
@@ -79,7 +79,7 @@ ClassicEditor.defaultConfig = {
 			'|',
 			'bulletedList', 'numberedList', 'alignment',
 			'|',
-			'blockQuote', 'code',
+			'blockQuote', 'codeBlock',
 			'|',
 			'imageUpload', 'FileStore', 'mediaEmbed', 'insertTable',
 			'|',
