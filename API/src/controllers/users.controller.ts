@@ -17,14 +17,14 @@ export class UsersController extends Controller {
 	 */
 	@GET({ path: '/users/', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.admin)] })
 	public async getAllUsers(req: Req, res: Res, next: Next) {
-		const users: User[] = await UserModel.find(
+		const users = await UserModel.find(
 			{},
 			{
 				username: 1,
 				roles: 1,
 				createdAt: 1
 			}
-		).lean().sort('username_lower');
+		).lean<User[]>().sort('username_lower');
 
 		return res.status(200).send(users); // At least one user has to exist
 	}

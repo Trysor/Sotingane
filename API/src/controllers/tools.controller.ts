@@ -10,7 +10,7 @@ import { Auth } from '../libs/auth';
 import { ContentModel } from '../models';
 
 // Types and global settings
-import { JWTUser, Content, AccessRoles } from '../../types';
+import { JWTUser, Content, AccessRoles, ContentEntry } from '../../types';
 
 
 @RouteDomain('/tools')
@@ -26,7 +26,7 @@ export class ToolsController extends Controller {
 
 		const contentDoc = await ContentModel.findOne({ 'current.route': route }, {
 			current: true, prev: true
-		}).lean();
+		}).lean<ContentEntry>();
 		if (!contentDoc) {
 			return res.status(404).send(status(CMS_STATUS.CONTENT_NOT_FOUND));
 		}

@@ -82,7 +82,7 @@ export class FilesController extends Controller {
 	public async deleteFile(req: Req, res: Res, next: Next) {
 		const uuid: string = req.params.uuid;
 
-		const deleted = await FileModel.deleteOne({ uuid }).lean();
+		const deleted = await FileModel.deleteOne({ uuid }).lean<FileData & { deletedCount?: number }>();
 		if (deleted.deletedCount > 0) {
 			return res.status(200).send(status(FILE_STATUS.DELETE_SUCCESSFUL));
 		}

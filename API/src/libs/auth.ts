@@ -8,7 +8,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import { Types as MongoTypes } from 'mongoose';
 
-import { AccessRoles, JWTUser, AuthorObject } from '../../types';
+import { AccessRoles, JWTUser, AuthorObject, User } from '../../types';
 import { JWT } from '../../global';
 
 import { UserModel } from '../models';
@@ -68,7 +68,7 @@ passportUse(ByTokenName, new JwtStrategy(jwtOptions, async (payload: JWTUser, do
 	done(null, payload);
 }));
 passportUse(ByRefreshName, new JwtStrategy(jwtRefreshOptions, async (payload: JWTUser, done: VerifiedCallback) => {
-	const user = await UserModel.findById(payload._id).lean(); // we need to verify the user is still in fact a user
+	const user = await UserModel.findById(payload._id).lean<User>(); // we need to verify the user is still in fact a user
 	if (!user) { return done(null, null); }
 
 	const newPayload: JWTUser = {

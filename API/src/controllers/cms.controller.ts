@@ -2,7 +2,7 @@ import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 
 // Libs
 import { UAParser } from 'ua-parser-js';
-import { escape } from 'validator';
+import validator from 'validator';
 import { sanitize, stripHTML } from '../libs/sanitizer';
 import { status, JSchema, ROUTE_STATUS, CMS_STATUS, validate, RegisterSchema } from '../libs/validate';
 import { Controller, RouteDomain, GET, POST, PATCH, DELETE, isProduction } from '../libs/routing';
@@ -15,6 +15,8 @@ import { LogModel, ContentModel } from '../models';
 // Types and global settings
 import { JWTUser, AccessRoles, Log, Content, ContentEntry } from '../../types';
 import { CONTENT_MAX_LENGTH } from '../../global';
+
+const escape = validator.escape;
 
 
 @RouteDomain('/cms')
