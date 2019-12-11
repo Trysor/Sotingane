@@ -33,8 +33,8 @@ type CKETablePluginToolbar = 'tableColumn' | 'tableRow' | 'mergeTableCells';
 
 type CKEToolbarItems =
 	'heading' | 'bold' | 'italic' | 'link' | 'bulletedList' | 'numberedList' | 'removeFormat'
-	| 'fontSize' | 'fontFamily' | 'fontSize' | 'fontColor' |
-	'alignment' | 'blockQuote' | 'code' | 'imageUpload' | 'mediaEmbed' | 'insertTable' | 'undo' | 'redo'
+	| 'fontSize' | 'fontFamily' | 'fontSize' | 'fontColor'
+	| 'alignment' | 'blockQuote' | 'code' | 'codeBlock' | 'imageUpload' | 'mediaEmbed' | 'insertTable' | 'undo' | 'redo'
 	| 'FileStore';
 
 type CKEToolbarItemSpacer = '|';
