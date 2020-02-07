@@ -1,6 +1,6 @@
 import { get as configGet } from 'config';
 import { Strategy as JwtStrategy, StrategyOptions as jwtOptions, VerifiedCallback } from 'passport-jwt';
-import { verify } from 'jsonwebtoken';
+import { verify, VerifyOptions } from 'jsonwebtoken';
 import { Strategy as LocalStrategy, IStrategyOptions as localOptions } from 'passport-local';
 import { use as passportUse, authenticate } from 'passport';
 import { Handler } from 'express';
@@ -29,7 +29,7 @@ const localOptions: localOptions = {
 };
 
 // Setting JWT strategy options
-const jwtOptions: jwtOptions = {
+const jwtOptions: jwtOptions & VerifyOptions = {
 	jwtFromRequest: (req: Request): string => {
 		return !!req.headers.authorization
 			? req.headers.authorization
@@ -39,7 +39,7 @@ const jwtOptions: jwtOptions = {
 	audience: configGet<string>('tokenAudience'),
 };
 
-const jwtRefreshOptions: jwtOptions = {
+const jwtRefreshOptions: jwtOptions & VerifyOptions = {
 	jwtFromRequest: (req: Request): string => {
 		return !!req.headers.authorization
 			? req.headers.authorization

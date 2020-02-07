@@ -48,7 +48,7 @@ export class AdminController extends Controller {
 	public async getContentFull(req: Req, res: Res, next: Next) {
 		const route: string = req.params.route;
 
-		const contentDoc =  await ContentModel.findOne(
+		const contentDoc = await ContentModel.findOne(
 			{ 'current.route': route },
 			{ current: 1 }
 		).populate([
@@ -73,21 +73,21 @@ export class AdminController extends Controller {
 
 		// Content filtering
 		const match: any[] = [];
-		if (query.createdBy) { match.push({'current.createdBy': MongoTypes.ObjectId(query.createdBy) }); }		// CreatedBy
-		if (query.hasOwnProperty('published')) { match.push({'current.published': query.published}); }			// Published
-		if (query.route) { match.push({'current.route': query.route.toLowerCase()}); }							// Route
-		if (query.folder) { match.push({'current.folder': query.folder}); }										// Folder
+		if (query.createdBy) { match.push({ 'current.createdBy': MongoTypes.ObjectId(query.createdBy) }); }		// CreatedBy
+		if (query.hasOwnProperty('published')) { match.push({ 'current.published': query.published }); }		// Published
+		if (query.route) { match.push({ 'current.route': query.route.toLowerCase() }); }						// Route
+		if (query.folder) { match.push({ 'current.folder': query.folder }); }									// Folder
 		if (query.access && query.access.length > 0) {															// Access
 			match.push({ 'current.access': { $elemMatch: { $in: query.access } } });
 		} else if (query.access && query.access.length === 0) {
 			match.push({ 'current.access': { $eq: [] } });
 		}
 		if (!!query.createdAfterDate && !!query.createdBeforeDate) {											// CreatedAt
-			match.push({'current.createdAt': { $gte: new Date(query.createdAfterDate), $lt: new Date(query.createdBeforeDate) }});
+			match.push({ 'current.createdAt': { $gte: new Date(query.createdAfterDate), $lt: new Date(query.createdBeforeDate) } });
 		} else if (query.createdAfterDate) {
-			match.push({'current.createdAt': { $gte: new Date(query.createdAfterDate) }});
+			match.push({ 'current.createdAt': { $gte: new Date(query.createdAfterDate) } });
 		} else if (query.createdBeforeDate) {
-			match.push({'current.createdAt': { $lt: new Date(query.createdBeforeDate) }});
+			match.push({ 'current.createdAt': { $lt: new Date(query.createdBeforeDate) } });
 		}
 
 		// Early project
