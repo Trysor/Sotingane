@@ -20,7 +20,12 @@ export interface CKEditorDefaultConfig {
 		contentToolbar: CKETablePluginToolbar[];
 	};
 	language: string;
+
+	codeBlock?: {
+		languages?: CKECodeBlockPluginLanguages[]
+	};
 }
+
 
 type CKEImagePluginToolbar = 'imageTextAlternative' | '|' | string;
 type CKEMediaEmbedPluginToolbar = 'imageTextAlternative' | '|' | 'imageStyle:alignLeft' | 'imageStyle:full' | 'imageStyle:alignRight';
@@ -39,6 +44,11 @@ type CKEToolbarItems =
 
 type CKEToolbarItemSpacer = '|';
 
+interface CKECodeBlockPluginLanguages {
+	language: string;
+	label: string;
+	class?: string;
+}
 
 
 
