@@ -47,5 +47,4 @@ import 'zone.js/dist/zone';  // Included with Angular CLI.
  * APPLICATION IMPORTS
  */
 
-// import 'intersection-observer'; // polyfilled for unsuppored browsers (including chrome 41 - used by the google crawler)
 import 'hammerjs';
