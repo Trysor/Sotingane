@@ -9,7 +9,7 @@ import { SnackBarService } from '@app/services/utility/snackbar.service';
 import { PlatformService } from '@app/services/utility/platform.service';
 import { HttpService } from '@app/services/http/http.service';
 
-import { throwError, TimeoutError } from 'rxjs';
+import { throwError, TimeoutError, of } from 'rxjs';
 import { timeout, finalize, catchError } from 'rxjs/operators';
 
 
@@ -47,7 +47,7 @@ export class InterceptorService implements HttpInterceptor {
 			catchError((err: HttpErrorResponse | TimeoutError) => {
 				if (err instanceof TimeoutError) {
 					this.snackBar.open('Request timed out');
-					return throwError('Request timed out');
+					return of(null);
 				}
 				// Any non-timed-out request has to be handled from where it originated
 				return throwError(err);

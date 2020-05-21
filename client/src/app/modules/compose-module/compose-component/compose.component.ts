@@ -18,7 +18,7 @@ import { Content, AccessRoles } from '@types';
 import { CONTENT_MAX_LENGTH } from '@global';
 
 
-import { BehaviorSubject, of, pipe, Observable } from 'rxjs';
+import { BehaviorSubject, of, pipe, Observable, TimeoutError } from 'rxjs';
 import { takeUntil, catchError, distinctUntilChanged, finalize } from 'rxjs/operators';
 
 
@@ -268,10 +268,12 @@ export class ComposeComponent extends DestroyableClass implements CanDeactivate<
 			return Promise.resolve(false);
 		}
 
-		this.cmsService.getContentList(true);
-		this.ContentForm.markAsPristine(); // Mark the content form as pristince to allow navigation
+		if (!!returnValue) {
+			this.cmsService.getContentList(true);
+			this.ContentForm.markAsPristine(); // Mark the content form as pristince to allow navigation
 
-		return this.router.navigateByUrl(returnValue.published ? returnValue.route : '');
+			return this.router.navigateByUrl(returnValue.published ? returnValue.route : '');
+		}
 	}
 
 
