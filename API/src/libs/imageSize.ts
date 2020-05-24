@@ -18,7 +18,7 @@ export class ImageSize {
 					res.on('data', chunk => {
 						chunks.push(chunk);
 						if (chunks.reduce((acc, e) => acc + e.length, 0) > 10) {
-							req.abort();
+							req.end(); // end early. We need just the first part of the file.
 						}
 					}).on('end', () => {
 						try {

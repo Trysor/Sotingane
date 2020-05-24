@@ -9,6 +9,7 @@ import { Server } from 'http';
 
 import { Setup } from './libs/setup';
 import { AppRouter } from './router';
+import { FirstRunCheck } from './libs/firstrun';
 
 
 class App {
@@ -20,7 +21,7 @@ class App {
 
 		// SETUP
 		Setup.initiate(this.app);
-
+		FirstRunCheck.PerformCheckAndInitialize();
 
 		// CONTROLLERS & ROUTER
 		AppRouter.initiate(this.app);

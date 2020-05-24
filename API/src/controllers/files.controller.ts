@@ -129,7 +129,7 @@ export class FilesController extends Controller {
 			const buffer = (file.data as FileDataObject)[size].buffer;
 			res.writeHead(200, {
 				'Content-Type': file.mimeType,
-				'Content-Disposition': `attachment; filename=${fileURL}`,
+				// 'Content-Disposition': `attachment; filename=${fileURL}`,
 				'Content-Length': buffer.length,
 				'Cache-Control': 'max-age=31536000'
 			});

@@ -1,7 +1,7 @@
 import { get as configGet } from 'config';
 import { UploadedFile } from 'express-fileupload';
 import * as sharp from 'sharp';
-import * as uuid from 'uuid/v5';
+import { v5 as uuid } from 'uuid';
 
 import { isProduction } from './routing';
 import { FileModel } from '../models';

@@ -1,4 +1,4 @@
-﻿import { Express, Router } from 'express';
+﻿import { Router } from 'express';
 import { RequestHandler, PathParams } from 'express-serve-static-core';
 import { util as configUtil } from 'config';
 
