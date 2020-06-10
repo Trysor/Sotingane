@@ -6,12 +6,20 @@ import { ModalData, ImageModalData, Content, StatusMessage } from '@types';
 
 import { ModalComponent } from '@app/modules/shared-module/modals/modal.component';
 import { ImageModalComponent } from '@app/modules/shared-module/modals/imagemodal.component';
+import { LoginComponent } from '@app/modules/base-module/login-component/login.component';
 
 
 @Injectable({ providedIn: 'root' })
 export class ModalService {
 
 	constructor(private dialog: MatDialog) { }
+
+	/**
+	 * Opens login modal
+	 */
+	public openLoginModal() {
+		return this.dialog.open(LoginComponent);
+	}
 
 
 	/**

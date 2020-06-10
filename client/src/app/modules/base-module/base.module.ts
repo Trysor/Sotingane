@@ -16,6 +16,7 @@ import { ControlPanelComponent } from './control-panel-component/control.panel.c
 import { FooterComponent } from './footer-component/footer.component';
 import { NavComponent } from './nav-component/nav.component';
 import { SearchComponent } from './search-component/search.component';
+import { LoginComponent } from './login-component/login.component';
 
 @NgModule({
 	declarations: [
@@ -27,6 +28,7 @@ import { SearchComponent } from './search-component/search.component';
 		FooterComponent,
 		NavComponent,
 		SearchComponent,
+		LoginComponent
 	],
 	imports: [
 		SharedModule,

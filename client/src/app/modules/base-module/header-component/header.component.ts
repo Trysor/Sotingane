@@ -1,6 +1,7 @@
 import { Component, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 
 import { AuthService } from '@app/services/controllers/auth.service';
+import { ModalService } from '@app/services/utility/modal.service';
 
 @Component({
 	selector: 'header-component',
@@ -12,7 +13,7 @@ export class HeaderComponent {
 	@Output() leftNav: EventEmitter<void> = new EventEmitter();
 	@Output() rightNav: EventEmitter<void> = new EventEmitter();
 
-	constructor(public authService: AuthService) {	}
+	constructor(public authService: AuthService, public modalService: ModalService) {	}
 
 
 	/**

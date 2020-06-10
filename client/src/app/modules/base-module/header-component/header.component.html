@@ -43,11 +43,11 @@
 	<ng-template #headerlogin>
 		<div class="flex right" [ngSwitch]="(mobile.isMobile | async)">
 			<!-- For MOBILE -->
-			<button mat-icon-button *ngSwitchCase="true" routerLink="/login" routerLinkActive="active" class="userToggle mobile" aria-label="Go to login">
+			<button mat-icon-button *ngSwitchCase="true" routerLinkActive="active" class="userToggle mobile" aria-label="Go to login" (click)="modalService.openLoginModal()">
 				<mat-icon>person</mat-icon>
 			</button>
 			<!-- For DESKTOP -->
-			<button mat-button *ngSwitchCase="false" routerLink="/login" routerLinkActive="active" class="userToggle" aria-label="Go to login">
+			<button mat-button *ngSwitchCase="false" routerLinkActive="active" class="userToggle" aria-label="Go to login" (click)="modalService.openLoginModal()">
 				<mat-icon>person</mat-icon> <ng-container *ngIf="!(mobile.isMobile | async)">Login</ng-container>
 			</button>
 		</div>

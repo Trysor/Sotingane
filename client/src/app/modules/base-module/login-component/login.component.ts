@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { MatDialogRef } from '@angular/material/dialog';
 
 import { User } from '@types';
 import { AuthService } from '@app/services/controllers/auth.service';
@@ -30,12 +30,12 @@ export class LoginComponent extends DestroyableClass {
 	public state = new BehaviorSubject<STATES>(STATES.READY);
 
 	constructor(
-		private router: Router,
+		public dialogRef: MatDialogRef<LoginComponent>,
 		private fb: FormBuilder,
 		public authService: AuthService) {
 
 		super();
-		this.loginForm = fb.group({
+		this.loginForm = this.fb.group({
 			username: ['', Validators.required],
 			password: ['', Validators.required]
 		});
@@ -61,7 +61,7 @@ export class LoginComponent extends DestroyableClass {
 	public logIn() {
 		this.state.next(STATES.LOADING);
 		const user: User = this.loginForm.getRawValue();
-		this.authService.login(user).pipe(
+		return this.authService.login(user).pipe(
 			catchError((error: HttpErrorResponse) => {
 				this.state.next((error && error.status >= 400 && error.status < 500)
 					? STATES.TRY_AGAIN
@@ -70,8 +70,8 @@ export class LoginComponent extends DestroyableClass {
 				return of(false);
 			})
 		).subscribe((loggedIn) => {
-			if (!loggedIn) { return; } // Check if we're NOT logged in
-			this.router.navigateByUrl('/');
+			if (!loggedIn) { return; }
+			this.dialogRef.close();
 		});
 	}
 }
