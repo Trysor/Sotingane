@@ -11,17 +11,17 @@
 				<mat-icon matChipRemove>cancel</mat-icon>
 			</mat-chip>
 		</mat-chip-list>
-		<mat-autocomplete #tagsAuto="matAutocomplete" (optionSelected)="addAutocompleteTag($event)">
+		<mat-autocomplete #tagsAuto="matAutocomplete" (optionSelected)="addTag($event)">
 			<mat-option *ngFor="let tag of AutoCompleteList | async" [value]="tag">
 				{{ tag }}
 			</mat-option>
 		</mat-autocomplete>
 		<input
+			autocomplete="off"
 			id="input"
 			#input
 			matInput
-			matChipInputAddOnBlur="false"
-			autocomplete="off"
+			[matChipInputAddOnBlur]="false"
 			[matChipInputFor]="tags"
 			[matChipInputSeparatorKeyCodes]="tagSeparatorKeyCodes"
 			(matChipInputTokenEnd)="addTag($event)"

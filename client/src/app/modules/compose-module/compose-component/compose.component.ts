@@ -189,7 +189,7 @@ export class ComposeComponent extends DestroyableClass implements CanDeactivate<
 
 	private loadTags() {
 		// Fetch all tags
-		this.cmsService.requestAllTags().subscribe(requestedTags => this._tags = requestedTags);
+		this.cmsService.requestAllTags().pipe(startWith([])).subscribe(requestedTags => this._tags = requestedTags);
 	}
 
 

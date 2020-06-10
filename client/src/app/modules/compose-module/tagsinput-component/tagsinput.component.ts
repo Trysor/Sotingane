@@ -5,9 +5,10 @@ import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatChipInputEvent } from '@angular/material/chips';
-import { map } from 'rxjs/operators';
+import { MatChipInputEvent, MatChipInput } from '@angular/material/chips';
+import { map, takeUntil } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { DestroyableClass } from '@app/classes';
 
 
 @Component({
@@ -16,7 +17,7 @@ import { Observable } from 'rxjs';
 	styleUrls: ['./tagsinput.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TagsInputComponent {
+export class TagsInputComponent extends DestroyableClass {
 	@ViewChild('input', { static: true }) private inputElem: ElementRef<HTMLInputElement>;
 	@Input() form: FormGroup;
 	@Input() controlName: string;
@@ -28,9 +29,11 @@ export class TagsInputComponent {
 	public AutoCompleteList: Observable<string[]>;
 
 	constructor() {
+		super();
 		this.AutoCompleteList = this.tagTextInputControl.valueChanges.pipe(
+			takeUntil(this.OnDestroy),
 			map((typedText: string) => this.data.filter(tag =>
-				tag.startsWith(typedText.toLowerCase())										// Startswith filter
+				tag.toLowerCase().startsWith(typedText.toLowerCase())										// Startswith filter
 				&& !(this.form.get(this.controlName).value as string[]).includes(tag)		// not already part of our list
 			))
 		);
@@ -40,12 +43,13 @@ export class TagsInputComponent {
 	// --------------- METHODS ---------------
 	// ---------------------------------------
 
-	public addTag(event: MatChipInputEvent) {
-		this.AddTagToState(event?.value?.trim());
-	}
+	public addTag(event: MatChipInputEvent | MatAutocompleteSelectedEvent) {
+		const newTag = (event instanceof MatAutocompleteSelectedEvent) ? event.option.viewValue : event?.value?.trim();
 
-	public addAutocompleteTag(event: MatAutocompleteSelectedEvent) {
-		this.inputElem.nativeElement.value = event.option.viewValue;
+		const tags = this.form.get(this.controlName).value as string[];
+		if (!newTag || tags.includes(newTag)) { return; }
+		this.inputElem.nativeElement.value = '';
+		tags.push(newTag);
 	}
 
 	public removeTag(tag: string) {
@@ -57,17 +61,5 @@ export class TagsInputComponent {
 
 	public sortTag(event: CdkDragDrop<string[]>) {
 		moveItemInArray(this.form.get(this.controlName).value, event.previousIndex, event.currentIndex);
-	}
-
-
-	// ---------------------------------------
-	// --------------- HELPERS ---------------
-	// ---------------------------------------
-
-	private AddTagToState(newTag: string) {
-		const tags = this.form.get(this.controlName).value as string[];
-		if (!newTag || tags.includes(newTag)) { return; }
-		this.inputElem.nativeElement.value = '';
-		tags.push(newTag);
 	}
 }
