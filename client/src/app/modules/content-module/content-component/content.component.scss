@@ -5,24 +5,28 @@
 	flex-flow: column;
 	display: flex;
 	padding-bottom: 44px;
+}
 
-	#content {
-		padding: 0 3px;
-	}
+#content {
+	padding: 0 3px;
+}
 
-	.info {
-		position: absolute;
-		left: 0;
-		bottom: 0;
-		margin-top: 10px;
-		font-weight: 600;
-		font-size: 0.7em;
+.absolute {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	margin-top: 10px;
+}
 
-		&.right {
-			text-align: right;
-			left: initial;
-			right: 0;
-		}
+.info {
+
+	font-weight: 600;
+	font-size: 0.7em;
+
+	&.right {
+		text-align: right;
+		left: initial;
+		right: 0;
 	}
 }
 
@@ -30,4 +34,12 @@
 	position: absolute;
 	right: 0.2em;
 	top: 0.2em;
+}
+
+.tags {
+	text-align: right;
+	margin-top: -20px;
+	::ng-deep .mat-chip-list-wrapper {
+		justify-content: flex-end;
+	}
 }

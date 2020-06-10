@@ -42,6 +42,7 @@
 // Common-module
 @include mat-select-theme($app-theme);
 @include mat-checkbox-theme($app-theme);
+@include mat-chips-theme($app-theme);
 @include mat-expansion-panel-theme($app-theme);
 @include mat-tabs-theme($app-theme);
 

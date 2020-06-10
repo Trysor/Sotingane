@@ -15,12 +15,14 @@ import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { ComposeComponent } from './compose-component/compose.component';
 import { CKEDitorComponent } from './ckeditor-component/ckeditor.component';
 import { FilesUploadedComponent } from './filesuploaded-component/filesuploaded.component';
+import { TagsInputComponent } from './tagsinput-component/tagsinput.component';
 
 @NgModule({
 	declarations: [
 		ComposeComponent,
 		CKEDitorComponent,
-		FilesUploadedComponent
+		FilesUploadedComponent,
+		TagsInputComponent
 	],
 	imports: [
 		SharedModule,

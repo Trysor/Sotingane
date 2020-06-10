@@ -6,6 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 import { MatSelectChange } from '@angular/material/select';
 
+
 import { FormErrorInstant, AccessHandler, DestroyableClass } from '@app/classes';
 import { CMSService } from '@app/services/controllers/cms.service';
 import { AdminService } from '@app/services/controllers/admin.service';
@@ -18,9 +19,8 @@ import { Content, AccessRoles } from '@types';
 import { CONTENT_MAX_LENGTH } from '@global';
 
 
-import { BehaviorSubject, of, pipe, Observable, TimeoutError } from 'rxjs';
-import { takeUntil, catchError, distinctUntilChanged, finalize } from 'rxjs/operators';
-
+import { BehaviorSubject, of, pipe, Observable } from 'rxjs';
+import { takeUntil, catchError, distinctUntilChanged, finalize, map, startWith } from 'rxjs/operators';
 
 
 @Component({
@@ -53,6 +53,12 @@ export class ComposeComponent extends DestroyableClass implements CanDeactivate<
 	// FOLDER FIELDS
 	private _folders: string[] = []; // Holds a list of used Folders
 	private readonly _filteredFolders = new BehaviorSubject<string[]>(['']);
+
+	// TAGS FIELDS
+	private _tags: string[] = [];
+	public get Tags() { return this._tags; }
+
+
 	// DRAFTING FIELDS
 	private _originalContent: Content; // When editing, the original content is kept here
 
@@ -68,7 +74,7 @@ export class ComposeComponent extends DestroyableClass implements CanDeactivate<
 		private router: Router,
 		private route: ActivatedRoute,
 		private fb: FormBuilder,
-		private cmsService: CMSService,
+		public cmsService: CMSService,
 		private adminService: AdminService) {
 
 		super();
@@ -82,12 +88,14 @@ export class ComposeComponent extends DestroyableClass implements CanDeactivate<
 
 		this.initFormHooks();
 
+		this.loadTags();
 
 		// Router: Check if we are editing or creating content. Load from API
 		const editingContentRoute = this.route.snapshot.params.route;
 		if (editingContentRoute) {
 			this.loadEditContentForRoute(editingContentRoute);
 		}
+
 	}
 
 
@@ -114,6 +122,7 @@ export class ComposeComponent extends DestroyableClass implements CanDeactivate<
 			nav: [true],
 			folder: ['', Validators.maxLength(this.CONTENT_MAX_LENGTH.FOLDER)],
 			content: ['', Validators.required],
+			tags: [[]]
 		});
 	}
 
@@ -175,6 +184,12 @@ export class ComposeComponent extends DestroyableClass implements CanDeactivate<
 
 		// We also need to fetch history when editing existing content
 		this.cmsService.requestContentHistory(route).subscribe(list => { this.HistoryHandler.setHistoryList(list); });
+	}
+
+
+	private loadTags() {
+		// Fetch all tags
+		this.cmsService.requestAllTags().subscribe(requestedTags => this._tags = requestedTags);
 	}
 
 
@@ -264,6 +279,7 @@ export class ComposeComponent extends DestroyableClass implements CanDeactivate<
 
 	private onSubmit(returnValue: Content | HttpErrorResponse) {
 		if (returnValue instanceof HttpErrorResponse) {
+			// TODO: open login modal if 401 and user object doesn't exist. Then if login passed run submitForm() again
 			this.modalService.openHTTPErrorModal(returnValue.error);
 			return Promise.resolve(false);
 		}

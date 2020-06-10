@@ -11,6 +11,7 @@ export const API = {
 	tools: {
 		history: '/api/tools/history',
 		search: '/api/tools/search',
+		tags: '/api/tools/tags',
 	},
 	files: '/api/files/',
 	admin: {

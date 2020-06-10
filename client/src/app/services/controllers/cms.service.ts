@@ -21,6 +21,7 @@ export class CMSService {
 		description: '404 - Not found',
 		version: 0,
 		route: '',
+		tags: []
 	};
 
 	public get content() { return this._pageSubject; }
@@ -91,5 +92,13 @@ export class CMSService {
 	 */
 	public createContent(newContent: Content) {
 		return this.http.client.post<Content>(env.API.cms, newContent);
+	}
+
+
+	/**
+	 * Requests all tags
+	 */
+	public requestAllTags() {
+		return this.http.client.get<string[]>(env.API.tools.tags);
 	}
 }
