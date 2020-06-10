@@ -29,7 +29,8 @@ describe('REST: Tools', () => {
 				description: 'test',
 				folder: 'test',
 				published: true,
-				nav: true
+				nav: true,
+				tags: [],
 			};
 
 			const patched: Content = {
@@ -40,7 +41,8 @@ describe('REST: Tools', () => {
 				description: 'test',
 				folder: 'test',
 				published: true,
-				nav: true
+				nav: true,
+				tags: [],
 			};
 
 			await TestBed.http.post('/api/cms/')
@@ -95,7 +97,8 @@ describe('REST: Tools', () => {
 					description: 'search',
 					folder: 'test',
 					published: true,
-					nav: true
+					nav: true,
+					tags: []
 				}));
 
 				list.push(TestBed.http.post('/api/cms/').set('Cookie', TestBed.AdminCookie).send({
@@ -106,7 +109,8 @@ describe('REST: Tools', () => {
 					description: 'search',
 					folder: 'test',
 					published: true,
-					nav: true
+					nav: true,
+					tags: []
 				}));
 
 				list.push(TestBed.http.post('/api/cms/').set('Cookie', TestBed.AdminCookie).send({
@@ -117,7 +121,8 @@ describe('REST: Tools', () => {
 					description: 'search',
 					folder: 'test',
 					published: true,
-					nav: true
+					nav: true,
+					tags: []
 				}));
 			}
 

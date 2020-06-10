@@ -29,7 +29,8 @@ describe('REST: Content', () => {
 				description: 'test',
 				folder: 'test',
 				published: true,
-				nav: true
+				nav: true,
+				tags: []
 			};
 
 			const res = await TestBed.http.post('/api/cms/')
@@ -72,7 +73,8 @@ describe('REST: Content', () => {
 				description: 'test',
 				folder: 'test',
 				published: true,
-				nav: true
+				nav: true,
+				tags: []
 			};
 
 			const res = await TestBed.http.post('/api/cms/')
@@ -120,7 +122,8 @@ describe('REST: Content', () => {
 				description: 'test',
 				folder: 'test',
 				published: true,
-				nav: true
+				nav: true,
+				tags: []
 			};
 
 			const res = await TestBed.http.post('/api/cms/')
@@ -155,6 +158,7 @@ describe('REST: Content', () => {
 				folder: 'test',
 				published: true,
 				nav: true,
+				tags: []
 			};
 
 			const badRoute = Object.assign({}, properContent);
@@ -214,6 +218,7 @@ describe('REST: Content', () => {
 				folder: 'test',
 				published: true,
 				nav: true,
+				tags: []
 			};
 
 			await TestBed.http.post('/api/cms/')
@@ -256,6 +261,7 @@ describe('REST: Content', () => {
 				folder: 'test',
 				published: true,
 				nav: true,
+				tags: []
 			};
 
 			await TestBed.http.post('/api/cms/')
@@ -318,7 +324,8 @@ describe('REST: Content', () => {
 				description: 'test',
 				folder: 'test',
 				published: true,
-				nav: true
+				nav: true,
+				tags: []
 			};
 
 			await TestBed.http.post('/api/cms/')
@@ -361,7 +368,8 @@ describe('REST: Content', () => {
 				description: 'test',
 				folder: 'test',
 				published: true,
-				nav: true
+				nav: true,
+				tags: []
 			};
 
 			await TestBed.http.post('/api/cms/')
@@ -398,7 +406,8 @@ describe('REST: Content', () => {
 				description: 'test',
 				folder: 'test',
 				published: true,
-				nav: true
+				nav: true,
+				tags: []
 			};
 
 			await TestBed.http.post('/api/cms/')
@@ -439,7 +448,8 @@ describe('REST: Content', () => {
 				description: 'test',
 				folder: 'test',
 				published: true,
-				nav: true
+				nav: true,
+				tags: []
 			};
 
 			await TestBed.http.post('/api/cms/')
@@ -467,7 +477,8 @@ describe('REST: Content', () => {
 				description: 'test',
 				folder: 'test',
 				published: true,
-				nav: true
+				nav: true,
+				tags: []
 			};
 
 			await TestBed.http.post('/api/cms/')
@@ -494,7 +505,8 @@ describe('REST: Content', () => {
 				description: 'test',
 				folder: 'test',
 				published: true,
-				nav: true
+				nav: true,
+				tags: []
 			};
 
 			const res = await TestBed.http.patch('/api/cms/' + route)
@@ -516,7 +528,8 @@ describe('REST: Content', () => {
 				description: 'test',
 				folder: 'test',
 				published: true,
-				nav: true
+				nav: true,
+				tags: []
 			};
 
 			const badRoute = Object.assign({}, properContent);
@@ -570,7 +583,8 @@ describe('REST: Content', () => {
 				description: 'test',
 				folder: 'test',
 				published: true,
-				nav: true
+				nav: true,
+				tags: []
 			};
 
 			await TestBed.http.post('/api/cms/')
@@ -594,7 +608,8 @@ describe('REST: Content', () => {
 				description: 'test',
 				folder: 'test',
 				published: true,
-				nav: true
+				nav: true,
+				tags: []
 			};
 
 			await TestBed.http.post('/api/cms/')

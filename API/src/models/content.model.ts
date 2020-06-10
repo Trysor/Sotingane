@@ -23,7 +23,7 @@ const schema = new Schema({
 			type: { type: String },
 			url: { type: String }
 		}],
-
+		tags: [{ type: String, index: true }],
 		folder: { type: String },
 		nav: { type: Boolean, default: false },
 

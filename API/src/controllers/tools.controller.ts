@@ -33,6 +33,26 @@ export class ToolsController extends Controller {
 		return res.status(200).send(contentDoc.prev); // length of 0 is also status 200
 	}
 
+	/**
+	 * Gets content history of a given route
+	 */
+	@GET({ path: '/tags', do: [Auth.ByToken, Auth.RequireRole(AccessRoles.writer)] })
+	public async getTags(req: Req, res: Res, next: Next) {
+
+		const user = req.user as JWTUser;
+
+		const match = Auth.getUserAccessMatchObject(user, {});
+
+		const unwoundDocs: any[] = await ContentModel.aggregate([
+			{ $match: match },
+			{ $replaceRoot: { newRoot: '$current' } },
+			{ $project: { tags: 1 } },
+			{ $unwind : '$tags' }
+		]).allowDiskUse(true);
+
+		const tags = unwoundDocs?.length > 0 && unwoundDocs.map(x => x.tags as string) || [];
+		return res.status(200).send(tags); // length of 0 is also status 200
+	}
 
 
 	/**

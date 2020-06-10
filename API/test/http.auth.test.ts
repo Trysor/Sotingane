@@ -20,7 +20,8 @@ describe('HTTP: Authorization', () => {
 			description: 'test',
 			folder: 'test',
 			published: true,
-			nav: true
+			nav: true,
+			tags: []
 		};
 
 		const res = await TestBed.http.post('/api/cms/')
@@ -40,7 +41,8 @@ describe('HTTP: Authorization', () => {
 			description: 'test',
 			folder: 'test',
 			published: true,
-			nav: true
+			nav: true,
+			tags: []
 		};
 
 		const extractedJwt = TestBed.AdminCookie.split('=')[1];

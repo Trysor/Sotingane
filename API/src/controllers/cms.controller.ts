@@ -78,7 +78,7 @@ export class CMSController extends Controller {
 			{
 				'current.title': 1, 'current.access': 1, 'current.route': 1, 'current.content': 1, 'current.description': 1,
 				'current.updatedBy': 1, 'current.createdBy': 1, 'current.updatedAt': 1, 'current.createdAt': 1,
-				'current.images.height': 1, 'current.images.width': 1, 'current.images.url': 1
+				'current.images.height': 1, 'current.images.width': 1, 'current.images.url': 1, 'current.tags': 1
 			}
 		).populate([
 			{ path: 'current.updatedBy', select: 'username' },
@@ -144,6 +144,7 @@ export class CMSController extends Controller {
 			content_searchable: searchable ? searchable + ' ' : ' ',
 			description: sanitize(data.description),
 			images: await ImageSize.imageDataFromURLs(imageUrls),
+			tags: data.tags,
 			nav: !!data.nav,
 			folder: data.folder ? stripHTML(data.folder).replace(/\//g, '') : '',
 			createdBy: isPatch ? existingDoc.current.createdBy : user._id,
@@ -222,9 +223,16 @@ export class CMSController extends Controller {
 				},
 				nav: {
 					type: 'boolean'
+				},
+				tags: {
+					type: 'array',
+					items: {
+						type: 'string',
+					},
+					uniqueItems: true
 				}
 			},
-			required: ['title', 'published', 'access', 'route', 'content', 'description', 'folder', 'nav']
+			required: ['title', 'published', 'access', 'route', 'content', 'description', 'folder', 'nav', 'tags']
 		};
 	}
 }
