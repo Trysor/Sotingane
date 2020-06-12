@@ -86,8 +86,10 @@ describe('ComposeComponent', () => {
 			]
 		}).compileComponents();
 
-		createNewFixture();
 		httpTestingController = TestBed.inject(HttpTestingController);
+
+		createNewFixture();
+
 
 		routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
 		routerSpy.navigateByUrl.and.callFake(((newUrl: string) => {
@@ -176,7 +178,8 @@ describe('ComposeComponent', () => {
 				published: true,
 				access: [],
 				folder: '',
-				nav: true
+				nav: true,
+				tags: []
 			} as Content);
 			fixture.detectChanges();
 
@@ -195,9 +198,11 @@ describe('ComposeComponent', () => {
 	describe('Edit existing content', () => {
 		it('should query for existing data when given a route', () => {
 			route.snapshot.params = { route: 'someRoute' } as Params;
+
+			httpTestingController.expectOne(env.API.tools.tags).flush([]);
 			createNewFixture();
 
-
+			httpTestingController.expectOne(env.API.tools.tags).flush([]);
 			const contentReq = httpTestingController.expectOne(`${env.API.admin.cms}/${route.snapshot.params.route as string}`);
 			const historyReq = httpTestingController.expectOne(`${env.API.tools.history}/${route.snapshot.params.route as string}`);
 
@@ -210,6 +215,7 @@ describe('ComposeComponent', () => {
 				nav: true,
 				access: [],
 				folder: '',
+				tags: []
 			};
 
 			const historyCopy1 = Object.assign({}, loadedContent);
@@ -258,11 +264,13 @@ describe('ComposeComponent', () => {
 				nav: true,
 				access: [],
 				folder: '',
+				tags: []
 			} as Content);
 
 			component.submitForm();
 			fixture.detectChanges();
 
+			httpTestingController.expectOne(env.API.tools.tags).flush([]);
 			httpTestingController.expectOne(env.API.cms).flush(
 				{ message: 'Something went wrong' } as StatusMessage,
 				{ status: 400, statusText: 'Bad Request' }
@@ -275,8 +283,6 @@ describe('ComposeComponent', () => {
 		});
 
 		it('should create content when submitting form when starting with an empty form', () => {
-			httpTestingController.verify();
-
 			component.ContentForm.setValue({
 				content: '<p>some content</p>',
 				title: 'some title',
@@ -286,6 +292,7 @@ describe('ComposeComponent', () => {
 				nav: true,
 				access: [],
 				folder: '',
+				tags: []
 			} as Content);
 
 			fixture.detectChanges();
@@ -296,6 +303,7 @@ describe('ComposeComponent', () => {
 			submitEl.dispatchEvent(new Event('click'));
 			fixture.detectChanges();
 
+			httpTestingController.expectOne(env.API.tools.tags).flush([]);
 			const createReq = httpTestingController.expectOne(env.API.cms);
 			httpTestingController.verify();
 
@@ -307,8 +315,11 @@ describe('ComposeComponent', () => {
 
 		it('should update content when submitting form for some given route', () => {
 			route.snapshot.params = { route: 'someRoute' } as Params;
+
+			httpTestingController.expectOne(env.API.tools.tags).flush([]);
 			createNewFixture();
 
+			httpTestingController.expectOne(env.API.tools.tags).flush([]);
 			httpTestingController.expectOne(`${env.API.admin.cms}/${route.snapshot.params.route as string}`).flush({
 				content: '<p>some content</p>',
 				title: 'some title',
@@ -348,6 +359,7 @@ describe('ComposeComponent', () => {
 
 	describe('Navigation', () => {
 		it('should navigate to home when creating content that is set as not published', () => {
+			httpTestingController.expectOne(env.API.tools.tags).flush([]);
 			httpTestingController.verify();
 
 			component.ContentForm.setValue({
@@ -359,6 +371,7 @@ describe('ComposeComponent', () => {
 				nav: true,
 				access: [],
 				folder: '',
+				tags: []
 			} as Content);
 
 			component.submitForm();
@@ -410,6 +423,8 @@ describe('ComposeComponent', () => {
 	describe('History', () => {
 		it('should preserve draft state between history selection change', () => {
 			route.snapshot.params = { route: 'someRoute' } as Params;
+
+			httpTestingController.expectOne(env.API.tools.tags).flush([]);
 			createNewFixture();
 
 			fixture.detectChanges();
@@ -423,6 +438,7 @@ describe('ComposeComponent', () => {
 				nav: true,
 				access: [],
 				folder: '',
+				tags: []
 			};
 			httpTestingController.expectOne(`${env.API.admin.cms}/${route.snapshot.params.route as string}`).flush(loadedContent);
 
@@ -433,6 +449,7 @@ describe('ComposeComponent', () => {
 			const historyCopy3 = Object.assign({}, loadedContent);
 			historyCopy3.description = 'history changed thrice';
 
+			httpTestingController.expectOne(env.API.tools.tags).flush([]);
 			httpTestingController.expectOne(`${env.API.tools.history}/${route.snapshot.params.route as string}`)
 				.flush([historyCopy1, historyCopy2, historyCopy3]);
 
@@ -486,10 +503,13 @@ describe('ComposeComponent', () => {
 
 		it('should set draft state to the history item when restoring history', () => {
 			route.snapshot.params = { route: 'someRoute' } as Params;
+
+			httpTestingController.expectOne(env.API.tools.tags).flush([]);
 			createNewFixture();
 
 			fixture.detectChanges();
 
+			httpTestingController.expectOne(env.API.tools.tags).flush([]);
 			const contentReq = httpTestingController.expectOne(`${env.API.admin.cms}/${route.snapshot.params.route as string}`);
 			const historyReq = httpTestingController.expectOne(`${env.API.tools.history}/${route.snapshot.params.route as string}`);
 
@@ -502,6 +522,7 @@ describe('ComposeComponent', () => {
 				nav: true,
 				access: [],
 				folder: '',
+				tags: []
 			};
 
 			const historyCopy1 = Object.assign({}, loadedContent);
