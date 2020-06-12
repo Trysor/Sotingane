@@ -29,7 +29,9 @@
 
 
 // reference
-// https://github.com/ckeditor/ckeditor5-theme-lark/blob/master/theme/ckeditor5-ui/globals/_colors.css
+// https://github.com/ckeditor/ckeditor5/blob/master/packages/ckeditor5-theme-lark/theme/ckeditor5-ui/globals/_colors.css
+// There are additional variables in components in that same repo.
+
 ::ng-deep :root {
 	--ck-color-base-foreground: 								var(--color-header);
 	--ck-color-base-background: 								var(--color-header);
@@ -43,8 +45,9 @@
 
 	/* -- Generic colors ------------------------------------------------------------------------ */
 
+	--ck-color-focus-border-coordinates: 						208, 79%, 51%;
 	--ck-color-focus-border:									var(--color-border);
-	--ck-color-focus-shadow:									var(--color-background);
+	--ck-color-focus-outer-shadow:								var(--color-background);
 	--ck-color-focus-disabled-shadow:							var(--color-disabled);
 	--ck-color-focus-error-shadow:								hsla(9,100%,56%,.3);
 	--ck-color-text: 											var(--color-text);
@@ -77,8 +80,11 @@
 	--ck-color-button-cancel: 									hsl(15, 100%, 43%);
 
 	--ck-color-switch-button-off-background:					var(--color-material);
+	--ck-color-switch-button-off-hover-background:				var(--color-background);
 	--ck-color-switch-button-on-background:						var(--ck-color-button-action-background);
+	--ck-color-switch-button-on-hover-background:				var(--color-active);
 	--ck-color-switch-button-inner-background:					var(--ck-color-base-background);
+	--ck-color-switch-button-inner-shadow:						hsla(0, 0%, 0%, 0.1);
 
 	/* -- Dropdown ------------------------------------------------------------------------------ */
 
@@ -131,4 +137,9 @@
 
 	--ck-color-link-default:									var(--color-primary);
 	--ck-color-link-selected-background: 						var(--color-shade);
+
+	/* -- splitbutton -------------------------------------------------------------------------------- */
+
+	--ck-color-split-button-hover-background: var(--ck-color-base-background);
+	--ck-color-split-button-hover-border: var(--ck-color-base-border);						
 }
