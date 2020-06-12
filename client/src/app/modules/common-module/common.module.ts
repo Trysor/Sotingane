@@ -13,6 +13,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { MatChipsModule } from '@angular/material/chips';
 
 
 import { TableComponent } from './table-component/table.component';
@@ -33,6 +35,8 @@ import { SectionComponent } from './section-component/section.component';
 		MatSortModule,
 		MatDatepickerModule,
 		ScrollingModule,
+		DragDropModule,
+		MatChipsModule,
 
 		// Components
 		TableComponent,
@@ -58,6 +62,8 @@ import { SectionComponent } from './section-component/section.component';
 		MatSortModule,
 		MatDatepickerModule,
 		ScrollingModule,
+		DragDropModule,
+		MatChipsModule
 	]
 })
 export class CommonModule { }

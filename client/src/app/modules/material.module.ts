@@ -12,8 +12,6 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatChipsModule } from '@angular/material/chips';
-import { DragDropModule } from '@angular/cdk/drag-drop';
 
 
 @NgModule({
@@ -29,8 +27,6 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 		MatDialogModule,
 		MatInputModule,
 		MatDividerModule,
-		MatChipsModule,
-		DragDropModule
 	]
 })
 export class MaterialModule { }
