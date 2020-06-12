@@ -76,8 +76,8 @@ describe('AdminService', () => {
 
 	it('getAllContent()', () => {
 		const testContent: Content[] = [
-			{ title: 'test', route: 'test' },
-			{ title: 'test2', route: 'test2' },
+			{ title: 'test', route: 'test', tags: [] },
+			{ title: 'test2', route: 'test2', tags: [] },
 		];
 
 		// Subscribe to request
@@ -95,7 +95,7 @@ describe('AdminService', () => {
 	});
 
 	it('getContentPage()', () => {
-		const testContent: Content = { title: 'test', route: 'test' };
+		const testContent: Content = { title: 'test', route: 'test', tags: [] };
 
 		// Subscribe to request
 		service.getContentPage(testContent.route).subscribe(content => {
