@@ -29,7 +29,9 @@
 						],
 						"extractCss": true,
 						"styles": [
-							"src/app/app.scss"
+							"src/app/app.scss",
+							"node_modules/prismjs/themes/prism-tomorrow.css",
+							"node_modules/prismjs/plugins/line-numbers/prism-line-numbers.css"
 						],
 						"scripts": []
 					},

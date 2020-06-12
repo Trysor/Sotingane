@@ -191,6 +191,25 @@ $figure-margin: 0.8em;
 			}
 		}
 	}
+
+	pre {
+		border: var(--border);
+		background: var(--color-sidepanel);
+		box-shadow: var(--shadow) inset;
+		color: var(--color-text);
+		font-size: 0.9em;
+		overflow: initial;
+		position: relative;
+
+		&::before {
+			content: attr(lang);
+			position: absolute;
+			top: 0.3em;
+			right: 0.5em;
+			font-weight: 600;
+			font-size: 0.75em;
+		}
+	}
 }
 
 
