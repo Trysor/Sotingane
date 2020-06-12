@@ -73,7 +73,7 @@ class TestBedSingleton {
 			// Initiate tests
 			console.timeEnd('Setting up DB for tests');
 			console.log('Initiating tests');
-			mocha.run(async (failures) => process.exit(failures > 0 ? 1 : 0));
+			mocha.run((failures) => process.exit(failures > 0 ? 1 : 0));
 		});
 	}
 

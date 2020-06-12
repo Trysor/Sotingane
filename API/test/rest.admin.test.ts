@@ -469,7 +469,7 @@ describe('REST: Admin', () => {
 			const queryMembers: AggregationQuery = { access: [AccessRoles.member] };
 			const queryAdmins: AggregationQuery = { access: [AccessRoles.admin] };
 
-			const content: Partial<Content> = { content: 'test', description: 'test', folder: 'test', published: true, nav: true };
+			const content: Partial<Content> = { content: 'test', description: 'test', folder: 'test', published: true, nav: true, tags: [] };
 
 			const [res1, res2, res3] = await Promise.all([
 				TestBed.http.post('/api/cms').set('Cookie', TestBed.AdminCookie).send(Object.assign({
