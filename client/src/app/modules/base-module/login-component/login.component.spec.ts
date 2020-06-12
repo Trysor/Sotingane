@@ -6,11 +6,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 // Material
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from '@app/modules/material.module';
-
-// Routing
-import { RouterTestingModule } from '@angular/router/testing';
-const routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
-import { Router } from '@angular/router';
+import { MatDialogRef } from '@angular/material/dialog';
+const dialogSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
 
 // Forms
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
@@ -28,7 +25,7 @@ import { Subject } from 'rxjs';
 describe('LoginComponent', () => {
 	let component: LoginComponent;
 	let fixture: ComponentFixture<LoginComponent>;
-	let router: Router;
+	let dialog: MatDialogRef<LoginComponent>;
 	let auth: AuthServiceStub;
 	let loginSubject: Subject<boolean>;
 
@@ -38,12 +35,11 @@ describe('LoginComponent', () => {
 			schemas: [NO_ERRORS_SCHEMA],
 			providers: [
 				{ provide: AuthService, useValue: authServiceStub },
-				{ provide: Router, useValue: routerSpy },
+				{ provide: MatDialogRef, useValue: dialogSpy },
 				FormBuilder
 			],
 			imports: [
 				NoopAnimationsModule,
-				RouterTestingModule,
 				ReactiveFormsModule,
 				MaterialModule
 			]
@@ -55,7 +51,7 @@ describe('LoginComponent', () => {
 		fixture = TestBed.createComponent(LoginComponent);
 		component = fixture.componentInstance;
 		auth = TestBed.inject(AuthService);
-		router = TestBed.inject(Router);
+		dialog = TestBed.inject(MatDialogRef);
 		loginSubject = new Subject<boolean>();
 		auth.login = () => loginSubject.asObservable();
 
@@ -131,7 +127,7 @@ describe('LoginComponent', () => {
 
 
 
-	it('should successfully login and route to home', () => {
+	it('should successfully login and close dialog', () => {
 		const button: HTMLButtonElement = fixture.debugElement.query(By.css('.loginButton')).nativeElement;
 
 		// Expect initial state
@@ -154,10 +150,9 @@ describe('LoginComponent', () => {
 		// Trigger login
 		loginSubject.next(true);
 
-		// Expect to be routed to home
-		const spy = router.navigateByUrl as jasmine.Spy;
-		const navArgs = spy.calls.first().args[0];
-		expect(navArgs).toBe('/', 'Should be routed to "/"');
+		// Expect the form to have been closed.
+		const spy = dialog.close as jasmine.Spy;
+		expect(spy.calls.count()).toBe(1, 'Dialog should have closed');
 	});
 
 	it('should successfully give error message on faulty login', () => {
