@@ -4,17 +4,10 @@ import { DynamicComponent, Content } from '@types';
 import { ModalService } from '@app/services/utility/modal.service';
 import { IntersectionService } from '@app/services/utility/intersection.service';
 import { MobileService } from '@app/services/utility/mobile.service';
-import { PlatformService } from '@app/services/utility/platform.service';
-
 
 import { DynamicLazyLoader } from './dynamic.lazy.loader';
 
 import { takeUntil } from 'rxjs/operators';
-
-interface PictureSource {
-	src: string;
-	media: string;
-}
 
 @Component({
 	selector: 'image-container',
@@ -34,7 +27,6 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 		private inters: IntersectionService,
 		private renderer: Renderer2,
 		private mobileService: MobileService,
-		private platform: PlatformService,
 		@Optional() private modalService: ModalService) {
 
 		super(elRef, inters);
@@ -91,6 +83,7 @@ export class DynamicImageComponent extends DynamicLazyLoader implements DynamicC
 			return;
 		}
 
+		this.renderer.addClass(this._imgEl, 'anim');
 		this._listeners.push(this.renderer.listen(this._imgEl, 'load', this.onload.bind(this)));
 		this._listeners.push(this.renderer.listen(this._imgEl, 'error', this.onerror.bind(this)));
 	}

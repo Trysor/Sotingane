@@ -9,6 +9,7 @@ import { AuthService } from '@app/services/controllers/auth.service';
 import { SettingsService } from '@app/services/controllers/settings.service';
 import { ModalService } from '@app/services/utility/modal.service';
 import { ContentService } from '@app/services/utility/content.service';
+
 import { AccessRoles } from '@types';
 
 import { takeUntil, filter } from 'rxjs/operators';
@@ -27,7 +28,6 @@ export class ContentComponent extends DestroyableClass implements AfterViewInit,
 
 	// Template Helpers
 	public readonly AccessRoles = AccessRoles;
-	public readonly isPlatformServer: boolean;
 	public get settings() { return this.settingsService.settings; }
 
 	// Constructor

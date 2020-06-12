@@ -71,6 +71,7 @@ $figure-margin: 0.8em;
 
 		border: var(--border);
 		background: var(--color-sidepanel);
+		clear: both;
 
 		// Lazy-load pre-sizing to fill space.
 		&.lazy {
@@ -96,11 +97,13 @@ $figure-margin: 0.8em;
 		}
 
 		img {
-			transition: $lazy-transition;
 			display: block;
 			margin: 0;
 			width: 100%;
 			max-width: 100%;
+			&.anim {
+				transition: $lazy-transition;
+			}
 		}
 
 		figcaption {
