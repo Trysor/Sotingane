@@ -1,13 +1,13 @@
-import { Component, ChangeDetectionStrategy, Input, ViewChild, ElementRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 
 import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatChipInputEvent, MatChipInput } from '@angular/material/chips';
-import { map, takeUntil } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { MatChipInputEvent, MatChipList } from '@angular/material/chips';
+import { map, takeUntil, startWith } from 'rxjs/operators';
+import { Observable, combineLatest, BehaviorSubject } from 'rxjs';
 import { DestroyableClass } from '@app/classes';
 
 
@@ -17,25 +17,36 @@ import { DestroyableClass } from '@app/classes';
 	styleUrls: ['./tagsinput.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TagsInputComponent extends DestroyableClass {
+export class TagsInputComponent extends DestroyableClass implements AfterViewInit {
 	@ViewChild('input', { static: true }) private inputElem: ElementRef<HTMLInputElement>;
 	@Input() form: FormGroup;
 	@Input() controlName: string;
-	@Input() data: string[];
+	@Input() data: BehaviorSubject<string[]>;
 
 	public readonly tagSeparatorKeyCodes: number[] = [ENTER, COMMA];
 	public readonly tagTextInputControl = new FormControl();
 
 	public AutoCompleteList: Observable<string[]>;
+	public currentTags: Observable<string[]>;
 
-	constructor() {
-		super();
-		this.AutoCompleteList = this.tagTextInputControl.valueChanges.pipe(
+	constructor() { super(); }
+
+	ngAfterViewInit(): void {
+		this.currentTags = this.form.get(this.controlName).valueChanges.pipe(startWith([]));
+
+		this.AutoCompleteList = combineLatest([
+			this.tagTextInputControl.valueChanges as Observable<string>,
+			this.data
+		]).pipe(
 			takeUntil(this.OnDestroy),
-			map((typedText: string) => this.data.filter(tag =>
-				tag.toLowerCase().startsWith(typedText.toLowerCase())										// Startswith filter
-				&& !(this.form.get(this.controlName).value as string[]).includes(tag)		// not already part of our list
-			))
+			map(combinedLatest => {
+				const [typedText, data] = combinedLatest;
+
+				return data.filter(tag =>
+					tag.toLowerCase().startsWith(typedText.toLowerCase())						// Startswith filter
+					&& !(this.form.get(this.controlName).value as string[]).includes(tag)		// not already part of our list
+				);
+			})
 		);
 	}
 
@@ -43,14 +54,17 @@ export class TagsInputComponent extends DestroyableClass {
 	// --------------- METHODS ---------------
 	// ---------------------------------------
 
-	public addTag(event: MatChipInputEvent | MatAutocompleteSelectedEvent) {
+	public addTag(event: MatAutocompleteSelectedEvent | MatChipInputEvent) {
 		const newTag = (event instanceof MatAutocompleteSelectedEvent) ? event.option.viewValue : event?.value?.trim();
 
 		const tags = this.form.get(this.controlName).value as string[];
 		if (!newTag || tags.includes(newTag)) { return; }
 		this.inputElem.nativeElement.value = '';
+		this.tagTextInputControl.setValue('');
 		tags.push(newTag);
+		this.form.get(this.controlName).setValue(tags);
 	}
+
 
 	public removeTag(tag: string) {
 		if (!tag) { return; }

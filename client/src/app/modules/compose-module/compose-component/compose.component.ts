@@ -6,7 +6,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 import { MatSelectChange } from '@angular/material/select';
 
-
 import { FormErrorInstant, AccessHandler, DestroyableClass } from '@app/classes';
 import { CMSService } from '@app/services/controllers/cms.service';
 import { AdminService } from '@app/services/controllers/admin.service';
@@ -55,7 +54,7 @@ export class ComposeComponent extends DestroyableClass implements CanDeactivate<
 	private readonly _filteredFolders = new BehaviorSubject<string[]>(['']);
 
 	// TAGS FIELDS
-	private _tags: string[] = [];
+	private readonly _tags = new BehaviorSubject<string[]>([]);
 	public get Tags() { return this._tags; }
 
 
@@ -189,7 +188,7 @@ export class ComposeComponent extends DestroyableClass implements CanDeactivate<
 
 	private loadTags() {
 		// Fetch all tags
-		this.cmsService.requestAllTags().pipe(startWith([])).subscribe(requestedTags => this._tags = requestedTags);
+		this.cmsService.requestAllTags().pipe(startWith([])).subscribe(requestedTags => this._tags.next(requestedTags));
 	}
 
 

@@ -1,13 +1,14 @@
 <ng-container [formGroup]="form">
 	<mat-form-field appearance="outline">
-		<mat-chip-list #tags removable="true"
+		<mat-label>Tags</mat-label>
+		<mat-chip-list #tags [multiple]="true"
 			cdkDropList cdkDropListOrientation="horizontal">
-			<mat-chip *ngFor="let tag of form.get(controlName).value"
+			<mat-chip *ngFor="let tag of currentTags | async"
 				removable="true"
-				cdkDrag (cdkDropListDropped)="sortTag($event)" (cdkDragDropped)="sortTag($event)"
+				cdkDrag (cdkDragDropped)="sortTag($event)"
 				(removed)="removeTag(tag)"
-				color="primary" selected>
-				{{tag}}
+				color="primary" [selected]="!(data | async).includes(tag)">
+				{{tag}} ({{!(data | async).includes(tag)}})
 				<mat-icon matChipRemove>cancel</mat-icon>
 			</mat-chip>
 		</mat-chip-list>
