@@ -6,7 +6,7 @@ dist: xenial
 
 install:
   - cd $PROJECT
-  - npm install 
+  - npm ci 
 script:
   - npm run test
 
@@ -25,7 +25,6 @@ jobs:
           - "client/node_modules"
       before-install:
         - export NG_CLI_ANALYTICS=ci
-        - npm install webpack-cli -g #used for CKEditor cross-folder install
     - env: PROJECT="CKEditor"
       cache: 
         directories: 

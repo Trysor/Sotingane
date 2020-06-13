@@ -50,5 +50,3 @@ dist/
 # Do not include seeds
 /src/libs/seeds.ts
 
-# package-lock
-package-lock.json
