@@ -6,7 +6,7 @@
 		"webpack": "webpack --config webpack.ckeditor.config.js --progress --colors",
 		"build": "npm run webpack",
 		"buildtsc": "tsc",
-		"postinstall": "webpack --config webpack.ckeditor.config.js --progress --colors"
+		"postinstall": "webpack --config webpack.ckeditor.config.js --silent"
 	},
 	"main": "dist/ckeditor.js",
 	"types": "ckeditor.ts",
