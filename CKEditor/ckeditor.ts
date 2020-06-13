@@ -19,7 +19,7 @@ import ImageUploadPlugin from '@ckeditor/ckeditor5-image/src/imageupload';
 import CustomUploadAdapter from './plugins/customUploadAdapter/customUploadAdapter';
 
 // FileStore
-import FileStorePlugin from './plugins/FileStore/fileStore.plugin';
+import FileStorePlugin from './plugins/fileStore/fileStore.plugin';
 
 // Features
 import LinkPlugin from '@ckeditor/ckeditor5-link/src/link';
