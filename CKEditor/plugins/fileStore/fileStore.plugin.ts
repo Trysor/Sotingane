@@ -7,7 +7,7 @@ import { insertImage, isImageAllowed } from '@ckeditor/ckeditor5-image/src/image
 import { CKEFileStoreOptions, FileURLPayload } from '../../types';
 
 const FILESTORE = 'FileStore';
-import fileStoreIcon from './FileStore.svg';
+import fileStoreIcon from './fileStore.svg';
 
 export default class FileStorePlugin extends Plugin {
 	static get pluginName() { return 'FileStore'; }
