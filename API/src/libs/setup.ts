@@ -5,6 +5,7 @@ import * as helmet from 'helmet';
 import * as logger from 'morgan';
 import * as methodOverride from 'method-override';
 import * as cookieParser from 'cookie-parser';
+import * as fileUpload from 'express-fileupload';
 
 export class Setup {
 	/**
@@ -22,18 +23,23 @@ export class Setup {
 
 		// bodyParser
 		app.use(urlencoded({ extended: false }));
-		app.use(json());
+		app.use(json({ type: 'application/json' }));
+
+		// express-fileupload
+		app.use(fileUpload({
+			// limits: { fileSize: 10 * 1024 * 1024 } // 10 MB
+		}));
 
 		// Logging
 		if (configUtil.getEnv('NODE_ENV') !== 'test') {
-			// use morgan to log at command line
-			app.use(logger(configGet<string>('loggingMode')));
+			app.use(logger(configGet<string>('loggingMode'))); // logger
 		}
 
 		// Headers (CORS)
+		const allowedOrigins = configGet<string[]>('allowedOrigins');
 		app.use((req: Request, res: Response, next: NextFunction) => {
 			const origin = req.headers.origin;
-			if (typeof origin === 'string' && configGet<string[]>('allowedOrigins').indexOf(origin) > -1) {
+			if (typeof origin === 'string' && allowedOrigins.includes(origin)) {
 				res.setHeader('Access-Control-Allow-Origin', origin);
 			}
 			res.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, PATCH, OPTIONS');

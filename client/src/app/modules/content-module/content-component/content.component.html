@@ -1,18 +1,21 @@
-
 <!-- HEADER -->
 <ng-container *ngIf="cmsService.content | async as contentObject">
 	<!-- if the content exists and you're authorized, the content will be a valid object; else not. -->
 	<h1>{{contentObject.title || "[Blank]"}}</h1>
+	<div *ngIf="contentObject.tags.length > 0" class="tags info">
+		<span *ngFor="let tag of contentObject.tags; let last = last;">{{tag}}<span *ngIf="!last">, </span></span>
+	</div>
 	<div *ngIf="(authService.user | async) && authService.isUserOfRole(AccessRoles.writer)" class="pageControls">
-		<button mat-icon-button [matMenuTriggerFor]="pageControls">
+		<button mat-icon-button [matMenuTriggerFor]="pageControls" aria-label="Page options">
 			<mat-icon>more_vert</mat-icon>
 		</button>
 		<mat-menu #pageControls="matMenu" xPosition="before">
 			<ng-template matMenuContent>
-				<button mat-menu-item (click)="navigateToEditPage()">
+				<button mat-menu-item (click)="navigateToEditPage()" aria-label="Edit page">
 					<mat-icon>mode_edit</mat-icon> Edit
 				</button>
-				<button mat-menu-item (click)="deletePage()" [disabled]="contentObject.route === (settings | async).indexRoute">
+				<button mat-menu-item (click)="deletePage()"
+					[disabled]="contentObject.route === (settings | async).indexRoute" aria-label="Delete page">
 					<mat-icon>delete</mat-icon> Delete
 				</button>
 			</ng-template>
@@ -25,17 +28,20 @@
 
 <!-- Details -->
 <ng-container *ngIf="cmsService.content | async as contentObject">
-	<div class="info" *ngIf="contentObject.access.length > 0">
-		Access groups: <span *ngFor="let role of contentObject.access; last as last">{{role}}<ng-container *ngIf="!last">, </ng-container></span>
+	<div class="absolute info" *ngIf="contentObject.access.length > 0">
+		Access groups: <span *ngFor="let role of contentObject.access; last as last">{{role}}<ng-container
+				*ngIf="!last">, </ng-container></span>
 	</div>
-	<div class="info right" *ngIf="contentObject.route !== (settings | async).indexRoute && contentObject.updatedAt">
+	<div class="absolute info right" *ngIf="contentObject.route !== (settings | async).indexRoute && contentObject.updatedAt">
 		<div>
-			Updated by: {{contentObject.updatedBy.username}}, <span [matTooltip]="contentObject.updatedAt | TimeAgo" matTooltipPosition="above">
+			Updated by: {{contentObject.updatedBy.username}}, <span [matTooltip]="contentObject.updatedAt | TimeAgo"
+				matTooltipPosition="above">
 				{{ contentObject.updatedAt | date:'dd. MMM yyyy, HH:mm' }}
 			</span>
 		</div>
 		<div>
-			Written by: {{contentObject.createdBy.username}}, <span [matTooltip]="contentObject.createdAt | TimeAgo" matTooltipPosition="above">
+			Written by: {{contentObject.createdBy.username}}, <span [matTooltip]="contentObject.createdAt | TimeAgo"
+				matTooltipPosition="above">
 				{{ contentObject.createdAt | date:'dd. MMM yyyy, HH:mm' }}
 			</span>
 		</div>

@@ -3,7 +3,6 @@ import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core
 import { Router } from '@angular/router';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
-import { MobileService } from '@app/services';
 
 @Component({
 	selector: 'search-component',
@@ -16,7 +15,6 @@ export class SearchComponent implements OnInit {
 	public form: FormGroup;
 
 	constructor(
-		public mobileService: MobileService,
 		private fb: FormBuilder,
 		private router: Router) {
 		this.form = this.fb.group({ search: [''] });
@@ -36,7 +34,7 @@ export class SearchComponent implements OnInit {
 	/**
 	 * Perform a search and navigate to the search page
 	 */
-	public search() {
+	public async search() {
 		this.router.navigateByUrl('/search/' + this.form.get('search').value);
 		// this.form.get('search').setValue('');
 	}

@@ -18,7 +18,6 @@
 
 // Generic
 @include mat-button-theme($app-theme);
-@include mat-list-theme($app-theme);
 @include mat-divider-theme($app-theme);
 @include mat-icon-theme($app-theme);
 
@@ -29,12 +28,26 @@
 // Layout
 @include mat-sidenav-theme($app-theme);
 
-// Features
+
 @include mat-menu-theme($app-theme);
+
+
+// popups etc
+@include mat-progress-bar-theme($app-theme);
+@include mat-progress-spinner-theme($app-theme);
+@include mat-snack-bar-theme($app-theme);
+@include mat-dialog-theme($app-theme);
+@include mat-tooltip-theme($app-theme);
+
+// Common-module
+@include mat-select-theme($app-theme);
+@include mat-checkbox-theme($app-theme);
+@include mat-chips-theme($app-theme);
+@include mat-expansion-panel-theme($app-theme);
+@include mat-tabs-theme($app-theme);
+
+@include mat-autocomplete-theme($app-theme);
+@include mat-datepicker-theme($app-theme);
+
 @include mat-paginator-theme($app-theme);
 @include mat-table-theme($app-theme);
-
-@import 'lazy';
-
-// This here includes everything.
-// @include angular-material-theme($app-theme);

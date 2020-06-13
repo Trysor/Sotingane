@@ -1,15 +1,17 @@
-import { Component, Optional, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Optional, OnDestroy, ChangeDetectionStrategy, AfterViewInit } from '@angular/core';
 
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
-import { ModalService, SettingsService, AdminService } from '@app/services';
+import { SettingsService } from '@app/services/controllers/settings.service';
+import { ModalService } from '@app/services/utility/modal.service';
+import { AdminService } from '@app/services/controllers/admin.service';
 
-import { Content, TableSettings, ColumnType, AccessRoles } from '@types';
+import { Content, TableSettings, ColumnType } from '@types';
 
-import { AccessHandler } from '@app/classes';
+import { AccessHandler, DestroyableClass } from '@app/classes';
 
-import { Subject, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -18,8 +20,7 @@ import { takeUntil } from 'rxjs/operators';
 	styleUrls: ['./pages.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PagesComponent implements OnDestroy {
-	private _ngUnsub = new Subject();
+export class PagesComponent extends DestroyableClass implements AfterViewInit {
 	public data = new BehaviorSubject<Content[]>(null);
 
 	private readonly _accessHandler = new AccessHandler();
@@ -114,14 +115,13 @@ export class PagesComponent implements OnDestroy {
 		private adminService: AdminService,
 		private datePipe: DatePipe) {
 
-		this.adminService.getAllContent().pipe(takeUntil(this._ngUnsub)).subscribe((contentList) => {
+		super();
+
+	}
+
+	ngAfterViewInit() {
+		this.adminService.getAllContent().pipe(takeUntil(this.OnDestroy)).subscribe((contentList) => {
 			this.data.next(contentList);
 		});
 	}
-
-	ngOnDestroy(): void {
-		this._ngUnsub.next();
-		this._ngUnsub.complete();
-	}
-
 }

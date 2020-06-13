@@ -1,6 +1,6 @@
 import { get as configGet } from 'config';
 import { Strategy as JwtStrategy, StrategyOptions as jwtOptions, VerifiedCallback } from 'passport-jwt';
-import { verify } from 'jsonwebtoken';
+import { verify, VerifyOptions } from 'jsonwebtoken';
 import { Strategy as LocalStrategy, IStrategyOptions as localOptions } from 'passport-local';
 import { use as passportUse, authenticate } from 'passport';
 import { Handler } from 'express';
@@ -8,7 +8,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import { Types as MongoTypes } from 'mongoose';
 
-import { AccessRoles, JWTUser, AuthorObject } from '../../types';
+import { AccessRoles, JWTUser, AuthorObject, User } from '../../types';
 import { JWT } from '../../global';
 
 import { UserModel } from '../models';
@@ -29,7 +29,7 @@ const localOptions: localOptions = {
 };
 
 // Setting JWT strategy options
-const jwtOptions: jwtOptions = {
+const jwtOptions: jwtOptions & VerifyOptions = {
 	jwtFromRequest: (req: Request): string => {
 		return !!req.headers.authorization
 			? req.headers.authorization
@@ -39,7 +39,7 @@ const jwtOptions: jwtOptions = {
 	audience: configGet<string>('tokenAudience'),
 };
 
-const jwtRefreshOptions: jwtOptions = {
+const jwtRefreshOptions: jwtOptions & VerifyOptions = {
 	jwtFromRequest: (req: Request): string => {
 		return !!req.headers.authorization
 			? req.headers.authorization
@@ -68,7 +68,7 @@ passportUse(ByTokenName, new JwtStrategy(jwtOptions, async (payload: JWTUser, do
 	done(null, payload);
 }));
 passportUse(ByRefreshName, new JwtStrategy(jwtRefreshOptions, async (payload: JWTUser, done: VerifiedCallback) => {
-	const user = await UserModel.findById(payload._id).lean(); // we need to verify the user is still in fact a user
+	const user = await UserModel.findById(payload._id).lean<User>(); // we need to verify the user is still in fact a user
 	if (!user) { return done(null, null); }
 
 	const newPayload: JWTUser = {
@@ -108,11 +108,11 @@ const RequireRole = (role: AccessRoles) => {
 
 export class Auth {
 	// Authentication Handlers
-	public static ByLogin: Handler = authenticate('local', { session: false });
-	public static ByToken: Handler = authenticate(ByTokenName, { session: false });
-	public static ByRefresh: Handler = authenticate(ByRefreshName, { session: false });
-	public static Personalize: Handler = Personalize;
-	public static RequireRole = RequireRole;
+	public static readonly ByLogin: Handler = authenticate('local', { session: false });
+	public static readonly ByToken: Handler = authenticate(ByTokenName, { session: false });
+	public static readonly ByRefresh: Handler = authenticate(ByRefreshName, { session: false });
+	public static readonly Personalize: Handler = Personalize;
+	public static readonly RequireRole = RequireRole;
 
 
 	// Access Rights methods

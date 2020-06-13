@@ -1,9 +1,7 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Route } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 import { BaseComponent } from './base-component/base.component';
-import { SearchResultsComponent } from './search-results-component/search.results.component';
-// External
 import { ContentComponent } from '@app/modules/content-module/content-component/content.component';
 
 
@@ -30,8 +28,7 @@ import { AuthGuard, AdminGuard, LoginGuard, RedirectGuard } from '@app/guards';
 						path: 'login', loadChildren: () => import('app/modules/auth-module/auth.module').then(m => m.AuthModule), pathMatch: 'full',
 						canActivate: [LoginGuard]
 					},
-					{ path: 'search', redirectTo: 'search/', pathMatch: 'full', data: { SearchResults: '' } },
-					{ path: 'search/:term', component: SearchResultsComponent },
+					{ path: 'search', loadChildren: () => import('app/modules/search-module/search.module').then(m => m.SearchModule) },
 					// User routes (all users)
 					{
 						path: 'user', loadChildren: () => import('app/modules/user-module/user.module').then(m => m.UserModule), pathMatch: 'full',
@@ -43,7 +40,9 @@ import { AuthGuard, AdminGuard, LoginGuard, RedirectGuard } from '@app/guards';
 					{ path: '**', children: [], canActivate: [RedirectGuard] }
 				]
 			},
-		])
+		], {
+			initialNavigation: true
+		})
 	],
 	exports: [
 		RouterModule

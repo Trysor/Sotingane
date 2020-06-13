@@ -30,6 +30,7 @@ export interface Content {
 	description?: string;
 	images?: ImageContentData[];
 
+	tags: string[];
 	folder?: string;
 	nav?: boolean;
 

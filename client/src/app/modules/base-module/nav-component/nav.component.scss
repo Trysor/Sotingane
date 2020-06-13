@@ -4,27 +4,41 @@
 	margin: 10px 0;
 }
 
-a[mat-list-item] {
+ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+a,
+h2 {
+	padding: 0 24px;
+}
+
+a {
+	display: block;
+	text-align: start;
+	border-radius: 0;
+
 	&.active {
 		background: var(--color-active);
 	}
 
 	&.subItem {
-		padding-left: 14px;
+		padding-left: 48px;
 		box-sizing: border-box;
 	
 		::ng-deep .mat-ripple {
-			margin-left: -14px;
+			margin-left: -48px;
 		}
 	}
 }
 
-
-
-mat-nav-list h2.mat-subheader {
+h2 {
 	font-weight: bold;
+	font-size: 1.1em;
 }
 
-mat-divider {
+.folder {
 	margin-top: 1em;
 }

@@ -1,13 +1,12 @@
 {
 	"compileOnSave": false,
 	"compilerOptions": {
-    	"importHelpers": true,
+		"importHelpers": true,
 		"outDir": "./dist/out-tsc",
 		"sourceMap": true,
 		"declaration": false,
 		"moduleResolution": "node",
 		"allowJs": true,
-		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"target": "es2015",
 		"module": "esnext",
@@ -16,17 +15,31 @@
 		],
 		"baseUrl": "src",
 		"paths": {
-			"@app/*": [ "app/*" ],
-			"@env": [ "environments/environment" ],
-			"@app/ckeditor": [ "../../CKEditor" ],
-			"@types": [ "../../Shared/types" ],
-			"@global": [ "../../Shared/global.settings" ],
-			"tslib": [ "../node_modules/tslib"]
+			"@app/*": [
+				"app/*"
+			],
+			"@env": [
+				"environments/environment"
+			],
+			"@types": [
+				"../../Shared/types"
+			],
+			"@global": [
+				"../../Shared/global.settings"
+			],
+			"tslib": [
+				"../node_modules/tslib"
+			]
 		},
 		"lib": [
 			"es2018",
 			"dom"
 		]
 	},
-	"exclude": [ "node_modules" ]
+	"exclude": [
+		"node_modules"
+	],
+	"angularCompilerOptions": {
+		"enableIvy": true
+	}
 }

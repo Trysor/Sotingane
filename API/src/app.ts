@@ -1,3 +1,5 @@
+console.time('Launch time');
+
 import * as express from 'express';
 import { get as configGet, util as configUtil } from 'config';
 import 'source-map-support/register';
@@ -7,19 +9,19 @@ import { Server } from 'http';
 
 import { Setup } from './libs/setup';
 import { AppRouter } from './router';
+import { FirstRunCheck } from './libs/firstrun';
 
 
 class App {
 	public app: express.Express;
 
 	constructor() {
-		console.time('Launch time');
 		this.app = express();
 		console.log('Launching Node REST API for ' + configUtil.getEnv('NODE_ENV') + '..');
 
 		// SETUP
 		Setup.initiate(this.app);
-
+		FirstRunCheck.PerformCheckAndInitialize();
 
 		// CONTROLLERS & ROUTER
 		AppRouter.initiate(this.app);
@@ -39,16 +41,15 @@ class App {
 		});
 
 		const uri = process.env.db || configGet<string>('database');
-
-		mongoose.set('useCreateIndex', true);
-		mongoose.set('useFindAndModify', false);
-
 		mongoose.connect(uri, {
 			keepAlive: true,
-			useNewUrlParser: true
+			useNewUrlParser: true,
+			useCreateIndex: true,
+			useFindAndModify: false,
+			useUnifiedTopology: true
 		}, (error) => {
 			if (error) {
-				// if error is true, the problem is often with mongoDB not connection
+				// if error is truthy, the problem is often with mongoDB not connection
 				console.error('Mongoose connection error:', error.message);
 				process.exit(1);
 				return;

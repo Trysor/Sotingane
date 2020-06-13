@@ -2,6 +2,8 @@
 
 import { Content, DynamicComponent } from '@types';
 
+import { ModuleLoaderService } from '@app/services/http/moduleloader.service';
+
 import { DynamicLinkComponent } from '@app/modules/content-module/content-controllers/dynamic.link.component';
 import { DynamicImageComponent } from '@app/modules/content-module/content-controllers/dynamic.image.component';
 import { DynamicMediaComponent } from '@app/modules/content-module/content-controllers/dynamic.media.component';
@@ -14,7 +16,8 @@ export class ContentService {
 
 	constructor(
 		private resolver: ComponentFactoryResolver,
-		private injector: Injector) {
+		private injector: Injector,
+		private moduleLoaderService: ModuleLoaderService) {
 
 		// Map the tag to replace with the corresponding factory
 		this._dynamicContent.set('a', this.resolver.resolveComponentFactory(DynamicLinkComponent));
@@ -40,7 +43,7 @@ export class ContentService {
 
 		// Clean components before rebuilding.
 		this.cleanEmbeddedComponents();
-		e.innerHTML = content.content.replace(/src/g, 'data-src');
+		e.innerHTML = this.transformContentData(content.content);
 
 		// Inject
 		this._dynamicContent.forEach((fac, selector) => {
@@ -65,6 +68,8 @@ export class ContentService {
 				this._embeddedComponents.push(comp);
 			}
 		});
+
+		this.loadCodeHighlightModule(e);
 	}
 
 	/**
@@ -74,5 +79,18 @@ export class ContentService {
 		// destroycomponents to avoid be memory leaks
 		this._embeddedComponents.forEach(comp => comp.destroy());
 		this._embeddedComponents.length = 0;
+	}
+
+
+	private transformContentData(content: string) {
+		return content.replace(/src=/g, 'data-src=').replace(/srcset=/g, 'data-srcset=');
+	}
+
+	public async loadCodeHighlightModule(parent: HTMLDivElement) {
+		const allPreElements = parent.querySelectorAll('pre');
+		if (!allPreElements || allPreElements.length === 0) { return; }
+
+		const module = await this.moduleLoaderService.loadCodeHighlightModule();
+		module.highlightFor(parent, allPreElements);
 	}
 }

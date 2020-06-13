@@ -1,0 +1,32 @@
+<ng-container [formGroup]="form">
+	<mat-form-field appearance="outline">
+		<mat-label>Tags</mat-label>
+		<mat-chip-list #tags [multiple]="true"
+			cdkDropList cdkDropListOrientation="horizontal">
+			<mat-chip *ngFor="let tag of currentTags | async"
+				removable="true"
+				cdkDrag (cdkDragDropped)="sortTag($event)"
+				(removed)="removeTag(tag)"
+				color="primary" [selected]="!(data | async).includes(tag)">
+				{{tag}} ({{!(data | async).includes(tag)}})
+				<mat-icon matChipRemove>cancel</mat-icon>
+			</mat-chip>
+		</mat-chip-list>
+		<mat-autocomplete #tagsAuto="matAutocomplete" (optionSelected)="addTag($event)">
+			<mat-option *ngFor="let tag of AutoCompleteList | async" [value]="tag">
+				{{ tag }}
+			</mat-option>
+		</mat-autocomplete>
+		<input
+			autocomplete="off"
+			id="input"
+			#input
+			matInput
+			[matChipInputAddOnBlur]="false"
+			[matChipInputFor]="tags"
+			[matChipInputSeparatorKeyCodes]="tagSeparatorKeyCodes"
+			(matChipInputTokenEnd)="addTag($event)"
+			[matAutocomplete]="tagsAuto"
+			[formControl]="tagTextInputControl">
+	</mat-form-field>
+</ng-container>

@@ -8,5 +8,8 @@
 	],
 	"loggingMode": "dev",
 	"tokenAudience": "someAudienceForTheAuthToken",
-	"refreshTokenAudience": "someAudienceForTheRefresherToken"
+	"refreshTokenAudience": "someAudienceForTheRefresherToken",
+	"browserRelativeUploadPath": "some/relative/url",
+	"FilestoreNamespace": "ad9a4643-7f70-462d-8d8a-ded0b2dc44ac",
+	"FilestoreFileURLBase": "http://localhost:2001"
 }

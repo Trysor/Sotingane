@@ -1,28 +1,47 @@
 <ng-container *ngIf="authService.user | async; let user" [ngSwitch]="layout">
 	<ng-container *ngSwitchCase="'menu'">
-		<button mat-menu-item routerLink="/user" routerLinkActive="active"><mat-icon>settings</mat-icon> User Settings</button>
+		<button mat-menu-item routerLink="/user" routerLinkActive="active">
+			<mat-icon>settings</mat-icon> User Settings
+		</button>
 		<mat-divider></mat-divider>
-		<button mat-menu-item routerLink="/compose" routerLinkActive="active" *ngIf="authService.isUserOfRole(AccessRoles.writer)"><mat-icon>create</mat-icon> Create Content</button>
-		<button mat-menu-item routerLink="/admin" routerLinkActive="active" *ngIf="authService.isUserOfRole(AccessRoles.admin)"><mat-icon>build</mat-icon> Administration</button>
+		<button mat-menu-item routerLink="/compose" routerLinkActive="active"
+			*ngIf="authService.isUserOfRole(AccessRoles.writer)">
+			<mat-icon>create</mat-icon> Create Content
+		</button>
+		<button mat-menu-item routerLink="/admin" routerLinkActive="active"
+			*ngIf="authService.isUserOfRole(AccessRoles.admin)">
+			<mat-icon>build</mat-icon> Administration
+		</button>
 		<mat-divider></mat-divider>
-		<button mat-menu-item (click)="authService.logOut()"><mat-icon>exit_to_app</mat-icon> Log out</button>
+		<button mat-menu-item (click)="authService.logOut()">
+			<mat-icon>exit_to_app</mat-icon> Log out
+		</button>
 	</ng-container>
 
 	<ng-container *ngSwitchDefault>
-		<mat-nav-list ngClass="nav" dense>
+		<ul class="nav">
+			<li>
+				<a mat-button routerLink="/user" routerLinkActive="active">
+					<mat-icon>settings</mat-icon> User Settings
+				</a>
+			</li>
 			<mat-divider></mat-divider>
-			<a mat-list-item
-			   routerLink="/user"
-			   routerLinkActive="active"><mat-icon matListIcon>settings</mat-icon>User Settings</a>
+			<li *ngIf="authService.isUserOfRole(AccessRoles.writer)">
+				<a mat-button routerLink="/compose" routerLinkActive="active">
+					<mat-icon>create</mat-icon> Create Content
+				</a>
+			</li>
+			<li *ngIf="authService.isUserOfRole(AccessRoles.admin)">
+				<a mat-button routerLink="/admin" routerLinkActive="active">
+					<mat-icon>build</mat-icon> Administration
+				</a>
+			</li>
 			<mat-divider></mat-divider>
-			<a mat-list-item *ngIf="authService.isUserOfRole(AccessRoles.writer)"
-			   routerLink="/compose"
-			   routerLinkActive="active"><mat-icon matListIcon>create</mat-icon>Create Content</a>
-			<a mat-list-item *ngIf="authService.isUserOfRole(AccessRoles.admin)"
-			   routerLink="/admin"
-			   routerLinkActive="active"><mat-icon matListIcon>build</mat-icon>Administration</a>
-			<mat-divider></mat-divider>
-			<mat-list-item (click)="authService.logOut()"><mat-icon matListIcon>exit_to_app</mat-icon> Log out</mat-list-item>
-		</mat-nav-list>
+			<li>
+				<button mat-button (click)="authService.logOut()">
+					<mat-icon>exit_to_app</mat-icon> Log out
+				</button>
+			</li>
+		</ul>
 	</ng-container>
 </ng-container>

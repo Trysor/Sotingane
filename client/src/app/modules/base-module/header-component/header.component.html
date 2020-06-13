@@ -1,7 +1,7 @@
-<header class="topHeader" [ngClass]="{ 'fixed': (mobileService.isMobile() | async) }">
+<header class="topHeader" appMobile #mobile="appMobile">
 
 	<!-- Mobile navigation toggler -->
-	<div class="flex" *ngIf="mobileService.isMobile() | async">
+	<div class="flex" *ngIf="mobile.isMobile | async">
 		<button mat-icon-button (click)="toggleLeft()"
 				class="navToggle" aria-label="Toggle navigation">
 			<mat-icon>menu</mat-icon>
@@ -9,19 +9,19 @@
 	</div>
 
 	<!-- Title -->
-	<div class="flex" [ngClass]="{ 'center': (mobileService.isMobile() | async) }">
+	<div class="flex" [ngClass]="{ 'center': (mobile.isMobile | async) }">
 		<a routerLink="/" class="title"><mat-icon svgIcon="logo" ngClass="logo"></mat-icon>otingane</a>
 	</div>
 
 	<!-- Search box -->
-	<div class="flex center" *ngIf="!(mobileService.isMobile() | async)">
+	<div class="flex center" *ngIf="!(mobile.isMobile | async)">
 		<search-component class="search"></search-component>
 	</div>
 
 	<!-- Right side logic -->
 	<!-- IF you are logged in -->
 	<ng-container *ngIf="authService.user | async as user; else headerlogin">
-		<div class="flex right" [ngSwitch]="(mobileService.isMobile() | async)">
+		<div class="flex right" [ngSwitch]="(mobile.isMobile | async)">
 			<!-- For MOBILE -->
 			<button mat-icon-button *ngSwitchCase="true" (click)="toggleRight()"
 					class="userToggle mobile" aria-label="Toggle user panel">
@@ -41,14 +41,14 @@
 
 	<!-- If you are NOT logged in -->
 	<ng-template #headerlogin>
-		<div class="flex right" [ngSwitch]="(mobileService.isMobile() | async)">
+		<div class="flex right" [ngSwitch]="(mobile.isMobile | async)">
 			<!-- For MOBILE -->
-			<button mat-icon-button *ngSwitchCase="true" routerLink="/login" routerLinkActive="active" class="userToggle mobile" aria-label="Go to login">
+			<button mat-icon-button *ngSwitchCase="true" routerLinkActive="active" class="userToggle mobile" aria-label="Go to login" (click)="modalService.openLoginModal()">
 				<mat-icon>person</mat-icon>
 			</button>
 			<!-- For DESKTOP -->
-			<button mat-button *ngSwitchCase="false" routerLink="/login" routerLinkActive="active" class="userToggle" aria-label="Go to login">
-				<mat-icon>person</mat-icon> <ng-container *ngIf="!(mobileService.isMobile() | async)">Login</ng-container>
+			<button mat-button *ngSwitchCase="false" routerLinkActive="active" class="userToggle" aria-label="Go to login" (click)="modalService.openLoginModal()">
+				<mat-icon>person</mat-icon> <ng-container *ngIf="!(mobile.isMobile | async)">Login</ng-container>
 			</button>
 		</div>
 	</ng-template>

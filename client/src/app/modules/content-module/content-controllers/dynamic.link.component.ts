@@ -1,10 +1,9 @@
-﻿import { Component, OnInit, Input, ChangeDetectionStrategy, HostBinding, HostListener } from '@angular/core';
+﻿import { Component, Input, ChangeDetectionStrategy, HostBinding, HostListener } from '@angular/core';
 
 import { Router } from '@angular/router';
 
 import { DynamicComponent } from '@types';
 import { PlatformService } from '@app/services/utility/platform.service';
-import { Subject } from 'rxjs';
 
 
 @Component({
@@ -12,7 +11,7 @@ import { Subject } from 'rxjs';
 	template: `<ng-content></ng-content>`,
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DynamicLinkComponent implements DynamicComponent, OnInit {
+export class DynamicLinkComponent implements DynamicComponent {
 	private _isRemoteUrl = true;
 	@Input() @HostBinding('attr.href') link: string;
 
@@ -29,7 +28,12 @@ export class DynamicLinkComponent implements DynamicComponent, OnInit {
 
 	constructor(private router: Router, private platform: PlatformService) {}
 
-	ngOnInit() {
+	/**
+	 * DynamicComponent interface method. Triggered as the component is injected
+	 */
+	public buildJob(el: Element): void {
+		this.link = el.getAttribute('href');
+
 		if (!this.link || this.link.length === 0) { return; }
 
 		if (this.platform.document) {
@@ -37,12 +41,5 @@ export class DynamicLinkComponent implements DynamicComponent, OnInit {
 		}
 
 		this._isRemoteUrl = !this.link.startsWith('/');
-	}
-
-	/**
-	 * DynamicComponent interface method. Triggered as the component is injected
-	 */
-	public buildJob(el: Element): void {
-		this.link = el.getAttribute('href');
 	}
 }

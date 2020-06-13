@@ -3,7 +3,8 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { HttpClient } from '@angular/common/http';
 
-import { AdminService, HttpService } from '@app/services';
+import { AdminService } from '@app/services/controllers/admin.service';
+import { HttpService } from '@app/services/http/http.service';
 import { User, Content } from '@types';
 
 import { env } from '@env';
@@ -24,11 +25,11 @@ describe('AdminService', () => {
 			],
 			imports: [HttpClientTestingModule]
 		});
-		service = TestBed.get(AdminService);
-		httpTestingController = TestBed.get(HttpTestingController as Type<HttpTestingController>);
+		service = TestBed.inject(AdminService);
+		httpTestingController = TestBed.inject(HttpTestingController as Type<HttpTestingController>);
 
 		// Override the client property to use the test client
-		( service as any).http.client = TestBed.get(HttpClient);
+		( service as any).http.client = TestBed.inject(HttpClient);
 	});
 
 	afterEach(() => {
@@ -75,8 +76,8 @@ describe('AdminService', () => {
 
 	it('getAllContent()', () => {
 		const testContent: Content[] = [
-			{ title: 'test', route: 'test' },
-			{ title: 'test2', route: 'test2' },
+			{ title: 'test', route: 'test', tags: [] },
+			{ title: 'test2', route: 'test2', tags: [] },
 		];
 
 		// Subscribe to request
@@ -94,7 +95,7 @@ describe('AdminService', () => {
 	});
 
 	it('getContentPage()', () => {
-		const testContent: Content = { title: 'test', route: 'test' };
+		const testContent: Content = { title: 'test', route: 'test', tags: [] };
 
 		// Subscribe to request
 		service.getContentPage(testContent.route).subscribe(content => {

@@ -19,11 +19,6 @@ import { DynamicImageComponent } from './content-controllers/dynamic.image.compo
 	imports: [
 		SharedModule
 	],
-	entryComponents: [
-		DynamicLinkComponent,
-		DynamicMediaComponent,
-		DynamicImageComponent
-	],
 	exports: [
 		ContentComponent
 	]

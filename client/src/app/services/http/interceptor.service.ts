@@ -9,7 +9,7 @@ import { SnackBarService } from '@app/services/utility/snackbar.service';
 import { PlatformService } from '@app/services/utility/platform.service';
 import { HttpService } from '@app/services/http/http.service';
 
-import { throwError, TimeoutError } from 'rxjs';
+import { throwError, TimeoutError, of } from 'rxjs';
 import { timeout, finalize, catchError } from 'rxjs/operators';
 
 
@@ -27,6 +27,7 @@ export class InterceptorService implements HttpInterceptor {
 	intercept(req: HttpRequest<any>, next: HttpHandler) {
 		// Only intercept if the request is going to our server.
 		if (!req.url.startsWith(env.API.api)) { return next.handle(req); }
+		const shouldSetAsJson = !req.url.startsWith(env.API.files);
 
 		// LoadingService
 		this.loadingService.addRequest();
@@ -34,7 +35,7 @@ export class InterceptorService implements HttpInterceptor {
 		// Handle the request, set headers and pipe it
 		return next.handle(
 			req.clone({
-				headers: this.getHeadersObject(req),
+				headers: this.getHeadersObject(req, shouldSetAsJson),
 				withCredentials: true,
 				url: this.getAPIUrl(req)							// Deal with server vs client side URL handling
 			})
@@ -46,7 +47,7 @@ export class InterceptorService implements HttpInterceptor {
 			catchError((err: HttpErrorResponse | TimeoutError) => {
 				if (err instanceof TimeoutError) {
 					this.snackBar.open('Request timed out');
-					return throwError('Request timed out');
+					return of(null);
 				}
 				// Any non-timed-out request has to be handled from where it originated
 				return throwError(err);
@@ -57,8 +58,14 @@ export class InterceptorService implements HttpInterceptor {
 	/**
 	 * Create the HttpHeaders object with headers set
 	 */
-	private getHeadersObject(req: HttpRequest<any>) {
-		let headers = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
+	private getHeadersObject(req: HttpRequest<any>, shouldSetAsJson: boolean) {
+		let headers = new HttpHeaders();
+		if (req.headers.has('Content-Type')) {
+			headers.set('Content-Type', req.headers.get('Content-Type'));
+		} else if (shouldSetAsJson) {
+			headers.set('Content-Type', 'application/json; charset=utf-8');
+		}
+
 		const token = req.url.startsWith(env.API.auth.token)
 			? this.tokenService.refreshToken
 			: this.tokenService.token;

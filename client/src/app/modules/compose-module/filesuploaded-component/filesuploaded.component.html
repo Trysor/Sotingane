@@ -1,0 +1,38 @@
+<div class="headerbox">
+	<h2 mat-dialog-title>Insert image</h2>
+	<div [formGroup]="filterForm" class="filterParent">
+		<!-- class="filterBox" -->
+		<mat-form-field floatLabel="never" ngClass="filter">
+			<input matInput placeholder="Filter" type="text" autocomplete="off" formControlName="filterControl">
+			<button *ngIf="filterForm.get('filterControl').value.length > 0" matSuffix mat-icon-button
+				(click)="filterForm.get('filterControl').reset('')">
+				<mat-icon>clear</mat-icon>
+			</button>
+		</mat-form-field>
+	</div>
+</div>
+
+
+<div mat-dialog-content class="wrapper" appMobile #mobile="appMobile">
+	<div class="contentBox">
+		<cdk-virtual-scroll-viewport itemSize="150">
+			<div *cdkVirtualFor="let thumbnailObj of Thumbnails | async; let odd=odd" class="item"
+				[ngClass]="{ odd: odd }" (click)="clickImage(thumbnailObj.uuid)">
+				<div class="imageContainer">
+					<img [src]="thumbnailObj.thumbnail">
+				</div>
+				<h3 class="title">{{ thumbnailObj.title }}</h3>
+				<div class="dataContainer">
+					<div>Uploaded by: {{ thumbnailObj.uploadedBy.username }}</div>
+					<div>{{ thumbnailObj.uploadedDate | date:DateFormat }}</div>
+				</div>
+			</div>
+		</cdk-virtual-scroll-viewport>
+	</div>
+	<div class="count">
+		Number of images: {{ (Thumbnails | async).length }}
+	</div>
+</div>
+<div mat-dialog-actions align="end">
+	<button mat-raised-button color="primary" (click)="close()">Close</button>
+</div>

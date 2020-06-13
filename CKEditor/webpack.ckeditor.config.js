@@ -20,8 +20,8 @@ module.exports = {
 		umdNamedDefine: true
 	},
 
-	optimization: { // Preserve CKEditor 5 license comments.
-		minimizer: [ new TerserPlugin({ sourceMap: true, parallel: true, cache: true, terserOptions: { output: { comments: /@license/i } }  }) ]
+	optimization: {
+		minimizer: [ new TerserPlugin({ sourceMap: true, parallel: true, cache: true, terserOptions: { output: { comments: false } }  }) ]
 	},
 	module: {
 		rules: [
@@ -32,7 +32,7 @@ module.exports = {
 				use: [
 					{
 						loader: 'style-loader',
-						options: { singleton: true }
+						options: { injectType: 'singletonStyleTag' }
 					},
 					{
 						loader: 'postcss-loader',

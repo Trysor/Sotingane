@@ -6,7 +6,8 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TransferHttpCacheModule } from '@nguniversal/common';
 
 // Directly load base module
-import { BaseModule, MaterialDateModule } from '@app/modules';
+import { BaseModule } from '@app/modules/base-module/base.module';
+import { MaterialDateModule } from '@app/modules/material.date.module';
 import { BaseRoutingModule } from '@app/modules/base-module/base.routing-module';
 
 // Services

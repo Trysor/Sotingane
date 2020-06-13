@@ -6,20 +6,19 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { TransferState } from '@angular/platform-browser';
 
 // Material
-import { MaterialModule } from '@app/modules';
+import { MaterialModule } from '@app/modules/material.module';
 
 // Routing
 import { Router } from '@angular/router';
 const routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
 
-
-import { AuthService, HttpService } from '@app/services';
+import { AuthService } from '@app/services/controllers/auth.service';
+import { HttpService } from '@app/services/http/http.service';
 import { User, TokenResponse } from '@types';
 
 import { env } from '@env';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { Type } from '@angular/core';
 
 describe('AuthService', () => {
 	let service: AuthService;
@@ -43,12 +42,12 @@ describe('AuthService', () => {
 		});
 
 		// Override the client property to use the test client
-		// This needs to happen before we do TestBed.get(AuthService);
-		TestBed.get(HttpService).client = TestBed.get(HttpClient);
+		// This needs to happen before we do TestBed.inject(AuthService);
+		(TestBed.inject(HttpService) as any).client = TestBed.inject(HttpClient);
 
 		// Get the service, and the httpTestingController, so we can use these in our tests
-		service = TestBed.get(AuthService);
-		httpTestingController = TestBed.get(HttpTestingController as Type<HttpTestingController>);
+		service = TestBed.inject(AuthService);
+		httpTestingController = TestBed.inject(HttpTestingController);
 
 		// Deal with the refresh token request from the constructor (moved to SetupService)
 		// const req = httpTestingController.expectOne(r => r.url.includes(env.API.auth.token));

@@ -18,7 +18,7 @@ const sanitizeOptions: sanitizeHtml.IOptions = {
 	allowedAttributes: {
 		'*': ['class', 'style'],
 		a: ['href'],
-		img: ['src', 'alt'],
+		img: ['src', 'alt', 'srcset', 'sizes'],
 		div: ['data-oembed-url'],
 		oembed: ['url']
 	},

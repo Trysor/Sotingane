@@ -2,13 +2,16 @@ import { Request as Req, Response as Res, NextFunction as Next } from 'express';
 import * as Ajv from 'ajv';
 import { ErrorObject } from 'ajv';
 
+import { StatusMessage, ErrorMessage } from 'types';
+
 /*
  |--------------------------------------------------------------------------
  | AJV
  |--------------------------------------------------------------------------
 */
 
-export const ajv = new Ajv({ allErrors: true });
+const ajv = new Ajv({ allErrors: true });
+
 
 export const validate = (schema: SchemaValidationObject) => {
 	return (req: Req, res: Res, next: Next): Res => {
@@ -20,6 +23,27 @@ export const validate = (schema: SchemaValidationObject) => {
 	};
 };
 
+/**
+ * Property Decorator: Registers the schema into AJV.
+ * Also assigns the $id field its name, given the validation object
+ */
+export const RegisterSchema = (schemaValidationObject: SchemaValidationObject) => {
+	return (target: any, propertyKey: string | symbol) => {
+		const schema = target[propertyKey];
+		schema.$id = schemaValidationObject.name;
+
+		if (ajv.validateSchema(schema)) {
+			ajv.addSchema(schema, schemaValidationObject.name);
+		} else {
+			throw Error(`${schemaValidationObject.name} did not validate`);
+		}
+	};
+};
+
+
+/**
+ * Returns a status formatted json object containing the message and any error messages given
+ */
 export const status = (value: string, errors?: ErrorObject[]): StatusMessage => {
 	const msg: StatusMessage = { message: value };
 	if (errors) {
@@ -79,6 +103,12 @@ export const JSchema: SchemaValidation = {
 		name: 'ThemeSchema',
 		err: VALIDATION_FAILED.THEME_MODEL
 	},
+
+	// File
+	FileDataSchema: {
+		name: 'FileDataSchema',
+		err: VALIDATION_FAILED.File_MODEL
+	}
 };
 
 
@@ -93,7 +123,8 @@ export const enum VALIDATION_FAILED {
 	CONTENT_MODEL = 'Content object validation failed',
 	ADMIN_MODEL = 'Query object validation failed',
 	SETTING_MODEL = 'Setting object validation failed',
-	THEME_MODEL = 'Theme object validation failed'
+	THEME_MODEL = 'Theme object validation failed',
+	File_MODEL = 'File object validation failed'
 }
 
 
@@ -153,16 +184,17 @@ export const enum THEME_STATUS {
 	THEME_NONE_FOUND = 'Could not find theme',
 }
 
+export const enum FILE_STATUS {
+	NO_FILES_FOUND = 'No files were found',
+	ERROR_BAD_FILE = 'Bad request',
+	ERROR_BAD_UPLOAD_FOLDER = 'Cannot process your request',
+	ERROR_IMAGE_TOO_LARGE = 'Image too large',
+	ERROR_WRITING = 'Could not complete request',
+	DELETE_SUCCESSFUL = 'Successfully deleted the file.',
+	PATCH_SUCCESSFUL = 'Successfully updated file data.',
+	DATA_UNABLE_TO_SAVE = 'Could not save. Internal server error',
+}
 
-export interface StatusMessage {
-	message: string;
-	errors?: ErrorMessage[];
-}
-interface ErrorMessage {
-	property?: string;
-	error: string;
-	params: Ajv.ErrorParameters;
-}
 
 interface SchemaValidation {
 	[key: string]: SchemaValidationObject;

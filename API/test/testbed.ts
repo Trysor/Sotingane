@@ -7,7 +7,7 @@ import * as Mocha from 'mocha';
 import { readdirSync } from 'fs';
 import { join as pathjoin } from 'path';
 
-import { ContentModel, LogModel, SettingsModel, UserModel, ThemeModel, UserDoc } from '../src/models';
+import { ContentModel, LogModel, SettingsModel, UserModel, ThemeModel, UserDoc, FileModel } from '../src/models';
 import { User, TokenResponse, AccessRoles } from '../types';
 import { JWT } from '../global';
 
@@ -73,7 +73,7 @@ class TestBedSingleton {
 			// Initiate tests
 			console.timeEnd('Setting up DB for tests');
 			console.log('Initiating tests');
-			mocha.run(async (failures) => process.exit(failures > 0 ? 1 : 0));
+			mocha.run((failures) => process.exit(failures > 0 ? 1 : 0));
 		});
 	}
 
@@ -96,7 +96,8 @@ class TestBedSingleton {
 				ContentModel.deleteMany({}).exec(),
 				LogModel.deleteMany({}).exec(),
 				SettingsModel.deleteMany({}).exec(),
-				ThemeModel.deleteMany({}).exec()
+				ThemeModel.deleteMany({}).exec(),
+				FileModel.deleteMany({}).exec()
 			]);
 	}
 }

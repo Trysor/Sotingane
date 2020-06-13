@@ -27,17 +27,22 @@
 							"src/manifest.json",
 							"src/robots.txt"
 						],
+						"extractCss": true,
 						"styles": [
 							"src/app/app.scss",
-							{
-								"input": "src/app/scss/lazy.scss",
-								"lazy": true
-							}
+							"node_modules/prismjs/themes/prism-tomorrow.css",
+							"node_modules/prismjs/plugins/line-numbers/prism-line-numbers.css"
 						],
 						"scripts": []
 					},
 					"configurations": {
 						"production": {
+							"budgets": [
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "6kb"
+								}
+							],
 							"optimization": true,
 							"outputHashing": "all",
 							"sourceMap": false,
@@ -119,7 +124,7 @@
 					"builder": "@angular-devkit/build-angular:server",
 					"options": {
 						"outputPath": "dist/server",
-						"main": "src/main.server.ts",
+						"main": "server.ts",
 						"tsConfig": "src/tsconfig.server.json",
 						"stylePreprocessorOptions": {
 							"includePaths": [
@@ -130,7 +135,6 @@
 					"configurations": {
 						"production": {
 							"optimization": true,
-							"sourceMap": true,
 							"fileReplacements": [
 								{
 									"replace": "src/environments/environment.ts",
@@ -147,7 +151,7 @@
 	"schematics": {
 		"@schematics/angular:component": {
 			"prefix": "",
-			"styleext": "scss"
+			"style": "scss"
 		},
 		"@schematics/angular:directive": {
 			"prefix": ""

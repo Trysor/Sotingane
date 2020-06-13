@@ -1,23 +1,26 @@
-import { Component, OnDestroy, ChangeDetectionStrategy, Optional } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Optional } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, CanDeactivate } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 
-import { MatSelectChange } from '@app/modules/material.types';
+import { MatSelectChange } from '@angular/material/select';
 
-import ClassicEditor from '@app/ckeditor';
+import { FormErrorInstant, AccessHandler, DestroyableClass } from '@app/classes';
+import { CMSService } from '@app/services/controllers/cms.service';
+import { AdminService } from '@app/services/controllers/admin.service';
+import { ModalService } from '@app/services/utility/modal.service';
+import { StorageService, StorageKey } from '@app/services/utility/storage.service';
 
+import { HistoryHandler } from './compose.history.handler';
 
-import { ModalService, CMSService, MobileService, AdminService, StorageService, StorageKey } from '@app/services';
 import { Content, AccessRoles } from '@types';
 import { CONTENT_MAX_LENGTH } from '@global';
 
-import { FormErrorInstant, AccessHandler } from '@app/classes';
 
-import { BehaviorSubject, Observable, Subject, of } from 'rxjs';
-import { takeUntil, take, catchError } from 'rxjs/operators';
+import { BehaviorSubject, of, pipe, Observable } from 'rxjs';
+import { takeUntil, catchError, distinctUntilChanged, finalize, map, startWith } from 'rxjs/operators';
 
-enum VersionHistory { Draft = -1 }
 
 @Component({
 	selector: 'compose-component',
@@ -25,33 +28,43 @@ enum VersionHistory { Draft = -1 }
 	styleUrls: ['./compose.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeComponent> {
+export class ComposeComponent extends DestroyableClass implements CanDeactivate<ComposeComponent> {
 
-	public contentForm: FormGroup; // Form
-	public readonly formErrorInstant = new FormErrorInstant(); // Form validation errors trigger instantly
-	public readonly ClassicEditor = ClassicEditor; // CKEditor
-	public originalContent: Content; // When editing, the original content is kept here
-	// Access
+	// Public readonly fields required for HTML
 	public readonly AccessRoles = AccessRoles;
 	public readonly accessHandler = new AccessHandler();
-
-	// History fields
-	public versionIndex: number = VersionHistory.Draft;
-	public history: Content[] = null;
-	public readonly VersionHistory = VersionHistory;
-
+	public readonly HistoryHandler: HistoryHandler;
 	public readonly CONTENT_MAX_LENGTH = CONTENT_MAX_LENGTH;
-	public readonly filteredFolders = new BehaviorSubject<string[]>(['']);
+	public readonly formErrorInstant = new FormErrorInstant(); // Form validation errors trigger instantly
+	public readonly ContentForm: FormGroup; // Form
 
-	private _currentDraft: Content; // used with the versioning
-	private folders: string[] = []; // Holds a list of used Folders
-
-	private _ngUnsub = new Subject();
-	private _hasSaved = false;
+	// Public properties used by HTML
+	public get OriginalRoute() { return this._originalContent && this._originalContent.route; }
+	public get FilteredFolderList() { return this._filteredFolders; }
 
 	public get tabIndex() { return this.storage.getSession(StorageKey.ComposeTabIndex); }
 	public set tabIndex(value: string) { this.storage.setSession(StorageKey.ComposeTabIndex, value); }
 
+	private _editor: any;
+	public get Editor() { return this._editor; }
+	public set Editor(editor: any) { this._editor = editor; }
+
+	// FOLDER FIELDS
+	private _folders: string[] = []; // Holds a list of used Folders
+	private readonly _filteredFolders = new BehaviorSubject<string[]>(['']);
+
+	// TAGS FIELDS
+	private readonly _tags = new BehaviorSubject<string[]>([]);
+	public get Tags() { return this._tags; }
+
+
+	// DRAFTING FIELDS
+	private _originalContent: Content; // When editing, the original content is kept here
+
+
+	// ---------------------------------------
+	// ------------- CONSTRUCTOR -------------
+	// ---------------------------------------
 
 	constructor(
 		@Optional() private modalService: ModalService,
@@ -60,19 +73,44 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 		private router: Router,
 		private route: ActivatedRoute,
 		private fb: FormBuilder,
-		private cmsService: CMSService,
-		private adminService: AdminService,
-		public mobileService: MobileService) {
+		public cmsService: CMSService,
+		private adminService: AdminService) {
+
+		super();
+		this.HistoryHandler = new HistoryHandler(this.datePipe);
 
 		// Form
-		this.contentForm = this.fb.group({
+		this.ContentForm = this.initForm();
+
+		// Set current draft as blank initially. May be overriden until loaded.
+		this.HistoryHandler.setWorkingDraft(this.ContentForm.getRawValue());
+
+		this.initFormHooks();
+
+		this.loadTags();
+
+		// Router: Check if we are editing or creating content. Load from API
+		const editingContentRoute = this.route.snapshot.params.route;
+		if (editingContentRoute) {
+			this.loadEditContentForRoute(editingContentRoute);
+		}
+
+	}
+
+
+	// ---------------------------------------
+	// ------------ INITALIZATION ------------
+	// ---------------------------------------
+
+	private initForm() {
+		return this.fb.group({
 			route: ['', Validators.compose([
 				Validators.maxLength(this.CONTENT_MAX_LENGTH.ROUTE),
-				this.disallowed(this.cmsService.getContentList(), 'route').bind(this)
+				this.propertyMustBeUnique(this.cmsService.getContentList(), 'route').bind(this)
 			])],
 			title: ['', Validators.compose([
 				Validators.maxLength(this.CONTENT_MAX_LENGTH.TITLE),
-				this.disallowed(this.cmsService.getContentList(), 'title').bind(this)
+				this.propertyMustBeUnique(this.cmsService.getContentList(), 'title').bind(this)
 			])],
 			published: [true],
 			description: ['', Validators.compose([
@@ -83,197 +121,246 @@ export class ComposeComponent implements OnDestroy, CanDeactivate<ComposeCompone
 			nav: [true],
 			folder: ['', Validators.maxLength(this.CONTENT_MAX_LENGTH.FOLDER)],
 			content: ['', Validators.required],
+			tags: [[]]
 		});
-		this._currentDraft = this.contentForm.getRawValue();
+	}
 
-		// Hook (non-dirty) route to title.
-		const routeEdit = this.contentForm.get('route');
-		const titleEdit = this.contentForm.get('title');
+
+	private initFormHooks() {
+		const pipes = <T>() => pipe<Observable<T>, Observable<T>, Observable<T>>(distinctUntilChanged(), takeUntil(this.OnDestroy));
+
+		// Create Folder autocomplete list
+		this.cmsService.getContentList().pipe(pipes()).subscribe(contentList => this.setFoldersFromList(contentList));
+
+
+		// Hook onto folder changes such that we can filter our list
+		this.ContentForm.get('folder').valueChanges.pipe<string>(pipes()).subscribe(val => this._filteredFolders.next(
+			this._folders.filter(option => option.toLowerCase().includes(val.toLowerCase()))
+		));
+
+		// Hook to disable / enable form and control states based on nav toggle
+		this.ContentForm.get('nav').valueChanges.pipe<boolean>(pipes()).subscribe((e) => {
+			this.setFormDisabledState();
+		});
+
+		// Hook to Update routeEdit IFF the user specifically edits title without having touched route, and the values are equal
+		const routeEdit = this.ContentForm.get('route');
+		const titleEdit = this.ContentForm.get('title');
 		let oldTitleValue = titleEdit.value;
-		this.contentForm.get('title').valueChanges.pipe(takeUntil(this._ngUnsub)).subscribe(newVal => {
-			// Update routeEdit IFF the user specifically edits title without having touched route, and the values are equal
+		titleEdit.valueChanges.pipe<string>(pipes()).subscribe(newVal => {
 			if (titleEdit.dirty && !routeEdit.dirty && !routeEdit.disabled && (oldTitleValue === routeEdit.value)) {
 				routeEdit.setValue(newVal);
 			}
 			oldTitleValue = newVal;
 		});
+	}
 
-		// Create Folder autocomplete list
-		this.cmsService.getContentList().pipe(takeUntil(this._ngUnsub)).subscribe(contentList => {
-			if (!contentList) { return; }
-			const folders: string[] = [];
-			for (const content of contentList) {
-				if (content.folder && folders.indexOf(content.folder) === -1) {
-					folders.push(content.folder);
-				}
-			}
-			this.folders = folders.sort();
-			this.filteredFolders.next(
-				this.folders.filter(option => option.toLowerCase().includes(this.contentForm.get('folder').value.toLowerCase()))
-			);
+
+	private loadEditContentForRoute(route: string) {
+		// Lock down form whilst loading.
+		this.ContentForm.disable();
+
+		// Fetch content that we're supposed to be editing
+		this.adminService.getContentPage(route).pipe(
+			catchError(() => {
+				this.router.navigateByUrl('/compose'); // Could not find any data. Navigate to create
+				return of(null as Content);
+			}),
+			finalize(() => {
+				this.setFormDisabledState(); // Unlock the controls that should be available
+				this.ContentForm.markAsPristine(); // Should not be touched at this point
+			})
+		).subscribe(data => {
+			if (!data) { return; }
+
+			// Set the initial state
+			this._originalContent = data;
+			this.HistoryHandler.setWorkingDraft(data);
+
+			// Update the form
+			this.ContentForm.patchValue(data);
 		});
-		this.contentForm.get('folder').valueChanges.pipe(takeUntil(this._ngUnsub)).subscribe(val => this.filteredFolders.next(
-			this.folders.filter(option => option.toLowerCase().includes(val.toLowerCase()))
-		));
 
-		// Router: Check if we are editing or creating content. Load from API
-		const editingContentRoute = this.route.snapshot.params.route;
-		if (editingContentRoute) {
-			this.adminService.getContentPage(editingContentRoute).pipe(
-				catchError(() => {
-					this.router.navigateByUrl('/compose');
-					return of(null);
-				})
-			).subscribe(data => {
-				if (!data) { return; }
-
-				this.originalContent = data;
-				this._currentDraft = data;
-
-				this.contentForm.patchValue(data);
-				this.setFormDisabledState();
-			});
-
-			this.cmsService.requestContentHistory(editingContentRoute).subscribe(historyList => {
-				this.history = historyList;
-			});
-		}
+		// We also need to fetch history when editing existing content
+		this.cmsService.requestContentHistory(route).subscribe(list => { this.HistoryHandler.setHistoryList(list); });
 	}
 
-	/**
-	 * Event handler for when the currently viewed version changes
-	 */
-	public versionChange(event: MatSelectChange) {
-		const c = this.history ? this.history[event.value] : null;
 
-		if (c && !this.contentForm.disabled) {
-			// Only store current draft when the user is actually able to draft.
-			// The form should be disabled when reviewing history.
-			this._currentDraft = this.contentForm.value;
-		}
-
-		this.contentForm.patchValue(c ? c : this._currentDraft);
-		this.setFormDisabledState(); // Disabled state has to occur BELOW the disabled check above!
+	private loadTags() {
+		// Fetch all tags
+		this.cmsService.requestAllTags().pipe(startWith([])).subscribe(requestedTags => this._tags.next(requestedTags));
 	}
 
-	ngOnDestroy() {
-		this._ngUnsub.next();
-		this._ngUnsub.complete();
-	}
+
+	// ---------------------------------------
+	// ------------- INTERFACES --------------
+	// ---------------------------------------
 
 
 	// Implements interface: CanDeactivate<ComposeComponent>
 	canDeactivate() {
-		// if we've saved, we're fine deactivating!
-		if (this._hasSaved) { return true; }
-
-		// if we're not dirty, we can also deactivate
-		if (!this.contentForm.dirty) { return true; }
-
+		// if (!this.authService.user.getValue()) { return true; }
+		if (!this.ContentForm.dirty) {
+			return true;
+		} // We can deactivate so long we're not dirty
 		return this.modalService.openDeactivateComposeModal().afterClosed();
 	}
 
-	/**
-	 * Form Validation that disallows values that are considered unique for the given property.
-	 */
-	private disallowed(contentList: BehaviorSubject<Content[]>, prop: string) {
-		return (control: FormControl): { [key: string]: any } => {
-			const list = contentList.getValue();
-			if (list && list.some((content) => {
-				const val = content[prop].toLowerCase();
 
-				if (this.originalContent) {
-					// Only match for equal values that are NOT the same as the originalContent value (which is this draft)
-					return (val === control.value.toLowerCase()) && (val !== this.originalContent[prop].toLowerCase());
-				}
-				return (val === control.value.toLowerCase());
-			})) {
-				return { alreadyExists: true };
-			}
-		};
+
+	// ---------------------------------------
+	// ----------- EVENT HANDLERS ------------
+	// ---------------------------------------
+
+	/**
+	 * Event handler for when the user selects a history item
+	 */
+	public onSetStateAsHistroyFromVersion(event: MatSelectChange) {
+		// Only store current draft when the user is actually able to draft.
+		// The form should be disabled when reviewing history.
+		const c = this.HistoryHandler.reconfigureAfterVersionChange(
+			this.ContentForm.disabled
+				? null
+				: this.ContentForm.value
+		);
+
+		this.ContentForm.patchValue(c);
+		this.setFormDisabledState();
 	}
 
 	/**
-	 * Presents the user with a modal asking if the he/she wants to apply the old version
-	 * a
+	 * Presents the user with a modal asking if the he/she wants to restore a previous
+	 * version of the content, and if accepted the state is then set to drafting with
+	 * the restored history content as the draft content.
 	 */
-	public restoreOldVersion() {
-		const c = this.history ? this.history[this.versionIndex] : null;
-		if (!c) { return; }
+	public onSetSateFromHistoryAsCurrentDraft() {
+		if (this.HistoryHandler.isDrafting) { return; }
+		const historyItemToBeApplied = this.HistoryHandler.HistoryValue;
 
 		this.modalService.openRestoreOldVersionModal(
-			this.getHistoryItemFormatted(c.version + 1, this.datePipe.transform(c.updatedAt)),
+			this.HistoryHandler.getHistoryItemFormatted(this.HistoryHandler.HistoryVersionIndex),
 		).afterClosed().subscribe(result => {
 			if (!result) { return; }
 
-			this.versionIndex = VersionHistory.Draft;
-			this._currentDraft = c;
-			this.setFormDisabledState(); // Enable controls (and allow validation)
+			this.HistoryHandler.HistoryVersionIndex = this.HistoryHandler.VersionHistory.Draft;
+			this.HistoryHandler.reconfigureAfterVersionChange(historyItemToBeApplied);
+
+			this.ContentForm.markAsDirty(); // restoring should mark it as dirty
+			this.setFormDisabledState();
 		});
 	}
+
 
 	/**
 	 * Submits the form and hands it over to the cmsService
 	 */
 	public submitForm() {
-		const content: Content = this.contentForm.getRawValue();
+		const content: Content = this.ContentForm.getRawValue();
 		content.route = content.route.toLowerCase();
 
-		// Helper
-		const onSubmit = (obs: Observable<Content>) => {
-			obs.pipe(
-				take(1),
-				catchError(() => of(null as Content))
-			).subscribe(newContent => {
-				if (!newContent) {
-					// TODO: Tell the user why it failed
-					return;
-				}
-
-				this.cmsService.getContentList(true);
-				this._hasSaved = true;
-
-				if (newContent.published) {
-					this.router.navigateByUrl(newContent.route);
-				} else {
-					this.router.navigateByUrl(''); // redirect to homepage instead.
-				}
-			});
-		};
-
-		if (this.originalContent) {
-			// use this.inputContent.route instead of the new route, as we want to update
+		if (this.OriginalRoute) {
+			// use OriginalRoute instead of the new route, as we want to update
 			// the route might've changed in the form data
-			onSubmit(this.cmsService.updateContent(this.originalContent.route, content));
+			this.cmsService.updateContent(this.OriginalRoute, content)
+				.pipe(catchError((e: HttpErrorResponse) => of(e)))
+				.subscribe(newContent => { this.onSubmit(newContent); });
 			return;
 		}
-		onSubmit(this.cmsService.createContent(content));
+
+		this.cmsService.createContent(content)
+			.pipe(catchError((e: HttpErrorResponse) => of(e)))
+			.subscribe(newContent => { this.onSubmit(newContent); });
+	}
+
+	// ---------------------------------------
+	// -------------- ON SUBMIT --------------
+	// ---------------------------------------
+
+	private onSubmit(returnValue: Content | HttpErrorResponse) {
+		if (returnValue instanceof HttpErrorResponse) {
+			// TODO: open login modal if 401 and user object doesn't exist. Then if login passed run submitForm() again
+			this.modalService.openHTTPErrorModal(returnValue.error);
+			return Promise.resolve(false);
+		}
+
+		if (!!returnValue) {
+			this.cmsService.getContentList(true);
+			this.ContentForm.markAsPristine(); // Mark the content form as pristince to allow navigation
+
+			return this.router.navigateByUrl(returnValue.published ? returnValue.route : '');
+		}
+	}
+
+
+	// ---------------------------------------
+	// ------------ FORM HELPERS -------------
+	// ---------------------------------------
+
+	/**
+	 * Form Validation that disallows values that are considered unique for the given property.
+	 */
+	private propertyMustBeUnique(contentList: BehaviorSubject<Content[]>, prop: keyof Content) {
+		return (control: FormControl): { [key: string]: any } => {
+			const list = contentList.getValue();
+			if (list && list.some(content => this.validateDoesValueAlreadyExist(control.value, content, prop))) {
+				return { alreadyExists: true };
+			}
+		};
+	}
+
+
+	private validateDoesValueAlreadyExist(value: string, content: Content, prop: keyof Content) {
+		const val = (content[prop] as string).toLowerCase();
+		const valueToCheck = value.toLowerCase();
+
+		if (this._originalContent) {
+			// Only match for equal values that are NOT the same as the originalContent value (which is this draft)
+			const originalVal = (this._originalContent[prop] as string).toLowerCase();
+			return (valueToCheck === val) && (val !== originalVal);
+		}
+		return (valueToCheck === val);
 	}
 
 	/**
-	 * Returns the display format of history items
+	 * toggles the disabled status of the folder field.
 	 */
-	public getHistoryItemFormatted(ver: number, text: string) {
-		return `${ver}. ${text}`;
-	}
-
-
-	/**
-	 * toggles the disabled status of the folder field
-	 */
-	public setFormDisabledState() {
+	private setFormDisabledState() {
 		// Disable form for old versions
-		if (this.versionIndex !== VersionHistory.Draft) {
-			this.contentForm.disable();
+		if (!this.HistoryHandler.isDrafting) {
+			this.ContentForm.disable();
 			return;
 		}
 		// Enable form for draft
-		if (this.contentForm.disabled) { this.contentForm.enable(); }
+		this.ContentForm.enable();
 
-		if (this.contentForm.get('nav').value) {
-			this.contentForm.get('folder').enable();
+		if (this.ContentForm.get('nav').value) {
+			this.ContentForm.get('folder').enable();
 		} else {
-			this.contentForm.get('folder').disable();
+			this.ContentForm.get('folder').disable();
 		}
+	}
+
+
+	// ---------------------------------------
+	// ----------- FOLDER HELPERS ------------
+	// ---------------------------------------
+
+	/**
+	 * Create folders based on the list of content we've got available
+	 */
+	public setFoldersFromList(contentList: Content[]) {
+		if (!contentList) { return; }
+
+		const folders: string[] = [];
+
+		for (const content of contentList) {
+			if (content.folder && folders.indexOf(content.folder) === -1) {
+				folders.push(content.folder);
+			}
+		}
+		this._folders = folders.sort();
+		this._filteredFolders.next(
+			this._folders.filter(option => option.toLowerCase().includes(this.ContentForm.get('folder').value.toLowerCase()))
+		);
 	}
 }

@@ -1,7 +1,5 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 
-import { MobileService } from '@app/services';
-
 @Component({
 	selector: 'auth-component',
 	templateUrl: './auth.component.html',
@@ -9,6 +7,6 @@ import { MobileService } from '@app/services';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AuthComponent {
-	constructor(public mobileService: MobileService) { }
+	constructor() { }
 
 }

@@ -1,18 +1,39 @@
 /// <reference path="../../../scss/_theme_vars.scss" />
 
-.mat-card {
-	margin-bottom: 10px;
-}
+
 
 .nav {
-	position: relative;
-	padding-top: 0;
-
-	a.active {
-		background: var(--color-active);
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	
+	a,
+	button {
+		padding: 0 24px;
+	}
+	
+	button,
+	a {
+		display: block;
+		text-align: start;
+		border-radius: 0;
+	
+		&.active {
+			background: var(--color-active);
+		}
+	
+		&.subItem {
+			padding-left: 48px;
+			box-sizing: border-box;
+		
+			::ng-deep .mat-ripple {
+				margin-left: -48px;
+			}
+		}
+	}
+	
+	button {
+		width: 100%;
 	}
 }
 
-button.active {
-	background: var(--color-active);
-}

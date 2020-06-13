@@ -1,16 +1,16 @@
 language: node_js 
 node_js: 
   - "node" 
-
-sudo: required
+os: linux
+dist: xenial
 
 install:
   - cd $PROJECT
-  - npm install 
+  - npm ci 
 script:
   - npm run test
 
-matrix:
+jobs:
   include:
     - env: PROJECT="API"
       services: mongodb
@@ -20,16 +20,15 @@ matrix:
     - env: PROJECT="client"
       addons:
         chrome: stable
-      install:
-        - cd CKEditor && npm install && cd ../client
-        - npm install
       cache:
         directories: 
-          - "CKEditor/node_modules" 
           - "client/node_modules"
-      script:
-        - cd ../CKEditor && npm run build && cd ../client
-        - npm run test
+          - "CKEditor/node_modules" 
+      before-install:
+        - export NG_CLI_ANALYTICS=ci
+        - cd CKEditor
+        - npm ci
+        - cd ..
     - env: PROJECT="CKEditor"
       cache: 
         directories: 

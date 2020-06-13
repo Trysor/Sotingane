@@ -16,3 +16,7 @@ export const CONTENT_MAX_LENGTH = {
 	DESC: 300
 };
 
+export const FILE_MAX_LENGTH = {
+	TITLE: 50
+};
+

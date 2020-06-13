@@ -21,6 +21,7 @@ export class CMSService {
 		description: '404 - Not found',
 		version: 0,
 		route: '',
+		tags: []
 	};
 
 	public get content() { return this._pageSubject; }
@@ -46,21 +47,21 @@ export class CMSService {
 	 * Requests the content list
 	 */
 	private requestContentList() {
-		return this.http.client.get<Content[]>(env.API.cms.content);
+		return this.http.client.get<Content[]>(env.API.cms);
 	}
 
 	/**
 	 * Requests the content from the given url
 	 */
 	public searchContent(searchTerm: string) {
-		return this.http.client.get<SearchResultContent[]>(`${env.API.cms.search}/${searchTerm}`);
+		return this.http.client.get<SearchResultContent[]>(`${env.API.tools.search}/${searchTerm}`);
 	}
 
 	/**
 	 * Requests the content from the given url
 	 */
 	public requestContent(contentUrl: string) {
-		this.http.client.get<Content>(`${env.API.cms.content}/${contentUrl}`).pipe(
+		this.http.client.get<Content>(`${env.API.cms}/${contentUrl}`).pipe(
 			catchError(() => of(this._failedToLoad))
 		).subscribe(content => this._pageSubject.next(content));
 	}
@@ -69,27 +70,35 @@ export class CMSService {
 	 * Requests the content History array from the given url
 	 */
 	public requestContentHistory(contentUrl: string) {
-		return this.http.client.get<Content[]>(`${env.API.cms.history}/${contentUrl}`);
+		return this.http.client.get<Content[]>(`${env.API.tools.history}/${contentUrl}`);
 	}
 
 	/**
 	 * Requests to update the content for a given url
 	 */
 	public updateContent(contentUrl: string, updatedContent: Content) {
-		return this.http.client.patch<Content>(`${env.API.cms.content}/${contentUrl}`, updatedContent);
+		return this.http.client.patch<Content>(`${env.API.cms}/${contentUrl}`, updatedContent);
 	}
 
 	/**
 	 * Requests to update the content for a given url
 	 */
 	public deleteContent(contentUrl: string) {
-		return this.http.client.delete<boolean>(`${env.API.cms.content}/${contentUrl}`);
+		return this.http.client.delete<boolean>(`${env.API.cms}/${contentUrl}`);
 	}
 
 	/**
 	 * Requests to create the content for a given url
 	 */
 	public createContent(newContent: Content) {
-		return this.http.client.post<Content>(env.API.cms.content, newContent);
+		return this.http.client.post<Content>(env.API.cms, newContent);
+	}
+
+
+	/**
+	 * Requests all tags
+	 */
+	public requestAllTags() {
+		return this.http.client.get<string[]>(env.API.tools.tags);
 	}
 }

@@ -4,12 +4,11 @@
 		"outDir": "../out-tsc/app",
 		"module": "commonjs"
 	},
-	"exclude": [
-		"test.ts",
-		"**/*.spec.ts"
+	"files": [
+		"main.server.ts",
+		"../server.ts"
 	],
 	"angularCompilerOptions": {
-		"entryModule": "app/app.server.module#AppServerModule",
-		"enableIvy": false
+		"entryModule": "app/app.server.module#AppServerModule"
 	}
 }

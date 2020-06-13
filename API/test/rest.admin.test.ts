@@ -233,6 +233,7 @@ describe('REST: Admin', () => {
 				folder: 'test',
 				published: true,
 				nav: true,
+				tags: []
 			};
 
 			const postRes = await TestBed.http.post('/api/cms/')
@@ -258,6 +259,7 @@ describe('REST: Admin', () => {
 				folder: 'test',
 				published: true,
 				nav: true,
+				tags: []
 			};
 
 			const postRes = await TestBed.http.post('/api/cms/')
@@ -351,7 +353,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'aggregDate', route: 'aggregdate', content: 'test', access: [],
-				description: 'test', folder: 'test', published: true, nav: true
+				description: 'test', folder: 'test', published: true, nav: true, tags: []
 			};
 
 			const contentRes = await TestBed.http.post('/api/cms/').set('Cookie', TestBed.AdminCookie).send(content);
@@ -386,7 +388,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'aggregDateBefore', route: 'aggregdatebefore', content: 'test', access: [],
-				description: 'test', folder: 'test', published: true, nav: true
+				description: 'test', folder: 'test', published: true, nav: true, tags: []
 			};
 
 			const contentRes = await TestBed.http.post('/api/cms/').set('Cookie', TestBed.AdminCookie).send(content);
@@ -424,7 +426,7 @@ describe('REST: Admin', () => {
 				title: 'writtenByAdmin2', route: 'writtenbyadmin2',
 				content: 'test', access: [],
 				description: 'test', folder: 'test',
-				published: true, nav: true
+				published: true, nav: true, tags: []
 			};
 
 			const WrittenByAdmin2Res = await TestBed.http.post('/api/cms/')
@@ -467,7 +469,7 @@ describe('REST: Admin', () => {
 			const queryMembers: AggregationQuery = { access: [AccessRoles.member] };
 			const queryAdmins: AggregationQuery = { access: [AccessRoles.admin] };
 
-			const content: Partial<Content> = { content: 'test', description: 'test', folder: 'test', published: true, nav: true };
+			const content: Partial<Content> = { content: 'test', description: 'test', folder: 'test', published: true, nav: true, tags: [] };
 
 			const [res1, res2, res3] = await Promise.all([
 				TestBed.http.post('/api/cms').set('Cookie', TestBed.AdminCookie).send(Object.assign({
@@ -524,7 +526,7 @@ describe('REST: Admin', () => {
 				title: 'unpubAggreg', route: 'unpubaggreg',
 				content: 'test', access: [],
 				description: 'test', folder: 'test',
-				published: false, nav: true // published === false
+				published: false, nav: true, tags: [] // published === false
 			};
 
 			const pushUnpublishedContentRes = await TestBed.http.post('/api/cms/')
@@ -563,7 +565,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'aggregSeenAfter', route: 'aggregseenafter', content: 'test', access: [],
-				description: 'test', folder: 'test', published: true, nav: true
+				description: 'test', folder: 'test', published: true, nav: true, tags: []
 			};
 
 			const contentRes = await TestBed.http.post('/api/cms/').set('Cookie', TestBed.AdminCookie).send(content);
@@ -601,7 +603,7 @@ describe('REST: Admin', () => {
 
 			const content: Content = {
 				title: 'aggregSeenBefore', route: 'aggregseenbefore', content: 'test', access: [],
-				description: 'test', folder: 'test', published: true, nav: true
+				description: 'test', folder: 'test', published: true, nav: true, tags: []
 			};
 
 			const contentRes = await TestBed.http.post('/api/cms/').set('Cookie', TestBed.AdminCookie).send(content);
@@ -651,7 +653,7 @@ describe('REST: Admin', () => {
 				title: 'browserAggreg', route: 'browseraggreg',
 				content: 'test', access: [],
 				description: 'test', folder: 'test',
-				published: true, nav: true
+				published: true, nav: true, tags: []
 			};
 			const pageToViewRes = await TestBed.http.post('/api/cms').set('Cookie', TestBed.AdminCookie).send(content);
 			expect(pageToViewRes).to.have.status(200);
@@ -697,7 +699,7 @@ describe('REST: Admin', () => {
 				title: 'unwindAggreg', route: 'unwindaggreg',
 				content: 'test', access: [],
 				description: 'test', folder: 'test',
-				published: true, nav: true
+				published: true, nav: true, tags: []
 			};
 			const pageToViewRes = await TestBed.http.post('/api/cms').set('Cookie', TestBed.AdminCookie).send(content);
 			expect(pageToViewRes).to.have.status(200);
@@ -736,7 +738,7 @@ describe('REST: Admin', () => {
 				title: 'propAggreg', route: 'propaggreg',
 				content: 'test', access: [],
 				description: 'test', folder: 'test',
-				published: true, nav: true
+				published: true, nav: true, tags: []
 			};
 			const pageToViewRes = await TestBed.http.post('/api/cms').set('Cookie', TestBed.AdminCookie).send(content);
 			expect(pageToViewRes).to.have.status(200);

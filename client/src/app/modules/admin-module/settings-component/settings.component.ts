@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 
 import { SettingsService } from '@app/services/controllers/settings.service';
@@ -6,8 +6,9 @@ import { SnackBarService } from '@app/services/utility/snackbar.service';
 
 import { Settings } from '@types';
 
-import { Subject, of } from 'rxjs';
+import { of } from 'rxjs';
 import { take, takeUntil, catchError } from 'rxjs/operators';
+import { DestroyableClass } from '@app/classes';
 
 
 @Component({
@@ -16,17 +17,16 @@ import { take, takeUntil, catchError } from 'rxjs/operators';
 	styleUrls: ['./settings.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SettingsComponent implements OnDestroy {
+export class SettingsComponent extends DestroyableClass {
 
 	public settingsForm: FormGroup;
-
-	private _ngUnsub = new Subject();
 
 	constructor(
 		private settingsService: SettingsService,
 		private snackBar: SnackBarService,
 		private fb: FormBuilder) {
 
+		super();
 		this.settingsForm = this.fb.group({
 			indexRoute: ['', Validators.required],
 			org: ['', Validators.required],
@@ -42,14 +42,9 @@ export class SettingsComponent implements OnDestroy {
 
 		this.settingsService.updateSettings();
 
-		this.settingsService.settings.pipe(takeUntil(this._ngUnsub)).subscribe( newSettings => {
+		this.settingsService.settings.pipe(takeUntil(this.OnDestroy)).subscribe( newSettings => {
 			this.settingsForm.setValue(newSettings);
 		});
-	}
-
-	ngOnDestroy() {
-		this._ngUnsub.next();
-		this._ngUnsub.complete();
 	}
 
 	public submitForm() {

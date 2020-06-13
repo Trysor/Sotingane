@@ -1,19 +1,19 @@
-import { Component, OnDestroy, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 
-import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 
 import {
 	AggregationQuery, AggregationResult, AggregationResultSummarized, AggregationResultUnwinded, User, TableSettings
 } from '@types';
-import { CMSService, AdminService, MobileService, SnackBarService } from '@app/services';
+import { AdminService } from '@app/services/controllers/admin.service';
+import { SnackBarService } from '@app/services/utility/snackbar.service';
 
-import { FormErrorInstant, AccessHandler } from '@app/classes';
+import { FormErrorInstant, AccessHandler, DestroyableClass } from '@app/classes';
 
 import { min as DateMin } from 'date-fns';
 
-import { Subject, BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { takeUntil, distinctUntilChanged, catchError } from 'rxjs/operators';
 
 enum AnalyticsState {
@@ -28,8 +28,7 @@ enum AnalyticsState {
 	styleUrls: ['./analytics.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AnalyticsComponent implements OnDestroy, AfterViewInit {
-	private _ngUnsub = new Subject();
+export class AnalyticsComponent extends DestroyableClass implements AfterViewInit {
 
 	// Subjects
 	public data = new BehaviorSubject<AggregationResult[]>(null);
@@ -84,27 +83,25 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 		'WeChat', 'Yandex'
 	].sort();
 
-
 	// Results Settings
 	public readonly unwindSettings: TableSettings<AggregationResultUnwinded> = {
 		columns: [
 			{
 				header: 'Timestamp',
 				property: 'logDataTs',
-				val: a => this.datePipe.transform(a.logDataTs, 'yyyy-MM-dd HH:mm:ss')
+				val: a => this.datePipe.transform(a.logDataTs, 'yyyy-MM-dd HH:mm:ss'),
+				tooltip: a => this.datePipe.transform(a.logDataTs, 'yyyy-MM-dd HH:mm:ss'),
 			},
 			{
 				header: 'Route',
 				property: 'route',
+				tooltip: a => a.route,
 			},
 			{
 				header: 'User',
 				property: 'logDataUser',
-				val: a => {
-					const user = this.users.getValue().find(u => u._id === a.logDataUser);
-					if (user) { return user.username; }
-					return 'Anonymous';
-				},
+				val: this._helperUserValue.bind(this),
+				tooltip: this._helperUserValue.bind(this)
 			},
 			{
 				header: 'Browser',
@@ -112,7 +109,7 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 				val: a => a.logDataBrowser ? `${a.logDataBrowser} ${a.logDataBrowserVer}` : 'Unknown'
 			}
 		],
-		mobile: ['logDataTs', 'title', 'logDataUser'],
+		mobile: ['logDataTs', 'route', 'logDataUser'],
 
 		active: 'logDataTs',
 		dir: 'desc',
@@ -146,13 +143,13 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 				header: 'Views',
 				property: 'views',
 				rightAlign: true,
-				val: (a) => a.views
+				val: a => a.views
 			},
 			{
 				header: 'Last visited',
 				property: 'lastVisit',
 				rightAlign: true,
-				val: (a) => this.datePipe.transform(a.lastVisit, 'yyyy-MM-dd HH:mm:ss')
+				val: a => this.datePipe.transform(a.lastVisit, 'yyyy-MM-dd HH:mm:ss')
 			}
 		],
 		mobile: ['title', 'route', 'views'],
@@ -165,13 +162,12 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 
 
 	constructor(
-		public mobileService: MobileService,
-		private router: Router,
 		private fb: FormBuilder,
-		private cmsService: CMSService,
 		private adminService: AdminService,
 		private snackBar: SnackBarService,
 		private datePipe: DatePipe) {
+
+		super();
 
 		// Form
 		const _disableAccessOnInit = true;
@@ -193,12 +189,7 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 			unwind: [false],
 		});
 
-		// Get users
-		this.adminService.getAllusers().pipe(takeUntil(this._ngUnsub)).subscribe(users => {
-			this.users.next(users);
-		});
-
-		this.aggregateForm.get('accessFilter').valueChanges.pipe(takeUntil(this._ngUnsub)).subscribe(val => {
+		this.aggregateForm.get('accessFilter').valueChanges.pipe(takeUntil(this.OnDestroy)).subscribe(val => {
 			if (val) {
 				this.aggregateForm.get('access').enable();
 			} else {
@@ -207,12 +198,13 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 		});
 	}
 
-	ngOnDestroy(): void {
-		this._ngUnsub.next();
-		this._ngUnsub.complete();
-	}
 
-	ngAfterViewInit(): void {
+	ngAfterViewInit() {
+		// Get users
+		this.adminService.getAllusers().pipe(takeUntil(this.OnDestroy)).subscribe(users => {
+			this.users.next(users);
+		});
+
 		// Track changes
 		this.aggregateForm.get('unwind').valueChanges.pipe(distinctUntilChanged()).subscribe(() => {
 			this.data.next(null);
@@ -251,7 +243,16 @@ export class AnalyticsComponent implements OnDestroy, AfterViewInit {
 		this.data.next(null);
 	}
 
-	setState(newState: AnalyticsState) {
+	public setState(newState: AnalyticsState) {
 		this.state.next(newState);
 	}
+
+
+	// HELPERS for settings
+	private _helperUserValue(agg: AggregationResultUnwinded) {
+		const user = this.users.getValue().find(u => u._id === agg.logDataUser);
+		if (user) { return user.username; }
+		return 'Anonymous';
+	}
+
 }

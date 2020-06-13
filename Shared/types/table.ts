@@ -1,4 +1,6 @@
-﻿export interface TableSettings<T> {
+﻿import { FileDropSettings } from './components';
+
+export interface TableSettings<T> {
 	columns: ColumnSettings<T>[];
 	mobile: Column<T>[];
 
@@ -9,6 +11,8 @@
 	trackBy: (index: number, item: T) => string | number;
 
 	rowClick?: (rowOjb: T) => void;
+
+	fileDrop?: FileDropSettings;
 }
 
 export interface TableFilterSettings {

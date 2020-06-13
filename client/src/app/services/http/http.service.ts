@@ -2,10 +2,9 @@
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer } from '@angular/platform-browser';
 
-import { MatIconRegistry } from '@app/modules/material.types';
+import { MatIconRegistry } from '@angular/material/icon';
 
 import { ServerService } from '@app/services/http/server.service';
-import { PlatformService } from '@app/services/utility/platform.service';
 
 
 @Injectable({ providedIn: 'root' })
@@ -17,17 +16,16 @@ export class HttpService {
 
 	constructor(
 		@Optional() private serverService: ServerService,
-		private platform: PlatformService,
 		private httpClient: HttpClient,
 		private iconRegistry: MatIconRegistry,
 		private san: DomSanitizer) {
 
-		this._urlBase = this.platform.isServer
+		this._urlBase = !!serverService
 			? this.serverService.urlBase
 			: `${document.location.protocol}//${document.location.hostname}`; // colon included in protocol
 
 		// Registers the logo
-		const logoPath = `${(this.platform.isServer ? this._urlBase : '')}/assets/logo192themed.svg`;
+		const logoPath = `${(!!serverService ? this._urlBase : '')}/assets/logo192themed.svg`;
 		this.iconRegistry.addSvgIcon('logo', this.san.bypassSecurityTrustResourceUrl(logoPath));
 	}
 }
