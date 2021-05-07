@@ -31,7 +31,7 @@
 		"sanitize-html": "1.26.0",
 		"sharp": "^0.25.4",
 		"source-map-support": "0.5.19",
-		"ua-parser-js": "0.7.21",
+		"ua-parser-js": "0.7.24",
 		"uuid": "8.1.0",
 		"validator": "13.1.1"
 	},
