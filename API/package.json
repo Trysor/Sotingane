@@ -13,7 +13,7 @@
 		"webpack": "webpack --config webpack.config.js --progress --colors"
 	},
 	"dependencies": {
-		"ajv": "6.12.2",
+		"ajv": "6.12.3",
 		"bcrypt": "^5.0.0",
 		"config": "3.3.1",
 		"cookie-parser": "1.4.5",
